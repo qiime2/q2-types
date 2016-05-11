@@ -9,7 +9,7 @@
 from setuptools import setup, find_packages
 
 setup(
-    name="q2types",
+    name="q2-types",
     # TODO stop duplicating version string
     version="0.0.0-dev",
     packages=find_packages(),

@@ -11,7 +11,7 @@ import os.path
 import tempfile
 import unittest
 
-import q2types
+import q2_types
 from qiime.sdk import Artifact
 
 
@@ -36,7 +36,7 @@ class TypesTests(unittest.TestCase):
     def test_all_types_represented(self):
         # confirm that all types defined in this repository have at lease one
         # example artifact
-        all_types = set(q2types.__all__)
+        all_types = set(q2_types.__all__)
         artifact_fps = glob.glob(os.path.join(self.data_dir, '*qtf'))
         for artifact_fp in artifact_fps:
             a = Artifact(artifact_fp)
