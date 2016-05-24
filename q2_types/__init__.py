@@ -6,10 +6,13 @@
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
 
-from ._types import (DistanceMatrix, Phylogeny, PCoAResults, FeatureTable,
-                     Frequency, RelativeFrequency, PresenceAbsence)
+__version__ = "0.0.0-dev"  # noqa
 
-__version__ = "0.0.0-dev"
+from ._feature_table import (FeatureTable, Frequency, RelativeFrequency,
+                             PresenceAbsence)
+from ._distance_matrix import DistanceMatrix
+from ._tree import Phylogeny
+from ._ordination import PCoAResults
 
 __all__ = ['DistanceMatrix', 'Phylogeny', 'PCoAResults', 'FeatureTable',
            'Frequency', 'RelativeFrequency', 'PresenceAbsence']
