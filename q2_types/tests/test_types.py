@@ -23,28 +23,26 @@ class TypesTests(unittest.TestCase):
     def test_load_save(self):
         # confirm that for every example artifact in the repository,
         # the artifact can be loaded and a new artifact saved and reloaded
-        artifact_fps = glob.glob(os.path.join(self.data_dir, '*qtf'))
+        artifact_fps = glob.glob(os.path.join(self.data_dir, '*qzf'))
         for artifact_fp in artifact_fps:
             # load example artifact
-            a = Artifact(artifact_fp)
-            with tempfile.NamedTemporaryFile(suffix='.qtf') as f:
+            a = Artifact.load(artifact_fp)
+            with tempfile.NamedTemporaryFile(suffix='.qzf') as f:
                 # save loaded artifact
-                a.save(a.data, a.type, a.provenance, f.name)
+                a.save(f.name)
                 # reload saved artifact
-                Artifact(f.name)
+                Artifact.load(f.name)
 
     def test_all_types_represented(self):
         # confirm that all types defined in this repository have at lease one
         # example artifact
         all_types = set(q2_types.__all__)
-        artifact_fps = glob.glob(os.path.join(self.data_dir, '*qtf'))
+        artifact_fps = glob.glob(os.path.join(self.data_dir, '*qzf'))
         for artifact_fp in artifact_fps:
-            a = Artifact(artifact_fp)
-            for type_imports in a.type().get_imports():
-                type_name = type_imports[0]
-                if type_name in all_types:
-                    all_types.remove(type_name)
-        self.assertEqual(len(all_types), 0,
+            a = Artifact.load(artifact_fp)
+            symbols = set(a.type.iter_symbols())
+            all_types -= symbols
+        self.assertFalse(all_types,
                          "Example artifact not included for type(s): %s"
                          % ', '.join(all_types))
 

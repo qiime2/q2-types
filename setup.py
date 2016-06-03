@@ -20,5 +20,8 @@ setup(
     description="Common QIIME 2 semantic types.",
     license="BSD",
     url="http://www.qiime.org",
-    entry_points={}
+    entry_points={
+        'qiime.plugin':
+        ['q2-types=q2_types.plugin_setup:plugin']
+    }
 )
