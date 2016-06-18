@@ -13,8 +13,8 @@ setup(
     # TODO stop duplicating version string
     version="0.0.0-dev",
     packages=find_packages(),
-    install_requires=['scikit-bio >= 0.4.2, < 0.5.0',
-                      'qiime >= 2.0.0', 'biom-format >= 2.1.5, < 2.2.0'],
+    install_requires=['scikit-bio', 'qiime >= 2.0.0',
+                      'biom-format >= 2.1.5, < 2.2.0'],
     author="Greg Caporaso",
     author_email="gregcaporaso@gmail.com",
     description="Common QIIME 2 semantic types.",
