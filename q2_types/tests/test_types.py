@@ -23,11 +23,11 @@ class TypesTests(unittest.TestCase):
     def test_load_save(self):
         # confirm that for every example artifact in the repository,
         # the artifact can be loaded and a new artifact saved and reloaded
-        artifact_fps = glob.glob(os.path.join(self.data_dir, '*qzf'))
+        artifact_fps = glob.glob(os.path.join(self.data_dir, '*qza'))
         for artifact_fp in artifact_fps:
             # load example artifact
             a = Artifact.load(artifact_fp)
-            with tempfile.NamedTemporaryFile(suffix='.qzf') as f:
+            with tempfile.NamedTemporaryFile(suffix='.qza') as f:
                 # save loaded artifact
                 a.save(f.name)
                 # reload saved artifact
@@ -37,7 +37,7 @@ class TypesTests(unittest.TestCase):
         # confirm that all types defined in this repository have at lease one
         # example artifact
         all_types = set(q2_types.__all__)
-        artifact_fps = glob.glob(os.path.join(self.data_dir, '*qzf'))
+        artifact_fps = glob.glob(os.path.join(self.data_dir, '*qza'))
         for artifact_fp in artifact_fps:
             a = Artifact.load(artifact_fp)
             symbols = set(a.type.iter_symbols())
