@@ -32,16 +32,14 @@ def skbio_ordination_results_to_ordination(view, data_dir):
         view.write(fh, format='ordination')
 
 
-plugin.register_archive_format('ordination', 1, validator)
+plugin.register_data_layout('ordination', 1, validator)
 
-plugin.register_archive_format_reader('ordination', 1,
-                                      skbio.OrdinationResults,
-                                      ordination_to_skbio_ordination_results)
+plugin.register_data_layout_reader('ordination', 1, skbio.OrdinationResults,
+                                   ordination_to_skbio_ordination_results)
 
-plugin.register_archive_format_writer('ordination', 1,
-                                      skbio.OrdinationResults,
-                                      skbio_ordination_results_to_ordination)
+plugin.register_data_layout_writer('ordination', 1, skbio.OrdinationResults,
+                                   skbio_ordination_results_to_ordination)
 
 plugin.register_semantic_type(PCoAResults)
 
-plugin.register_type_to_archive_format(PCoAResults, 'ordination', 1)
+plugin.register_type_to_data_layout(PCoAResults, 'ordination', 1)

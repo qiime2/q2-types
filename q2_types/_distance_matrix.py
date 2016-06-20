@@ -31,16 +31,14 @@ def skbio_distance_matrix_to_distance_matrix(view, data_dir):
         view.write(fh, format='lsmat')
 
 
-plugin.register_archive_format('distance-matrix', 1, validator)
+plugin.register_data_layout('distance-matrix', 1, validator)
 
-plugin.register_archive_format_reader('distance-matrix', 1,
-                                      skbio.DistanceMatrix,
-                                      distance_matrix_to_skbio_distance_matrix)
+plugin.register_data_layout_reader('distance-matrix', 1, skbio.DistanceMatrix,
+                                   distance_matrix_to_skbio_distance_matrix)
 
-plugin.register_archive_format_writer('distance-matrix', 1,
-                                      skbio.DistanceMatrix,
-                                      skbio_distance_matrix_to_distance_matrix)
+plugin.register_data_layout_writer('distance-matrix', 1, skbio.DistanceMatrix,
+                                   skbio_distance_matrix_to_distance_matrix)
 
 plugin.register_semantic_type(DistanceMatrix)
 
-plugin.register_type_to_archive_format(DistanceMatrix, 'distance-matrix', 1)
+plugin.register_type_to_data_layout(DistanceMatrix, 'distance-matrix', 1)
