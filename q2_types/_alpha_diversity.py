@@ -26,12 +26,12 @@ def alpha_diversity_to_pandas_series(data_dir):
         # Since we're wanting to round-trip with pd.Series.to_csv, the pandas
         # docs recommend using from_csv here (rather than the more commonly
         # used pd.read_csv).
-        return pd.Series.from_csv(fh, sep='\t')
+        return pd.Series.from_csv(fh, sep='\t', header=0)
 
 
 def pandas_series_to_alpha_diversity(view, data_dir):
     with open(os.path.join(data_dir, 'alpha-diversity.tsv'), 'w') as fh:
-        view.to_csv(fh, sep='\t')
+        view.to_csv(fh, sep='\t', header=True)
 
 
 plugin.register_data_layout('alpha-diversity', 1, validator)
