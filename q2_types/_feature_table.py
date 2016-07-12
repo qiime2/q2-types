@@ -6,12 +6,13 @@
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
 
+import ijson
 import json
 import os.path
 
 import biom
 import qiime
-from qiime.plugin import SemanticType
+from qiime.plugin import SemanticType, FileFormat, DataLayout
 
 from .plugin_setup import plugin
 
@@ -27,8 +28,32 @@ PresenceAbsence = SemanticType('PresenceAbsence',
                                variant_of=FeatureTable.field['content'])
 
 
-def validator(data_dir):
-    raise NotImplementedError()
+class BIOMV1Format(FileFormat):
+    name = 'biom-v1.0'
+    top_level_keys = {
+        'id', 'format', 'format_url', 'type', 'generated_by',
+        'date', 'rows', 'columns', 'matrix_type', 'matrix_element_type',
+        'shape', 'data', 'comment'
+    }
+
+    @classmethod
+    def sniff(cls, filepath):
+        with open(filepath, 'r') as fh:
+            try:
+                parser = ijson.parse(fh)
+                for prefix, event, value in parser:
+                    if (prefix, event) == ('', 'map_key'):
+                        # `format_url` seems pretty unique to BIOM 1.0.
+                        if value == 'format_url':
+                            return True
+                        elif value not in cls.top_level_keys:
+                            return False
+            except ijson.JSONError:
+                pass
+            return False
+
+feature_table_data_layout = DataLayout('feature-table', 1)
+feature_table_data_layout.register_file('feature-table.biom', BIOMV1Format)
 
 
 def feature_table_to_biom_table(data_dir):
@@ -41,7 +66,7 @@ def biom_table_to_feature_table(view, data_dir):
         fh.write(view.to_json(generated_by='qiime %s' % qiime.__version__))
 
 
-plugin.register_data_layout('feature-table', 1, validator)
+plugin.register_data_layout(feature_table_data_layout)
 
 plugin.register_data_layout_reader('feature-table', 1, biom.Table,
                                    feature_table_to_biom_table)

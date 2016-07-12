@@ -9,7 +9,8 @@
 import os.path
 
 import skbio
-from qiime.plugin import SemanticType
+import skbio.io
+from qiime.plugin import SemanticType, FileFormat, DataLayout
 
 from .plugin_setup import plugin
 
@@ -17,8 +18,16 @@ from .plugin_setup import plugin
 DistanceMatrix = SemanticType('DistanceMatrix')
 
 
-def validator(data_dir):
-    raise NotImplementedError()
+class LSMatFormat(FileFormat):
+    name = 'lsmat'
+
+    @classmethod
+    def sniff(cls, filepath):
+        sniffer = skbio.io.io_registry.get_sniffer('lsmat')
+        return sniffer(filepath)[0]
+
+distance_matrix_data_layout = DataLayout('distance-matrix', 1)
+distance_matrix_data_layout.register_file('distance-matrix.tsv', LSMatFormat)
 
 
 def distance_matrix_to_skbio_distance_matrix(data_dir):
@@ -31,7 +40,7 @@ def skbio_distance_matrix_to_distance_matrix(view, data_dir):
         view.write(fh, format='lsmat')
 
 
-plugin.register_data_layout('distance-matrix', 1, validator)
+plugin.register_data_layout(distance_matrix_data_layout)
 
 plugin.register_data_layout_reader('distance-matrix', 1, skbio.DistanceMatrix,
                                    distance_matrix_to_skbio_distance_matrix)
