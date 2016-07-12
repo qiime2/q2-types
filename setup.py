@@ -14,14 +14,14 @@ setup(
     version="0.0.0-dev",
     packages=find_packages(),
     install_requires=['scikit-bio', 'qiime >= 2.0.0', 'pandas',
-                      'biom-format >= 2.1.5, < 2.2.0'],
+                      'biom-format >= 2.1.5, < 2.2.0', 'ijson'],
     author="Greg Caporaso",
     author_email="gregcaporaso@gmail.com",
     description="Common QIIME 2 semantic types.",
     license="BSD",
     url="http://www.qiime.org",
     entry_points={
-        'qiime.plugin':
+        'qiime.plugins':
         ['q2-types=q2_types.plugin_setup:plugin']
     }
 )
