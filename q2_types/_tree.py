@@ -9,7 +9,8 @@
 import os.path
 
 import skbio
-from qiime.plugin import SemanticType
+import skbio.io
+from qiime.plugin import SemanticType, FileFormat, DataLayout
 
 from .plugin_setup import plugin
 
@@ -17,8 +18,16 @@ from .plugin_setup import plugin
 Phylogeny = SemanticType('Phylogeny')
 
 
-def validator(data_dir):
-    raise NotImplementedError()
+class NewickFormat(FileFormat):
+    name = 'newick'
+
+    @classmethod
+    def sniff(cls, filepath):
+        sniffer = skbio.io.io_registry.get_sniffer('newick')
+        return sniffer(filepath)[0]
+
+tree_data_layout = DataLayout('tree', 1)
+tree_data_layout.register_file('tree.nwk', NewickFormat)
 
 
 def tree_to_skbio_tree_node(data_dir):
@@ -31,7 +40,7 @@ def skbio_tree_node_to_tree(view, data_dir):
         view.write(fh, format='newick')
 
 
-plugin.register_data_layout('tree', 1, validator)
+plugin.register_data_layout(tree_data_layout)
 
 plugin.register_data_layout_reader('tree', 1, skbio.TreeNode,
                                    tree_to_skbio_tree_node)
