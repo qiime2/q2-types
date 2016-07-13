@@ -9,7 +9,8 @@
 import os.path
 
 import skbio
-from qiime.plugin import SemanticType
+import skbio.io
+from qiime.plugin import SemanticType, FileFormat, DataLayout
 
 from .plugin_setup import plugin
 
@@ -17,8 +18,16 @@ from .plugin_setup import plugin
 PCoAResults = SemanticType('PCoAResults')
 
 
-def validator(data_dir):
-    raise NotImplementedError()
+class OrdinationFormat(FileFormat):
+    name = 'ordination'
+
+    @classmethod
+    def sniff(cls, filepath):
+        sniffer = skbio.io.io_registry.get_sniffer('ordination')
+        return sniffer(filepath)[0]
+
+ordination_data_layout = DataLayout('ordination', 1)
+ordination_data_layout.register_file('ordination.txt', OrdinationFormat)
 
 
 def ordination_to_skbio_ordination_results(data_dir):
@@ -32,7 +41,7 @@ def skbio_ordination_results_to_ordination(view, data_dir):
         view.write(fh, format='ordination')
 
 
-plugin.register_data_layout('ordination', 1, validator)
+plugin.register_data_layout(ordination_data_layout)
 
 plugin.register_data_layout_reader('ordination', 1, skbio.OrdinationResults,
                                    ordination_to_skbio_ordination_results)
