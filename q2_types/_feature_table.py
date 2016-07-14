@@ -6,11 +6,12 @@
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
 
-import ijson
 import json
 import os.path
 
 import biom
+import ijson
+import pandas as pd
 import qiime
 from qiime.plugin import SemanticType, FileFormat, DataLayout
 
@@ -66,6 +67,20 @@ def biom_table_to_feature_table(view, data_dir):
         fh.write(view.to_json(generated_by='qiime %s' % qiime.__version__))
 
 
+# TODO this always returns a pd.DataFrame of floats due to how biom loads
+# tables, and we don't know what the dtype of the DataFrame should be. It would
+# be nice to have support for a semantic-type override that specifies further
+# transformations (e.g. converting from floats to ints or bools as
+# appropriate).
+def feature_table_to_pandas_dataframe(data_dir):
+    with open(os.path.join(data_dir, 'feature-table.biom'), 'r') as fh:
+        table = biom.Table.from_json(json.load(fh))
+        array = table.matrix_data.toarray().T
+        sample_ids = table.ids(axis='sample')
+        feature_ids = table.ids(axis='observation')
+        return pd.DataFrame(array, index=sample_ids, columns=feature_ids)
+
+
 plugin.register_data_layout(feature_table_data_layout)
 
 plugin.register_data_layout_reader('feature-table', 1, biom.Table,
@@ -73,6 +88,9 @@ plugin.register_data_layout_reader('feature-table', 1, biom.Table,
 
 plugin.register_data_layout_writer('feature-table', 1, biom.Table,
                                    biom_table_to_feature_table)
+
+plugin.register_data_layout_reader('feature-table', 1, pd.DataFrame,
+                                   feature_table_to_pandas_dataframe)
 
 plugin.register_semantic_type(FeatureTable)
 plugin.register_semantic_type(Frequency)
