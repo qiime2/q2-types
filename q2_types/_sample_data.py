@@ -13,8 +13,10 @@ from qiime.plugin import SemanticType, FileFormat, DataLayout
 
 from .plugin_setup import plugin
 
+SampleData = SemanticType('SampleData', field_names='type')
 
-AlphaDiversity = SemanticType('AlphaDiversity')
+AlphaDiversity = SemanticType('AlphaDiversity',
+                              variant_of=SampleData.field['type'])
 
 
 class AlphaDiversityFormat(FileFormat):
@@ -55,6 +57,8 @@ plugin.register_data_layout_reader('alpha-diversity', 1, pd.Series,
 plugin.register_data_layout_writer('alpha-diversity', 1, pd.Series,
                                    pandas_series_to_alpha_diversity)
 
+plugin.register_semantic_type(SampleData)
 plugin.register_semantic_type(AlphaDiversity)
 
-plugin.register_type_to_data_layout(AlphaDiversity, 'alpha-diversity', 1)
+plugin.register_type_to_data_layout(SampleData[AlphaDiversity],
+                                    'alpha-diversity', 1)
