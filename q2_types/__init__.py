@@ -14,7 +14,9 @@ from ._distance_matrix import DistanceMatrix
 from ._sample_data import SampleData, AlphaDiversity
 from ._tree import Phylogeny
 from ._ordination import PCoAResults
+from ._feature_data import FeatureData, Taxonomy, Sequence, AlignedSequence
 
 __all__ = ['DistanceMatrix', 'Phylogeny', 'PCoAResults', 'FeatureTable',
            'Frequency', 'RelativeFrequency', 'PresenceAbsence',
-           'SampleData', 'AlphaDiversity']
+           'SampleData', 'AlphaDiversity', 'FeatureData', 'Taxonomy',
+           'Sequence', 'AlignedSequence']
