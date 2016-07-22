@@ -106,9 +106,14 @@ def _read_taxonomy(data_dir):
     filepath = os.path.join(data_dir, 'taxonomy.tsv')
     # Using read_csv for access to comment parameter, and set index_col,
     # header, and parse_dates to Series.from_csv default settings for
-    # better handling of round-trips
-    return pd.read_csv(filepath, sep='\t', comment='#', index_col=0, header=0,
-                       parse_dates=True, skip_blank_lines=True, dtype=object)
+    # better handling of round-trips.
+    #
+    # Using `dtype=object` and `set_index` to avoid type casting/inference of
+    # any columns or the index.
+    df = pd.read_csv(filepath, sep='\t', comment='#', header=0,
+                     parse_dates=True, skip_blank_lines=True, dtype=object)
+    df.set_index(df.columns[0], drop=True, append=False, inplace=True)
+    return df
 
 
 def _write_taxonomy(view, data_dir):
