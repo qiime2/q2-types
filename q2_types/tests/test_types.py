@@ -12,7 +12,7 @@ import tempfile
 import unittest
 
 import q2_types
-from qiime.sdk import Artifact
+from qiime.sdk import Artifact, PluginManager
 
 
 class TypesTests(unittest.TestCase):
@@ -45,6 +45,29 @@ class TypesTests(unittest.TestCase):
         self.assertFalse(all_types,
                          "Example artifact not included for type(s): %s"
                          % ', '.join(all_types))
+
+    def test_data_layout_readers_and_writers(self):
+        # Confirm that for every example artifact in the repository,
+        # all registered views of that artifact can be loaded without error
+        # (the data in the view is not yet tested, just that it loads without
+        # error). Also test that for each registered writer, an appropriate
+        # view can be written. Note: the writer tests assume there is a
+        # corresponding reader for the writer's type, which may not always be
+        # true (but is for the types currently in this repo). This test may
+        # need to be revised if this assumption doesn't hold in the future.
+        pm = PluginManager()
+        artifact_fps = glob.glob(os.path.join(self.data_dir, '*qza'))
+        for artifact_fp in artifact_fps:
+            # load example artifact
+            a = Artifact.load(artifact_fp)
+            data_layout = pm.get_data_layout(a.type)
+            for view_type in data_layout.readers:
+                view = a.view(view_type)
+                self.assertIs(type(view), view_type)
+            for view_type in data_layout.writers:
+                view = a.view(view_type)
+                self.assertIs(type(view), view_type)
+                Artifact._from_view(view, a.type, None)
 
 
 if __name__ == "__main__":
