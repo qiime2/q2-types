@@ -7,6 +7,7 @@
 # ----------------------------------------------------------------------------
 
 import os
+import types
 
 import skbio
 import skbio.io
@@ -50,13 +51,23 @@ class TaxonomyFormat(FileFormat):
             return False if count == 0 else True
 
 
-class FASTAFormat(FileFormat):
-    name = 'fasta'
+class DNAFASTAFormat(FileFormat):
+    name = 'dna-fasta'
 
     @classmethod
     def sniff(cls, filepath):
         sniffer = skbio.io.io_registry.get_sniffer('fasta')
-        return sniffer(filepath)[0]
+        if sniffer(filepath)[0]:
+            generator = skbio.io.read(filepath, constructor=skbio.DNA,
+                                      format='fasta')
+            try:
+                for seq, _ in zip(generator, range(5)):
+                    pass
+                return True
+            # ValueError raised by skbio if there are invalid DNA chars.
+            except ValueError:
+                pass
+        return False
 
 
 class AlignedDNAFASTAFormat(FileFormat):
@@ -83,8 +94,8 @@ class AlignedDNAFASTAFormat(FileFormat):
 taxonomy_data_layout = DataLayout('taxonomy', 1)
 taxonomy_data_layout.register_file('taxonomy.tsv', TaxonomyFormat)
 
-sequences_data_layout = DataLayout('sequences', 1)
-sequences_data_layout.register_file('sequences.fasta', FASTAFormat)
+dna_sequences_data_layout = DataLayout('dna-sequences', 1)
+dna_sequences_data_layout.register_file('dna-sequences.fasta', DNAFASTAFormat)
 
 aligned_dna_sequences_data_layout = DataLayout('aligned-dna-sequences', 1)
 aligned_dna_sequences_data_layout.register_file('aligned-dna-sequences.fasta',
@@ -110,6 +121,11 @@ def taxonomy_to_pandas_series(data_dir):
     return df.iloc[:, 0]
 
 
+def taxonomy_to_pandas_dataframe(data_dir):
+    df = _read_taxonomy(data_dir)
+    return df
+
+
 def taxonomy_to_qiime_metadata(data_dir):
     df = _read_taxonomy(data_dir)
     return qiime.Metadata(df)
@@ -119,24 +135,17 @@ def pandas_to_taxonomy(view, data_dir):
     _write_taxonomy(view, data_dir)
 
 
-def sequences_to_pandas_series(data_dir):
-    index = []
-    seqs = []
-    for seq in skbio.io.read(os.path.join(data_dir, 'sequences.fasta'),
-                             format='fasta'):
-        index.append(seq.metadata['id'])
-        seqs.append(seq)
-    return pd.Series(data=seqs, index=index)
+# TODO can this be generalized to any iterable type? See:
+#     https://github.com/biocore/scikit-bio/issues/1031#issuecomment-225252290
+def dna_sequences_to_generator(data_dir):
+    return skbio.io.read(os.path.join(data_dir, 'dna-sequences.fasta'),
+                         format='fasta', constructor=skbio.DNA)
 
 
-def pandas_series_to_sequences(view, data_dir):
-    file = os.path.join(data_dir, 'sequences.fasta')
+def generator_to_dna_sequences(view, data_dir):
+    file = os.path.join(data_dir, 'dna-sequences.fasta')
 
-    # https://github.com/biocore/scikit-bio/issues/1031#issuecomment-225252290
-    def generator():
-        yield from view
-
-    skbio.io.write(generator(), format='fasta', into=file)
+    skbio.io.write(view, format='fasta', into=file)
 
 
 def aligned_dna_sequences_to_tabular_msa(data_dir):
@@ -153,6 +162,8 @@ def tabular_msa_to_aligned_dna_sequences(view, data_dir):
 plugin.register_data_layout(taxonomy_data_layout)
 plugin.register_data_layout_reader('taxonomy', 1, pd.Series,
                                    taxonomy_to_pandas_series)
+plugin.register_data_layout_reader('taxonomy', 1, pd.DataFrame,
+                                   taxonomy_to_pandas_dataframe)
 plugin.register_data_layout_reader('taxonomy', 1, qiime.Metadata,
                                    taxonomy_to_qiime_metadata)
 plugin.register_data_layout_writer('taxonomy', 1, pd.Series,
@@ -160,11 +171,11 @@ plugin.register_data_layout_writer('taxonomy', 1, pd.Series,
 plugin.register_data_layout_writer('taxonomy', 1, pd.DataFrame,
                                    pandas_to_taxonomy)
 
-plugin.register_data_layout(sequences_data_layout)
-plugin.register_data_layout_reader('sequences', 1, pd.Series,
-                                   sequences_to_pandas_series)
-plugin.register_data_layout_writer('sequences', 1, pd.Series,
-                                   pandas_series_to_sequences)
+plugin.register_data_layout(dna_sequences_data_layout)
+plugin.register_data_layout_reader('dna-sequences', 1, types.GeneratorType,
+                                   dna_sequences_to_generator)
+plugin.register_data_layout_writer('dna-sequences', 1, types.GeneratorType,
+                                   generator_to_dna_sequences)
 
 plugin.register_data_layout(aligned_dna_sequences_data_layout)
 plugin.register_data_layout_reader('aligned-dna-sequences', 1,
@@ -180,6 +191,6 @@ plugin.register_semantic_type(Sequence)
 plugin.register_semantic_type(AlignedSequence)
 
 plugin.register_type_to_data_layout(FeatureData[Taxonomy], 'taxonomy', 1)
-plugin.register_type_to_data_layout(FeatureData[Sequence], 'sequences', 1)
+plugin.register_type_to_data_layout(FeatureData[Sequence], 'dna-sequences', 1)
 plugin.register_type_to_data_layout(FeatureData[AlignedSequence],
                                     'aligned-dna-sequences', 1)
