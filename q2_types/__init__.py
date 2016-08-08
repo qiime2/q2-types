@@ -6,7 +6,7 @@
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
 
-__version__ = "0.0.1"  # noqa
+__version__ = "0.0.2"  # noqa
 
 from ._feature_table import (FeatureTable, Frequency, RelativeFrequency,
                              PresenceAbsence)
