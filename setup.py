@@ -13,7 +13,7 @@ setup(
     # TODO stop duplicating version string
     version="0.0.1",
     packages=find_packages(),
-    install_requires=['scikit-bio', 'qiime >= 2.0.0', 'pandas',
+    install_requires=['scikit-bio', 'qiime >= 2.0.2', 'pandas',
                       'biom-format >= 2.1.5, < 2.2.0', 'ijson'],
     author="Greg Caporaso",
     author_email="gregcaporaso@gmail.com",
