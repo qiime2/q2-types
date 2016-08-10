@@ -14,10 +14,12 @@ from ._distance_matrix import DistanceMatrix
 from ._sample_data import SampleData, AlphaDiversity
 from ._tree import Phylogeny
 from ._ordination import PCoAResults
-from ._feature_data import FeatureData, Taxonomy, Sequence, AlignedSequence
+from ._feature_data import (FeatureData, Taxonomy, Sequence, PairedEndSequence,
+                            AlignedSequence)
 from ._reference_features import ReferenceFeatures, SSU
 
 __all__ = ['DistanceMatrix', 'Phylogeny', 'PCoAResults', 'FeatureTable',
            'Frequency', 'RelativeFrequency', 'PresenceAbsence',
            'SampleData', 'AlphaDiversity', 'FeatureData', 'Taxonomy',
-           'Sequence', 'AlignedSequence', 'ReferenceFeatures', 'SSU']
+           'Sequence', 'PairedEndSequence', 'AlignedSequence',
+           'ReferenceFeatures', 'SSU']
