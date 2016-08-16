@@ -8,6 +8,7 @@
 
 import os
 import types
+from itertools import zip_longest
 
 import skbio
 import skbio.io
@@ -23,6 +24,9 @@ FeatureData = SemanticType('FeatureData', field_names='type')
 Taxonomy = SemanticType('Taxonomy', variant_of=FeatureData.field['type'])
 
 Sequence = SemanticType('Sequence', variant_of=FeatureData.field['type'])
+
+PairedEndSequence = SemanticType('PairedEndSequence',
+                                 variant_of=FeatureData.field['type'])
 
 AlignedSequence = SemanticType('AlignedSequence',
                                variant_of=FeatureData.field['type'])
@@ -97,6 +101,12 @@ taxonomy_data_layout.register_file('taxonomy.tsv', TaxonomyFormat)
 dna_sequences_data_layout = DataLayout('dna-sequences', 1)
 dna_sequences_data_layout.register_file('dna-sequences.fasta', DNAFASTAFormat)
 
+paired_dna_sequences_data_layout = DataLayout('paired-dna-sequences', 1)
+paired_dna_sequences_data_layout.register_file('left-dna-sequences.fasta',
+                                               DNAFASTAFormat)
+paired_dna_sequences_data_layout.register_file('right-dna-sequences.fasta',
+                                               DNAFASTAFormat)
+
 aligned_dna_sequences_data_layout = DataLayout('aligned-dna-sequences', 1)
 aligned_dna_sequences_data_layout.register_file('aligned-dna-sequences.fasta',
                                                 AlignedDNAFASTAFormat)
@@ -153,6 +163,35 @@ def generator_to_dna_sequences(view, data_dir):
     skbio.io.write(view, format='fasta', into=file)
 
 
+def paired_dna_sequences_to_generator(data_dir):
+    left = skbio.io.read(os.path.join(data_dir, 'left-dna-sequences.fasta'),
+                         format='fasta', constructor=skbio.DNA)
+    right = skbio.io.read(os.path.join(data_dir, 'right-dna-sequences.fasta'),
+                          format='fasta', constructor=skbio.DNA)
+    for lseq, rseq in zip_longest(left, right):
+        if rseq is None:
+            raise ValueError('more left sequences than right sequences')
+        if lseq is None:
+            raise ValueError('more right sequences than left sequences')
+        if rseq.metadata['id'] != lseq.metadata['id']:
+            raise ValueError(lseq.metadata['id'] + ' and ' +
+                             rseq.metadata['id'] + ' differ')
+        yield lseq, rseq
+
+
+def generator_to_paired_dna_sequences(view, data_dir):
+    lfilepath = os.path.join(data_dir, 'left-dna-sequences.fasta')
+    rfilepath = os.path.join(data_dir, 'right-dna-sequences.fasta')
+
+    with open(lfilepath, 'w') as lfile, open(rfilepath, 'w') as rfile:
+        for lseq, rseq in view:
+            if rseq.metadata['id'] != lseq.metadata['id']:
+                raise ValueError(lseq.metadata['id'] + ' and ' +
+                                 rseq.metadata['id'] + ' differ')
+            skbio.io.write(lseq, format='fasta', into=lfile)
+            skbio.io.write(rseq, format='fasta', into=rfile)
+
+
 def aligned_dna_sequences_to_tabular_msa(data_dir):
     return skbio.TabularMSA.read(
         os.path.join(data_dir, 'aligned-dna-sequences.fasta'),
@@ -182,6 +221,14 @@ plugin.register_data_layout_reader('dna-sequences', 1, types.GeneratorType,
 plugin.register_data_layout_writer('dna-sequences', 1, types.GeneratorType,
                                    generator_to_dna_sequences)
 
+plugin.register_data_layout(paired_dna_sequences_data_layout)
+plugin.register_data_layout_reader('paired-dna-sequences', 1,
+                                   types.GeneratorType,
+                                   paired_dna_sequences_to_generator)
+plugin.register_data_layout_writer('paired-dna-sequences', 1,
+                                   types.GeneratorType,
+                                   generator_to_paired_dna_sequences)
+
 plugin.register_data_layout(aligned_dna_sequences_data_layout)
 plugin.register_data_layout_reader('aligned-dna-sequences', 1,
                                    skbio.TabularMSA,
@@ -193,9 +240,12 @@ plugin.register_data_layout_writer('aligned-dna-sequences', 1,
 plugin.register_semantic_type(FeatureData)
 plugin.register_semantic_type(Taxonomy)
 plugin.register_semantic_type(Sequence)
+plugin.register_semantic_type(PairedEndSequence)
 plugin.register_semantic_type(AlignedSequence)
 
 plugin.register_type_to_data_layout(FeatureData[Taxonomy], 'taxonomy', 1)
 plugin.register_type_to_data_layout(FeatureData[Sequence], 'dna-sequences', 1)
+plugin.register_type_to_data_layout(FeatureData[PairedEndSequence],
+                                    'paired-dna-sequences', 1)
 plugin.register_type_to_data_layout(FeatureData[AlignedSequence],
                                     'aligned-dna-sequences', 1)
