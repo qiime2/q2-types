@@ -12,7 +12,7 @@ from ._feature_table import (FeatureTable, Frequency, RelativeFrequency,
                              PresenceAbsence)
 from ._distance_matrix import DistanceMatrix
 from ._sample_data import SampleData, AlphaDiversity
-from ._tree import Phylogeny
+from ._tree import Phylogeny, Rooted, Unrooted
 from ._ordination import PCoAResults
 from ._feature_data import (FeatureData, Taxonomy, Sequence, PairedEndSequence,
                             AlignedSequence)
@@ -22,4 +22,4 @@ __all__ = ['DistanceMatrix', 'Phylogeny', 'PCoAResults', 'FeatureTable',
            'Frequency', 'RelativeFrequency', 'PresenceAbsence',
            'SampleData', 'AlphaDiversity', 'FeatureData', 'Taxonomy',
            'Sequence', 'PairedEndSequence', 'AlignedSequence',
-           'ReferenceFeatures', 'SSU']
+           'ReferenceFeatures', 'SSU', 'Rooted', 'Unrooted']
