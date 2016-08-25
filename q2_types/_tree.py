@@ -15,7 +15,11 @@ from qiime.plugin import SemanticType, FileFormat, DataLayout
 from .plugin_setup import plugin
 
 
-Phylogeny = SemanticType('Phylogeny')
+Phylogeny = SemanticType('Phylogeny', field_names=['type'])
+
+Rooted = SemanticType('Rooted', variant_of=Phylogeny.field['type'])
+
+Unrooted = SemanticType('Unrooted', variant_of=Phylogeny.field['type'])
 
 
 class NewickFormat(FileFormat):
@@ -49,5 +53,7 @@ plugin.register_data_layout_writer('tree', 1, skbio.TreeNode,
                                    skbio_tree_node_to_tree)
 
 plugin.register_semantic_type(Phylogeny)
+plugin.register_semantic_type(Rooted)
+plugin.register_semantic_type(Unrooted)
 
-plugin.register_type_to_data_layout(Phylogeny, 'tree', 1)
+plugin.register_type_to_data_layout(Phylogeny[Rooted | Unrooted], 'tree', 1)
