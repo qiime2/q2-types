@@ -19,12 +19,9 @@ from .plugin_setup import plugin
 DistanceMatrix = SemanticType('DistanceMatrix')
 
 
-plugin.register_semantic_type(DistanceMatrix)
-plugin.register_type_to_directory_format(DistanceMatrix, 'distance-matrix')
-
-
 # Formats
 class LSMatFormat(TextFileFormat):
+    # TODO: revisit sniffer/validation
     pass
 
 
@@ -54,3 +51,11 @@ def _3(df: DistanceMatrixDirectoryFormat) -> LSMatFormat:
 def _4(lsmat: LSMatFormat) -> DistanceMatrix:
     with lsmat.open() as fh:
         return skbio.DistanceMatrix(fh, format='lsmat', verify=False)
+
+
+# Registrations
+plugin.register_semantic_type(DistanceMatrix)
+plugin.register_semantic_type_to_format(
+    DistanceMatrix,
+    artifact_format=DistanceMatrixDirectoryFormat
+)
