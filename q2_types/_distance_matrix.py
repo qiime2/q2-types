@@ -6,8 +6,6 @@
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
 
-import os.path
-
 import skbio
 import skbio.io
 from qiime.plugin import SemanticType, TextFileFormat
@@ -36,6 +34,7 @@ def _1(dm: DistanceMatrix) -> DistanceMatrixDirectoryFormat:
     df.distance_matrix.set(dm, DistanceMatrix)
     return df
 
+
 @plugin.register_transformation
 def _2(dm: DistanceMatrix) -> LSMatFormat:
     out = LSMatFormat()
@@ -43,9 +42,11 @@ def _2(dm: DistanceMatrix) -> LSMatFormat:
         dm.write(fh, format='lsmat')
     return out
 
+
 @plugin.register_transformation
 def _3(df: DistanceMatrixDirectoryFormat) -> LSMatFormat:
     return df.distance_matrix.view(DistanceMatrix)
+
 
 @plugin.register_transformation
 def _4(lsmat: LSMatFormat) -> DistanceMatrix:
