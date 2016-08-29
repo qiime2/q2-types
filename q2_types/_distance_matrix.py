@@ -10,7 +10,8 @@ import os.path
 
 import skbio
 import skbio.io
-from qiime.plugin import SemanticType, FileFormat, DataLayout
+from qiime.plugin import SemanticType, TextFileFormat
+import qiime.plugin.resource as resource
 
 from .plugin_setup import plugin
 
@@ -18,36 +19,38 @@ from .plugin_setup import plugin
 DistanceMatrix = SemanticType('DistanceMatrix')
 
 
-class LSMatFormat(FileFormat):
-    name = 'lsmat'
-
-    @classmethod
-    def sniff(cls, filepath):
-        sniffer = skbio.io.io_registry.get_sniffer('lsmat')
-        return sniffer(filepath)[0]
-
-distance_matrix_data_layout = DataLayout('distance-matrix', 1)
-distance_matrix_data_layout.register_file('distance-matrix.tsv', LSMatFormat)
-
-
-def distance_matrix_to_skbio_distance_matrix(data_dir):
-    with open(os.path.join(data_dir, 'distance-matrix.tsv'), 'r') as fh:
-        return skbio.DistanceMatrix.read(fh, format='lsmat', verify=False)
-
-
-def skbio_distance_matrix_to_distance_matrix(view, data_dir):
-    with open(os.path.join(data_dir, 'distance-matrix.tsv'), 'w') as fh:
-        view.write(fh, format='lsmat')
-
-
-plugin.register_data_layout(distance_matrix_data_layout)
-
-plugin.register_data_layout_reader('distance-matrix', 1, skbio.DistanceMatrix,
-                                   distance_matrix_to_skbio_distance_matrix)
-
-plugin.register_data_layout_writer('distance-matrix', 1, skbio.DistanceMatrix,
-                                   skbio_distance_matrix_to_distance_matrix)
-
 plugin.register_semantic_type(DistanceMatrix)
+plugin.register_type_to_directory_format(DistanceMatrix, 'distance-matrix')
 
-plugin.register_type_to_data_layout(DistanceMatrix, 'distance-matrix', 1)
+
+# Formats
+class LSMatFormat(TextFileFormat):
+    pass
+
+
+class DistanceMatrixDirectoryFormat(resource.DirectoryFormat):
+    distance_matrix = resource.File('distance-matrix.tsv', format=LSMatFormat)
+
+
+# Transformers
+@plugin.register_transformation
+def _1(dm: DistanceMatrix) -> DistanceMatrixDirectoryFormat:
+    df = DistanceMatrixDirectoryFormat()
+    df.distance_matrix.set(dm, DistanceMatrix)
+    return df
+
+@plugin.register_transformation
+def _2(dm: DistanceMatrix) -> LSMatFormat:
+    out = LSMatFormat()
+    with out.open() as fh:
+        dm.write(fh, format='lsmat')
+    return out
+
+@plugin.register_transformation
+def _3(df: DistanceMatrixDirectoryFormat) -> LSMatFormat:
+    return df.distance_matrix.view(DistanceMatrix)
+
+@plugin.register_transformation
+def _4(lsmat: LSMatFormat) -> DistanceMatrix:
+    with lsmat.open() as fh:
+        return skbio.DistanceMatrix(fh, format='lsmat', verify=False)
