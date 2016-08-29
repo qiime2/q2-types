@@ -28,14 +28,14 @@ class DistanceMatrixDirectoryFormat(resource.DirectoryFormat):
 
 
 # Transformers
-@plugin.register_transformation
+@plugin.register_transformer
 def _1(dm: DistanceMatrix) -> DistanceMatrixDirectoryFormat:
     df = DistanceMatrixDirectoryFormat()
     df.distance_matrix.set(dm, DistanceMatrix)
     return df
 
 
-@plugin.register_transformation
+@plugin.register_transformer
 def _2(dm: DistanceMatrix) -> LSMatFormat:
     out = LSMatFormat()
     with out.open() as fh:
@@ -43,12 +43,12 @@ def _2(dm: DistanceMatrix) -> LSMatFormat:
     return out
 
 
-@plugin.register_transformation
+@plugin.register_transformer
 def _3(df: DistanceMatrixDirectoryFormat) -> LSMatFormat:
     return df.distance_matrix.view(DistanceMatrix)
 
 
-@plugin.register_transformation
+@plugin.register_transformer
 def _4(lsmat: LSMatFormat) -> DistanceMatrix:
     with lsmat.open() as fh:
         return skbio.DistanceMatrix(fh, format='lsmat', verify=False)
