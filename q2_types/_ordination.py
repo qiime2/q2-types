@@ -6,11 +6,9 @@
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
 
-import os.path
-
 import skbio
-import skbio.io
-from qiime.plugin import SemanticType, FileFormat, DataLayout
+from qiime.plugin import SemanticType, TextFileFormat
+import qiime.plugin.resource as resource
 
 from .plugin_setup import plugin
 
@@ -18,37 +16,46 @@ from .plugin_setup import plugin
 PCoAResults = SemanticType('PCoAResults')
 
 
-class OrdinationFormat(FileFormat):
-    name = 'ordination'
-
-    @classmethod
-    def sniff(cls, filepath):
-        sniffer = skbio.io.io_registry.get_sniffer('ordination')
-        return sniffer(filepath)[0]
-
-ordination_data_layout = DataLayout('ordination', 1)
-ordination_data_layout.register_file('ordination.txt', OrdinationFormat)
+# Formats
+class OrdinationFormat(TextFileFormat):
+    pass
 
 
-def ordination_to_skbio_ordination_results(data_dir):
-    with open(os.path.join(data_dir, 'ordination.txt'), 'r') as fh:
+class OrdinationDirectoryFormat(resource.DirectoryFormat):
+    ordination = resource.FileFormat('ordination.txt', format=OrdinationFormat)
+
+
+# Transformers
+@plugin.register_transformer
+def _1(data: skbio.OrdinationResults) -> OrdinationDirectoryFormat:
+    df = OrdinationDirectoryFormat()
+    df.ordination.set(data, skbio.OrdinationResults)
+    return df
+
+
+@plugin.register_transformer
+def _2(data: skbio.OrdinationResults) -> OrdinationFormat:
+    ff = OrdinationFormat()
+    with ff.open() as fh:
+        data.write(fh, format='ordination')
+    return ff
+
+
+@plugin.register_transformer
+def _3(df: OrdinationDirectoryFormat) -> skbio.OrdinationResults:
+    return df.ordination.view(skbio.OrdinationResults)
+
+
+@plugin.register_transformer
+def _4(ff: OrdinationFormat) -> skbio.OrdinationResults:
+    with ff.open() as fh:
         return skbio.OrdinationResults.read(fh, format='ordination',
                                             verify=False)
 
 
-def skbio_ordination_results_to_ordination(view, data_dir):
-    with open(os.path.join(data_dir, 'ordination.txt'), 'w') as fh:
-        view.write(fh, format='ordination')
-
-
-plugin.register_data_layout(ordination_data_layout)
-
-plugin.register_data_layout_reader('ordination', 1, skbio.OrdinationResults,
-                                   ordination_to_skbio_ordination_results)
-
-plugin.register_data_layout_writer('ordination', 1, skbio.OrdinationResults,
-                                   skbio_ordination_results_to_ordination)
-
+# Registrations
 plugin.register_semantic_type(PCoAResults)
-
-plugin.register_type_to_data_layout(PCoAResults, 'ordination', 1)
+plugin.register_semantic_type_to_format(
+    PCoAResults,
+    artifact_format=OrdinationDirectoryFormat
+)
