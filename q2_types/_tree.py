@@ -6,8 +6,6 @@
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
 
-import os.path
-
 import skbio
 from qiime.plugin import SemanticType, TextFileFormat
 import qiime.plugin.resource as resource
