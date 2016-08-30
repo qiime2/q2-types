@@ -15,7 +15,9 @@ import skbio.io
 import pandas as pd
 
 import qiime
-from qiime.plugin import SemanticType, DataLayout, FileFormat
+from qiime.plugin import SemanticType, TextFileFormat
+import qiime.plugin.resource as resource
+
 from .plugin_setup import plugin
 
 
@@ -32,124 +34,108 @@ AlignedSequence = SemanticType('AlignedSequence',
                                variant_of=FeatureData.field['type'])
 
 
-class TaxonomyFormat(FileFormat):
-    name = 'taxonomy'
-
-    @classmethod
-    def sniff(cls, filepath):
-        with open(filepath, 'r') as fh:
-            # validate up to 10 data lines (i.e. non-comment lines)
-            # recreate behavior of zip(fh, range(10)) accounting for comments
-            count = 0
-            while count < 10:
-                line = fh.readline()
-                if line == '':
-                    break
-                elif line.startswith('#'):
-                    continue
-                else:
-                    cells = line.split('\t')
-                    if len(cells) < 2:
-                        return False
-                    count += 1
-            return False if count == 0 else True
+# Formats
+class TaxonomyFormat(TextFileFormat):
+    # TODO: revisit sniffer/validation
+    pass
 
 
-class DNAFASTAFormat(FileFormat):
-    name = 'dna-fasta'
-
-    @classmethod
-    def sniff(cls, filepath):
-        sniffer = skbio.io.io_registry.get_sniffer('fasta')
-        if sniffer(filepath)[0]:
-            generator = skbio.io.read(filepath, constructor=skbio.DNA,
-                                      format='fasta')
-            try:
-                for seq, _ in zip(generator, range(5)):
-                    pass
-                return True
-            # ValueError raised by skbio if there are invalid DNA chars.
-            except ValueError:
-                pass
-        return False
+class DNAFASTAFormat(TextFileFormat):
+    # TODO: revisit sniffer/validation
+    pass
 
 
-class AlignedDNAFASTAFormat(FileFormat):
-    name = 'aligned-dna-fasta'
-
-    @classmethod
-    def sniff(cls, filepath):
-        sniffer = skbio.io.io_registry.get_sniffer('fasta')
-        if sniffer(filepath)[0]:
-            generator = skbio.io.read(filepath, constructor=skbio.DNA,
-                                      format='fasta')
-            try:
-                initial_length = len(next(generator))
-                for seq, _ in zip(generator, range(4)):
-                    if len(seq) != initial_length:
-                        return False
-                return True
-            # ValueError raised by skbio if there are invalid DNA chars.
-            except (StopIteration, ValueError):
-                pass
-        return False
+class AlignedDNAFASTAFormat(TextFileFormat):
+    # TODO: revisit sniffer/validation
+    pass
 
 
-taxonomy_data_layout = DataLayout('taxonomy', 1)
-taxonomy_data_layout.register_file('taxonomy.tsv', TaxonomyFormat)
-
-dna_sequences_data_layout = DataLayout('dna-sequences', 1)
-dna_sequences_data_layout.register_file('dna-sequences.fasta', DNAFASTAFormat)
-
-paired_dna_sequences_data_layout = DataLayout('paired-dna-sequences', 1)
-paired_dna_sequences_data_layout.register_file('left-dna-sequences.fasta',
-                                               DNAFASTAFormat)
-paired_dna_sequences_data_layout.register_file('right-dna-sequences.fasta',
-                                               DNAFASTAFormat)
-
-aligned_dna_sequences_data_layout = DataLayout('aligned-dna-sequences', 1)
-aligned_dna_sequences_data_layout.register_file('aligned-dna-sequences.fasta',
-                                                AlignedDNAFASTAFormat)
+class TaxonomyDirectoryFormat(resource.DirectoryFormat):
+    taxonomy = resource.File('taxonomy.tsv', format=TaxonomyFormat)
 
 
-def _read_taxonomy(data_dir):
-    filepath = os.path.join(data_dir, 'taxonomy.tsv')
+class DNASequencesDirectoryFormat(resource.DirectoryFormat):
+    dna_sequences = resource.File('dna-sequences.fasta', format=DNAFASTAFormat)
+
+
+class PairedDNASequencesDirectoryFormat(resource.DirectoryFormat):
+    left_dna_sequences = resource.File('left-dna-sequences.fasta',
+                                       format=DNAFASTAFormat)
+    right_dna_sequences = resource.File('right-dna-sequences.fasta',
+                                        format=DNAFASTAFormat)
+
+
+class AlignedDNASequencesDirectoryFormat(resource.DirectoryFormat):
+    aligned_dna_sequences = resource.File('aligned-dna-sequences.fasta',
+                                          format=AlignedDNAFASTAFormat)
+
+
+# Transformers
+@plugin.register_transformer
+def _1(data: pd.DataFrame) -> TaxonomyDirectoryFormat:
+    df = TaxonomyDirectoryFormat()
+    df.taxonomy.set(data, pd.DataFrame)
+    return df
+
+
+@plugin.register_transformer
+def _2(data: pd.DataFrame) -> TaxonomyFormat:
+    ff = TaxonomyFormat()
+    with ff.open() as fh:
+        data.to_csv(fh, sep='\t', header=True, index=True)
+    return ff
+
+
+def _read_taxonomy(fh):
     # Using read_csv for access to comment parameter, and set index_col,
     # header, and parse_dates to Series.from_csv default settings for
     # better handling of round-trips.
     #
     # Using `dtype=object` and `set_index` to avoid type casting/inference of
     # any columns or the index.
-    df = pd.read_csv(filepath, sep='\t', comment='#', header=0,
+    df = pd.read_csv(fh, sep='\t', comment='#', header=0,
                      parse_dates=True, skip_blank_lines=True, dtype=object)
     df.set_index(df.columns[0], drop=True, append=False, inplace=True)
     return df
 
 
-def _write_taxonomy(view, data_dir):
-    filepath = os.path.join(data_dir, 'taxonomy.tsv')
-    view.to_csv(filepath, sep='\t', header=True, index=True)
+@plugin.register_transformer
+def _3(df: TaxonomyDirectoryFormat) -> pd.DataFrame:
+    return df.taxonomy.view(pd.DataFrame)
 
 
-def taxonomy_to_pandas_series(data_dir):
-    df = _read_taxonomy(data_dir)
-    return df.iloc[:, 0]
+@plugin.register_transformer
+def _4(ff: TaxonomyFormat) -> pd.DataFrame:
+    with ff.open() as fh:
+        return _read_taxonomy(fh)
 
 
-def taxonomy_to_pandas_dataframe(data_dir):
-    df = _read_taxonomy(data_dir)
-    return df
+@plugin.register_transformer
+def _5(df: TaxonomyDirectoryFormat) -> pd.Series:
+    return df.taxonomy.view(pd.Series)
 
 
-def taxonomy_to_qiime_metadata(data_dir):
-    df = _read_taxonomy(data_dir)
-    return qiime.Metadata(df)
+@plugin.register_transformer
+def _6(ff: TaxonomyFormat) -> pd.Series:
+    with ff.open() as fh:
+        data = _read_taxonomy(fh)
+        return data.iloc[:, 0]
 
 
-def pandas_to_taxonomy(view, data_dir):
-    _write_taxonomy(view, data_dir)
+@plugin.register_transformer
+def _7(df: TaxonomyDirectoryFormat) -> qiime.Metadata:
+    return df.taxonomy.view(qiime.Metadata)
 
 
+@plugin.register_transformer
+def _8(ff: TaxonomyFormat) -> qiime.Metadata:
+    with ff.open() as fh:
+        data = _read_taxonomy(fh)
+        return qiime.Metadata(data)
+
+
+# LEFT OFF HERE:
+######################################################################
 # TODO can this be generalized to any iterable type? See:
 #     https://github.com/biocore/scikit-bio/issues/1031#issuecomment-225252290
 def dna_sequences_to_generator(data_dir):
