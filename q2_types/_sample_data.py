@@ -26,7 +26,8 @@ class AlphaDiversityFormat(TextFileFormat):
 
 
 class AlphaDiversityDirectoryFormat(resource.DirectoryFormat):
-    alpha_div = resource.File('alpha-diversity.tsv', format=AlphaDiversity)
+    alpha_div = resource.File('alpha-diversity.tsv',
+                              format=AlphaDiversityFormat)
 
 
 # Transformers
@@ -42,6 +43,7 @@ def _2(data: pd.Series) -> AlphaDiversityFormat:
     ff = AlphaDiversityFormat()
     with ff.open() as fh:
         data.to_csv(fh, sep='\t', header=True)
+    return ff
 
 
 @plugin.register_transformer
