@@ -7,7 +7,6 @@
 # ----------------------------------------------------------------------------
 
 import skbio
-import skbio.io
 from qiime.plugin import SemanticType, TextFileFormat
 import qiime.plugin.resource as resource
 
@@ -29,28 +28,28 @@ class DistanceMatrixDirectoryFormat(resource.DirectoryFormat):
 
 # Transformers
 @plugin.register_transformer
-def _1(dm: DistanceMatrix) -> DistanceMatrixDirectoryFormat:
+def _1(data: skbio.DistanceMatrix) -> DistanceMatrixDirectoryFormat:
     df = DistanceMatrixDirectoryFormat()
-    df.distance_matrix.set(dm, DistanceMatrix)
+    df.distance_matrix.set(data, skbio.DistanceMatrix)
     return df
 
 
 @plugin.register_transformer
-def _2(dm: DistanceMatrix) -> LSMatFormat:
-    out = LSMatFormat()
-    with out.open() as fh:
-        dm.write(fh, format='lsmat')
-    return out
+def _2(data: skbio.DistanceMatrix) -> LSMatFormat:
+    ff = LSMatFormat()
+    with ff.open() as fh:
+        data.write(fh, format='lsmat')
+    return ff
 
 
 @plugin.register_transformer
-def _3(df: DistanceMatrixDirectoryFormat) -> LSMatFormat:
-    return df.distance_matrix.view(DistanceMatrix)
+def _3(df: DistanceMatrixDirectoryFormat) -> skbio.DistanceMatrix:
+    return df.distance_matrix.view(skbio.DistanceMatrix)
 
 
 @plugin.register_transformer
-def _4(lsmat: LSMatFormat) -> DistanceMatrix:
-    with lsmat.open() as fh:
+def _4(ff: LSMatFormat) -> skbio.DistanceMatrix:
+    with ff.open() as fh:
         return skbio.DistanceMatrix(fh, format='lsmat', verify=False)
 
 
