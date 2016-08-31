@@ -7,8 +7,8 @@
 # ----------------------------------------------------------------------------
 
 import pandas as pd
-from qiime.plugin import SemanticType, TextFileFormat
-import qiime.plugin.resource as resource
+from qiime.plugin import SemanticType
+import qiime.plugin.model as model
 
 from .plugin_setup import plugin
 
@@ -20,26 +20,24 @@ AlphaDiversity = SemanticType('AlphaDiversity',
 
 
 # Formats
-class AlphaDiversityFormat(TextFileFormat):
-    # TODO: revisit sniffer/validation
-    pass
+class AlphaDiversityFormat(model.TextFileFormat):
+    def sniff(self):
+        with self.open() as fh:
+            for line, _ in zip(fh, range(10)):
+                cells = line.split('\t')
+                if len(cells) != 2:
+                    return False
+            return True
 
 
-class AlphaDiversityDirectoryFormat(resource.DirectoryFormat):
-    alpha_div = resource.File('alpha-diversity.tsv',
-                              format=AlphaDiversityFormat)
+AlphaDiversityDirectoryFormat = model.SingleFileDirectoryFormat(
+    'AlphaDiversityDirectoryFormat', 'alpha-diversity.tsv',
+    AlphaDiversityFormat)
 
 
 # Transformers
 @plugin.register_transformer
-def _1(data: pd.Series) -> AlphaDiversityDirectoryFormat:
-    df = AlphaDiversityDirectoryFormat()
-    df.alpha_div.set(data, pd.Series)
-    return df
-
-
-@plugin.register_transformer
-def _2(data: pd.Series) -> AlphaDiversityFormat:
+def _1(data: pd.Series) -> AlphaDiversityFormat:
     ff = AlphaDiversityFormat()
     with ff.open() as fh:
         data.to_csv(fh, sep='\t', header=True)
@@ -47,12 +45,7 @@ def _2(data: pd.Series) -> AlphaDiversityFormat:
 
 
 @plugin.register_transformer
-def _3(df: AlphaDiversityDirectoryFormat) -> pd.Series:
-    return df.alpha_div.view(pd.Series)
-
-
-@plugin.register_transformer
-def _4(ff: AlphaDiversityFormat) -> pd.Series:
+def _2(ff: AlphaDiversityFormat) -> pd.Series:
     with ff.open() as fh:
         # Since we're wanting to round-trip with pd.Series.to_csv, the pandas
         # docs recommend using from_csv here (rather than the more commonly

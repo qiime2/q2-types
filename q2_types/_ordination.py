@@ -7,8 +7,8 @@
 # ----------------------------------------------------------------------------
 
 import skbio
-from qiime.plugin import SemanticType, TextFileFormat
-import qiime.plugin.resource as resource
+from qiime.plugin import SemanticType
+import qiime.plugin.model as model
 
 from .plugin_setup import plugin
 
@@ -17,40 +17,28 @@ PCoAResults = SemanticType('PCoAResults')
 
 
 # Formats
-class OrdinationFormat(TextFileFormat):
-    pass
+class OrdinationFormat(model.TextFileFormat):
+    def sniff(self):
+        sniffer = skbio.io.io_registry.get_sniffer('ordination')
+        return sniffer(str(self))[0]
 
 
-class OrdinationDirectoryFormat(resource.DirectoryFormat):
-    ordination = resource.FileFormat('ordination.txt', format=OrdinationFormat)
+OrdinationDirectoryFormat = model.SingleFileDirectoryFormat(
+    'OrdinationDirectoryFormat', 'ordination.txt', OrdinationFormat)
 
 
 # Transformers
 @plugin.register_transformer
-def _1(data: skbio.OrdinationResults) -> OrdinationDirectoryFormat:
-    df = OrdinationDirectoryFormat()
-    df.ordination.set(data, skbio.OrdinationResults)
-    return df
-
-
-@plugin.register_transformer
-def _2(data: skbio.OrdinationResults) -> OrdinationFormat:
+def _1(data: skbio.OrdinationResults) -> OrdinationFormat:
     ff = OrdinationFormat()
-    with ff.open() as fh:
-        data.write(fh, format='ordination')
+    data.write(str(ff.path), format='ordination')
     return ff
 
 
 @plugin.register_transformer
-def _3(df: OrdinationDirectoryFormat) -> skbio.OrdinationResults:
-    return df.ordination.view(skbio.OrdinationResults)
-
-
-@plugin.register_transformer
-def _4(ff: OrdinationFormat) -> skbio.OrdinationResults:
-    with ff.open() as fh:
-        return skbio.OrdinationResults.read(fh, format='ordination',
-                                            verify=False)
+def _2(ff: OrdinationFormat) -> skbio.OrdinationResults:
+    return skbio.OrdinationResults.read(str(ff.path), format='ordination',
+                                        verify=False)
 
 
 # Registrations

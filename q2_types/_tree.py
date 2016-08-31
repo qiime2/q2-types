@@ -7,8 +7,8 @@
 # ----------------------------------------------------------------------------
 
 import skbio
-from qiime.plugin import SemanticType, TextFileFormat
-import qiime.plugin.resource as resource
+from qiime.plugin import SemanticType
+import qiime.plugin.model as model
 
 from .plugin_setup import plugin
 
@@ -17,25 +17,19 @@ Phylogeny = SemanticType('Phylogeny')
 
 
 # Formats
-class NewickFormat(TextFileFormat):
-    # TODO: revisit sniffer/validation
-    pass
+class NewickFormat(model.TextFileFormat):
+    def sniffer(self):
+        sniffer = skbio.io.io_registry.get_sniffer('newick')
+        return sniffer(str(self))[0]
 
 
-class NewickDirectoryFormat(resource.DirectoryFormat):
-    tree = resource.File('tree.nwk', format=NewickFormat)
+NewickDirectoryFormat = model.SingleFileDirectoryFormat(
+    'NewickDirectoryFormat', 'tree.nwk', NewickFormat)
 
 
 # Transformers
 @plugin.register_transformer
-def _1(data: skbio.TreeNode) -> NewickDirectoryFormat:
-    df = NewickDirectoryFormat()
-    df.tree.set(data, skbio.TreeNode)
-    return df
-
-
-@plugin.register_transformer
-def _2(data: skbio.TreeNode) -> NewickFormat:
+def _1(data: skbio.TreeNode) -> NewickFormat:
     ff = NewickFormat()
     with ff.open() as fh:
         data.write(fh, format='newick')
@@ -43,12 +37,7 @@ def _2(data: skbio.TreeNode) -> NewickFormat:
 
 
 @plugin.register_transformer
-def _3(df: NewickDirectoryFormat) -> skbio.TreeNode:
-    return df.tree.view(skbio.TreeNode)
-
-
-@plugin.register_transformer
-def _4(ff: NewickFormat) -> skbio.TreeNode:
+def _2(ff: NewickFormat) -> skbio.TreeNode:
     with ff.open() as fh:
         return skbio.TreeNode.read(fh, format='newick', verify=False)
 

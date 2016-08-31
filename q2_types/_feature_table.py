@@ -9,10 +9,11 @@
 import json
 
 import biom
+import ijson
 import pandas as pd
 import qiime
-from qiime.plugin import SemanticType, TextFileFormat
-import qiime.plugin.resource as resource
+from qiime.plugin import SemanticType
+import qiime.plugin.model as model
 
 
 from .plugin_setup import plugin
@@ -30,26 +31,36 @@ PresenceAbsence = SemanticType('PresenceAbsence',
 
 
 # Formats
-# TODO: double check that this is text version of biom
-class BIOMV1Format(TextFileFormat):
-    # TODO: revisit sniffer/validation
-    pass
+class BIOMV1Format(model.TextFileFormat):
+    top_level_keys = {
+        'id', 'format', 'format_url', 'type', 'generated_by',
+        'date', 'rows', 'columns', 'matrix_type', 'matrix_element_type',
+        'shape', 'data', 'comment'
+    }
+
+    def sniff(self):
+        with self.open() as fh:
+            try:
+                parser = ijson.parse(fh)
+                for prefix, event, value in parser:
+                    if (prefix, event) == ('', 'map_key'):
+                        # `format_url` seems pretty unique to BIOM 1.0.
+                        if value == 'format_url':
+                            return True
+                        elif value not in self.top_level_keys:
+                            return False
+            except ijson.JSONError:
+                pass
+            return False
 
 
-class FeatureTableDirectoryFormat(resource.DirectoryFormat):
-    feature_table = resource.File('feature-table.biom', format=BIOMV1Format)
+FeatureTableDirectoryFormat = model.SingleFileDirectoryFormat(
+    'FeatureTableDirectoryFormat', 'feature-table.biom', BIOMV1Format)
 
 
 # Transformations
 @plugin.register_transformer
-def _1(data: biom.Table) -> FeatureTableDirectoryFormat:
-    df = FeatureTableDirectoryFormat()
-    df.feature_table.set(data, biom.Table)
-    return df
-
-
-@plugin.register_transformer
-def _2(data: biom.Table) -> BIOMV1Format:
+def _1(data: biom.Table) -> BIOMV1Format:
     ff = BIOMV1Format()
     with ff.open() as fh:
         fh.write(data.to_json(generated_by='qiime %s' % qiime.__version__))
@@ -57,12 +68,7 @@ def _2(data: biom.Table) -> BIOMV1Format:
 
 
 @plugin.register_transformer
-def _3(df: FeatureTableDirectoryFormat) -> biom.Table:
-    return df.feature_table.view(biom.Table)
-
-
-@plugin.register_transformer
-def _4(ff: BIOMV1Format) -> biom.Table:
+def _2(ff: BIOMV1Format) -> biom.Table:
     with ff.open() as fh:
         return biom.Table.from_json(json.loads(fh))
 
@@ -74,12 +80,7 @@ def _4(ff: BIOMV1Format) -> biom.Table:
 # transformations (e.g. converting from floats to ints or bools as
 # appropriate).
 @plugin.register_transformer
-def _5(df: FeatureTableDirectoryFormat) -> pd.DataFrame:
-    return df.feature_table.view(pd.DataFrame)
-
-
-@plugin.register_transformer
-def _6(ff: BIOMV1Format) -> pd.DataFrame:
+def _3(ff: BIOMV1Format) -> pd.DataFrame:
     with ff.open() as fh:
         table = biom.Table.from_json(json.load(fh))
         array = table.matrix_data.toarray().T
