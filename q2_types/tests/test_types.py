@@ -34,7 +34,7 @@ class TypesTests(unittest.TestCase):
                 Artifact.load(f.name)
 
     def test_all_types_represented(self):
-        # confirm that all types defined in this repository have at lease one
+        # confirm that all types defined in this repository have at least one
         # example artifact
         all_types = set(q2_types.__all__)
         artifact_fps = glob.glob(os.path.join(self.data_dir, '*qza'))
@@ -46,15 +46,16 @@ class TypesTests(unittest.TestCase):
                          "Example artifact not included for type(s): %s"
                          % ', '.join(all_types))
 
-    def test_data_layout_readers_and_writers(self):
-        # Confirm that for every example artifact in the repository,
-        # all registered views of that artifact can be loaded without error
-        # (the data in the view is not yet tested, just that it loads without
-        # error). Also test that for each registered writer, an appropriate
-        # view can be written. Note: the writer tests assume there is a
-        # corresponding reader for the writer's type, which may not always be
-        # true (but is for the types currently in this repo). This test may
-        # need to be revised if this assumption doesn't hold in the future.
+    def test_transformers(self):
+        # Confirm that for every example artifact in the repository, all
+        # registered views of that artifact can be loaded without error (the
+        # data in the view is not yet tested, just that it loads without
+        # error). Also test that for each registered transformer, an
+        # appropriate view can be produced. Note: the transformer tests assume
+        # there is a corresponding reverse transformation for the type, which
+        # may not always be true (but is for the types currently in this repo).
+        # This test may need to be revised if this assumption doesn't hold in
+        # the future.
         pm = PluginManager()
         artifact_fps = glob.glob(os.path.join(self.data_dir, '*qza'))
         for artifact_fp in artifact_fps:
