@@ -75,7 +75,7 @@ class DNAFASTAFormat(model.TextFileFormat):
         sniffer = skbio.io.io_registry.get_sniffer('fasta')
         if sniffer(filepath)[0]:
             generator = skbio.io.read(filepath, constructor=skbio.DNA,
-                                      format='fasta')
+                                      format='fasta', verify=False)
             try:
                 for seq, _ in zip(generator, range(5)):
                     pass
@@ -92,7 +92,7 @@ class AlignedDNAFASTAFormat(model.TextFileFormat):
         sniffer = skbio.io.io_registry.get_sniffer('fasta')
         if sniffer(filepath)[0]:
             generator = skbio.io.read(filepath, constructor=skbio.DNA,
-                                      format='fasta')
+                                      format='fasta', verify=False)
             try:
                 initial_length = len(next(generator))
                 for seq, _ in zip(generator, range(4)):
