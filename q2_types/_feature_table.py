@@ -7,13 +7,14 @@
 # ----------------------------------------------------------------------------
 
 import json
-import os.path
 
 import biom
 import ijson
 import pandas as pd
 import qiime
-from qiime.plugin import SemanticType, FileFormat, DataLayout
+from qiime.plugin import SemanticType
+import qiime.plugin.resource as model
+
 
 from .plugin_setup import plugin
 
@@ -29,17 +30,16 @@ PresenceAbsence = SemanticType('PresenceAbsence',
                                variant_of=FeatureTable.field['content'])
 
 
-class BIOMV1Format(FileFormat):
-    name = 'biom-v1.0'
+# Formats
+class BIOMV1Format(model.TextFileFormat):
     top_level_keys = {
         'id', 'format', 'format_url', 'type', 'generated_by',
         'date', 'rows', 'columns', 'matrix_type', 'matrix_element_type',
         'shape', 'data', 'comment'
     }
 
-    @classmethod
-    def sniff(cls, filepath):
-        with open(filepath, 'r') as fh:
+    def sniff(self):
+        with self.open() as fh:
             try:
                 parser = ijson.parse(fh)
                 for prefix, event, value in parser:
@@ -47,33 +47,41 @@ class BIOMV1Format(FileFormat):
                         # `format_url` seems pretty unique to BIOM 1.0.
                         if value == 'format_url':
                             return True
-                        elif value not in cls.top_level_keys:
+                        elif value not in self.top_level_keys:
                             return False
             except ijson.JSONError:
                 pass
             return False
 
-feature_table_data_layout = DataLayout('feature-table', 1)
-feature_table_data_layout.register_file('feature-table.biom', BIOMV1Format)
+
+FeatureTableDirectoryFormat = model.SingleFileDirectoryFormat(
+    'FeatureTableDirectoryFormat', 'feature-table.biom', BIOMV1Format)
 
 
-def feature_table_to_biom_table(data_dir):
-    with open(os.path.join(data_dir, 'feature-table.biom'), 'r') as fh:
+# Transformations
+@plugin.register_transformer
+def _1(data: biom.Table) -> BIOMV1Format:
+    ff = BIOMV1Format()
+    with ff.open() as fh:
+        fh.write(data.to_json(generated_by='qiime %s' % qiime.__version__))
+    return ff
+
+
+@plugin.register_transformer
+def _2(ff: BIOMV1Format) -> biom.Table:
+    with ff.open() as fh:
         return biom.Table.from_json(json.load(fh))
 
 
-def biom_table_to_feature_table(view, data_dir):
-    with open(os.path.join(data_dir, 'feature-table.biom'), 'w') as fh:
-        fh.write(view.to_json(generated_by='qiime %s' % qiime.__version__))
-
-
-# TODO this always returns a pd.DataFrame of floats due to how biom loads
+# Note: this is an old TODO and should be revisited with the new view system.
+# TODO: this always returns a pd.DataFrame of floats due to how biom loads
 # tables, and we don't know what the dtype of the DataFrame should be. It would
 # be nice to have support for a semantic-type override that specifies further
 # transformations (e.g. converting from floats to ints or bools as
 # appropriate).
-def feature_table_to_pandas_dataframe(data_dir):
-    with open(os.path.join(data_dir, 'feature-table.biom'), 'r') as fh:
+@plugin.register_transformer
+def _3(ff: BIOMV1Format) -> pd.DataFrame:
+    with ff.open() as fh:
         table = biom.Table.from_json(json.load(fh))
         array = table.matrix_data.toarray().T
         sample_ids = table.ids(axis='sample')
@@ -81,22 +89,14 @@ def feature_table_to_pandas_dataframe(data_dir):
         return pd.DataFrame(array, index=sample_ids, columns=feature_ids)
 
 
-plugin.register_data_layout(feature_table_data_layout)
-
-plugin.register_data_layout_reader('feature-table', 1, biom.Table,
-                                   feature_table_to_biom_table)
-
-plugin.register_data_layout_writer('feature-table', 1, biom.Table,
-                                   biom_table_to_feature_table)
-
-plugin.register_data_layout_reader('feature-table', 1, pd.DataFrame,
-                                   feature_table_to_pandas_dataframe)
-
+# Registrations
 plugin.register_semantic_type(FeatureTable)
 plugin.register_semantic_type(Frequency)
 plugin.register_semantic_type(RelativeFrequency)
 plugin.register_semantic_type(PresenceAbsence)
 
-plugin.register_type_to_data_layout(
+# TODO: revisit this
+plugin.register_semantic_type_to_format(
     FeatureTable[Frequency | RelativeFrequency | PresenceAbsence],
-    'feature-table', 1)
+    artifact_format=FeatureTableDirectoryFormat
+)

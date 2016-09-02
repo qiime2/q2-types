@@ -6,11 +6,9 @@
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
 
-import os.path
-
 import skbio
-import skbio.io
-from qiime.plugin import SemanticType, FileFormat, DataLayout
+from qiime.plugin import SemanticType
+import qiime.plugin.resource as model
 
 from .plugin_setup import plugin
 
@@ -18,37 +16,34 @@ from .plugin_setup import plugin
 PCoAResults = SemanticType('PCoAResults')
 
 
-class OrdinationFormat(FileFormat):
-    name = 'ordination'
-
-    @classmethod
-    def sniff(cls, filepath):
+# Formats
+class OrdinationFormat(model.TextFileFormat):
+    def sniff(self):
         sniffer = skbio.io.io_registry.get_sniffer('ordination')
-        return sniffer(filepath)[0]
-
-ordination_data_layout = DataLayout('ordination', 1)
-ordination_data_layout.register_file('ordination.txt', OrdinationFormat)
+        return sniffer(str(self))[0]
 
 
-def ordination_to_skbio_ordination_results(data_dir):
-    with open(os.path.join(data_dir, 'ordination.txt'), 'r') as fh:
-        return skbio.OrdinationResults.read(fh, format='ordination',
-                                            verify=False)
+OrdinationDirectoryFormat = model.SingleFileDirectoryFormat(
+    'OrdinationDirectoryFormat', 'ordination.txt', OrdinationFormat)
 
 
-def skbio_ordination_results_to_ordination(view, data_dir):
-    with open(os.path.join(data_dir, 'ordination.txt'), 'w') as fh:
-        view.write(fh, format='ordination')
+# Transformers
+@plugin.register_transformer
+def _1(data: skbio.OrdinationResults) -> OrdinationFormat:
+    ff = OrdinationFormat()
+    data.write(str(ff), format='ordination')
+    return ff
 
 
-plugin.register_data_layout(ordination_data_layout)
+@plugin.register_transformer
+def _2(ff: OrdinationFormat) -> skbio.OrdinationResults:
+    return skbio.OrdinationResults.read(str(ff), format='ordination',
+                                        verify=False)
 
-plugin.register_data_layout_reader('ordination', 1, skbio.OrdinationResults,
-                                   ordination_to_skbio_ordination_results)
 
-plugin.register_data_layout_writer('ordination', 1, skbio.OrdinationResults,
-                                   skbio_ordination_results_to_ordination)
-
+# Registrations
 plugin.register_semantic_type(PCoAResults)
-
-plugin.register_type_to_data_layout(PCoAResults, 'ordination', 1)
+plugin.register_semantic_type_to_format(
+    PCoAResults,
+    artifact_format=OrdinationDirectoryFormat
+)
