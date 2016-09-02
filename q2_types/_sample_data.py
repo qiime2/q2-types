@@ -58,11 +58,6 @@ plugin.register_semantic_type(SampleData)
 plugin.register_semantic_type(AlphaDiversity)
 
 plugin.register_semantic_type_to_format(
-    AlphaDiversity,
-    artifact_format=AlphaDiversityDirectoryFormat
-)
-# TODO: revisit this
-plugin.register_semantic_type_to_format(
     SampleData[AlphaDiversity],
     artifact_format=AlphaDiversityDirectoryFormat
 )

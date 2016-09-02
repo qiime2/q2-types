@@ -37,7 +37,12 @@ class TypesTests(unittest.TestCase):
     def test_all_types_represented(self):
         # confirm that all types defined in this repository have at least one
         # example artifact
-        all_types = set(q2_types.__all__)
+        all_types = q2_types.__all__
+        # Note: DNAIterator and PairedDNAIterator are not Semantic Types,
+        # so we need to make sure we remove them from the list.
+        all_types.remove('DNAIterator')
+        all_types.remove('PairedDNAIterator')
+        all_types = set(all_types)
         artifact_fps = glob.glob(os.path.join(self.data_dir, '*qza'))
         for artifact_fp in artifact_fps:
             a = Artifact.load(artifact_fp)
@@ -61,11 +66,9 @@ class TypesTests(unittest.TestCase):
             a = Artifact.load(artifact_fp)
             if issubclass(a.format, SingleFileDirectoryFormatBase):
                 # Single file directory format
-                from_view = a.format.file.format
                 to_views = transformers.get(a.format.file.format)
             elif a.format in transformers:
                 # Directory format with at least one transformer registered
-                from_view = a.format
                 to_views = transformers.get(a.format)
             else:
                 # Directory format with no transformers registered
@@ -74,6 +77,7 @@ class TypesTests(unittest.TestCase):
                 if transformer_record.plugin.name == 'types':
                     view = a.view(to_view)
                     self.assertIs(type(view), to_view)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -67,10 +67,14 @@ def _1(data: biom.Table) -> BIOMV1Format:
     return ff
 
 
-@plugin.register_transformer
-def _2(ff: BIOMV1Format) -> biom.Table:
+def _parse_biom_table(ff):
     with ff.open() as fh:
         return biom.Table.from_json(json.load(fh))
+
+
+@plugin.register_transformer
+def _2(ff: BIOMV1Format) -> biom.Table:
+    return _parse_biom_table(ff)
 
 
 # Note: this is an old TODO and should be revisited with the new view system.
@@ -81,12 +85,11 @@ def _2(ff: BIOMV1Format) -> biom.Table:
 # appropriate).
 @plugin.register_transformer
 def _3(ff: BIOMV1Format) -> pd.DataFrame:
-    with ff.open() as fh:
-        table = biom.Table.from_json(json.load(fh))
-        array = table.matrix_data.toarray().T
-        sample_ids = table.ids(axis='sample')
-        feature_ids = table.ids(axis='observation')
-        return pd.DataFrame(array, index=sample_ids, columns=feature_ids)
+    table = _parse_biom_table(ff)
+    array = table.matrix_data.toarray().T
+    sample_ids = table.ids(axis='sample')
+    feature_ids = table.ids(axis='observation')
+    return pd.DataFrame(array, index=sample_ids, columns=feature_ids)
 
 
 # Registrations
@@ -95,7 +98,6 @@ plugin.register_semantic_type(Frequency)
 plugin.register_semantic_type(RelativeFrequency)
 plugin.register_semantic_type(PresenceAbsence)
 
-# TODO: revisit this
 plugin.register_semantic_type_to_format(
     FeatureTable[Frequency | RelativeFrequency | PresenceAbsence],
     artifact_format=FeatureTableDirectoryFormat

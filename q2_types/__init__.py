@@ -22,4 +22,5 @@ __all__ = ['DistanceMatrix', 'Phylogeny', 'PCoAResults', 'FeatureTable',
            'Frequency', 'RelativeFrequency', 'PresenceAbsence',
            'SampleData', 'AlphaDiversity', 'FeatureData', 'Taxonomy',
            'Sequence', 'PairedEndSequence', 'AlignedSequence',
-           'ReferenceFeatures', 'SSU', 'Rooted', 'Unrooted']
+           'ReferenceFeatures', 'SSU', 'Rooted', 'Unrooted', 'DNAIterator',
+           'PairedDNAIterator']
