@@ -13,7 +13,7 @@ import ijson
 import pandas as pd
 import qiime
 from qiime.plugin import SemanticType
-import qiime.plugin.resource as model
+import qiime.plugin.model as model
 
 
 from .plugin_setup import plugin

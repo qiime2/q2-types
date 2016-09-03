@@ -13,7 +13,7 @@ import unittest
 
 import q2_types
 from qiime.sdk import Artifact, PluginManager
-from qiime.plugin.resource import SingleFileDirectoryFormatBase
+from qiime.plugin.model import SingleFileDirectoryFormatBase
 
 
 class TypesTests(unittest.TestCase):
