@@ -13,6 +13,7 @@ import unittest
 
 import q2_types
 from qiime.sdk import Artifact, PluginManager
+from qiime.plugin.model import SingleFileDirectoryFormatBase
 
 
 class TypesTests(unittest.TestCase):
@@ -34,9 +35,14 @@ class TypesTests(unittest.TestCase):
                 Artifact.load(f.name)
 
     def test_all_types_represented(self):
-        # confirm that all types defined in this repository have at lease one
+        # confirm that all types defined in this repository have at least one
         # example artifact
-        all_types = set(q2_types.__all__)
+        all_types = q2_types.__all__
+        # Note: DNAIterator and PairedDNAIterator are not Semantic Types,
+        # so we need to make sure we remove them from the list.
+        all_types.remove('DNAIterator')
+        all_types.remove('PairedDNAIterator')
+        all_types = set(all_types)
         artifact_fps = glob.glob(os.path.join(self.data_dir, '*qza'))
         for artifact_fp in artifact_fps:
             a = Artifact.load(artifact_fp)
@@ -46,28 +52,31 @@ class TypesTests(unittest.TestCase):
                          "Example artifact not included for type(s): %s"
                          % ', '.join(all_types))
 
-    def test_data_layout_readers_and_writers(self):
-        # Confirm that for every example artifact in the repository,
-        # all registered views of that artifact can be loaded without error
-        # (the data in the view is not yet tested, just that it loads without
-        # error). Also test that for each registered writer, an appropriate
-        # view can be written. Note: the writer tests assume there is a
-        # corresponding reader for the writer's type, which may not always be
-        # true (but is for the types currently in this repo). This test may
-        # need to be revised if this assumption doesn't hold in the future.
+    def test_transformers(self):
+        # Confirm that for every example artifact in the repository, all
+        # registered views of that artifact can be loaded without error (the
+        # data in the view is not yet tested, just that it loads without
+        # error). Also test that for each registered transformer, an
+        # appropriate view can be produced.
         pm = PluginManager()
         artifact_fps = glob.glob(os.path.join(self.data_dir, '*qza'))
+        transformers = pm.transformers
         for artifact_fp in artifact_fps:
             # load example artifact
             a = Artifact.load(artifact_fp)
-            data_layout = pm.get_data_layout(a.type)
-            for view_type in data_layout.readers:
-                view = a.view(view_type)
-                self.assertIs(type(view), view_type)
-            for view_type in data_layout.writers:
-                view = a.view(view_type)
-                self.assertIs(type(view), view_type)
-                Artifact._from_view(view, a.type, None)
+            if issubclass(a.format, SingleFileDirectoryFormatBase):
+                # Single file directory format
+                to_views = transformers.get(a.format.file.format)
+            elif a.format in transformers:
+                # Directory format with at least one transformer registered
+                to_views = transformers.get(a.format)
+            else:
+                # Directory format with no transformers registered
+                continue
+            for to_view, transformer_record in to_views.items():
+                if transformer_record.plugin.name == 'types':
+                    view = a.view(to_view)
+                    self.assertIs(type(view), to_view)
 
 
 if __name__ == "__main__":
