@@ -20,6 +20,29 @@ import qiime.plugin.model as model
 from .plugin_setup import plugin
 
 
+__all__ = [
+    # Types
+    'FeatureData',
+    'Taxonomy',
+    'Sequence',
+    'PairedEndSequence',
+    'AlignedSequence',
+
+    # Formats
+    'TaxonomyFormat',
+    'DNAFASTAFormat',
+    'AlignedDNAFASTAFormat',
+    'TaxonomyDirectoryFormat',
+    'DNASequencesDirectoryFormat',
+    'PairedDNASequencesDirectoryFormat',
+    'AlignedDNASequencesDirectoryFormat',
+
+    # Objects
+    'DNAIterator',
+    'PairedDNAIterator'
+]
+
+
 FeatureData = SemanticType('FeatureData', field_names='type')
 
 Taxonomy = SemanticType('Taxonomy', variant_of=FeatureData.field['type'])
@@ -75,7 +98,7 @@ class DNAFASTAFormat(model.TextFileFormat):
         sniffer = skbio.io.io_registry.get_sniffer('fasta')
         if sniffer(filepath)[0]:
             generator = skbio.io.read(filepath, constructor=skbio.DNA,
-                                      format='fasta', verify=False)
+                                      format='fasta')
             try:
                 for seq, _ in zip(generator, range(5)):
                     pass
@@ -92,7 +115,7 @@ class AlignedDNAFASTAFormat(model.TextFileFormat):
         sniffer = skbio.io.io_registry.get_sniffer('fasta')
         if sniffer(filepath)[0]:
             generator = skbio.io.read(filepath, constructor=skbio.DNA,
-                                      format='fasta', verify=False)
+                                      format='fasta')
             try:
                 initial_length = len(next(generator))
                 for seq, _ in zip(generator, range(4)):

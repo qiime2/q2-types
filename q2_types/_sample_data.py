@@ -13,6 +13,17 @@ import qiime.plugin.model as model
 from .plugin_setup import plugin
 
 
+__all__ = [
+    # Types
+    'SampleData',
+    'AlphaDiversity',
+
+    # Formats
+    'AlphaDiversityFormat',
+    'AlphaDiversityDirectoryFormat'
+]
+
+
 SampleData = SemanticType('SampleData', field_names='type')
 
 AlphaDiversity = SemanticType('AlphaDiversity',

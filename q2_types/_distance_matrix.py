@@ -14,6 +14,15 @@ import qiime.plugin.model as model
 from .plugin_setup import plugin
 
 
+__all__ = [
+    # Types
+    'DistanceMatrix',
+    # Formats
+    'LSMatFormat',
+    'DistanceMatrixDirectoryFormat'
+]
+
+
 DistanceMatrix = SemanticType('DistanceMatrix')
 
 

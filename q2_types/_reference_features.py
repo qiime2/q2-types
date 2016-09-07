@@ -13,6 +13,15 @@ from ._feature_data import (DNAFASTAFormat, AlignedDNAFASTAFormat,
                             TaxonomyFormat)
 from ._tree import NewickFormat
 
+__all__ = [
+    # Types
+    'ReferenceFeatures',
+    'SSU',
+
+    # Formats
+    'ReferenceFeaturesDirectoryFormat'
+]
+
 
 ReferenceFeatures = SemanticType('ReferenceFeatures', field_names='type')
 SSU = SemanticType('SSU', variant_of=ReferenceFeatures.field['type'])

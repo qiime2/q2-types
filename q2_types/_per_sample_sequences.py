@@ -15,6 +15,26 @@ from qiime.plugin import SemanticType
 from .plugin_setup import plugin
 from ._sample_data import SampleData
 
+
+__all__ = [
+    # Types
+    'SequencesWithQuality',
+    'PairedEndSequencesWithQuality',
+
+    # Formats
+    'FastqManifestFormat',
+    'YamlFormat',
+    'FastqGzFormat',
+    'CasavaOneEightSingleLanePerSampleDirFmt',
+    'SingleLanePerSampleSingleEndFastqDirFmt',
+    'SingleLanePerSamplePairedEndFastqDirFmt',
+
+    # Objects
+    'PerSampleDNAIterators',
+    'PerSamplePairedDNAIterators'
+]
+
+
 SequencesWithQuality = SemanticType(
     'SequencesWithQuality', variant_of=SampleData.field['type'])
 PairedEndSequencesWithQuality = SemanticType(

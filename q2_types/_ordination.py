@@ -13,6 +13,16 @@ import qiime.plugin.model as model
 from .plugin_setup import plugin
 
 
+__all__ = [
+    # Types
+    'PCoAResults',
+
+    # Formats
+    'OrdinationFormat',
+    'OrdinationDirectoryFormat'
+]
+
+
 PCoAResults = SemanticType('PCoAResults')
 
 
