@@ -8,17 +8,21 @@
 
 __version__ = "0.0.2"  # noqa
 
-from ._feature_table import (FeatureTable, Frequency, RelativeFrequency,
-                             PresenceAbsence)
-from ._distance_matrix import DistanceMatrix
-from ._sample_data import SampleData, AlphaDiversity
-from ._tree import Phylogeny, Rooted, Unrooted
-from ._ordination import PCoAResults
-from ._feature_data import (FeatureData, Taxonomy, Sequence, PairedEndSequence,
-                            AlignedSequence, DNAIterator, PairedDNAIterator)
-from ._reference_features import ReferenceFeatures, SSU
-from ._per_sample_sequences import (SequencesWithQuality,
-                                    PairedEndSequencesWithQuality)
+# TODO remove all imports and from __all__ because they are available as public
+# imports in their respective subpackages. These imports are here so the
+# existing tests will pass; they can be removed when the tests are rewritten.
+
+from .feature_table import (FeatureTable, Frequency, RelativeFrequency,
+                            PresenceAbsence)
+from .distance_matrix import DistanceMatrix
+from .sample_data import SampleData, AlphaDiversity
+from .tree import Phylogeny, Rooted, Unrooted
+from .ordination import PCoAResults
+from .feature_data import (FeatureData, Taxonomy, Sequence, PairedEndSequence,
+                           AlignedSequence, DNAIterator, PairedDNAIterator)
+from .reference_features import ReferenceFeatures, SSU
+from .per_sample_sequences import (SequencesWithQuality,
+                                   PairedEndSequencesWithQuality)
 
 __all__ = ['DistanceMatrix', 'Phylogeny', 'PCoAResults', 'FeatureTable',
            'Frequency', 'RelativeFrequency', 'PresenceAbsence',
