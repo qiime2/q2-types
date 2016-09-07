@@ -1,0 +1,74 @@
+# ----------------------------------------------------------------------------
+# Copyright (c) 2016--, QIIME development team.
+#
+# Distributed under the terms of the Modified BSD License.
+#
+# The full license is in the file LICENSE, distributed with this software.
+# ----------------------------------------------------------------------------
+
+import skbio.io
+import yaml
+import qiime.plugin.model as model
+
+
+class FastqManifestFormat(model.TextFileFormat):
+    """
+    Mapping of sample identifiers to filepaths and read direction.
+
+    """
+    def sniff(self):
+        with self.open() as fh:
+            header = fh.readline()
+            return header.strip() == 'sample-id,filename,direction'
+
+
+class YamlFormat(model.TextFileFormat):
+    """
+    Arbitrary yaml-formatted file.
+
+    """
+    def sniff(self):
+        with self.open() as fh:
+            try:
+                yaml.safe_load(fh)
+            except yaml.YAMLError:
+                return False
+        return True
+
+
+class FastqGzFormat(model.BinaryFileFormat):
+    """
+    A gzipped fastq file.
+
+    """
+    def sniff(self):
+        sniffer = skbio.io.io_registry.get_sniffer('fastq')
+        return sniffer(str(self))[0]
+
+
+class CasavaOneEightSingleLanePerSampleDirFmt(model.DirectoryFormat):
+    sequences = model.FileCollection(
+        r'.+_.+_L[0-9][0-9][0-9]_R[12]_001\.fastq\.gz',
+        format=FastqGzFormat)
+
+    @sequences.set_path_maker
+    def sequences_path_maker(self, sample_id, barcode_id, lane_number,
+                             read_number):
+        return '%s_%s_L%03d_R%d_001.fastq.gz' % (sample_id, barcode_id,
+                                                 lane_number, read_number)
+
+
+class _SingleLanePerSampleFastqDirFmt(CasavaOneEightSingleLanePerSampleDirFmt):
+    manifest = model.File('MANIFEST', format=FastqManifestFormat)
+    metadata = model.File('metadata.yml', format=YamlFormat)
+
+
+class SingleLanePerSampleSingleEndFastqDirFmt(_SingleLanePerSampleFastqDirFmt):
+    pass
+
+
+class SingleLanePerSamplePairedEndFastqDirFmt(_SingleLanePerSampleFastqDirFmt):
+    # There is no difference between this and
+    # SingleLanePerSampleSingleEndFastqDirFmt (canonically pronounced,
+    # SLPSSEFDF) until we have validation.
+    pass

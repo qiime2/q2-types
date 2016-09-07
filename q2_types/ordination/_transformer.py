@@ -7,27 +7,11 @@
 # ----------------------------------------------------------------------------
 
 import skbio
-from qiime.plugin import SemanticType
-import qiime.plugin.model as model
 
-from .plugin_setup import plugin
-
-
-PCoAResults = SemanticType('PCoAResults')
+from ..plugin_setup import plugin
+from . import OrdinationFormat
 
 
-# Formats
-class OrdinationFormat(model.TextFileFormat):
-    def sniff(self):
-        sniffer = skbio.io.io_registry.get_sniffer('ordination')
-        return sniffer(str(self))[0]
-
-
-OrdinationDirectoryFormat = model.SingleFileDirectoryFormat(
-    'OrdinationDirectoryFormat', 'ordination.txt', OrdinationFormat)
-
-
-# Transformers
 @plugin.register_transformer
 def _1(data: skbio.OrdinationResults) -> OrdinationFormat:
     ff = OrdinationFormat()
@@ -39,11 +23,3 @@ def _1(data: skbio.OrdinationResults) -> OrdinationFormat:
 def _2(ff: OrdinationFormat) -> skbio.OrdinationResults:
     return skbio.OrdinationResults.read(str(ff), format='ordination',
                                         verify=False)
-
-
-# Registrations
-plugin.register_semantic_type(PCoAResults)
-plugin.register_semantic_type_to_format(
-    PCoAResults,
-    artifact_format=OrdinationDirectoryFormat
-)
