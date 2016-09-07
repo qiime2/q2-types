@@ -1,0 +1,4 @@
+The QIIME Artifact files `./sample-data-paired-end-sequences-with-quality.qza`
+and `./sample-data-sequences-with-quality.qza` were derived from the BaseSpace
+Sequence Hub public project "MiSeq v3: 16S Metagenomics (Human Saliva,
+Wastewater Sludge, Alum Rock Cave)" accessed on 6 Sept 2016 by JG Caporaso.

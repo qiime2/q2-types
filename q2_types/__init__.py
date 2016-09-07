@@ -17,10 +17,13 @@ from ._ordination import PCoAResults
 from ._feature_data import (FeatureData, Taxonomy, Sequence, PairedEndSequence,
                             AlignedSequence, DNAIterator, PairedDNAIterator)
 from ._reference_features import ReferenceFeatures, SSU
+from ._per_sample_sequences import (SequencesWithQuality,
+                                    PairedEndSequencesWithQuality)
 
 __all__ = ['DistanceMatrix', 'Phylogeny', 'PCoAResults', 'FeatureTable',
            'Frequency', 'RelativeFrequency', 'PresenceAbsence',
            'SampleData', 'AlphaDiversity', 'FeatureData', 'Taxonomy',
            'Sequence', 'PairedEndSequence', 'AlignedSequence',
            'ReferenceFeatures', 'SSU', 'Rooted', 'Unrooted', 'DNAIterator',
-           'PairedDNAIterator']
+           'PairedDNAIterator', 'SequencesWithQuality',
+           'PairedEndSequencesWithQuality']
