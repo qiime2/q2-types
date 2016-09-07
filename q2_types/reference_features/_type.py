@@ -7,27 +7,14 @@
 # ----------------------------------------------------------------------------
 
 from qiime.plugin import SemanticType
-import qiime.plugin.model as model
-from .plugin_setup import plugin
-from ._feature_data import (DNAFASTAFormat, AlignedDNAFASTAFormat,
-                            TaxonomyFormat)
-from ._tree import NewickFormat
+
+from ..plugin_setup import plugin
+from ._format import ReferenceFeaturesDirectoryFormat
 
 
 ReferenceFeatures = SemanticType('ReferenceFeatures', field_names='type')
 SSU = SemanticType('SSU', variant_of=ReferenceFeatures.field['type'])
 
-
-# Formats
-class ReferenceFeaturesDirectoryFormat(model.DirectoryFormat):
-    dna_sequences = model.File('dna-sequences.fasta', format=DNAFASTAFormat)
-    aligned_dna_sequences = model.File('aligned-dna-sequences.fasta',
-                                       format=AlignedDNAFASTAFormat)
-    taxonomy = model.File('taxonomy.tsv', format=TaxonomyFormat)
-    tree = model.File('tree.nwk', format=NewickFormat)
-
-
-# Registrations
 plugin.register_semantic_type(ReferenceFeatures)
 plugin.register_semantic_type(SSU)
 
