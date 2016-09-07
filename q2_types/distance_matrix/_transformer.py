@@ -7,28 +7,11 @@
 # ----------------------------------------------------------------------------
 
 import skbio
-import skbio.io
-from qiime.plugin import SemanticType
-import qiime.plugin.model as model
 
-from .plugin_setup import plugin
+from ..plugin_setup import plugin
+from ._format import LSMatFormat
 
 
-DistanceMatrix = SemanticType('DistanceMatrix')
-
-
-# Formats
-class LSMatFormat(model.TextFileFormat):
-    def sniff(self):
-        sniffer = skbio.io.io_registry.get_sniffer('lsmat')
-        return sniffer(str(self))[0]
-
-
-DistanceMatrixDirectoryFormat = model.SingleFileDirectoryFormat(
-    'DistanceMatrixDirectoryFormat', 'distance-matrix.tsv', LSMatFormat)
-
-
-# Transformers
 @plugin.register_transformer
 def _1(data: skbio.DistanceMatrix) -> LSMatFormat:
     ff = LSMatFormat()
@@ -40,11 +23,3 @@ def _1(data: skbio.DistanceMatrix) -> LSMatFormat:
 @plugin.register_transformer
 def _2(ff: LSMatFormat) -> skbio.DistanceMatrix:
     return skbio.DistanceMatrix.read(str(ff), format='lsmat', verify=False)
-
-
-# Registrations
-plugin.register_semantic_type(DistanceMatrix)
-plugin.register_semantic_type_to_format(
-    DistanceMatrix,
-    artifact_format=DistanceMatrixDirectoryFormat
-)

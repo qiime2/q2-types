@@ -29,7 +29,7 @@ plugin = qiime.plugin.Plugin(
 )
 
 importlib.import_module('q2_types._feature_table')
-importlib.import_module('q2_types._distance_matrix')
+importlib.import_module('q2_types.distance_matrix')
 importlib.import_module('q2_types._tree')
 importlib.import_module('q2_types._ordination')
 importlib.import_module('q2_types._sample_data')
