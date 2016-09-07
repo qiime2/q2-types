@@ -19,6 +19,19 @@ import qiime.plugin.model as model
 from .plugin_setup import plugin
 
 
+__all__ = [
+    # Types
+    'FeatureTable',
+    'Frequency',
+    'RelativeFrequency',
+    'PresenceAbsence',
+
+    # Formats
+    'BIOMV1Format',
+    'FeatureTableDirectoryFormat'
+]
+
+
 FeatureTable = SemanticType('FeatureTable', field_names='content')
 
 Frequency = SemanticType('Frequency', variant_of=FeatureTable.field['content'])

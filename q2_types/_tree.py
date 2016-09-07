@@ -12,6 +12,17 @@ import qiime.plugin.model as model
 
 from .plugin_setup import plugin
 
+__all__ = [
+    # Types
+    'Phylogeny',
+    'Rooted',
+    'Unrooted',
+
+    # Formats
+    'NewickFormat',
+    'NewickDirectoryFormat'
+]
+
 
 Phylogeny = SemanticType('Phylogeny', field_names=['type'])
 
