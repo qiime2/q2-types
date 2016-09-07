@@ -21,8 +21,8 @@ from .ordination import PCoAResults
 from .feature_data import (FeatureData, Taxonomy, Sequence, PairedEndSequence,
                            AlignedSequence, DNAIterator, PairedDNAIterator)
 from .reference_features import ReferenceFeatures, SSU
-from ._per_sample_sequences import (SequencesWithQuality,
-                                    PairedEndSequencesWithQuality)
+from .per_sample_sequences import (SequencesWithQuality,
+                                   PairedEndSequencesWithQuality)
 
 __all__ = ['DistanceMatrix', 'Phylogeny', 'PCoAResults', 'FeatureTable',
            'Frequency', 'RelativeFrequency', 'PresenceAbsence',
