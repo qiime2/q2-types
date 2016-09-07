@@ -13,7 +13,7 @@ from .feature_table import (FeatureTable, Frequency, RelativeFrequency,
 from .distance_matrix import DistanceMatrix
 from ._sample_data import SampleData, AlphaDiversity
 from ._tree import Phylogeny, Rooted, Unrooted
-from ._ordination import PCoAResults
+from .ordination import PCoAResults
 from ._feature_data import (FeatureData, Taxonomy, Sequence, PairedEndSequence,
                             AlignedSequence, DNAIterator, PairedDNAIterator)
 from ._reference_features import ReferenceFeatures, SSU
