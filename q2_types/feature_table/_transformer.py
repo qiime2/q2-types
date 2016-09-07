@@ -12,7 +12,7 @@ import biom
 import pandas as pd
 import qiime
 
-from ._format import BIOMV1Format
+from . import BIOMV1Format
 from ..plugin_setup import plugin
 
 

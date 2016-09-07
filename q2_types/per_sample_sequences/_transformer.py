@@ -10,10 +10,9 @@ import skbio
 import yaml
 
 from ..plugin_setup import plugin
-from ._format import (SingleLanePerSampleSingleEndFastqDirFmt,
-                      FastqManifestFormat, FastqGzFormat, YamlFormat,
-                      SingleLanePerSamplePairedEndFastqDirFmt,
-                      CasavaOneEightSingleLanePerSampleDirFmt)
+from . import (SingleLanePerSampleSingleEndFastqDirFmt, FastqManifestFormat,
+               SingleLanePerSamplePairedEndFastqDirFmt, FastqGzFormat,
+               CasavaOneEightSingleLanePerSampleDirFmt, YamlFormat)
 
 
 class PerSampleDNAIterators(dict):

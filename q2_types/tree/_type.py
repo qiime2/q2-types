@@ -9,7 +9,7 @@
 from qiime.plugin import SemanticType
 
 from ..plugin_setup import plugin
-from ._format import NewickDirectoryFormat
+from . import NewickDirectoryFormat
 
 
 Phylogeny = SemanticType('Phylogeny', field_names=['type'])

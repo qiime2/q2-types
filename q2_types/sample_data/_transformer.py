@@ -9,7 +9,7 @@
 import pandas as pd
 
 from ..plugin_setup import plugin
-from ._format import AlphaDiversityFormat
+from . import AlphaDiversityFormat
 
 
 @plugin.register_transformer

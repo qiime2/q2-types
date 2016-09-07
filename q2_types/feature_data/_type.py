@@ -9,9 +9,9 @@
 from qiime.plugin import SemanticType
 
 from ..plugin_setup import plugin
-from ._format import (TaxonomyDirectoryFormat, DNASequencesDirectoryFormat,
-                      PairedDNASequencesDirectoryFormat,
-                      AlignedDNASequencesDirectoryFormat)
+from . import (TaxonomyDirectoryFormat, DNASequencesDirectoryFormat,
+               PairedDNASequencesDirectoryFormat,
+               AlignedDNASequencesDirectoryFormat)
 
 
 FeatureData = SemanticType('FeatureData', field_names='type')

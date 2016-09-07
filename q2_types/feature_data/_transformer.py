@@ -14,8 +14,8 @@ import skbio
 import qiime
 
 from ..plugin_setup import plugin
-from ._format import (TaxonomyFormat, DNAFASTAFormat,
-                      PairedDNASequencesDirectoryFormat, AlignedDNAFASTAFormat)
+from . import (TaxonomyFormat, DNAFASTAFormat,
+               PairedDNASequencesDirectoryFormat, AlignedDNAFASTAFormat)
 
 
 class DNAIterator(collections.Iterator):

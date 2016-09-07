@@ -9,7 +9,7 @@
 import skbio
 
 from ..plugin_setup import plugin
-from ._format import LSMatFormat
+from . import LSMatFormat
 
 
 @plugin.register_transformer

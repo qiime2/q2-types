@@ -9,7 +9,7 @@
 from qiime.plugin import SemanticType
 
 from ..plugin_setup import plugin
-from ._format import AlphaDiversityDirectoryFormat
+from . import AlphaDiversityDirectoryFormat
 
 
 SampleData = SemanticType('SampleData', field_names='type')

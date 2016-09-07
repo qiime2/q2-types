@@ -9,7 +9,7 @@
 from qiime.plugin import SemanticType
 
 from ..plugin_setup import plugin
-from ._format import ReferenceFeaturesDirectoryFormat
+from . import ReferenceFeaturesDirectoryFormat
 
 
 ReferenceFeatures = SemanticType('ReferenceFeatures', field_names='type')

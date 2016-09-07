@@ -10,8 +10,8 @@ from qiime.plugin import SemanticType
 
 from ..plugin_setup import plugin
 from ..sample_data import SampleData
-from ._format import (SingleLanePerSampleSingleEndFastqDirFmt,
-                      SingleLanePerSamplePairedEndFastqDirFmt)
+from . import (SingleLanePerSampleSingleEndFastqDirFmt,
+               SingleLanePerSamplePairedEndFastqDirFmt)
 
 
 SequencesWithQuality = SemanticType(

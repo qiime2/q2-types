@@ -9,7 +9,7 @@
 import skbio
 
 from ..plugin_setup import plugin
-from ._format import OrdinationFormat
+from . import OrdinationFormat
 
 
 @plugin.register_transformer

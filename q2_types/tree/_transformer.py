@@ -9,7 +9,7 @@
 import skbio
 
 from ..plugin_setup import plugin
-from ._format import NewickFormat
+from . import NewickFormat
 
 
 @plugin.register_transformer

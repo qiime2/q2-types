@@ -9,7 +9,7 @@
 from qiime.plugin import SemanticType
 
 from ..plugin_setup import plugin
-from ._format import FeatureTableDirectoryFormat
+from . import FeatureTableDirectoryFormat
 
 
 FeatureTable = SemanticType('FeatureTable', field_names='content')
