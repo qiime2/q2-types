@@ -15,7 +15,7 @@ __version__ = "0.0.2"  # noqa
 from .feature_table import (FeatureTable, Frequency, RelativeFrequency,
                             PresenceAbsence)
 from .distance_matrix import DistanceMatrix
-from ._sample_data import SampleData, AlphaDiversity
+from .sample_data import SampleData, AlphaDiversity
 from .tree import Phylogeny, Rooted, Unrooted
 from .ordination import PCoAResults
 from .feature_data import (FeatureData, Taxonomy, Sequence, PairedEndSequence,
