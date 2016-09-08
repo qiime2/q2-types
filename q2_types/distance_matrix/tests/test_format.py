@@ -35,6 +35,9 @@ class TestFormats(TestPluginBase):
             format.validate()
 
     def test_distance_matrix_directory_format(self):
+        # This test exists mainly to assert that the single-file directory
+        # format is defined and functional. More extensive testing is performed
+        # on its underlying format (LSMatFormat).
         filepath = self.get_data_path('distance-matrix-NxN.tsv')
         shutil.copy(filepath,
                     os.path.join(self.temp_dir.name, 'distance-matrix.tsv'))

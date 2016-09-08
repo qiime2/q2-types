@@ -50,3 +50,31 @@ class TestPluginBase(unittest.TestCase):
                 (from_type, to_type))
 
         return transformer_record.transformer
+
+    def assertRegisteredSemanticType(self, semantic_type):
+        try:
+            semantic_type_record = self.plugin.types[repr(semantic_type)]
+        except KeyError:
+            self.fail(
+                "Semantic type %r is not registered on the plugin." %
+                semantic_type)
+
+        obs_semantic_type = semantic_type_record.semantic_type
+
+        self.assertEqual(obs_semantic_type, semantic_type)
+
+    def assertSemanticTypeRegisteredToFormat(self, semantic_type, exp_format):
+        obs_format = None
+        for type_format_record in self.plugin.type_formats:
+            if type_format_record.type_expression == semantic_type:
+                obs_format = type_format_record.format
+                break
+
+        self.assertIsNotNone(
+            obs_format,
+            "Semantic type %r is not registered to a format." % semantic_type)
+
+        self.assertEqual(
+            obs_format, exp_format,
+            "Expected semantic type %r to be registered to format %r, not %r."
+            % (semantic_type, exp_format, obs_format))
