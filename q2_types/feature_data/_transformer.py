@@ -116,8 +116,8 @@ def _12(data: PairedDNAIterator) -> PairedDNASequencesDirectoryFormat:
             skbio.io.write(lseq, format='fasta', into=lfile)
             skbio.io.write(rseq, format='fasta', into=rfile)
 
-    df.left_dna_sequences.write(ff_left, DNAFASTAFormat)
-    df.right_dna_sequences.write(ff_right, DNAFASTAFormat)
+    df.left_dna_sequences.write_data(ff_left, DNAFASTAFormat)
+    df.right_dna_sequences.write_data(ff_right, DNAFASTAFormat)
     return df
 
 
