@@ -79,7 +79,7 @@ def _9(ff: DNAFASTAFormat) -> DNAIterator:
 @plugin.register_transformer
 def _10(data: DNAIterator) -> DNAFASTAFormat:
     ff = DNAFASTAFormat()
-    skbio.io.write(data, format='fasta', into=str(ff))
+    skbio.io.write(data.generator, format='fasta', into=str(ff))
     return ff
 
 
