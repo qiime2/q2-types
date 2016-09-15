@@ -79,10 +79,7 @@ class BIOMV210Format(model.BinaryFileFormat):
             return True
 
 
-FeatureTableDirectoryFormat_v1 = model.SingleFileDirectoryFormat(
-    'FeatureTableDirectoryFormat_v1', 'feature-table.biom', BIOMV1Format)
-FeatureTableDirectoryFormat_v210 = model.SingleFileDirectoryFormat(
-    'FeatureTableDirectoryFormat_v210', 'feature-table.biom', BIOMV210Format)
-
-# set a default?
-FeatureTableDirectoryFormat = FeatureTableDirectoryFormat_v210
+FeatureTableDirectoryFormatV1 = model.SingleFileDirectoryFormat(
+    'FeatureTableDirectoryFormatV1', 'feature-table.biom', BIOMV1Format)
+FeatureTableDirectoryFormatV210 = model.SingleFileDirectoryFormat(
+    'FeatureTableDirectoryFormatV210', 'feature-table.biom', BIOMV210Format)
