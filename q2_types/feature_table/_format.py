@@ -33,5 +33,55 @@ class BIOMV1Format(model.TextFileFormat):
             return False
 
 
-FeatureTableDirectoryFormat = model.SingleFileDirectoryFormat(
-    'FeatureTableDirectoryFormat', 'feature-table.biom', BIOMV1Format)
+class BIOMV210Format(model.BinaryFileFormat):
+    # minimum requirements as described by
+    # http://biom-format.org/documentation/format_versions/biom-2.1.html
+    groups = {'sample',
+              'sample/matrix',
+              'sample/metadata',
+              'sample/group-metadata',
+              'observation',
+              'observation/matrix',
+              'observation/metadata',
+              'observation/group-metadata'}
+    datasets = {'sample/ids',
+                'sample/matrix/data',
+                'sample/matrix/indptr',
+                'sample/matrix/indices',
+                'observation/ids',
+                'observation/matrix/data',
+                'observation/matrix/indptr',
+                'observation/matrix/indices'}
+    attrs = {'id',
+             'type',
+             'format-url',
+             'format-version',
+             'generated-by',
+             'creation-date',
+             'shape',
+             'nnz'}
+
+    def open(self):
+        return h5py.File(self.path, mode=self._mode)
+
+    def sniff(self):
+        with self.open() as fh:
+            for grp in self.groups:
+                if grp not in fh:
+                    return False
+            for ds in self.datasets:
+                if ds not in fh:
+                    return False
+            for attr in self.attrs:
+                if attr not in fh:
+                    return False
+            return True
+
+
+FeatureTableDirectoryFormat_v1 = model.SingleFileDirectoryFormat(
+    'FeatureTableDirectoryFormat_v1', 'feature-table.biom', BIOMV1Format)
+FeatureTableDirectoryFormat_v210 = model.SingleFileDirectoryFormat(
+    'FeatureTableDirectoryFormat_v210', 'feature-table.biom', BIOMV210Format)
+
+# set a default?
+FeatureTableDirectoryFormat = FeatureTableDirectoryFormat_v210
