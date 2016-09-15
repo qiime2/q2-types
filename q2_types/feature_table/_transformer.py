@@ -33,9 +33,11 @@ def _parse_biom_table_v100(ff):
     with ff.open() as fh:
         return biom.Table.from_json(json.load(fh))
 
+
 def _parse_biom_table_v210(ff):
     with ff.open() as fh:
         return biom.Table.from_hdf5(fh)
+
 
 @plugin.register_transformer
 def _2(ff: BIOMV1Format) -> biom.Table:
@@ -63,13 +65,13 @@ def _table_to_dataframe(table: biom.Table) -> pd.DataFrame:
 
 @plugin.register_transformer
 def _4(ff: BIOMV210Format) -> pd.DataFrame:
-    table = _parse_biom_table_v210(fh)
+    table = _parse_biom_table_v210(ff)
     return _table_to_dataframe(table)
 
 
 @plugin.register_transformer
 def _5(ff: BIOMV210Format) -> biom.Table:
-    return _parse_biom_table_v210(fh)
+    return _parse_biom_table_v210(ff)
 
 
 @plugin.register_transformer

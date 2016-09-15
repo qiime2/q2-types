@@ -6,6 +6,7 @@
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
 import ijson
+import h5py
 
 import qiime.plugin.model as model
 
