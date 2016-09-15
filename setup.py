@@ -23,5 +23,9 @@ setup(
     entry_points={
         'qiime.plugins':
         ['q2-types=q2_types.plugin_setup:plugin']
+    },
+    package_data={
+        'q2_types.tests': ['data/*'],
+        'q2_types.distance_matrix.tests': ['data/*']
     }
 )
