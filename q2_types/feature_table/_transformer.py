@@ -12,7 +12,7 @@ import biom
 import pandas as pd
 import qiime
 
-from . import BIOMV1Format, BIOMV210Format
+from . import BIOMV100Format, BIOMV210Format
 from ..plugin_setup import plugin
 
 
@@ -38,16 +38,15 @@ def _table_to_dataframe(table: biom.Table) -> pd.DataFrame:
 
 
 @plugin.register_transformer
-def _1(data: biom.Table) -> BIOMV1Format:
-    # TODO: issue a warning about limited support for this format
-    ff = BIOMV1Format()
+def _1(data: biom.Table) -> BIOMV100Format:
+    ff = BIOMV100Format()
     with ff.open() as fh:
         fh.write(data.to_json(generated_by=_get_generated_by()))
     return ff
 
 
 @plugin.register_transformer
-def _2(ff: BIOMV1Format) -> biom.Table:
+def _2(ff: BIOMV100Format) -> biom.Table:
     return _parse_biom_table_v100(ff)
 
 
@@ -58,7 +57,7 @@ def _2(ff: BIOMV1Format) -> biom.Table:
 # transformations (e.g. converting from floats to ints or bools as
 # appropriate).
 @plugin.register_transformer
-def _3(ff: BIOMV1Format) -> pd.DataFrame:
+def _3(ff: BIOMV100Format) -> pd.DataFrame:
     table = _parse_biom_table_v100(ff)
     return _table_to_dataframe(table)
 

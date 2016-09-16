@@ -11,7 +11,7 @@ import h5py
 import qiime.plugin.model as model
 
 
-class BIOMV1Format(model.TextFileFormat):
+class BIOMV100Format(model.TextFileFormat):
     top_level_keys = {
         'id', 'format', 'format_url', 'type', 'generated_by',
         'date', 'rows', 'columns', 'matrix_type', 'matrix_element_type',
@@ -79,9 +79,9 @@ class BIOMV210Format(model.BinaryFileFormat):
             return True
 
 
-BIOMV1DirFmt = model.SingleFileDirectoryFormat('BIOMV1DirFmt',
-                                               'feature-table.biom',
-                                               BIOMV1Format)
+BIOMV100DirFmt = model.SingleFileDirectoryFormat('BIOMV100DirFmt',
+                                                 'feature-table.biom',
+                                                 BIOMV100Format)
 BIOMV210DirFmt = model.SingleFileDirectoryFormat('BIOMV210DirFmt',
                                                  'feature-table.biom',
                                                  BIOMV210Format)

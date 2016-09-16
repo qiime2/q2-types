@@ -9,7 +9,7 @@
 from qiime.plugin import SemanticType
 
 from ..plugin_setup import plugin
-from . import BIOMV210DirFmt
+from . import BIOMV100DirFmt, BIOMV210DirFmt
 
 
 FeatureTable = SemanticType('FeatureTable', field_names='content')
@@ -31,4 +31,9 @@ plugin.register_semantic_type(PresenceAbsence)
 plugin.register_semantic_type_to_format(
     FeatureTable[Frequency | RelativeFrequency | PresenceAbsence],
     artifact_format=BIOMV210DirFmt
+)
+
+plugin.register_semantic_type_to_format(
+    FeatureTable[Frequency | RelativeFrequency | PresenceAbsence],
+    artifact_format=BIOMV100DirFmt
 )
