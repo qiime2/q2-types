@@ -6,11 +6,12 @@
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
 import ijson
+import h5py
 
 import qiime.plugin.model as model
 
 
-class BIOMV1Format(model.TextFileFormat):
+class BIOMV100Format(model.TextFileFormat):
     top_level_keys = {
         'id', 'format', 'format_url', 'type', 'generated_by',
         'date', 'rows', 'columns', 'matrix_type', 'matrix_element_type',
@@ -33,5 +34,54 @@ class BIOMV1Format(model.TextFileFormat):
             return False
 
 
-FeatureTableDirectoryFormat = model.SingleFileDirectoryFormat(
-    'FeatureTableDirectoryFormat', 'feature-table.biom', BIOMV1Format)
+class BIOMV210Format(model.BinaryFileFormat):
+    # minimum requirements as described by
+    # http://biom-format.org/documentation/format_versions/biom-2.1.html
+    groups = {'sample',
+              'sample/matrix',
+              'sample/metadata',
+              'sample/group-metadata',
+              'observation',
+              'observation/matrix',
+              'observation/metadata',
+              'observation/group-metadata'}
+    datasets = {'sample/ids',
+                'sample/matrix/data',
+                'sample/matrix/indptr',
+                'sample/matrix/indices',
+                'observation/ids',
+                'observation/matrix/data',
+                'observation/matrix/indptr',
+                'observation/matrix/indices'}
+    attrs = {'id',
+             'type',
+             'format-url',
+             'format-version',
+             'generated-by',
+             'creation-date',
+             'shape',
+             'nnz'}
+
+    def open(self):
+        return h5py.File(str(self), mode=self._mode)
+
+    def sniff(self):
+        with self.open() as fh:
+            for grp in self.groups:
+                if grp not in fh:
+                    return False
+            for ds in self.datasets:
+                if ds not in fh:
+                    return False
+            for attr in self.attrs:
+                if attr not in fh.attrs:
+                    return False
+            return True
+
+
+BIOMV100DirFmt = model.SingleFileDirectoryFormat('BIOMV100DirFmt',
+                                                 'feature-table.biom',
+                                                 BIOMV100Format)
+BIOMV210DirFmt = model.SingleFileDirectoryFormat('BIOMV210DirFmt',
+                                                 'feature-table.biom',
+                                                 BIOMV210Format)

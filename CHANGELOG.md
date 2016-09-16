@@ -1,3 +1,8 @@
+# Version 0.0.2-dev
+
+## Other changes
+* Added ``BIOMV210Format``
+
 # Version 0.0.2 (2016-08-08)
 
 ## Backward incompatible changes

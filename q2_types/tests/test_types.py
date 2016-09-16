@@ -63,21 +63,24 @@ class TypesTests(unittest.TestCase):
         transformers = pm.transformers
         for artifact_fp in artifact_fps:
             # load example artifact
-            a = Artifact.load(artifact_fp)
-            if issubclass(a.format, SingleFileDirectoryFormatBase):
-                # Single file directory format
-                to_views = transformers.get(a.format.file.format)
-            elif a.format in transformers:
-                # Directory format with at least one transformer registered
-                to_views = transformers.get(a.format)
-            else:
-                # Directory format with no transformers registered
-                continue
-            for to_view, transformer_record in to_views.items():
-                if transformer_record.plugin.name == 'types':
-                    view = a.view(to_view)
-                    self.assertIs(type(view), to_view)
-
+            try:
+                a = Artifact.load(artifact_fp)
+                if issubclass(a.format, SingleFileDirectoryFormatBase):
+                    # Single file directory format
+                    to_views = transformers.get(a.format.file.format)
+                elif a.format in transformers:
+                    # Directory format with at least one transformer registered
+                    to_views = transformers.get(a.format)
+                else:
+                    # Directory format with no transformers registered
+                    continue
+                for to_view, transformer_record in to_views.items():
+                    if transformer_record.plugin.name == 'types':
+                        view = a.view(to_view)
+                        self.assertIs(type(view), to_view)
+            except Exception as e:
+                raise AssertionError("Artifact %s failed with %s" %
+                                     (artifact_fp, e.args[0]))
 
 if __name__ == "__main__":
     unittest.main()
