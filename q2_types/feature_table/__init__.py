@@ -8,13 +8,12 @@
 
 import importlib
 
-from ._format import (BIOMV1Format, BIOMV210Format,
-                      FeatureTableDirectoryFormatV1,
-                      FeatureTableDirectoryFormatV210)
+from ._format import (BIOMV1Format, BIOMV210Format, BIOMV1DirFmt,
+                      BIOMV210DirFmt)
 from ._type import FeatureTable, Frequency, RelativeFrequency, PresenceAbsence
 
-__all__ = ['BIOMV1Format', 'FeatureTableDirectoryFormatV1', 'FeatureTable',
-           'Frequency', 'RelativeFrequency', 'PresenceAbsence',
-           'BIOMV210Format', 'FeatureTableDirectoryFormatV210']
+__all__ = ['BIOMV1Format', 'BIOMV1DirFmt', 'FeatureTable', 'Frequency',
+           'RelativeFrequency', 'PresenceAbsence', 'BIOMV210Format',
+           'BIOMV210DirFmt']
 
 importlib.import_module('q2_types.feature_table._transformer')

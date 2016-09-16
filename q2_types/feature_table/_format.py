@@ -63,7 +63,7 @@ class BIOMV210Format(model.BinaryFileFormat):
              'nnz'}
 
     def open(self):
-        return h5py.File(self.path, mode=self._mode)
+        return h5py.File(str(self), mode=self._mode)
 
     def sniff(self):
         with self.open() as fh:
@@ -74,12 +74,14 @@ class BIOMV210Format(model.BinaryFileFormat):
                 if ds not in fh:
                     return False
             for attr in self.attrs:
-                if attr not in fh:
+                if attr not in fh.attrs:
                     return False
             return True
 
 
-FeatureTableDirectoryFormatV1 = model.SingleFileDirectoryFormat(
-    'FeatureTableDirectoryFormatV1', 'feature-table.biom', BIOMV1Format)
-FeatureTableDirectoryFormatV210 = model.SingleFileDirectoryFormat(
-    'FeatureTableDirectoryFormatV210', 'feature-table.biom', BIOMV210Format)
+BIOMV1DirFmt = model.SingleFileDirectoryFormat('BIOMV1DirFmt',
+                                               'feature-table.biom',
+                                               BIOMV1Format)
+BIOMV210DirFmt = model.SingleFileDirectoryFormat('BIOMV210DirFmt',
+                                                 'feature-table.biom',
+                                                 BIOMV210Format)
