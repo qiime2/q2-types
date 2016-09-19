@@ -11,13 +11,17 @@ import importlib
 from ._format import (CasavaOneEightSingleLanePerSampleDirFmt, FastqGzFormat,
                       YamlFormat, FastqManifestFormat,
                       SingleLanePerSampleSingleEndFastqDirFmt,
-                      SingleLanePerSamplePairedEndFastqDirFmt)
+                      SingleLanePerSamplePairedEndFastqDirFmt,
+                      QIIME1DemultiplexedFastqDirFmt,
+                      QIIME1FastqManifestFormat)
 from ._type import SequencesWithQuality, PairedEndSequencesWithQuality
 
 __all__ = ['CasavaOneEightSingleLanePerSampleDirFmt', 'FastqGzFormat',
            'YamlFormat', 'FastqManifestFormat',
            'SingleLanePerSampleSingleEndFastqDirFmt',
            'SingleLanePerSamplePairedEndFastqDirFmt', 'SequencesWithQuality',
-           'PairedEndSequencesWithQuality']
+           'PairedEndSequencesWithQuality',
+           'QIIME1DemultiplexedFastqDirFmt',
+           'QIIME1FastqManifestFormat']
 
 importlib.import_module('q2_types.per_sample_sequences._transformer')
