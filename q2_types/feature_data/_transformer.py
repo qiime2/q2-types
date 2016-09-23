@@ -130,4 +130,5 @@ def _13(ff: AlignedDNAFASTAFormat) -> skbio.TabularMSA:
 @plugin.register_transformer
 def _14(data: skbio.TabularMSA) -> AlignedDNAFASTAFormat:
     ff = AlignedDNAFASTAFormat()
-    return data.write(str(ff), format='fasta')
+    data.write(str(ff), format='fasta')
+    return ff
