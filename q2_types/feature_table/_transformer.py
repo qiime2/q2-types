@@ -15,6 +15,27 @@ import qiime
 from . import BIOMV100Format, BIOMV210Format
 from ..plugin_setup import plugin
 
+# NOTE: In the readers and writers for BIOM v1 and v2 below, metadata must be
+# ignored on both axes because BIOM v1 and v2 are incompatible with certain
+# types of metadata. We need to support both versions of the format and
+# converting between them (e.g. to support existing QIIME 1 data). We can
+# ignore metadata because it is represented as different types in QIIME 2, and
+# thus is stored in separate artifacts. `biom.Table` does not have an API to
+# delete/unset metadata on its axes, so we construct a new `biom.Table` object
+# from the existing table's matrix data and axis IDs (see `_drop_axis_metadata`
+# below). This workaround should be fairly efficient because the matrix data
+# and axis IDs aren't copied; only a new `biom.Table` reference is created and
+# some ID indexing operations are performed.
+#
+# TODO: Revisit this workaround when `biom.Table` supports deletion of
+# metadata: https://github.com/biocore/biom-format/issues/708
+
+
+def _drop_axis_metadata(table):
+    return biom.Table(table.matrix_data,
+                      observation_ids=table.ids(axis='observation'),
+                      sample_ids=table.ids(axis='sample'))
+
 
 def _get_generated_by():
     return 'qiime %s' % qiime.__version__
@@ -22,12 +43,14 @@ def _get_generated_by():
 
 def _parse_biom_table_v100(ff):
     with ff.open() as fh:
-        return biom.Table.from_json(json.load(fh))
+        table = biom.Table.from_json(json.load(fh))
+        return _drop_axis_metadata(table)
 
 
 def _parse_biom_table_v210(ff):
     with ff.open() as fh:
-        return biom.Table.from_hdf5(fh)
+        table = biom.Table.from_hdf5(fh)
+        return _drop_axis_metadata(table)
 
 
 def _table_to_dataframe(table: biom.Table) -> pd.DataFrame:
@@ -39,6 +62,8 @@ def _table_to_dataframe(table: biom.Table) -> pd.DataFrame:
 
 @plugin.register_transformer
 def _1(data: biom.Table) -> BIOMV100Format:
+    data = _drop_axis_metadata(data)
+
     ff = BIOMV100Format()
     with ff.open() as fh:
         fh.write(data.to_json(generated_by=_get_generated_by()))
@@ -75,6 +100,8 @@ def _5(ff: BIOMV210Format) -> biom.Table:
 
 @plugin.register_transformer
 def _6(data: biom.Table) -> BIOMV210Format:
+    data = _drop_axis_metadata(data)
+
     ff = BIOMV210Format()
     with ff.open() as fh:
         data.to_hdf5(fh, generated_by=_get_generated_by())
