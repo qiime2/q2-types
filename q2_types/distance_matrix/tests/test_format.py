@@ -11,7 +11,7 @@ import shutil
 import unittest
 
 from q2_types.distance_matrix import LSMatFormat, DistanceMatrixDirectoryFormat
-from q2_types.testing import TestPluginBase
+from qiime.plugin.testing import TestPluginBase
 
 
 class TestFormats(TestPluginBase):

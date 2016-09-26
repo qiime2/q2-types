@@ -11,7 +11,7 @@ import unittest
 import skbio
 
 from q2_types.distance_matrix import LSMatFormat
-from q2_types.testing import TestPluginBase
+from qiime.plugin.testing import TestPluginBase
 
 
 class TestTransformers(TestPluginBase):

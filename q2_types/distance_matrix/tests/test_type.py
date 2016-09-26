@@ -10,10 +10,12 @@ import unittest
 
 from q2_types.distance_matrix import (DistanceMatrix,
                                       DistanceMatrixDirectoryFormat)
-from q2_types.testing import TestPluginBase
+from qiime.plugin.testing import TestPluginBase
 
 
 class TestTypes(TestPluginBase):
+    package = 'q2_types.distance_matrix.tests'
+
     def test_distance_matrix_semantic_type_registration(self):
         self.assertRegisteredSemanticType(DistanceMatrix)
 
