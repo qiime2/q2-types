@@ -15,7 +15,7 @@ from q2_types.feature_data import (
     DNASequencesDirectoryFormat, PairedDNASequencesDirectoryFormat,
     AlignedDNAFASTAFormat, AlignedDNASequencesDirectoryFormat
 )
-from q2_types.testing import TestPluginBase
+from qiime.plugin.testing import TestPluginBase
 
 
 class TestFormats(TestPluginBase):

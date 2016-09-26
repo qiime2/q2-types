@@ -13,10 +13,12 @@ from q2_types.feature_data import (
     TaxonomyDirectoryFormat, DNASequencesDirectoryFormat,
     PairedDNASequencesDirectoryFormat, AlignedDNASequencesDirectoryFormat
 )
-from q2_types.testing import TestPluginBase
+from qiime.plugin.testing import TestPluginBase
 
 
 class TestTypes(TestPluginBase):
+    package = 'q2_types.feature_data.tests'
+
     def test_feature_data_semantic_type_registration(self):
         self.assertRegisteredSemanticType(FeatureData)
 

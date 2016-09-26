@@ -18,7 +18,7 @@ from q2_types.feature_data import (
     TaxonomyFormat, DNAFASTAFormat, DNAIterator, PairedDNAIterator,
     PairedDNASequencesDirectoryFormat, AlignedDNAFASTAFormat
 )
-from q2_types.testing import TestPluginBase
+from qiime.plugin.testing import TestPluginBase
 
 
 class TestTranfomers(TestPluginBase):
