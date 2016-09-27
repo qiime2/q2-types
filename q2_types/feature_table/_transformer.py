@@ -106,3 +106,8 @@ def _6(data: biom.Table) -> BIOMV210Format:
     with ff.open() as fh:
         data.to_hdf5(fh, generated_by=_get_generated_by())
     return ff
+
+
+@plugin.register_transformer
+def _7(data: biom.Table) -> pd.DataFrame:
+    return _table_to_dataframe(data)
