@@ -9,6 +9,8 @@
 import skbio.io
 import qiime.plugin.model as model
 
+from ..plugin_setup import plugin
+
 
 class NewickFormat(model.TextFileFormat):
     def sniff(self):
@@ -18,3 +20,7 @@ class NewickFormat(model.TextFileFormat):
 
 NewickDirectoryFormat = model.SingleFileDirectoryFormat(
     'NewickDirectoryFormat', 'tree.nwk', NewickFormat)
+
+
+plugin.register_format(NewickFormat)
+plugin.register_format(NewickDirectoryFormat)

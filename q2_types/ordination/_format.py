@@ -9,6 +9,8 @@
 import skbio.io
 import qiime.plugin.model as model
 
+from ..plugin_setup import plugin
+
 
 class OrdinationFormat(model.TextFileFormat):
     def sniff(self):
@@ -18,3 +20,7 @@ class OrdinationFormat(model.TextFileFormat):
 
 OrdinationDirectoryFormat = model.SingleFileDirectoryFormat(
     'OrdinationDirectoryFormat', 'ordination.txt', OrdinationFormat)
+
+
+plugin.register_format(OrdinationFormat)
+plugin.register_format(OrdinationDirectoryFormat)

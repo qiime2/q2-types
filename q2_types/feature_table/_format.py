@@ -10,6 +10,8 @@ import h5py
 
 import qiime.plugin.model as model
 
+from ..plugin_setup import plugin
+
 
 class BIOMV100Format(model.TextFileFormat):
     top_level_keys = {
@@ -85,3 +87,8 @@ BIOMV100DirFmt = model.SingleFileDirectoryFormat('BIOMV100DirFmt',
 BIOMV210DirFmt = model.SingleFileDirectoryFormat('BIOMV210DirFmt',
                                                  'feature-table.biom',
                                                  BIOMV210Format)
+
+plugin.register_format(BIOMV100Format)
+plugin.register_format(BIOMV210Format)
+plugin.register_format(BIOMV100DirFmt)
+plugin.register_format(BIOMV210DirFmt)
