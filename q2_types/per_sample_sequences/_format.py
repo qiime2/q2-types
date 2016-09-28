@@ -10,6 +10,8 @@ import skbio.io
 import yaml
 import qiime.plugin.model as model
 
+from ..plugin_setup import plugin
+
 
 class FastqManifestFormat(model.TextFileFormat):
     """
@@ -72,3 +74,12 @@ class SingleLanePerSamplePairedEndFastqDirFmt(_SingleLanePerSampleFastqDirFmt):
     # SingleLanePerSampleSingleEndFastqDirFmt (canonically pronounced,
     # SLPSSEFDF) until we have validation.
     pass
+
+
+plugin.register_format(FastqManifestFormat)
+plugin.register_format(YamlFormat)
+plugin.register_format(FastqGzFormat)
+plugin.register_format(CasavaOneEightSingleLanePerSampleDirFmt)
+plugin.register_format(_SingleLanePerSampleFastqDirFmt)
+plugin.register_format(SingleLanePerSampleSingleEndFastqDirFmt)
+plugin.register_format(SingleLanePerSamplePairedEndFastqDirFmt)

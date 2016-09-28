@@ -8,6 +8,8 @@
 
 import qiime.plugin.model as model
 
+from ..plugin_setup import plugin
+
 
 class AlphaDiversityFormat(model.TextFileFormat):
     def sniff(self):
@@ -22,3 +24,7 @@ class AlphaDiversityFormat(model.TextFileFormat):
 AlphaDiversityDirectoryFormat = model.SingleFileDirectoryFormat(
     'AlphaDiversityDirectoryFormat', 'alpha-diversity.tsv',
     AlphaDiversityFormat)
+
+
+plugin.register_format(AlphaDiversityFormat)
+plugin.register_format(AlphaDiversityDirectoryFormat)
