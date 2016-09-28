@@ -11,6 +11,7 @@ import qiime.plugin.model as model
 from ..feature_data import (DNAFASTAFormat, AlignedDNAFASTAFormat,
                             TaxonomyFormat)
 from ..tree import NewickFormat
+from ..plugin_setup import plugin
 
 
 class ReferenceFeaturesDirectoryFormat(model.DirectoryFormat):
@@ -19,3 +20,6 @@ class ReferenceFeaturesDirectoryFormat(model.DirectoryFormat):
                                        format=AlignedDNAFASTAFormat)
     taxonomy = model.File('taxonomy.tsv', format=TaxonomyFormat)
     tree = model.File('tree.nwk', format=NewickFormat)
+
+
+plugin.register_format(ReferenceFeaturesDirectoryFormat)

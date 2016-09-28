@@ -9,6 +9,8 @@
 import skbio.io
 import qiime.plugin.model as model
 
+from ..plugin_setup import plugin
+
 
 class TaxonomyFormat(model.TextFileFormat):
     def sniff(self):
@@ -84,3 +86,12 @@ class AlignedDNAFASTAFormat(model.TextFileFormat):
 AlignedDNASequencesDirectoryFormat = model.SingleFileDirectoryFormat(
     'AlignedDNASequencesDirectoryFormat', 'aligned-dna-sequences.fasta',
     AlignedDNAFASTAFormat)
+
+
+plugin.register_format(TaxonomyFormat)
+plugin.register_format(TaxonomyDirectoryFormat)
+plugin.register_format(DNAFASTAFormat)
+plugin.register_format(DNASequencesDirectoryFormat)
+plugin.register_format(PairedDNASequencesDirectoryFormat)
+plugin.register_format(AlignedDNAFASTAFormat)
+plugin.register_format(AlignedDNASequencesDirectoryFormat)
