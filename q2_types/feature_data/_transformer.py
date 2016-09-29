@@ -33,11 +33,16 @@ class PairedDNAIterator(DNAIterator):
     pass
 
 
-@plugin.register_transformer
-def _2(data: pd.DataFrame) -> TaxonomyFormat:
+def _pandas_to_taxonomy_format(data):
+    # data can be pd.Series or pd.DataFrame
     ff = TaxonomyFormat()
     data.to_csv(str(ff), sep='\t', header=True, index=True)
     return ff
+
+
+@plugin.register_transformer
+def _2(data: pd.DataFrame) -> TaxonomyFormat:
+    return _pandas_to_taxonomy_format(data)
 
 
 def _read_taxonomy(fp):
@@ -70,9 +75,13 @@ def _8(ff: TaxonomyFormat) -> qiime.Metadata:
     return qiime.Metadata(data)
 
 
+def _read_dna_fasta(path):
+    return skbio.read(path, format='fasta', constructor=skbio.DNA)
+
+
 @plugin.register_transformer
 def _9(ff: DNAFASTAFormat) -> DNAIterator:
-    generator = skbio.read(str(ff), format='fasta', constructor=skbio.DNA)
+    generator = _read_dna_fasta(str(ff))
     return DNAIterator(generator)
 
 
@@ -132,3 +141,25 @@ def _14(data: skbio.TabularMSA) -> AlignedDNAFASTAFormat:
     ff = AlignedDNAFASTAFormat()
     data.write(str(ff), format='fasta')
     return ff
+
+
+@plugin.register_transformer
+def _15(ff: DNAFASTAFormat) -> pd.Series:
+    data = {}
+    for sequence in _read_dna_fasta(str(ff)):
+        data[sequence.metadata['id']] = sequence
+    return pd.Series(data)
+
+
+@plugin.register_transformer
+def _16(data: pd.Series) -> DNAFASTAFormat:
+    ff = DNAFASTAFormat()
+    with ff.open() as f:
+        for sequence in data:
+            skbio.io.write(sequence, format='fasta', into=f)
+    return ff
+
+
+@plugin.register_transformer
+def _17(data: pd.Series) -> TaxonomyFormat:
+    return _pandas_to_taxonomy_format(data)
