@@ -14,7 +14,7 @@ from . import OrdinationDirectoryFormat
 
 PCoAResults = SemanticType('PCoAResults')
 
-plugin.register_semantic_type(PCoAResults)
+plugin.register_semantic_types(PCoAResults)
 plugin.register_semantic_type_to_format(
     PCoAResults,
     artifact_format=OrdinationDirectoryFormat

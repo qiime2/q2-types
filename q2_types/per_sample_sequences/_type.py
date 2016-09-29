@@ -19,8 +19,8 @@ SequencesWithQuality = SemanticType(
 PairedEndSequencesWithQuality = SemanticType(
     'PairedEndSequencesWithQuality', variant_of=SampleData.field['type'])
 
-plugin.register_semantic_type(SequencesWithQuality)
-plugin.register_semantic_type(PairedEndSequencesWithQuality)
+plugin.register_semantic_types(SequencesWithQuality,
+                               PairedEndSequencesWithQuality)
 
 plugin.register_semantic_type_to_format(
     SampleData[SequencesWithQuality],

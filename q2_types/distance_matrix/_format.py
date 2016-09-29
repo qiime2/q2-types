@@ -22,5 +22,4 @@ DistanceMatrixDirectoryFormat = model.SingleFileDirectoryFormat(
     'DistanceMatrixDirectoryFormat', 'distance-matrix.tsv', LSMatFormat)
 
 
-plugin.register_format(LSMatFormat)
-plugin.register_format(DistanceMatrixDirectoryFormat)
+plugin.register_formats(LSMatFormat, DistanceMatrixDirectoryFormat)

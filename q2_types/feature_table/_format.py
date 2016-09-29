@@ -88,7 +88,6 @@ BIOMV210DirFmt = model.SingleFileDirectoryFormat('BIOMV210DirFmt',
                                                  'feature-table.biom',
                                                  BIOMV210Format)
 
-plugin.register_format(BIOMV100Format)
-plugin.register_format(BIOMV210Format)
-plugin.register_format(BIOMV100DirFmt)
-plugin.register_format(BIOMV210DirFmt)
+plugin.register_formats(
+    BIOMV100Format, BIOMV210Format, BIOMV100DirFmt, BIOMV210DirFmt
+)

@@ -26,5 +26,4 @@ AlphaDiversityDirectoryFormat = model.SingleFileDirectoryFormat(
     AlphaDiversityFormat)
 
 
-plugin.register_format(AlphaDiversityFormat)
-plugin.register_format(AlphaDiversityDirectoryFormat)
+plugin.register_formats(AlphaDiversityFormat, AlphaDiversityDirectoryFormat)

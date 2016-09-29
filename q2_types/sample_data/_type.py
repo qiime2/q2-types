@@ -17,8 +17,7 @@ SampleData = SemanticType('SampleData', field_names='type')
 AlphaDiversity = SemanticType('AlphaDiversity',
                               variant_of=SampleData.field['type'])
 
-plugin.register_semantic_type(SampleData)
-plugin.register_semantic_type(AlphaDiversity)
+plugin.register_semantic_types(SampleData, AlphaDiversity)
 
 plugin.register_semantic_type_to_format(
     SampleData[AlphaDiversity],

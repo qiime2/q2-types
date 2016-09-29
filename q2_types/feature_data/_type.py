@@ -26,11 +26,8 @@ PairedEndSequence = SemanticType('PairedEndSequence',
 AlignedSequence = SemanticType('AlignedSequence',
                                variant_of=FeatureData.field['type'])
 
-plugin.register_semantic_type(FeatureData)
-plugin.register_semantic_type(Taxonomy)
-plugin.register_semantic_type(Sequence)
-plugin.register_semantic_type(PairedEndSequence)
-plugin.register_semantic_type(AlignedSequence)
+plugin.register_semantic_types(FeatureData, Taxonomy, Sequence,
+                               PairedEndSequence, AlignedSequence)
 
 plugin.register_semantic_type_to_format(
     FeatureData[Taxonomy],

@@ -22,4 +22,4 @@ class ReferenceFeaturesDirectoryFormat(model.DirectoryFormat):
     tree = model.File('tree.nwk', format=NewickFormat)
 
 
-plugin.register_format(ReferenceFeaturesDirectoryFormat)
+plugin.register_formats(ReferenceFeaturesDirectoryFormat)

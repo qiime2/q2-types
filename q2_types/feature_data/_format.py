@@ -88,10 +88,8 @@ AlignedDNASequencesDirectoryFormat = model.SingleFileDirectoryFormat(
     AlignedDNAFASTAFormat)
 
 
-plugin.register_format(TaxonomyFormat)
-plugin.register_format(TaxonomyDirectoryFormat)
-plugin.register_format(DNAFASTAFormat)
-plugin.register_format(DNASequencesDirectoryFormat)
-plugin.register_format(PairedDNASequencesDirectoryFormat)
-plugin.register_format(AlignedDNAFASTAFormat)
-plugin.register_format(AlignedDNASequencesDirectoryFormat)
+plugin.register_formats(
+    TaxonomyFormat, TaxonomyDirectoryFormat, DNAFASTAFormat,
+    DNASequencesDirectoryFormat, PairedDNASequencesDirectoryFormat,
+    AlignedDNAFASTAFormat, AlignedDNASequencesDirectoryFormat
+)

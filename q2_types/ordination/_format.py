@@ -22,5 +22,4 @@ OrdinationDirectoryFormat = model.SingleFileDirectoryFormat(
     'OrdinationDirectoryFormat', 'ordination.txt', OrdinationFormat)
 
 
-plugin.register_format(OrdinationFormat)
-plugin.register_format(OrdinationDirectoryFormat)
+plugin.register_formats(OrdinationFormat, OrdinationDirectoryFormat)

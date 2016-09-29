@@ -23,10 +23,8 @@ PresenceAbsence = SemanticType('PresenceAbsence',
                                variant_of=FeatureTable.field['content'])
 
 
-plugin.register_semantic_type(FeatureTable)
-plugin.register_semantic_type(Frequency)
-plugin.register_semantic_type(RelativeFrequency)
-plugin.register_semantic_type(PresenceAbsence)
+plugin.register_semantic_types(FeatureTable, Frequency, RelativeFrequency,
+                               PresenceAbsence)
 
 plugin.register_semantic_type_to_format(
     FeatureTable[Frequency | RelativeFrequency | PresenceAbsence],
