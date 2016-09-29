@@ -18,9 +18,7 @@ Rooted = SemanticType('Rooted', variant_of=Phylogeny.field['type'])
 
 Unrooted = SemanticType('Unrooted', variant_of=Phylogeny.field['type'])
 
-plugin.register_semantic_type(Phylogeny)
-plugin.register_semantic_type(Rooted)
-plugin.register_semantic_type(Unrooted)
+plugin.register_semantic_types(Phylogeny, Rooted, Unrooted)
 
 plugin.register_semantic_type_to_format(Phylogeny[Rooted | Unrooted],
                                         artifact_format=NewickDirectoryFormat)

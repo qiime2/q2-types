@@ -76,10 +76,9 @@ class SingleLanePerSamplePairedEndFastqDirFmt(_SingleLanePerSampleFastqDirFmt):
     pass
 
 
-plugin.register_format(FastqManifestFormat)
-plugin.register_format(YamlFormat)
-plugin.register_format(FastqGzFormat)
-plugin.register_format(CasavaOneEightSingleLanePerSampleDirFmt)
-plugin.register_format(_SingleLanePerSampleFastqDirFmt)
-plugin.register_format(SingleLanePerSampleSingleEndFastqDirFmt)
-plugin.register_format(SingleLanePerSamplePairedEndFastqDirFmt)
+plugin.register_formats(
+    FastqManifestFormat, YamlFormat, FastqGzFormat,
+    CasavaOneEightSingleLanePerSampleDirFmt, _SingleLanePerSampleFastqDirFmt,
+    SingleLanePerSampleSingleEndFastqDirFmt,
+    SingleLanePerSamplePairedEndFastqDirFmt
+)

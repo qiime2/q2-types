@@ -22,5 +22,4 @@ NewickDirectoryFormat = model.SingleFileDirectoryFormat(
     'NewickDirectoryFormat', 'tree.nwk', NewickFormat)
 
 
-plugin.register_format(NewickFormat)
-plugin.register_format(NewickDirectoryFormat)
+plugin.register_formats(NewickFormat, NewickDirectoryFormat)

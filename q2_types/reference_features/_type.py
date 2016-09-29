@@ -15,8 +15,7 @@ from . import ReferenceFeaturesDirectoryFormat
 ReferenceFeatures = SemanticType('ReferenceFeatures', field_names='type')
 SSU = SemanticType('SSU', variant_of=ReferenceFeatures.field['type'])
 
-plugin.register_semantic_type(ReferenceFeatures)
-plugin.register_semantic_type(SSU)
+plugin.register_semantic_types(ReferenceFeatures, SSU)
 
 plugin.register_semantic_type_to_format(
     ReferenceFeatures[SSU],
