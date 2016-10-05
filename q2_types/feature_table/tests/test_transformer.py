@@ -86,6 +86,23 @@ class TestTransformers(TestPluginBase):
         self.assertEqual(obs.ids(axis='sample').all(),
                          exp.ids(axis='sample').all())
 
+    def test_biom_table_to_pandas_data_frame(self):
+        filepath = self.get_data_path('feature-table_v100.biom')
+        transformer = self.get_transformer(biom.Table, pd.DataFrame)
+        input = biom.load_table(filepath)
+
+        obs = transformer(input)
+
+        self.assertIsInstance(obs, pd.DataFrame)
+
+    def test_biom_v100_format_to_biom_v210_format(self):
+        filepath = self.get_data_path('feature-table_v100.biom')
+        transformer = self.get_transformer(BIOMV100Format, BIOMV210Format)
+        input = BIOMV100Format(filepath, mode='r')
+
+        obs = transformer(input)
+
+        self.assertIsInstance(obs, BIOMV210Format)
 
 if __name__ == "__main__":
     unittest.main()
