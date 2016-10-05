@@ -28,7 +28,6 @@ class TestTranfomers(TestPluginBase):
     def test_pd_dataframe_to_taxonomy_format(self):
         filepath = self.get_data_path('taxonomy.tsv')
         transformer = self.get_transformer(pd.DataFrame, TaxonomyFormat)
-
         # mimic _read_taxonomy from _transformer.py
         input = pd.read_csv(filepath, sep='\t', comment='#', header=0,
                             parse_dates=True, skip_blank_lines=True,
@@ -36,23 +35,23 @@ class TestTranfomers(TestPluginBase):
         input.set_index(input.columns[0], drop=True, append=False,
                         inplace=True)
 
-        # capture the return value of the transformer and mimic _read_taxonomy
         obs = transformer(input)
+        obs = pd.read_csv(str(obs), sep='\t',
+                          comment='#', header=0, parse_dates=True,
+                          skip_blank_lines=True, dtype=object)
+        obs.set_index(obs.columns[0], drop=True, append=False, inplace=True)
 
-        self.assertIsInstance(obs, TaxonomyFormat)
+        exp = input
+        assert_frame_equal(obs, exp)
 
-    def _init_taxonomy_tests(self, dest):
-        transformer = self.get_transformer(TaxonomyFormat, dest)
+    def test_taxonomy_format_to_pd_dataframe(self):
+        transformer = self.get_transformer(TaxonomyFormat, pd.DataFrame)
         filepath = self.get_data_path('taxonomy.tsv')
         format = TaxonomyFormat(filepath, mode='r')
 
-        return transformer, format
-
-    def test_taxonomy_format_to_pd_dataframe(self):
-        transformer, format = self._init_taxonomy_tests(pd.DataFrame)
         obs = transformer(format)
 
-        exp = pd.read_csv(self.get_data_path('taxonomy.tsv'), sep='\t',
+        exp = pd.read_csv(filepath, sep='\t',
                           comment='#', header=0, parse_dates=True,
                           skip_blank_lines=True, dtype=object)
         exp.set_index(exp.columns[0], drop=True, append=False, inplace=True)
@@ -61,10 +60,13 @@ class TestTranfomers(TestPluginBase):
         assert_frame_equal(obs, exp)
 
     def test_taxonomy_format_to_pd_series(self):
-        transformer, format = self._init_taxonomy_tests(pd.Series)
+        transformer = self.get_transformer(TaxonomyFormat, pd.Series)
+        filepath = self.get_data_path('taxonomy.tsv')
+        format = TaxonomyFormat(filepath, mode='r')
+
         obs = transformer(format)
 
-        exp = pd.read_csv(self.get_data_path('taxonomy.tsv'), sep='\t',
+        exp = pd.read_csv(filepath, sep='\t',
                           comment='#', header=0, parse_dates=True,
                           skip_blank_lines=True, dtype=object)
         exp.set_index(exp.columns[0], drop=True, append=False, inplace=True)
@@ -74,10 +76,13 @@ class TestTranfomers(TestPluginBase):
         assert_series_equal(obs, exp)
 
     def test_taxonomy_format_to_qiime_metadata(self):
-        transformer, format = self._init_taxonomy_tests(qiime.Metadata)
+        transformer = self.get_transformer(TaxonomyFormat, qiime.Metadata)
+        filepath = self.get_data_path('taxonomy.tsv')
+        format = TaxonomyFormat(filepath, mode='r')
+
         obs = transformer(format)
 
-        df = pd.read_csv(self.get_data_path('taxonomy.tsv'), sep='\t',
+        df = pd.read_csv(filepath, sep='\t',
                          comment='#', header=0, parse_dates=True,
                          skip_blank_lines=True, dtype=object)
         df.set_index(df.columns[0], drop=True, append=False, inplace=True)
@@ -154,6 +159,7 @@ class TestTranfomers(TestPluginBase):
                                            skbio.TabularMSA)
         filepath = self.get_data_path('aligned-dna-sequences.fasta')
         format = AlignedDNAFASTAFormat(filepath, mode='r')
+
         obs = transformer(format)
 
         self.assertIsInstance(obs, skbio.TabularMSA)
