@@ -13,19 +13,12 @@ import qiime.sdk
 
 from q2_types import __version__
 
-citation_text = ('This plugin does not have a direct citation. Please instead '
-                 'cite QIIME: %s' % qiime.sdk.CITATION)
-user_support_text = ('To get help with this plugin, see the QIIME 2 wiki at '
-                     'http://2.qiime.org, or post to the q2-types issue '
-                     'tracker at: https://github.com/qiime2/q2-types/issues')
 
 plugin = qiime.plugin.Plugin(
     name='types',
     version=__version__,
     website='https://github.com/qiime2/q2-types',
-    package='q2_types',
-    citation_text=citation_text,
-    user_support_text=user_support_text
+    package='q2_types'
 )
 
 importlib.import_module('q2_types.feature_table')
