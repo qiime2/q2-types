@@ -104,5 +104,27 @@ class TestTransformers(TestPluginBase):
 
         self.assertIsInstance(obs, BIOMV210Format)
 
+    def test_to_pandas_data_frame_to_biom_v210_format(self):
+        # load a table to a pd.DataFrame
+        filepath = self.get_data_path('feature-table_v100.biom')
+        transformer1 = self.get_transformer(BIOMV100Format, pd.DataFrame)
+        input = BIOMV100Format(filepath, mode='r')
+        df = transformer1(input)
+
+        transformer2 = self.get_transformer(pd.DataFrame, BIOMV210Format)
+        obs = transformer2(df)
+        self.assertIsInstance(obs, BIOMV210Format)
+
+    def test_to_pandas_data_frame_to_biom_table(self):
+        # load a table to a pd.DataFrame
+        filepath = self.get_data_path('feature-table_v100.biom')
+        transformer1 = self.get_transformer(BIOMV100Format, pd.DataFrame)
+        input = BIOMV100Format(filepath, mode='r')
+        df = transformer1(input)
+
+        transformer2 = self.get_transformer(pd.DataFrame, biom.Table)
+        obs = transformer2(df)
+        self.assertIsInstance(obs, biom.Table)
+
 if __name__ == "__main__":
     unittest.main()
