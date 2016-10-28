@@ -67,6 +67,11 @@ def _table_to_v210(data):
     return ff
 
 
+def _dataframe_to_table(df):
+    return biom.Table(df.T.values, observation_ids=df.columns,
+                      sample_ids=df.index)
+
+
 @plugin.register_transformer
 def _1(data: biom.Table) -> BIOMV100Format:
     data = _drop_axis_metadata(data)
@@ -120,3 +125,13 @@ def _7(data: biom.Table) -> pd.DataFrame:
 def _8(ff: BIOMV100Format) -> BIOMV210Format:
     data = _parse_biom_table_v100(ff)
     return _table_to_v210(data)
+
+
+@plugin.register_transformer
+def _9(df: pd.DataFrame) -> biom.Table:
+    return _dataframe_to_table(df)
+
+
+@plugin.register_transformer
+def _10(df: pd.DataFrame) -> BIOMV210Format:
+    return _table_to_v210(_dataframe_to_table(df))
