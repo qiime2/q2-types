@@ -6,7 +6,7 @@
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
 
-__version__ = "0.0.5"  # noqa
+__version__ = "0.0.6"  # noqa
 
 # TODO remove all imports and from __all__ because they are available as public
 # imports in their respective subpackages. These imports are here so the
