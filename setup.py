@@ -11,9 +11,9 @@ from setuptools import setup, find_packages
 setup(
     name="q2-types",
     # TODO stop duplicating version string
-    version="0.0.5",
+    version="0.0.6",
     packages=find_packages(),
-    install_requires=['scikit-bio', 'qiime >= 2.0.5', 'pandas',
+    install_requires=['scikit-bio', 'qiime >= 2.0.6', 'pandas',
                       'biom-format >= 2.1.5, < 2.2.0', 'ijson',
                       'h5py'],
     author="Greg Caporaso",
