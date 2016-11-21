@@ -10,8 +10,10 @@ import unittest
 
 import biom
 import pandas as pd
+import numpy as np
 
 from q2_types.feature_table import BIOMV100Format, BIOMV210Format
+from q2_types.feature_data import TaxonomyFormat
 from qiime.plugin.testing import TestPluginBase
 
 
@@ -125,6 +127,66 @@ class TestTransformers(TestPluginBase):
         transformer2 = self.get_transformer(pd.DataFrame, biom.Table)
         obs = transformer2(df)
         self.assertIsInstance(obs, biom.Table)
+
+    def test_biom_table_to_taxonomy_format(self):
+        transformer = self.get_transformer(biom.Table, TaxonomyFormat)
+
+        data = np.arange(16).reshape(4, 4)
+        observation_ids = ['O%d' % i for i in range(4)]
+        sample_ids = ['S%d' % i for i in range(4)]
+        sample_metadata = [dict(x=i) for i in range(4)]
+        observation_metadata = [dict(taxonomy=['a', 'b']) for _ in range(4)]
+
+        table = biom.Table(data, observation_ids, sample_ids,
+                           observation_metadata, sample_metadata)
+        obs = transformer(table)
+
+        self.assertIsInstance(obs, TaxonomyFormat)
+        self.assertEqual(
+            obs.path.read_text(),
+            'Feature ID\tTaxon\nO0\ta; b\nO1\ta; b\nO2\ta; b\nO3\ta; b\n')
+
+    def test_biom_table_to_taxonomy_format_no_taxonomy_md(self):
+        transformer = self.get_transformer(biom.Table, TaxonomyFormat)
+
+        data = np.arange(16).reshape(4, 4)
+        observation_ids = ['O%d' % i for i in range(4)]
+        sample_ids = ['S%d' % i for i in range(4)]
+        sample_metadata = [dict(x=i) for i in range(4)]
+        observation_metadata = [dict(taxon=['a', 'b']) for _ in range(4)]
+
+        table = biom.Table(data, observation_ids, sample_ids,
+                           observation_metadata, sample_metadata)
+
+        with self.assertRaisesRegex(KeyError, 'does not contain `taxonomy`'):
+            transformer(table)
+
+    def test_biom_table_to_taxonomy_format_missing_md(self):
+        transformer = self.get_transformer(biom.Table, TaxonomyFormat)
+
+        data = np.arange(16).reshape(4, 4)
+        observation_ids = ['O%d' % i for i in range(4)]
+        sample_ids = ['S%d' % i for i in range(4)]
+        sample_metadata = [dict(x=i) for i in range(4)]
+        observation_metadata = [dict(taxonomy=['a', 'b']) for _ in range(4)]
+        observation_metadata[2]['taxonomy'] = None
+
+        table = biom.Table(data, observation_ids, sample_ids,
+                           observation_metadata, sample_metadata)
+
+        with self.assertRaisesRegex(TypeError, 'metadata must be specified'):
+            transformer(table)
+
+    def test_biom_v210_format_no_md_to_taxonomy_format(self):
+        filepath = self.get_data_path('feature-table_v210.biom')
+        transformer = self.get_transformer(BIOMV210Format, biom.Table)
+        input = BIOMV210Format(filepath, mode='r')
+        table = transformer(input)
+
+        transformer = self.get_transformer(biom.Table, TaxonomyFormat)
+        with self.assertRaisesRegex(TypeError, 'must have metadata'):
+            transformer(table)
+
 
 if __name__ == "__main__":
     unittest.main()
