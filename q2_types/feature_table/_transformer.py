@@ -75,24 +75,26 @@ def _dataframe_to_table(df):
 
 
 def _biom_to_taxonomy_format(table):
-    axis = 'observation'
-    metadata = table.metadata(axis=axis)
+    metadata = table.metadata(axis='observation')
+    ids = table.ids(axis='observation')
     if metadata is None:
-        raise TypeError('Table must have metadata')
+        raise TypeError('Table must have observation metadata.')
 
     taxonomy = []
-    for m in metadata:
-        if 'taxonomy' not in m.keys():
-            raise KeyError('Observation does not contain `taxonomy` metadata')
+    for oid, m in zip(ids, metadata):
+        if 'taxonomy' not in m:
+            raise ValueError('Observation %s does not contain `taxonomy` '
+                             'metadata.' % oid)
 
-        taxa = m['taxonomy']
-        if taxa is None:
-            raise TypeError('Observation `taxonomy` metadata must be '
-                            'specified')
+        try:
+            taxonomy.append('; '.join(m['taxonomy']))
+        except Exception as e:
+            raise TypeError('There was a problem preparing the taxonomy '
+                            'data for Observation %s. Metadata should be '
+                            'formatted as a list of strings; received %r.'
+                            % (oid, type(m['taxonomy']))) from e
 
-        taxonomy.append('; '.join(taxa))
-
-    data = pd.Series(taxonomy, index=table.ids(axis=axis), name='Taxon')
+    data = pd.Series(taxonomy, index=ids, name='Taxon')
     data.index.name = 'Feature ID'
     return _pandas_to_taxonomy_format(data)
 
