@@ -12,6 +12,7 @@ import biom
 import pandas as pd
 
 from q2_types.feature_table import BIOMV100Format, BIOMV210Format
+from q2_types.feature_data import TaxonomyFormat
 from qiime.plugin.testing import TestPluginBase
 
 
@@ -125,6 +126,72 @@ class TestTransformers(TestPluginBase):
         transformer2 = self.get_transformer(pd.DataFrame, biom.Table)
         obs = transformer2(df)
         self.assertIsInstance(obs, biom.Table)
+
+    def test_biom_table_to_taxonomy_format(self):
+        filepath = self.get_data_path(
+            'feature-table-with-taxonomy-metadata_v210.biom')
+        table = biom.load_table(filepath)
+
+        transformer = self.get_transformer(biom.Table, TaxonomyFormat)
+        obs = transformer(table)
+
+        self.assertIsInstance(obs, TaxonomyFormat)
+        self.assertEqual(
+            obs.path.read_text(),
+            'Feature ID\tTaxon\nO0\ta; b\nO1\ta; b\nO2\ta; b\nO3\ta; b\n')
+
+    def test_biom_table_to_taxonomy_format_no_taxonomy_md(self):
+        filepath = self.get_data_path(
+            'feature-table-with-taxonomy-metadata_v210.biom')
+        table = biom.load_table(filepath)
+
+        observation_metadata = [dict(taxon=['a', 'b']) for _ in range(4)]
+        table = biom.Table(table.matrix_data,
+                           observation_ids=table.ids(axis='observation'),
+                           sample_ids=table.ids(axis='sample'),
+                           observation_metadata=observation_metadata)
+
+        transformer = self.get_transformer(biom.Table, TaxonomyFormat)
+
+        with self.assertRaisesRegex(ValueError,
+                                    'O0 does not contain `taxonomy`'):
+            transformer(table)
+
+    def test_biom_table_to_taxonomy_format_missing_md(self):
+        filepath = self.get_data_path(
+            'feature-table-with-taxonomy-metadata_v210.biom')
+        table = biom.load_table(filepath)
+
+        observation_metadata = [dict(taxonomy=['a', 'b']) for _ in range(4)]
+        observation_metadata[2]['taxonomy'] = None  # Wipe out one entry
+        table = biom.Table(table.matrix_data,
+                           observation_ids=table.ids(axis='observation'),
+                           sample_ids=table.ids(axis='sample'),
+                           observation_metadata=observation_metadata)
+
+        transformer = self.get_transformer(biom.Table, TaxonomyFormat)
+
+        with self.assertRaisesRegex(TypeError, 'problem preparing.*O2'):
+            transformer(table)
+
+    def test_biom_v210_format_to_taxonomy_format(self):
+        filepath = self.get_data_path(
+            'feature-table-with-taxonomy-metadata_v210.biom')
+        input = BIOMV210Format(filepath, mode='r')
+        transformer = self.get_transformer(BIOMV210Format, TaxonomyFormat)
+        obs = transformer(input)
+        self.assertIsInstance(obs, TaxonomyFormat)
+
+    def test_biom_v210_format_no_md_to_taxonomy_format(self):
+        filepath = self.get_data_path('feature-table_v210.biom')
+        transformer = self.get_transformer(BIOMV210Format, biom.Table)
+        input = BIOMV210Format(filepath, mode='r')
+        table = transformer(input)
+
+        transformer = self.get_transformer(biom.Table, TaxonomyFormat)
+        with self.assertRaisesRegex(TypeError, 'observation metadata'):
+            transformer(table)
+
 
 if __name__ == "__main__":
     unittest.main()

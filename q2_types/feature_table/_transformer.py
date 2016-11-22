@@ -13,6 +13,8 @@ import pandas as pd
 import qiime
 
 from . import BIOMV100Format, BIOMV210Format
+from ..feature_data import TaxonomyFormat
+from ..feature_data._transformer import _pandas_to_taxonomy_format
 from ..plugin_setup import plugin
 
 # NOTE: In the readers and writers for BIOM v1 and v2 below, metadata must be
@@ -70,6 +72,31 @@ def _table_to_v210(data):
 def _dataframe_to_table(df):
     return biom.Table(df.T.values, observation_ids=df.columns,
                       sample_ids=df.index)
+
+
+def _biom_to_taxonomy_format(table):
+    metadata = table.metadata(axis='observation')
+    ids = table.ids(axis='observation')
+    if metadata is None:
+        raise TypeError('Table must have observation metadata.')
+
+    taxonomy = []
+    for oid, m in zip(ids, metadata):
+        if 'taxonomy' not in m:
+            raise ValueError('Observation %s does not contain `taxonomy` '
+                             'metadata.' % oid)
+
+        try:
+            taxonomy.append('; '.join(m['taxonomy']))
+        except Exception as e:
+            raise TypeError('There was a problem preparing the taxonomy '
+                            'data for Observation %s. Metadata should be '
+                            'formatted as a list of strings; received %r.'
+                            % (oid, type(m['taxonomy']))) from e
+
+    data = pd.Series(taxonomy, index=ids, name='Taxon')
+    data.index.name = 'Feature ID'
+    return _pandas_to_taxonomy_format(data)
 
 
 @plugin.register_transformer
@@ -135,3 +162,16 @@ def _9(df: pd.DataFrame) -> biom.Table:
 @plugin.register_transformer
 def _10(df: pd.DataFrame) -> BIOMV210Format:
     return _table_to_v210(_dataframe_to_table(df))
+
+
+@plugin.register_transformer
+def _11(data: biom.Table) -> TaxonomyFormat:
+    return _biom_to_taxonomy_format(data)
+
+
+@plugin.register_transformer
+def _12(ff: BIOMV210Format) -> TaxonomyFormat:
+    # skip _parse_biom_table_v210 because it strips out metadata
+    with ff.open() as fh:
+        table = biom.Table.from_hdf5(fh)
+    return _biom_to_taxonomy_format(table)
