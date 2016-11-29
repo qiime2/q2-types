@@ -8,6 +8,7 @@
 
 import os
 import shutil
+import unittest
 
 from q2_types.ordination import OrdinationFormat, OrdinationDirectoryFormat
 from qiime.plugin.testing import TestPluginBase
@@ -36,3 +37,7 @@ class TestFormats(TestPluginBase):
         format = OrdinationDirectoryFormat(self.temp_dir.name, mode='r')
 
         format.validate()
+
+
+if __name__ == "__main__":
+    unittest.main()

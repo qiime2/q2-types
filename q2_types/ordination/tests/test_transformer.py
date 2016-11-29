@@ -6,6 +6,7 @@
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
 
+import unittest
 
 import skbio
 
@@ -35,3 +36,7 @@ class TestTransformers(TestPluginBase):
         obs = transformer(input)
 
         self.assertIsInstance(obs, skbio.OrdinationResults)
+
+
+if __name__ == "__main__":
+    unittest.main()
