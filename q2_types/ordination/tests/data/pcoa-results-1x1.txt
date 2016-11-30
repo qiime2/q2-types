@@ -1,0 +1,14 @@
+Eigvals	1
+0.0
+
+Proportion explained	1
+nan
+
+Species	0	0
+
+Site	1	1
+s1	0.0
+
+Biplot	0	0
+
+Site constraints	0	0

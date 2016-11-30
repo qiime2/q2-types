@@ -18,24 +18,30 @@ class TestTransformers(TestPluginBase):
     package = 'q2_types.ordination.tests'
 
     def test_skbio_ordination_results_to_ordination_format(self):
-        filepath = self.get_data_path('pcoa-results.txt')
-        transformer = self.get_transformer(skbio.OrdinationResults,
-                                           OrdinationFormat)
-        input = skbio.OrdinationResults.read(filepath)
+        filenames = ('pcoa-results-1x1.txt', 'pcoa-results-2x2.txt',
+                     'pcoa-results-NxN.txt')
+        for filename in filenames:
+            filepath = self.get_data_path(filename)
+            transformer = self.get_transformer(skbio.OrdinationResults,
+                                               OrdinationFormat)
+            input = skbio.OrdinationResults.read(filepath)
 
-        obs = transformer(input)
+            obs = transformer(input)
 
-        self.assertIsInstance(obs, OrdinationFormat)
+            self.assertIsInstance(obs, OrdinationFormat)
 
     def test_ordination_format_to_skbio_ordination_results(self):
-        filepath = self.get_data_path('pcoa-results.txt')
-        transformer = self.get_transformer(OrdinationFormat,
-                                           skbio.OrdinationResults)
-        input = OrdinationFormat(filepath, mode='r')
+        filenames = ('pcoa-results-1x1.txt', 'pcoa-results-2x2.txt',
+                     'pcoa-results-NxN.txt')
+        for filename in filenames:
+            filepath = self.get_data_path(filename)
+            transformer = self.get_transformer(OrdinationFormat,
+                                               skbio.OrdinationResults)
+            input = OrdinationFormat(filepath, mode='r')
 
-        obs = transformer(input)
+            obs = transformer(input)
 
-        self.assertIsInstance(obs, skbio.OrdinationResults)
+            self.assertIsInstance(obs, skbio.OrdinationResults)
 
 
 if __name__ == "__main__":

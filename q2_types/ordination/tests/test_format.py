@@ -18,7 +18,7 @@ class TestFormats(TestPluginBase):
     package = 'q2_types.ordination.tests'
 
     def test_ordination_format_validate_positive(self):
-        filepath = self.get_data_path('pcoa-results.txt')
+        filepath = self.get_data_path('pcoa-results-NxN.txt')
         format = OrdinationFormat(filepath, mode='r')
 
         format.validate()
@@ -31,7 +31,7 @@ class TestFormats(TestPluginBase):
             format.validate()
 
     def test_ordination_dir_format_validate_positive(self):
-        filepath = self.get_data_path('pcoa-results.txt')
+        filepath = self.get_data_path('pcoa-results-NxN.txt')
         shutil.copy(filepath,
                     os.path.join(self.temp_dir.name, 'ordination.txt'))
         format = OrdinationDirectoryFormat(self.temp_dir.name, mode='r')

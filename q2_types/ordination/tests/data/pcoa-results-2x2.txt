@@ -1,0 +1,15 @@
+Eigvals	2
+882.0	0.0
+
+Proportion explained	2
+1.0	0.0
+
+Species	0	0
+
+Site	2	2
+s1	-20.999999999999996	-0.0
+s2	20.999999999999996	-0.0
+
+Biplot	0	0
+
+Site constraints	0	0
