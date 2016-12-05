@@ -70,6 +70,8 @@ def _table_to_v210(data):
 
 
 def _dataframe_to_table(df):
+    if df.index.inferred_type != 'string':
+        raise TypeError("Please provide a DataFrame with a string-based Index")
     return biom.Table(df.T.values, observation_ids=df.columns,
                       sample_ids=df.index)
 
