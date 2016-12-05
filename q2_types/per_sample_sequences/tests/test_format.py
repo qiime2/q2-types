@@ -21,7 +21,8 @@ class TestFormats(TestPluginBase):
     package = 'q2_types.per_sample_sequences.tests'
 
     def test_fastq_gz_format_validate_positive(self):
-        filepath = self.get_data_path('Human-Kneecap_S1_L001_R1_001.fastq.gz')
+        filepath = self.get_data_path(
+            'single_end_data/Human-Kneecap_S1_L001_R1_001.fastq.gz')
         format = FastqGzFormat(filepath, mode='r')
 
         format.validate()
@@ -47,7 +48,7 @@ class TestFormats(TestPluginBase):
             format.validate()
 
     def test_fastq_manifest_format_validate_positive(self):
-        filepath = self.get_data_path('MANIFEST')
+        filepath = self.get_data_path('single_end_data/MANIFEST')
         format = FastqManifestFormat(filepath, mode='r')
 
         format.validate()
@@ -60,7 +61,8 @@ class TestFormats(TestPluginBase):
             format.validate()
 
     def test_casava_one_eight_slanepsample_dir_fmt_validate_positive(self):
-        filepath = self.get_data_path('Human-Kneecap_S1_L001_R1_001.fastq.gz')
+        filepath = self.get_data_path(
+            'single_end_data/Human-Kneecap_S1_L001_R1_001.fastq.gz')
         shutil.copy(filepath, self.temp_dir.name)
 
         format = CasavaOneEightSingleLanePerSampleDirFmt(
@@ -79,8 +81,8 @@ class TestFormats(TestPluginBase):
             format.validate()
 
     def test_slanepsample_single_end_fastq_dir_fmt_validate_positive(self):
-        filenames = ('MANIFEST', 'metadata.yml',
-                     'Human-Kneecap_S1_L001_R1_001.fastq.gz')
+        filenames = ('single_end_data/MANIFEST', 'metadata.yml',
+                     'single_end_data/Human-Kneecap_S1_L001_R1_001.fastq.gz')
         for filename in filenames:
             filepath = self.get_data_path(filename)
             shutil.copy(filepath, self.temp_dir.name)
@@ -91,7 +93,8 @@ class TestFormats(TestPluginBase):
         format.validate()
 
     def test_slanepsample_single_end_fastq_dir_fmt_validate_negative(self):
-        filenames = ('MANIFEST', 'metadata.yml', 'not-fastq.fastq.gz')
+        filenames = ('single_end_data/MANIFEST', 'metadata.yml',
+                     'not-fastq.fastq.gz')
         for filename in filenames:
             filepath = self.get_data_path(filename)
             shutil.copy(filepath, self.temp_dir.name)
@@ -103,8 +106,9 @@ class TestFormats(TestPluginBase):
             format.validate()
 
     def test_slanepsample_paired_end_fastq_dir_fmt_validate_positive(self):
-        filenames = ('MANIFEST', 'metadata.yml',
-                     'Human-Kneecap_S1_L001_R1_001.fastq.gz')
+        filenames = ('paired_end_data/MANIFEST', 'metadata.yml',
+                     'paired_end_data/Human-Kneecap_S1_L001_R1_001.fastq.gz',
+                     'paired_end_data/Human-Kneecap_S1_L001_R2_001.fastq.gz')
         for filename in filenames:
             filepath = self.get_data_path(filename)
             shutil.copy(filepath, self.temp_dir.name)
@@ -115,7 +119,8 @@ class TestFormats(TestPluginBase):
         format.validate()
 
     def test_slanepsample_paired_end_fastq_dir_fmt_validate_negative(self):
-        filenames = ('MANIFEST', 'metadata.yml', 'not-fastq.fastq.gz')
+        filenames = ('paired_end_data/MANIFEST', 'metadata.yml',
+                     'not-fastq.fastq.gz')
         for filename in filenames:
             filepath = self.get_data_path(filename)
             shutil.copy(filepath, self.temp_dir.name)
