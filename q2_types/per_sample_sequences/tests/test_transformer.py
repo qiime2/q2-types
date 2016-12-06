@@ -8,6 +8,8 @@
 
 import unittest
 
+import skbio
+
 from q2_types.per_sample_sequences import (
     PerSampleDNAIterators, PerSamplePairedDNAIterators,
     SingleLanePerSampleSingleEndFastqDirFmt,
@@ -27,6 +29,16 @@ class TestTransformers(TestPluginBase):
             SingleLanePerSampleSingleEndFastqDirFmt, PerSampleDNAIterators,
             filenames=filenames
         )
+
+        obs = {key: value for key, value in obs.items()
+               if key != 'Human-Kneecap'}
+        sk = skbio.io.read(
+            '%s/Human-Kneecap_S1_L001_R1_001.fastq.gz' % str(input),
+            format='fastq', constructor=skbio.DNA
+        )
+
+        for act, exp in zip(obs, sk):
+            self.assertEqual(act, exp)
 
     def test_slpspefdf_to_per_sample_paired_dna_iterators(self):
         filenames = ('paired_end_data/MANIFEST', 'metadata.yml',
