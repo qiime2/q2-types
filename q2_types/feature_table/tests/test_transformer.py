@@ -116,6 +116,17 @@ class TestTransformers(TestPluginBase):
         obs = transformer2(df)
         self.assertIsInstance(obs, BIOMV210Format)
 
+    def test_to_pandas_dataframe_bad_index(self):
+        transformer = self.get_transformer(pd.DataFrame, BIOMV210Format)
+        df = pd.DataFrame([[1, 2], [2, 3]], columns=['ATG', 'ACG'])
+        with self.assertRaisesRegex(TypeError, 'string-based'):
+            transformer(df)
+
+        df = pd.DataFrame([[1, 2], [2, 3]], columns=['ATG', 'ACG'],
+                          index=[98, 99])
+        with self.assertRaisesRegex(TypeError, 'string-based'):
+            transformer(df)
+
     def test_to_pandas_data_frame_to_biom_table(self):
         # load a table to a pd.DataFrame
         filepath = self.get_data_path('feature-table_v100.biom')
