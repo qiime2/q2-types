@@ -35,8 +35,8 @@ class TestTransformers(TestPluginBase):
         filenames = ('distance-matrix-1x1.tsv', 'distance-matrix-2x2.tsv',
                      'distance-matrix-NxN.tsv')
         for filename in filenames:
-            input, obs = self.transform_format(LSMatFormat, skbio.DistanceMatrix,
-                                               filename=filename)
+            input, obs = self.transform_format(
+                LSMatFormat, skbio.DistanceMatrix, filename=filename)
             exp = skbio.DistanceMatrix.read(str(input))
             self.assertEqual(obs, exp)
 

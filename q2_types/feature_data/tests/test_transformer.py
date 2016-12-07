@@ -6,8 +6,7 @@
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
 
-import os
-import shutil
+import unittest
 
 import pandas as pd
 import qiime
@@ -45,131 +44,120 @@ class TestTranfomers(TestPluginBase):
         assert_frame_equal(obs, exp)
 
     def test_taxonomy_format_to_pd_dataframe(self):
-        transformer = self.get_transformer(TaxonomyFormat, pd.DataFrame)
-        filepath = self.get_data_path('taxonomy.tsv')
-        format = TaxonomyFormat(filepath, mode='r')
+        input, obs = self.transform_format(TaxonomyFormat, pd.DataFrame,
+                                           filename='taxonomy.tsv')
 
-        obs = transformer(format)
-
-        exp = pd.read_csv(filepath, sep='\t',
+        exp = pd.read_csv(str(input), sep='\t',
                           comment='#', header=0, parse_dates=True,
                           skip_blank_lines=True, dtype=object)
         exp.set_index(exp.columns[0], drop=True, append=False, inplace=True)
 
-        self.assertIsInstance(obs, pd.DataFrame)
         assert_frame_equal(obs, exp)
 
     def test_taxonomy_format_to_pd_series(self):
-        transformer = self.get_transformer(TaxonomyFormat, pd.Series)
-        filepath = self.get_data_path('taxonomy.tsv')
-        format = TaxonomyFormat(filepath, mode='r')
+        input, obs = self.transform_format(TaxonomyFormat, pd.Series,
+                                           filename='taxonomy.tsv')
 
-        obs = transformer(format)
-
-        exp = pd.read_csv(filepath, sep='\t',
+        exp = pd.read_csv(str(input), sep='\t',
                           comment='#', header=0, parse_dates=True,
                           skip_blank_lines=True, dtype=object)
         exp.set_index(exp.columns[0], drop=True, append=False, inplace=True)
         exp = exp.iloc[:, 0]
 
-        self.assertIsInstance(obs, pd.Series)
         assert_series_equal(obs, exp)
 
     def test_taxonomy_format_to_qiime_metadata(self):
-        transformer = self.get_transformer(TaxonomyFormat, qiime.Metadata)
-        filepath = self.get_data_path('taxonomy.tsv')
-        format = TaxonomyFormat(filepath, mode='r')
+        input, obs = self.transform_format(TaxonomyFormat, qiime.Metadata,
+                                           filename='taxonomy.tsv')
 
-        obs = transformer(format)
-
-        df = pd.read_csv(filepath, sep='\t',
+        df = pd.read_csv(str(input), sep='\t',
                          comment='#', header=0, parse_dates=True,
                          skip_blank_lines=True, dtype=object)
         df.set_index(df.columns[0], drop=True, append=False, inplace=True)
         exp = qiime.Metadata(df)
 
-        self.assertIsInstance(obs, qiime.Metadata)
         assert_frame_equal(obs.to_dataframe(), exp.to_dataframe())
 
     # Test DNA Sequence Transformers
     def test_dna_fasta_format_to_dna_iterator(self):
-        transformer = self.get_transformer(DNAFASTAFormat, DNAIterator)
-        filepath = self.get_data_path('dna-sequences.fasta')
-        format = DNAFASTAFormat(filepath, mode='r')
+        input, obs = self.transform_format(DNAFASTAFormat, DNAIterator,
+                                           filename='dna-sequences.fasta')
 
-        obs = transformer(format)
+        exp = skbio.read(str(input), format='fasta', constructor=skbio.DNA)
 
-        exp = skbio.read(filepath, format='fasta', constructor=skbio.DNA)
         for observed, expected in zip(obs, exp):
             self.assertEqual(observed, expected)
-        self.assertIsInstance(obs, DNAIterator)
 
     def test_dna_iterator_to_dna_fasta_format(self):
         transformer = self.get_transformer(DNAIterator, DNAFASTAFormat)
         filepath = self.get_data_path('dna-sequences.fasta')
         generator = skbio.read(filepath, format='fasta', constructor=skbio.DNA)
-        format = DNAIterator(generator)
+        input = DNAIterator(generator)
 
-        obs = transformer(format)
-
+        obs = transformer(input)
         self.assertIsInstance(obs, DNAFASTAFormat)
+        obs = skbio.read(str(obs), format='fasta', constructor=skbio.DNA)
+
+        for act, exp in zip(obs, input):
+            self.assertEqual(act, exp)
 
     def test_pair_dna_sequences_directory_format_to_pair_dna_iterator(self):
-        transformer = self.get_transformer(PairedDNASequencesDirectoryFormat,
-                                           PairedDNAIterator)
-        filepath = self.get_data_path('dna-sequences.fasta')
-        temp_dir = self.temp_dir.name
-        l_seq = os.path.join(temp_dir, 'left-dna-sequences.fasta')
-        r_seq = os.path.join(temp_dir, 'right-dna-sequences.fasta')
+        filenames = ('left-dna-sequences.fasta', 'right-dna-sequences.fasta')
+        input, obs = self.transform_format(PairedDNASequencesDirectoryFormat,
+                                           PairedDNAIterator,
+                                           filenames=filenames)
 
-        shutil.copy(filepath, l_seq)
-        shutil.copy(filepath, r_seq)
-        format = PairedDNASequencesDirectoryFormat(temp_dir, mode='r')
-
-        obs = transformer(format)
-
-        exp_left = skbio.read(l_seq, format='fasta', constructor=skbio.DNA)
-        exp_right = skbio.read(r_seq, format='fasta', constructor=skbio.DNA)
-        for observed, expected in zip(obs, zip(exp_left, exp_right)):
-            self.assertEqual(observed, expected)
+        exp_left = skbio.read(self.get_data_path(filenames[0]),
+                              format='fasta', constructor=skbio.DNA)
+        exp_right = skbio.read(self.get_data_path(filenames[1]),
+                               format='fasta', constructor=skbio.DNA)
+        for act, exp in zip(obs, zip(exp_left, exp_right)):
+            self.assertEqual(act, exp)
         self.assertIsInstance(obs, PairedDNAIterator)
 
     def test_pair_dna_iterator_to_pair_dna_sequences_directory_format(self):
         transformer = self.get_transformer(PairedDNAIterator,
                                            PairedDNASequencesDirectoryFormat)
-        filepath = self.get_data_path('dna-sequences.fasta')
-        temp_dir = self.temp_dir.name
-        l_seq = os.path.join(temp_dir, 'left-dna-sequences.fasta')
-        r_seq = os.path.join(temp_dir, 'right-dna-sequences.fasta')
 
-        shutil.copy(filepath, l_seq)
-        shutil.copy(filepath, r_seq)
+        l_seqs = skbio.read(self.get_data_path('left-dna-sequences.fasta'),
+                            format='fasta', constructor=skbio.DNA)
+        r_seqs = skbio.read(self.get_data_path('right-dna-sequences.fasta'),
+                            format='fasta', constructor=skbio.DNA)
+        input = PairedDNAIterator(zip(l_seqs, r_seqs))
 
-        left = skbio.read(l_seq, format='fasta', constructor=skbio.DNA)
-        right = skbio.read(r_seq, format='fasta', constructor=skbio.DNA)
-        generator = zip(left, right)
-        format = PairedDNAIterator(generator)
+        obs = transformer(input)
+        obs_l = skbio.read('%s/left-dna-sequences.fasta' % str(obs),
+                           format='fasta', constructor=skbio.DNA)
+        obs_r = skbio.read('%s/right-dna-sequences.fasta' % str(obs),
+                           format='fasta', constructor=skbio.DNA)
 
-        obs = transformer(format)
-
+        for act, exp in zip(zip(obs_l, obs_r), zip(l_seqs, r_seqs)):
+            self.assertEqual(act, exp)
         self.assertIsInstance(obs, PairedDNASequencesDirectoryFormat)
 
     def test_aligned_dna_fasta_format_to_skbio_tabular_msa(self):
-        transformer = self.get_transformer(AlignedDNAFASTAFormat,
-                                           skbio.TabularMSA)
-        filepath = self.get_data_path('aligned-dna-sequences.fasta')
-        format = AlignedDNAFASTAFormat(filepath, mode='r')
+        filename = 'aligned-dna-sequences.fasta'
+        input, obs = self.transform_format(AlignedDNAFASTAFormat,
+                                           skbio.TabularMSA, filename=filename)
+        exp = skbio.TabularMSA.read(str(input), constructor=skbio.DNA,
+                                    format='fasta')
 
-        obs = transformer(format)
-
-        self.assertIsInstance(obs, skbio.TabularMSA)
+        for act, exp in zip(obs, exp):
+            self.assertEqual(act, exp)
 
     def test_skbio_tabular_msa_to_aligned_dna_fasta_format(self):
+        filepath = self.get_data_path('aligned-dna-sequences.fasta')
         transformer = self.get_transformer(skbio.TabularMSA,
                                            AlignedDNAFASTAFormat)
-        filepath = self.get_data_path('aligned-dna-sequences.fasta')
         input = skbio.TabularMSA.read(filepath, constructor=skbio.DNA,
                                       format='fasta')
         obs = transformer(input)
+        obs = skbio.TabularMSA.read(str(obs), constructor=skbio.DNA,
+                                    format='fasta')
 
-        self.assertIsInstance(obs, AlignedDNAFASTAFormat)
+        for act, exp in zip(obs, input):
+            self.assertEqual(act, exp)
+
+
+if __name__ == '__main__':
+    unittest.main()
