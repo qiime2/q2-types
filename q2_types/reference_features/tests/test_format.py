@@ -27,7 +27,15 @@ class TestFormats(TestPluginBase):
         format.validate()
 
     def test_reference_features_dir_fmt_validate_negative(self):
-        pass
+        filenames = ('dna-sequences.fasta', 'aligned-dna-sequences.fasta',
+                     'taxonomy.tsv')
+        for filename in filenames:
+            shutil.copy(self.get_data_path(filename), self.temp_dir.name)
+
+        format = ReferenceFeaturesDirectoryFormat(self.temp_dir.name, mode='r')
+
+        with self.assertRaisesRegex(ValueError, 'ReferenceFeaturesDirectory'):
+            format.validate()
 
 
 if __name__ == '__main__':
