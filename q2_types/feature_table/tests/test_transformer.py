@@ -11,9 +11,13 @@ import unittest
 import biom
 import pandas as pd
 
+from pandas.util.testing import assert_frame_equal
 from q2_types.feature_table import BIOMV100Format, BIOMV210Format
 from q2_types.feature_data import TaxonomyFormat
 from qiime.plugin.testing import TestPluginBase
+from q2_types.feature_table._transformer import (_parse_biom_table_v100,
+                                                 _parse_biom_table_v210,
+                                                 _table_to_dataframe)
 
 
 class TestTransformers(TestPluginBase):
@@ -34,44 +38,43 @@ class TestTransformers(TestPluginBase):
                          exp.ids(axis='sample').all())
 
     def test_biom_v100_format_to_biom_table(self):
-        filepath = self.get_data_path('feature-table_v100.biom')
-        transformer = self.get_transformer(BIOMV100Format, biom.Table)
-        input = BIOMV100Format(filepath, mode='r')
+        input, obs = self.transform_format(BIOMV100Format, biom.Table,
+                                           filename='feature-table_v100.biom')
 
-        obs = transformer(input)
-
-        exp = biom.load_table(filepath)
+        exp = biom.load_table(str(input))
         self.assertEqual(obs.ids(axis='observation').all(),
                          exp.ids(axis='observation').all())
         self.assertEqual(obs.ids(axis='sample').all(),
                          exp.ids(axis='sample').all())
 
     def test_biom_v100_format_to_pandas_data_frame(self):
-        filepath = self.get_data_path('feature-table_v100.biom')
-        transformer = self.get_transformer(BIOMV100Format, pd.DataFrame)
-        input = BIOMV100Format(filepath, mode='r')
+        input, obs = self.transform_format(BIOMV100Format, pd.DataFrame,
+                                           filename='feature-table_v100.biom')
 
-        obs = transformer(input)
+        table = _parse_biom_table_v100(input)
+        df = _table_to_dataframe(table)
 
-        self.assertIsInstance(obs, pd.DataFrame)
+        assert_frame_equal(df, obs)
 
     def test_biom_v210_format_to_pandas_data_frame(self):
-        filepath = self.get_data_path('feature-table_v210.biom')
-        transformer = self.get_transformer(BIOMV210Format, pd.DataFrame)
-        input = BIOMV210Format(filepath, mode='r')
+        input, obs = self.transform_format(BIOMV210Format, pd.DataFrame,
+                                           filename='feature-table_v210.biom')
 
-        obs = transformer(input)
+        table = _parse_biom_table_v210(input)
+        df = _table_to_dataframe(table)
 
-        self.assertIsInstance(obs, pd.DataFrame)
+        assert_frame_equal(df, obs)
 
     def test_biom_v210_format_to_biom_table(self):
-        filepath = self.get_data_path('feature-table_v210.biom')
-        transformer = self.get_transformer(BIOMV210Format, biom.Table)
-        input = BIOMV210Format(filepath, mode='r')
+        input, obs = self.transform_format(BIOMV210Format, biom.Table,
+                                           filename='feature-table_v210.biom')
 
-        obs = transformer(input)
+        exp = biom.load_table(str(input))
 
-        self.assertIsInstance(obs, biom.Table)
+        self.assertEqual(obs.ids(axis='observation').all(),
+                         exp.ids(axis='observation').all())
+        self.assertEqual(obs.ids(axis='sample').all(),
+                         exp.ids(axis='sample').all())
 
     def test_biom_table_to_biom_v210_format(self):
         filepath = self.get_data_path('feature-table_v210.biom')
@@ -97,16 +100,17 @@ class TestTransformers(TestPluginBase):
         self.assertIsInstance(obs, pd.DataFrame)
 
     def test_biom_v100_format_to_biom_v210_format(self):
-        filepath = self.get_data_path('feature-table_v100.biom')
-        transformer = self.get_transformer(BIOMV100Format, BIOMV210Format)
-        input = BIOMV100Format(filepath, mode='r')
+        input, obs = self.transform_format(BIOMV100Format, BIOMV210Format,
+                                           filename='feature-table_v100.biom')
+        exp = biom.load_table(str(input))
+        obs = biom.load_table(str(obs))
 
-        obs = transformer(input)
-
-        self.assertIsInstance(obs, BIOMV210Format)
+        self.assertEqual(obs.ids(axis='observation').all(),
+                         exp.ids(axis='observation').all())
+        self.assertEqual(obs.ids(axis='sample').all(),
+                         exp.ids(axis='sample').all())
 
     def test_to_pandas_data_frame_to_biom_v210_format(self):
-        # load a table to a pd.DataFrame
         filepath = self.get_data_path('feature-table_v100.biom')
         transformer1 = self.get_transformer(BIOMV100Format, pd.DataFrame)
         input = BIOMV100Format(filepath, mode='r')
@@ -128,7 +132,6 @@ class TestTransformers(TestPluginBase):
             transformer(df)
 
     def test_to_pandas_data_frame_to_biom_table(self):
-        # load a table to a pd.DataFrame
         filepath = self.get_data_path('feature-table_v100.biom')
         transformer1 = self.get_transformer(BIOMV100Format, pd.DataFrame)
         input = BIOMV100Format(filepath, mode='r')
@@ -186,22 +189,15 @@ class TestTransformers(TestPluginBase):
             transformer(table)
 
     def test_biom_v210_format_to_taxonomy_format(self):
-        filepath = self.get_data_path(
-            'feature-table-with-taxonomy-metadata_v210.biom')
-        input = BIOMV210Format(filepath, mode='r')
-        transformer = self.get_transformer(BIOMV210Format, TaxonomyFormat)
-        obs = transformer(input)
+        filename = 'feature-table-with-taxonomy-metadata_v210.biom'
+        _, obs = self.transform_format(BIOMV210Format, TaxonomyFormat,
+                                       filename=filename)
         self.assertIsInstance(obs, TaxonomyFormat)
 
     def test_biom_v210_format_no_md_to_taxonomy_format(self):
-        filepath = self.get_data_path('feature-table_v210.biom')
-        transformer = self.get_transformer(BIOMV210Format, biom.Table)
-        input = BIOMV210Format(filepath, mode='r')
-        table = transformer(input)
-
-        transformer = self.get_transformer(biom.Table, TaxonomyFormat)
         with self.assertRaisesRegex(TypeError, 'observation metadata'):
-            transformer(table)
+            self.transform_format(BIOMV210Format, TaxonomyFormat,
+                                  filename='feature-table_v210.biom')
 
 
 if __name__ == "__main__":
