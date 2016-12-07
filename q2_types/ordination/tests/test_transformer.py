@@ -27,21 +27,21 @@ class TestTransformers(TestPluginBase):
             input = skbio.OrdinationResults.read(filepath)
 
             obs = transformer(input)
-
             self.assertIsInstance(obs, OrdinationFormat)
+            obs = skbio.OrdinationResults.read(str(obs))
+
+            self.assertEqual(str(obs), str(input))
 
     def test_ordination_format_to_skbio_ordination_results(self):
         filenames = ('pcoa-results-1x1.txt', 'pcoa-results-2x2.txt',
                      'pcoa-results-NxN.txt')
         for filename in filenames:
-            filepath = self.get_data_path(filename)
-            transformer = self.get_transformer(OrdinationFormat,
-                                               skbio.OrdinationResults)
-            input = OrdinationFormat(filepath, mode='r')
+            input, obs = self.transform_format(OrdinationFormat,
+                                               skbio.OrdinationResults,
+                                               filename=filename)
+            exp = skbio.OrdinationResults.read(str(input))
 
-            obs = transformer(input)
-
-            self.assertIsInstance(obs, skbio.OrdinationResults)
+            self.assertEqual(str(exp), str(obs))
 
 
 if __name__ == "__main__":
