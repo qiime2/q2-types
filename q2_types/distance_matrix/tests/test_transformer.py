@@ -32,16 +32,12 @@ class TestTransformers(TestPluginBase):
             self.assertEqual(obs, exp)
 
     def test_lsmat_format_to_skbio_distance_matrix(self):
-        transformer = self.get_transformer(LSMatFormat, skbio.DistanceMatrix)
-
         filenames = ('distance-matrix-1x1.tsv', 'distance-matrix-2x2.tsv',
                      'distance-matrix-NxN.tsv')
         for filename in filenames:
-            input = self.get_data_path(filename)
-
-            obs = transformer(input)
-
-            exp = skbio.DistanceMatrix.read(input)
+            input, obs = self.transform_format(LSMatFormat, skbio.DistanceMatrix,
+                                               filename=filename)
+            exp = skbio.DistanceMatrix.read(str(input))
             self.assertEqual(obs, exp)
 
 
