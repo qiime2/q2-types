@@ -44,8 +44,20 @@ class FastqGzFormat(model.BinaryFileFormat):
 
     """
     def sniff(self):
+        filepath = str(self)
         sniffer = skbio.io.io_registry.get_sniffer('fastq')
-        return sniffer(str(self))[0]
+        if sniffer(str(self))[0]:
+            try:
+                generator = skbio.io.read(filepath, constructor=skbio.DNA,
+                                          phred_offset=33, format='fastq',
+                                          verify=False)
+                for seq, _ in zip(generator, range(15)):
+                    pass
+                return True
+            # ValueError raised by skbio if there are invalid DNA chars.
+            except ValueError:
+                pass
+        return False
 
 
 class CasavaOneEightSingleLanePerSampleDirFmt(model.DirectoryFormat):
