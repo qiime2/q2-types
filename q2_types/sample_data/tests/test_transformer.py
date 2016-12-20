@@ -1,5 +1,5 @@
 # ----------------------------------------------------------------------------
-# Copyright (c) 2016--, QIIME development team.
+# Copyright (c) 2016--, QIIME 2 development team.
 #
 # Distributed under the terms of the Modified BSD License.
 #
@@ -12,7 +12,7 @@ import pandas as pd
 
 from pandas.util.testing import assert_series_equal
 from q2_types.sample_data import AlphaDiversityFormat
-from qiime.plugin.testing import TestPluginBase
+from qiime2.plugin.testing import TestPluginBase
 
 
 class TestTransformers(TestPluginBase):

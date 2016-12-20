@@ -1,5 +1,5 @@
 # ----------------------------------------------------------------------------
-# Copyright (c) 2016--, QIIME development team.
+# Copyright (c) 2016--, QIIME 2 development team.
 #
 # Distributed under the terms of the Modified BSD License.
 #
@@ -9,7 +9,7 @@
 import unittest
 
 from q2_types.ordination import PCoAResults, OrdinationDirectoryFormat
-from qiime.plugin.testing import TestPluginBase
+from qiime2.plugin.testing import TestPluginBase
 
 
 class TestTypes(TestPluginBase):

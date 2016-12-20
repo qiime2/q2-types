@@ -1,12 +1,12 @@
 # ----------------------------------------------------------------------------
-# Copyright (c) 2016--, QIIME development team.
+# Copyright (c) 2016--, QIIME 2 development team.
 #
 # Distributed under the terms of the Modified BSD License.
 #
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
 
-import qiime.plugin.model as model
+import qiime2.plugin.model as model
 
 from ..feature_data import (DNAFASTAFormat, AlignedDNAFASTAFormat,
                             TaxonomyFormat)

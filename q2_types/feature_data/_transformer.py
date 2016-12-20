@@ -1,5 +1,5 @@
 # ----------------------------------------------------------------------------
-# Copyright (c) 2016--, QIIME development team.
+# Copyright (c) 2016--, QIIME 2 development team.
 #
 # Distributed under the terms of the Modified BSD License.
 #
@@ -11,7 +11,7 @@ from itertools import zip_longest
 
 import pandas as pd
 import skbio
-import qiime
+import qiime2
 
 from ..plugin_setup import plugin
 from . import (TaxonomyFormat, DNAFASTAFormat,
@@ -70,9 +70,9 @@ def _6(ff: TaxonomyFormat) -> pd.Series:
 
 
 @plugin.register_transformer
-def _8(ff: TaxonomyFormat) -> qiime.Metadata:
+def _8(ff: TaxonomyFormat) -> qiime2.Metadata:
     data = _read_taxonomy(str(ff))
-    return qiime.Metadata(data)
+    return qiime2.Metadata(data)
 
 
 def _read_dna_fasta(path):

@@ -1,5 +1,5 @@
 # ----------------------------------------------------------------------------
-# Copyright (c) 2016--, QIIME development team.
+# Copyright (c) 2016--, QIIME 2 development team.
 #
 # Distributed under the terms of the Modified BSD License.
 #
@@ -8,13 +8,13 @@
 
 import importlib
 
-import qiime.plugin
-import qiime.sdk
+import qiime2.plugin
+import qiime2.sdk
 
 from q2_types import __version__
 
 
-plugin = qiime.plugin.Plugin(
+plugin = qiime2.plugin.Plugin(
     name='types',
     version=__version__,
     website='https://github.com/qiime2/q2-types',

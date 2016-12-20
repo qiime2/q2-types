@@ -1,5 +1,5 @@
 # ----------------------------------------------------------------------------
-# Copyright (c) 2016--, QIIME development team.
+# Copyright (c) 2016--, QIIME 2 development team.
 #
 # Distributed under the terms of the Modified BSD License.
 #
@@ -10,19 +10,18 @@ from setuptools import setup, find_packages
 
 setup(
     name="q2-types",
-    # TODO stop duplicating version string
-    version="0.0.7.dev0",
+    version="2017.2.0.dev0",
     packages=find_packages(),
-    install_requires=['scikit-bio', 'qiime >= 2.0.6', 'pandas',
+    install_requires=['scikit-bio', 'qiime2 == 2017.2.*', 'pandas',
                       'biom-format >= 2.1.5, < 2.2.0', 'ijson',
                       'h5py'],
     author="Greg Caporaso",
     author_email="gregcaporaso@gmail.com",
     description="Common QIIME 2 semantic types.",
     license='BSD-3-Clause',
-    url="http://www.qiime.org",
+    url="https://qiime2.org",
     entry_points={
-        'qiime.plugins':
+        'qiime2.plugins':
         ['q2-types=q2_types.plugin_setup:plugin']
     },
     package_data={
