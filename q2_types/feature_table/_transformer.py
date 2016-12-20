@@ -1,5 +1,5 @@
 # ----------------------------------------------------------------------------
-# Copyright (c) 2016--, QIIME development team.
+# Copyright (c) 2016--, QIIME 2 development team.
 #
 # Distributed under the terms of the Modified BSD License.
 #
@@ -10,7 +10,7 @@ import json
 
 import biom
 import pandas as pd
-import qiime
+import qiime2
 
 from . import BIOMV100Format, BIOMV210Format
 from ..feature_data import TaxonomyFormat
@@ -40,7 +40,7 @@ def _drop_axis_metadata(table):
 
 
 def _get_generated_by():
-    return 'qiime %s' % qiime.__version__
+    return 'qiime2 %s' % qiime2.__version__
 
 
 def _parse_biom_table_v100(ff):

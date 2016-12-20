@@ -1,12 +1,13 @@
 # ----------------------------------------------------------------------------
-# Copyright (c) 2016--, QIIME development team.
+# Copyright (c) 2016--, QIIME 2 development team.
 #
 # Distributed under the terms of the Modified BSD License.
 #
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
+import pkg_resources
 
-__version__ = "0.0.7.dev0"  # noqa
+__version__ = pkg_resources.get_distribution('q2-types').version
 
 # TODO remove all imports and from __all__ because they are available as public
 # imports in their respective subpackages. These imports are here so the

@@ -1,5 +1,5 @@
 # ----------------------------------------------------------------------------
-# Copyright (c) 2016--, QIIME development team.
+# Copyright (c) 2016--, QIIME 2 development team.
 #
 # Distributed under the terms of the Modified BSD License.
 #
@@ -8,7 +8,7 @@
 
 import skbio.io
 import yaml
-import qiime.plugin.model as model
+import qiime2.plugin.model as model
 
 from ..plugin_setup import plugin
 

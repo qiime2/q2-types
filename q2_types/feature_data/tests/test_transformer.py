@@ -1,5 +1,5 @@
 # ----------------------------------------------------------------------------
-# Copyright (c) 2016--, QIIME development team.
+# Copyright (c) 2016--, QIIME 2 development team.
 #
 # Distributed under the terms of the Modified BSD License.
 #
@@ -9,7 +9,7 @@
 import unittest
 
 import pandas as pd
-import qiime
+import qiime2
 import skbio
 
 from pandas.util.testing import assert_frame_equal, assert_series_equal
@@ -17,7 +17,7 @@ from q2_types.feature_data import (
     TaxonomyFormat, DNAFASTAFormat, DNAIterator, PairedDNAIterator,
     PairedDNASequencesDirectoryFormat, AlignedDNAFASTAFormat
 )
-from qiime.plugin.testing import TestPluginBase
+from qiime2.plugin.testing import TestPluginBase
 
 
 class TestTranfomers(TestPluginBase):
@@ -67,14 +67,14 @@ class TestTranfomers(TestPluginBase):
         assert_series_equal(obs, exp)
 
     def test_taxonomy_format_to_qiime_metadata(self):
-        input, obs = self.transform_format(TaxonomyFormat, qiime.Metadata,
+        input, obs = self.transform_format(TaxonomyFormat, qiime2.Metadata,
                                            filename='taxonomy.tsv')
 
         df = pd.read_csv(str(input), sep='\t',
                          comment='#', header=0, parse_dates=True,
                          skip_blank_lines=True, dtype=object)
         df.set_index(df.columns[0], drop=True, append=False, inplace=True)
-        exp = qiime.Metadata(df)
+        exp = qiime2.Metadata(df)
 
         assert_frame_equal(obs.to_dataframe(), exp.to_dataframe())
 
