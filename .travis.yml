@@ -19,6 +19,8 @@ install:
   - pip install flake8
   - pip install .
   - 'echo "backend: Agg" > matplotlibrc'
+  - git clone https://github.com/qiime2/q2lint
 script:
   - nosetests
   - flake8
+  - python q2lint/q2lint.py
