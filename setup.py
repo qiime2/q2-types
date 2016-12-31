@@ -33,7 +33,6 @@ setup(
         'q2_types.per_sample_sequences.tests': ['data/*',
                                                 'data/paired_end_data/*',
                                                 'data/single_end_data/*'],
-        'q2_types.reference_features.tests': ['data/*'],
         'q2_types.sample_data.tests': ['data/*'],
         'q2_types.tree.tests': ['data/*']
     }
