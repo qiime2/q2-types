@@ -16,13 +16,14 @@ from ._type import (
     FeatureData, Taxonomy, Sequence, PairedEndSequence, AlignedSequence)
 
 # TODO remove these imports when tests are rewritten. Remove from __all__ too
-from ._transformer import DNAIterator, PairedDNAIterator
+from ._transformer import DNAIterator, PairedDNAIterator, AlignedDNAIterator
 
 __all__ = [
     'TaxonomyFormat', 'TaxonomyDirectoryFormat', 'DNAFASTAFormat',
     'DNASequencesDirectoryFormat', 'PairedDNASequencesDirectoryFormat',
     'AlignedDNAFASTAFormat', 'AlignedDNASequencesDirectoryFormat',
     'FeatureData', 'Taxonomy', 'Sequence', 'PairedEndSequence',
-    'AlignedSequence', 'DNAIterator', 'PairedDNAIterator']
+    'AlignedSequence', 'DNAIterator', 'PairedDNAIterator',
+    'AlignedDNAIterator']
 
 importlib.import_module('q2_types.feature_data._transformer')

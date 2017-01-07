@@ -33,6 +33,10 @@ class PairedDNAIterator(DNAIterator):
     pass
 
 
+class AlignedDNAIterator(DNAIterator):
+    pass
+
+
 def _pandas_to_taxonomy_format(data):
     # data can be pd.Series or pd.DataFrame
     ff = TaxonomyFormat()
@@ -163,3 +167,16 @@ def _16(data: pd.Series) -> DNAFASTAFormat:
 @plugin.register_transformer
 def _17(data: pd.Series) -> TaxonomyFormat:
     return _pandas_to_taxonomy_format(data)
+
+
+@plugin.register_transformer
+def _18(ff: AlignedDNAFASTAFormat) -> AlignedDNAIterator:
+    generator = _read_dna_fasta(str(ff))
+    return AlignedDNAIterator(generator)
+
+
+@plugin.register_transformer
+def _19(data: AlignedDNAIterator) -> AlignedDNAFASTAFormat:
+    ff = AlignedDNAFASTAFormat()
+    skbio.io.write(data.generator, format='fasta', into=str(ff))
+    return ff
