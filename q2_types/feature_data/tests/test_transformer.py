@@ -15,7 +15,8 @@ import skbio
 from pandas.util.testing import assert_frame_equal, assert_series_equal
 from q2_types.feature_data import (
     TaxonomyFormat, DNAFASTAFormat, DNAIterator, PairedDNAIterator,
-    PairedDNASequencesDirectoryFormat, AlignedDNAFASTAFormat
+    PairedDNASequencesDirectoryFormat, AlignedDNAFASTAFormat,
+    AlignedDNAIterator
 )
 from qiime2.plugin.testing import TestPluginBase
 
@@ -96,6 +97,31 @@ class TestTranfomers(TestPluginBase):
 
         obs = transformer(input)
         self.assertIsInstance(obs, DNAFASTAFormat)
+        obs = skbio.read(str(obs), format='fasta', constructor=skbio.DNA)
+
+        for act, exp in zip(obs, input):
+            self.assertEqual(act, exp)
+
+    def test_aln_dna_fasta_format_to_aln_dna_iterator(self):
+        filename = 'aligned-dna-sequences.fasta'
+        input, obs = self.transform_format(AlignedDNAFASTAFormat,
+                                           AlignedDNAIterator,
+                                           filename=filename)
+
+        exp = skbio.read(str(input), format='fasta', constructor=skbio.DNA)
+
+        for observed, expected in zip(obs, exp):
+            self.assertEqual(observed, expected)
+
+    def test_aln_dna_iterator_to_aln_dna_fasta_format(self):
+        transformer = self.get_transformer(AlignedDNAIterator,
+                                           AlignedDNAFASTAFormat)
+        filepath = self.get_data_path('aligned-dna-sequences.fasta')
+        generator = skbio.read(filepath, format='fasta', constructor=skbio.DNA)
+        input = AlignedDNAIterator(generator)
+
+        obs = transformer(input)
+        self.assertIsInstance(obs, AlignedDNAFASTAFormat)
         obs = skbio.read(str(obs), format='fasta', constructor=skbio.DNA)
 
         for act, exp in zip(obs, input):
