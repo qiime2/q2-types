@@ -6,6 +6,8 @@
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
 
+import os
+
 import skbio
 import yaml
 
@@ -107,3 +109,29 @@ def _4(dirfmt: CasavaOneEightSingleLanePerSampleDirFmt) \
         -> SingleLanePerSamplePairedEndFastqDirFmt:
     return _single_lane_per_sample_fastq_helper(
         dirfmt, SingleLanePerSamplePairedEndFastqDirFmt)
+
+
+@plugin.register_transformer
+def _5(dirfmt: SingleLanePerSamplePairedEndFastqDirFmt) \
+        -> SingleLanePerSampleSingleEndFastqDirFmt:
+    result = SingleLanePerSampleSingleEndFastqDirFmt()
+    manifest = FastqManifestFormat()
+
+    with manifest.open() as manifest_fh:
+        with dirfmt.manifest.view(FastqManifestFormat).open() as fh:
+            iterator = iter(fh)
+            manifest_fh.write(next(iterator))  # header line
+            for line in iterator:
+                _, relpath, direction = line.rstrip().split(',')
+                if direction == 'forward':
+                    manifest_fh.write(line)
+                    os.link(str(dirfmt.path / relpath),
+                            str(result.path / relpath))
+
+    result.manifest.write_data(manifest, FastqManifestFormat)
+
+    metadata = YamlFormat()
+    metadata.path.write_text(yaml.dump({'phred-offset': 33}))
+    result.metadata.write_data(metadata, YamlFormat)
+
+    return result
