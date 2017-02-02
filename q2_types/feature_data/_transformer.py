@@ -6,7 +6,7 @@
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
 
-import collections
+import collections.abc
 from itertools import zip_longest
 
 import pandas as pd
@@ -18,15 +18,12 @@ from . import (TaxonomyFormat, DNAFASTAFormat,
                PairedDNASequencesDirectoryFormat, AlignedDNAFASTAFormat)
 
 
-class DNAIterator(collections.Iterator):
+class DNAIterator(collections.abc.Iterable):
     def __init__(self, generator):
         self.generator = generator
 
     def __iter__(self):
-        return self.generator
-
-    def __next__(self):
-        return next(self.generator)
+        yield from self.generator
 
 
 class PairedDNAIterator(DNAIterator):
@@ -92,7 +89,7 @@ def _9(ff: DNAFASTAFormat) -> DNAIterator:
 @plugin.register_transformer
 def _10(data: DNAIterator) -> DNAFASTAFormat:
     ff = DNAFASTAFormat()
-    skbio.io.write(data.generator, format='fasta', into=str(ff))
+    skbio.io.write(iter(data), format='fasta', into=str(ff))
     return ff
 
 
@@ -178,5 +175,5 @@ def _18(ff: AlignedDNAFASTAFormat) -> AlignedDNAIterator:
 @plugin.register_transformer
 def _19(data: AlignedDNAIterator) -> AlignedDNAFASTAFormat:
     ff = AlignedDNAFASTAFormat()
-    skbio.io.write(data.generator, format='fasta', into=str(ff))
+    skbio.io.write(iter(data), format='fasta', into=str(ff))
     return ff
