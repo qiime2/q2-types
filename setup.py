@@ -10,9 +10,9 @@ from setuptools import setup, find_packages
 
 setup(
     name="q2-types",
-    version="2017.2.0",
+    version="2017.3.0.dev",
     packages=find_packages(),
-    install_requires=['scikit-bio', 'qiime2 == 2017.2.*', 'pandas',
+    install_requires=['scikit-bio', 'qiime2 == 2017.3.*', 'pandas',
                       'biom-format >= 2.1.5, < 2.2.0', 'ijson',
                       'h5py'],
     author="Greg Caporaso",
