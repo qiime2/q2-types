@@ -13,14 +13,16 @@ install:
   # we can let conda do dependency resolution when there are conda packages for
   # the various QIIME 2 projects. Until then, avoid installing heavyweight
   # dependencies via pip.
-  - conda create --yes -n test-env -c biocore python=$PYTHON_VERSION scikit-bio jupyter click nose
+  - conda create --yes -n test-env -c biocore python=$PYTHON_VERSION scikit-bio jupyter click pytest pytest-cov
   - source activate test-env
   - pip install https://github.com/qiime2/qiime2/archive/master.zip
-  - pip install flake8
+  - pip install flake8 coveralls
   - pip install .
   - 'echo "backend: Agg" > matplotlibrc'
   - git clone https://github.com/qiime2/q2lint
 script:
-  - nosetests
+  - py.test --cov=q2_types
   - flake8
   - python q2lint/q2lint.py
+after_success:
+  - coveralls
