@@ -35,5 +35,6 @@ setup(
                                                 'data/single_end_data/*'],
         'q2_types.sample_data.tests': ['data/*'],
         'q2_types.tree.tests': ['data/*']
-    }
+    },
+    zip_safe=False
 )

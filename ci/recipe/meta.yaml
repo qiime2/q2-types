@@ -1,0 +1,45 @@
+package:
+  name: q2-types
+  version: "2017.3.0.dev0"
+
+source:
+  path: ../..
+build:
+  noarch: python
+  script: python setup.py install
+
+requirements:
+  build:
+    - python 3.5*
+    - setuptools
+    - scikit-bio
+    - qiime2 2017.3.*
+    - pandas
+    - biom-format >=2.1.5,<2.2.0
+    - ijson
+    - h5py
+
+  run:
+    - python 3.5*
+    - setuptools
+    - scikit-bio
+    - qiime2 2017.3.*
+    - pandas
+    - biom-format >=2.1.5,<2.2.0
+    - ijson
+    - h5py
+
+test:
+  requires:
+    - pytest
+
+  imports:
+    - q2_types
+
+  commands:
+    - py.test --pyargs q2_types
+
+about:
+  home: https://qiime2.org
+  license: BSD-3-Clause
+  license_family: BSD
