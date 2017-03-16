@@ -14,7 +14,8 @@ import yaml
 from ..plugin_setup import plugin
 from . import (SingleLanePerSampleSingleEndFastqDirFmt, FastqManifestFormat,
                SingleLanePerSamplePairedEndFastqDirFmt, FastqGzFormat,
-               CasavaOneEightSingleLanePerSampleDirFmt, YamlFormat)
+               CasavaOneEightSingleLanePerSampleDirFmt, YamlFormat,
+               FastqWithManifest)
 
 
 class PerSampleDNAIterators(dict):
@@ -135,3 +136,36 @@ def _5(dirfmt: SingleLanePerSamplePairedEndFastqDirFmt) \
     result.metadata.write_data(metadata, YamlFormat)
 
     return result
+
+@plugin.register_transformer
+def _6(dirfmt: FastqWithManifest) \
+        -> SingleLanePerSampleSingleEndFastqDirFmt:
+    result = SingleLanePerSampleSingleEndFastqDirFmt()
+    manifest = FastqManifestFormat()
+
+    # if we can't use the manifest in the format definition, can we do
+    # some validation here to make sure that we observe all of the expected
+    # files (i think we don't care if there are files that are not included
+    # in the manifest)
+    with manifest.open() as manifest_fh:
+        with dirfmt.manifest.view(FastqManifestFormat).open() as fh:
+            iterator = iter(fh)
+            manifest_fh.write(next(iterator))  # header line
+            for barcode_id, line in enumerate(iterator):
+                sample_id, relpath, direction = line.rstrip().split(',')
+                if direction == 'forward':
+                    manifest_fh.write(line)
+                    result_path = '%s_%s_L001_R1_001.fastq.gz' % \
+                        (sample_id, barcode_id)
+                    os.link(str(dirfmt.path / relpath),
+                            str(result.path / result_path))
+
+    result.manifest.write_data(manifest, FastqManifestFormat)
+    result.metadata.write_data(dirfmt.metadata.view(YamlFormat), YamlFormat)
+
+    return result
+
+
+    def sequences_path_maker(self, sample_id, barcode_id, lane_number,
+                             read_number):
+        return

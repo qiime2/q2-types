@@ -59,14 +59,30 @@ class FastqGzFormat(model.BinaryFileFormat):
                 pass
         return False
 
+
+# if the format itself specifies the phred offset, that would make it so the
+# user doesn't have to provide the metadata.yml. for example, we could have
+# FastqWithManifest and FastqWithManifestPhred64. 
 class FastqWithManifest(model.DirectoryFormat):
     manifest = model.File('MANIFEST', format=FastqManifestFormat)
-    sequence_filepaths = []
-    with self.open() as fh:
-        header = fh.readline()
-        for record in fh:
-            sequence_filepaths.append(record.split(',')[1])
-    sequences = model.FileCollection(sequence_filepaths, format=FastqGzFormat)
+    sequences = model.FileCollection(r'.*\.fastq\.gz', format=FastqGzFormat)
+    metadata = model.File('metadata.yml', format=YamlFormat)
+
+    # # can we use the manifest in this class to figure out what the expected filepaths
+    # # are? i think the answer is no, because there is no instance of this yet,
+    # # but i'm thinking of something like:
+    # sequence_filepaths = []
+    # with manifest.view(FastqManifestFormat).open() as fh:
+    #     header = fh.readline()
+    #     for record in fh:
+    #         sequence_filepaths.append(record.split(',')[1])
+    # sequences = model.FileCollection(sequence_filepaths, format=FastqGzFormat)
+
+    # i don't get where this is used or why it's required here - evan, help.
+    @sequences.set_path_maker
+    def sequences_path_maker(self, sample_id, barcode_id, read_number):
+        return '%s_%s_L001_R%d_001.fastq.gz' % \
+            (sample_id, barcode_id, read_number)
 
 
 class CasavaOneEightSingleLanePerSampleDirFmt(model.DirectoryFormat):
@@ -101,5 +117,5 @@ plugin.register_formats(
     FastqManifestFormat, YamlFormat, FastqGzFormat,
     CasavaOneEightSingleLanePerSampleDirFmt, _SingleLanePerSampleFastqDirFmt,
     SingleLanePerSampleSingleEndFastqDirFmt,
-    SingleLanePerSamplePairedEndFastqDirFmt
+    SingleLanePerSamplePairedEndFastqDirFmt, FastqWithManifest
 )
