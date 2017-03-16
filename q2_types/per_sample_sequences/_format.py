@@ -59,6 +59,15 @@ class FastqGzFormat(model.BinaryFileFormat):
                 pass
         return False
 
+class FastqWithManifest(model.DirectoryFormat):
+    manifest = model.File('MANIFEST', format=FastqManifestFormat)
+    sequence_filepaths = []
+    with self.open() as fh:
+        header = fh.readline()
+        for record in fh:
+            sequence_filepaths.append(record.split(',')[1])
+    sequences = model.FileCollection(sequence_filepaths, format=FastqGzFormat)
+
 
 class CasavaOneEightSingleLanePerSampleDirFmt(model.DirectoryFormat):
     sequences = model.FileCollection(
