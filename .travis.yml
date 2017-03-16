@@ -4,25 +4,33 @@ env:
   - PYTHON_VERSION=3.5
 before_install:
   - wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
-  - chmod +x miniconda.sh
-  - ./miniconda.sh -b
-  - export PATH=/home/travis/miniconda3/bin:$PATH
+  - export MINICONDA_PREFIX="$HOME/miniconda"
+  - bash miniconda.sh -b -p $MINICONDA_PREFIX
+  - export PATH="$MINICONDA_PREFIX/bin:$PATH"
+  - conda config --set always_yes yes
+  - conda update conda
+  - conda install conda-build
+  - conda info -a
+  - git clone https://github.com/qiime2/q2lint ../q2lint
+  - git clone https://github.com/qiime2/qiime2 ../qiime2
 install:
-  # TODO some of the dependencies here aren't directly required by this
-  # package. For now, install them this way for faster build times. Ultimately
-  # we can let conda do dependency resolution when there are conda packages for
-  # the various QIIME 2 projects. Until then, avoid installing heavyweight
-  # dependencies via pip.
-  - conda create --yes -n test-env -c biocore python=$PYTHON_VERSION scikit-bio jupyter click pytest pytest-cov
+  - conda create -n test-env
   - source activate test-env
-  - pip install https://github.com/qiime2/qiime2/archive/master.zip
+  # Install testing utils
   - pip install flake8 coveralls
-  - pip install .
+  - conda install pytest-cov
+  # Install qiime2 environment
+  - conda env update -f ../qiime2/ci/environment.yaml
+  - cd ../qiime2 && python setup.py install && cd -
+  # Install q2-types environment
+  - conda env update -f ci/environment.yaml
+  - python setup.py install
   - 'echo "backend: Agg" > matplotlibrc'
-  - git clone https://github.com/qiime2/q2lint
 script:
-  - py.test --cov=q2_types
   - flake8
-  - python q2lint/q2lint.py
+  - python ../q2lint/q2lint.py
+  - py.test --cov=q2_types
+  - conda build -c qiime2 -c defaults --override-channels --python $PYTHON_VERSION --output-folder ../built-deps ../qiime2/ci/recipe
+  - conda build -c ../built-deps -c qiime2 -c biocore -c defaults --override-channels --python $PYTHON_VERSION ci/recipe
 after_success:
   - coveralls
