@@ -15,7 +15,7 @@ requirements:
     - scikit-bio
     - qiime2 2017.3.*
     - pandas
-    - biom-format >=2.1.5,<2.2.0
+    - biom-format
     - ijson
     - h5py
 
@@ -25,19 +25,14 @@ requirements:
     - scikit-bio
     - qiime2 2017.3.*
     - pandas
-    - biom-format >=2.1.5,<2.2.0
+    - biom-format
     - ijson
     - h5py
 
 test:
-  requires:
-    - pytest
-
   imports:
     - q2_types
-
-  commands:
-    - py.test --pyargs q2_types
+    - qiime2.plugins.types
 
 about:
   home: https://qiime2.org
