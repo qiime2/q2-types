@@ -1,5 +1,4 @@
 channels:
-  - ../built-deps
   - qiime2
   - biocore
   - defaults
@@ -8,7 +7,6 @@ channels:
 dependencies:
   - python=3.5*
   - setuptools
-  - qiime2=2017.3.*
   - scikit-bio
   - pandas
   - biom-format>=2.1.5,<2.2.0

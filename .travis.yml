@@ -13,15 +13,15 @@ before_install:
   - conda info -a
   - git clone https://github.com/qiime2/q2lint ../q2lint
   - git clone https://github.com/qiime2/qiime2 ../qiime2
-  - conda build -c qiime2 -c defaults --override-channels --python $PYTHON_VERSION --output-folder ../built-deps ../qiime2/ci/recipe
 install:
   - conda create -n test-env
   - source activate test-env
   # Install testing utils
-  - pip install flake8
+  - pip install flake8 coveralls
   - conda install pytest-cov
   # Install qiime2 environment
   - conda env update -f ../qiime2/ci/environment.yaml
+  - cd ../qiime2 && python setup.py install && cd -
   # Install q2-types environment
   - conda env update -f ci/environment.yaml
   - python setup.py install
@@ -30,6 +30,7 @@ script:
   - flake8
   - python ../q2lint/q2lint.py
   - py.test --cov=q2_types
+  - conda build -c qiime2 -c defaults --override-channels --python $PYTHON_VERSION --output-folder ../built-deps ../qiime2/ci/recipe
   - conda build -c ../built-deps -c qiime2 -c biocore -c defaults --override-channels --python $PYTHON_VERSION ci/recipe
 after_success:
   - coveralls
