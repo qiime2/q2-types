@@ -17,7 +17,7 @@ requirements:
     - scikit-bio
     - qiime2 2017.3.*
     - pandas
-    - biom-format
+    - biom-format >=2.1.5,<2.2.0
     - ijson
     - h5py
 
@@ -27,7 +27,7 @@ requirements:
     - scikit-bio
     - qiime2 2017.3.*
     - pandas
-    - biom-format
+    - biom-format >=2.1.5,<2.2.0
     - ijson
     - h5py
 
