@@ -8,9 +8,12 @@
 
 from setuptools import setup, find_packages
 
+import versioneer
+
 setup(
     name="q2-types",
-    version="2017.3.0.dev",
+    version=versioneer.get_version(),
+    cmdclass=versioneer.get_cmdclass(),
     packages=find_packages(),
     install_requires=['scikit-bio', 'qiime2 == 2017.3.*', 'pandas',
                       'biom-format >= 2.1.5, < 2.2.0', 'ijson',
@@ -36,5 +39,5 @@ setup(
         'q2_types.sample_data.tests': ['data/*'],
         'q2_types.tree.tests': ['data/*']
     },
-    zip_safe=False
+    zip_safe=False,
 )
