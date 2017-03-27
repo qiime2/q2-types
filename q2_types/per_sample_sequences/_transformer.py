@@ -139,6 +139,8 @@ def _5(dirfmt: SingleLanePerSamplePairedEndFastqDirFmt) \
 
     return result
 
+_direction_to_read_number = {'forward': 1, 'reverse': 2}
+
 @plugin.register_transformer
 def _6(fmt: SingleEndFastqManifestPhred33) \
         -> SingleLanePerSampleSingleEndFastqDirFmt:
@@ -151,15 +153,11 @@ def _6(fmt: SingleEndFastqManifestPhred33) \
             for barcode_id, line in enumerate(iterator):
                 sample_id, path, direction = line.rstrip().split(',')
                 abspath = os.path.abspath(path)
-                if not os.path.exists(abspath):
-                    raise FileNotFoundError(
-                        'A path specified in the manifest does not exist: '
-                        '%s' % path)
-                if direction == 'forward':
-                    manifest_fh.write(line)
-                    result_path = '%s_%s_L001_R1_001.fastq.gz' % \
-                        (sample_id, barcode_id)
-                    os.link(str(abspath), str(result.path / result_path))
+                manifest_fh.write(line)
+                result_path = '%s_%s_L001_R%d_001.fastq.gz' % \
+                    (sample_id, barcode_id,
+                     _direction_to_read_number[direction])
+                os.link(str(abspath), str(result.path / result_path))
 
     result.manifest.write_data(manifest, FastqManifestFormat)
 
@@ -181,14 +179,11 @@ def _7(fmt: SingleEndFastqManifestPhred64) \
             for barcode_id, line in enumerate(iterator):
                 sample_id, path, direction = line.rstrip().split(',')
                 abspath = os.path.abspath(path)
-                if not os.path.exists(abspath):
-                    raise FileNotFoundError(
-                        'A path specified in the manifest does not exist: '
-                        '%s' % path)
                 if direction == 'forward':
                     manifest_fh.write(line)
-                    result_path = '%s_%s_L001_R1_001.fastq.gz' % \
-                        (sample_id, barcode_id)
+                    result_path = '%s_%s_L001_R%d_001.fastq.gz' % \
+                        (sample_id, barcode_id,
+                         _direction_to_read_number[direction])
                     out_path = str(result.path / result_path)
                     # convert PHRED 64 to PHRED 33
                     with open(out_path, 'wb') as out_file:
@@ -219,22 +214,10 @@ def _8(fmt: PairedEndFastqManifestPhred33) \
             for barcode_id, line in enumerate(iterator):
                 sample_id, path, direction = line.rstrip().split(',')
                 abspath = os.path.abspath(path)
-                if not os.path.exists(abspath):
-                    raise FileNotFoundError(
-                        'A path specified in the manifest does not exist: '
-                        '%s' % path)
-                if direction == 'forward':
-                    manifest_fh.write(line)
-                    result_path = '%s_%s_L001_R1_001.fastq.gz' % \
-                        (sample_id, barcode_id)
-                elif direction == 'reverse':
-                    manifest_fh.write(line)
-                    result_path = '%s_%s_L001_R2_001.fastq.gz' % \
-                        (sample_id, barcode_id)
-                else:
-                    raise ValueError('Read direction must be "forward" or '
-                                     '"reverse" in manifest, but received: '
-                                     '%s' % direction)
+                manifest_fh.write(line)
+                result_path = '%s_%s_L001_R%d_001.fastq.gz' % \
+                    (sample_id, barcode_id,
+                     _direction_to_read_number[direction])
                 os.link(str(abspath), str(result.path / result_path))
 
     result.manifest.write_data(manifest, FastqManifestFormat)
@@ -257,22 +240,10 @@ def _9(fmt: PairedEndFastqManifestPhred64) \
             for barcode_id, line in enumerate(iterator):
                 sample_id, path, direction = line.rstrip().split(',')
                 abspath = os.path.abspath(path)
-                if not os.path.exists(abspath):
-                    raise FileNotFoundError(
-                        'A path specified in the manifest does not exist: '
-                        '%s' % path)
-                if direction == 'forward':
-                    manifest_fh.write(line)
-                    result_path = '%s_%s_L001_R1_001.fastq.gz' % \
-                        (sample_id, barcode_id)
-                elif direction == 'reverse':
-                    manifest_fh.write(line)
-                    result_path = '%s_%s_L001_R2_001.fastq.gz' % \
-                        (sample_id, barcode_id)
-                else:
-                    raise ValueError('Read direction must be "forward" or '
-                                     '"reverse" in manifest, but received: '
-                                     '%s' % direction)
+                manifest_fh.write(line)
+                result_path = '%s_%s_L001_R%d_001.fastq.gz' % \
+                    (sample_id, barcode_id,
+                     _direction_to_read_number[direction])
 
                 out_path = str(result.path / result_path)
                 # convert PHRED 64 to PHRED 33
