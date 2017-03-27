@@ -60,31 +60,20 @@ class FastqGzFormat(model.BinaryFileFormat):
         return False
 
 
-# if the format itself specifies the phred offset, that would make it so the
-# user doesn't have to provide the metadata.yml. for example, we could have
-# FastqWithManifest and FastqWithManifestPhred64.
+class SingleEndFastqManifestPhred33(FastqManifestFormat):
+    pass
 
-## based on conversation on 17 March, we're going to go with names like:
-##  - SingleEndFastqManifestPhred33
-##  - SingleEndFastqManifestPhred64
-##  - PairedEndFastqManifestPhred33
-##  - PairedEndFastqManifestPhred64
-## there will only be a manifest, and it will point to abs or relative paths
-## on the file system. the Phred64 formats will convert to Phred33, so that
-## internally all data is phred33. side note: update the moving pics tutorial
-## data so that it is phred33 on import.
-## this should be a FileFormat (not a DirectoryFormat)
-class FastqWithManifest(model.DirectoryFormat):
-    manifest = model.File('MANIFEST', format=FastqManifestFormat)
 
-    sequences = model.FileCollection(r'.*\.fastq\.gz', format=FastqGzFormat)
-    metadata = model.File('metadata.yml', format=YamlFormat)
+class SingleEndFastqManifestPhred64(FastqManifestFormat):
+    pass
 
-    # i don't get where this is used or why it's required here - evan, help.
-    @sequences.set_path_maker
-    def sequences_path_maker(self, sample_id, barcode_id, read_number):
-        return '%s_%s_L001_R%d_001.fastq.gz' % \
-            (sample_id, barcode_id, read_number)
+
+class PairedEndFastqManifestPhred33(FastqManifestFormat):
+    pass
+
+
+class PairedEndFastqManifestPhred64(FastqManifestFormat):
+    pass
 
 
 class CasavaOneEightSingleLanePerSampleDirFmt(model.DirectoryFormat):
@@ -119,5 +108,7 @@ plugin.register_formats(
     FastqManifestFormat, YamlFormat, FastqGzFormat,
     CasavaOneEightSingleLanePerSampleDirFmt, _SingleLanePerSampleFastqDirFmt,
     SingleLanePerSampleSingleEndFastqDirFmt,
-    SingleLanePerSamplePairedEndFastqDirFmt, FastqWithManifest
+    SingleLanePerSamplePairedEndFastqDirFmt, SingleEndFastqManifestPhred33,
+    SingleEndFastqManifestPhred64, PairedEndFastqManifestPhred33,
+    PairedEndFastqManifestPhred64
 )

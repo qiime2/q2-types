@@ -9,9 +9,13 @@
 import importlib
 
 from ._format import (CasavaOneEightSingleLanePerSampleDirFmt, FastqGzFormat,
-                      YamlFormat, FastqManifestFormat, FastqWithManifest,
+                      YamlFormat, FastqManifestFormat,
                       SingleLanePerSampleSingleEndFastqDirFmt,
-                      SingleLanePerSamplePairedEndFastqDirFmt)
+                      SingleLanePerSamplePairedEndFastqDirFmt,
+                      SingleEndFastqManifestPhred33,
+                      SingleEndFastqManifestPhred64,
+                      PairedEndFastqManifestPhred33,
+                      PairedEndFastqManifestPhred64)
 from ._type import SequencesWithQuality, PairedEndSequencesWithQuality
 from ._transformer import PerSampleDNAIterators, PerSamplePairedDNAIterators
 
@@ -20,6 +24,8 @@ __all__ = ['CasavaOneEightSingleLanePerSampleDirFmt', 'FastqGzFormat',
            'SingleLanePerSampleSingleEndFastqDirFmt',
            'SingleLanePerSamplePairedEndFastqDirFmt', 'SequencesWithQuality',
            'PairedEndSequencesWithQuality', 'PerSampleDNAIterators',
-           'PerSamplePairedDNAIterators', 'FastqWithManifest']
+           'PerSamplePairedDNAIterators', 'SingleEndFastqManifestPhred33',
+           'SingleEndFastqManifestPhred64', 'PairedEndFastqManifestPhred33',
+           'PairedEndFastqManifestPhred64']
 
 importlib.import_module('q2_types.per_sample_sequences._transformer')

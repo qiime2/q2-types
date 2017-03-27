@@ -7,6 +7,7 @@
 # ----------------------------------------------------------------------------
 
 import os
+import gzip
 
 import skbio
 import yaml
@@ -15,7 +16,8 @@ from ..plugin_setup import plugin
 from . import (SingleLanePerSampleSingleEndFastqDirFmt, FastqManifestFormat,
                SingleLanePerSamplePairedEndFastqDirFmt, FastqGzFormat,
                CasavaOneEightSingleLanePerSampleDirFmt, YamlFormat,
-               FastqWithManifest)
+               SingleEndFastqManifestPhred33, SingleEndFastqManifestPhred64,
+               PairedEndFastqManifestPhred33, PairedEndFastqManifestPhred64)
 
 
 class PerSampleDNAIterators(dict):
@@ -138,34 +140,154 @@ def _5(dirfmt: SingleLanePerSamplePairedEndFastqDirFmt) \
     return result
 
 @plugin.register_transformer
-def _6(dirfmt: FastqWithManifest) \
+def _6(fmt: SingleEndFastqManifestPhred33) \
         -> SingleLanePerSampleSingleEndFastqDirFmt:
     result = SingleLanePerSampleSingleEndFastqDirFmt()
     manifest = FastqManifestFormat()
-
-    # if we can't use the manifest in the format definition, can we do
-    # some validation here to make sure that we observe all of the expected
-    # files (i think we don't care if there are files that are not included
-    # in the manifest)
     with manifest.open() as manifest_fh:
-        with dirfmt.manifest.view(FastqManifestFormat).open() as fh:
+        with fmt.open() as fh:
             iterator = iter(fh)
             manifest_fh.write(next(iterator))  # header line
             for barcode_id, line in enumerate(iterator):
-                sample_id, relpath, direction = line.rstrip().split(',')
+                sample_id, path, direction = line.rstrip().split(',')
+                abspath = os.path.abspath(path)
+                if not os.path.exists(abspath):
+                    raise FileNotFoundError(
+                        'A path specified in the manifest does not exist: '
+                        '%s' % path)
                 if direction == 'forward':
                     manifest_fh.write(line)
                     result_path = '%s_%s_L001_R1_001.fastq.gz' % \
                         (sample_id, barcode_id)
-                    os.link(str(dirfmt.path / relpath),
-                            str(result.path / result_path))
+                    os.link(str(abspath), str(result.path / result_path))
 
     result.manifest.write_data(manifest, FastqManifestFormat)
-    result.metadata.write_data(dirfmt.metadata.view(YamlFormat), YamlFormat)
+
+    metadata = YamlFormat()
+    metadata.path.write_text(yaml.dump({'phred-offset': 33}))
+    result.metadata.write_data(metadata, YamlFormat)
 
     return result
 
+@plugin.register_transformer
+def _7(fmt: SingleEndFastqManifestPhred64) \
+        -> SingleLanePerSampleSingleEndFastqDirFmt:
+    result = SingleLanePerSampleSingleEndFastqDirFmt()
+    manifest = FastqManifestFormat()
+    with manifest.open() as manifest_fh:
+        with fmt.open() as fh:
+            iterator = iter(fh)
+            manifest_fh.write(next(iterator))  # header line
+            for barcode_id, line in enumerate(iterator):
+                sample_id, path, direction = line.rstrip().split(',')
+                abspath = os.path.abspath(path)
+                if not os.path.exists(abspath):
+                    raise FileNotFoundError(
+                        'A path specified in the manifest does not exist: '
+                        '%s' % path)
+                if direction == 'forward':
+                    manifest_fh.write(line)
+                    result_path = '%s_%s_L001_R1_001.fastq.gz' % \
+                        (sample_id, barcode_id)
+                    out_path = str(result.path / result_path)
+                    # convert PHRED 64 to PHRED 33
+                    with open(out_path, 'wb') as out_file:
+                        for seq in skbio.io.read(path, format='fastq',
+                                                 variant='illumina1.3'):
+                            skbio.io.write(seq, into=out_file,
+                                           format='fastq',
+                                           variant='illumina1.8',
+                                           compression='gzip')
 
-    def sequences_path_maker(self, sample_id, barcode_id, lane_number,
-                             read_number):
-        return
+    result.manifest.write_data(manifest, FastqManifestFormat)
+
+    metadata = YamlFormat()
+    metadata.path.write_text(yaml.dump({'phred-offset': 33}))
+    result.metadata.write_data(metadata, YamlFormat)
+
+    return result
+
+@plugin.register_transformer
+def _8(fmt: PairedEndFastqManifestPhred33) \
+        -> SingleLanePerSamplePairedEndFastqDirFmt:
+    result = SingleLanePerSamplePairedEndFastqDirFmt()
+    manifest = FastqManifestFormat()
+    with manifest.open() as manifest_fh:
+        with fmt.open() as fh:
+            iterator = iter(fh)
+            manifest_fh.write(next(iterator))  # header line
+            for barcode_id, line in enumerate(iterator):
+                sample_id, path, direction = line.rstrip().split(',')
+                abspath = os.path.abspath(path)
+                if not os.path.exists(abspath):
+                    raise FileNotFoundError(
+                        'A path specified in the manifest does not exist: '
+                        '%s' % path)
+                if direction == 'forward':
+                    manifest_fh.write(line)
+                    result_path = '%s_%s_L001_R1_001.fastq.gz' % \
+                        (sample_id, barcode_id)
+                elif direction == 'reverse':
+                    manifest_fh.write(line)
+                    result_path = '%s_%s_L001_R2_001.fastq.gz' % \
+                        (sample_id, barcode_id)
+                else:
+                    raise ValueError('Read direction must be "forward" or '
+                                     '"reverse" in manifest, but received: '
+                                     '%s' % direction)
+                os.link(str(abspath), str(result.path / result_path))
+
+    result.manifest.write_data(manifest, FastqManifestFormat)
+
+    metadata = YamlFormat()
+    metadata.path.write_text(yaml.dump({'phred-offset': 33}))
+    result.metadata.write_data(metadata, YamlFormat)
+
+    return result
+
+@plugin.register_transformer
+def _9(fmt: PairedEndFastqManifestPhred64) \
+        -> SingleLanePerSamplePairedEndFastqDirFmt:
+    result = SingleLanePerSamplePairedEndFastqDirFmt()
+    manifest = FastqManifestFormat()
+    with manifest.open() as manifest_fh:
+        with fmt.open() as fh:
+            iterator = iter(fh)
+            manifest_fh.write(next(iterator))  # header line
+            for barcode_id, line in enumerate(iterator):
+                sample_id, path, direction = line.rstrip().split(',')
+                abspath = os.path.abspath(path)
+                if not os.path.exists(abspath):
+                    raise FileNotFoundError(
+                        'A path specified in the manifest does not exist: '
+                        '%s' % path)
+                if direction == 'forward':
+                    manifest_fh.write(line)
+                    result_path = '%s_%s_L001_R1_001.fastq.gz' % \
+                        (sample_id, barcode_id)
+                elif direction == 'reverse':
+                    manifest_fh.write(line)
+                    result_path = '%s_%s_L001_R2_001.fastq.gz' % \
+                        (sample_id, barcode_id)
+                else:
+                    raise ValueError('Read direction must be "forward" or '
+                                     '"reverse" in manifest, but received: '
+                                     '%s' % direction)
+
+                out_path = str(result.path / result_path)
+                # convert PHRED 64 to PHRED 33
+                with open(out_path, 'wb') as out_file:
+                    for seq in skbio.io.read(path, format='fastq',
+                                             variant='illumina1.3'):
+                        skbio.io.write(seq, into=out_file,
+                                       format='fastq',
+                                       variant='illumina1.8',
+                                       compression='gzip')
+
+    result.manifest.write_data(manifest, FastqManifestFormat)
+
+    metadata = YamlFormat()
+    metadata.path.write_text(yaml.dump({'phred-offset': 33}))
+    result.metadata.write_data(metadata, YamlFormat)
+
+    return result
