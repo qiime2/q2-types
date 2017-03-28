@@ -6,7 +6,6 @@
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
 
-import os.path
 import skbio.io
 import yaml
 import qiime2.plugin.model as model
@@ -61,19 +60,37 @@ class FastqGzFormat(model.BinaryFileFormat):
         return False
 
 
-class SingleEndFastqManifestPhred33(FastqManifestFormat):
+class FastqAbsolutePathManifestFormat(model.TextFileFormat):
+    """
+    Mapping of sample identifiers to filepaths and read direction.
+
+    """
+    def sniff(self):
+        expected_header = 'sample-id,absolute-filepath,direction'
+        with self.open() as fh:
+            for line in fh:
+                line = line.strip()
+                if line and not line.startswith('#'):
+                    # the first non-blank, non-comment line should be
+                    # the header
+                    return line == expected_header
+        # never found the header
+        return False
+
+
+class SingleEndFastqManifestPhred33(FastqAbsolutePathManifestFormat):
     pass
 
 
-class SingleEndFastqManifestPhred64(FastqManifestFormat):
+class SingleEndFastqManifestPhred64(FastqAbsolutePathManifestFormat):
     pass
 
 
-class PairedEndFastqManifestPhred33(FastqManifestFormat):
+class PairedEndFastqManifestPhred33(FastqAbsolutePathManifestFormat):
     pass
 
 
-class PairedEndFastqManifestPhred64(FastqManifestFormat):
+class PairedEndFastqManifestPhred64(FastqAbsolutePathManifestFormat):
     pass
 
 
