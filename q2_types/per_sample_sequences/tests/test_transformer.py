@@ -7,14 +7,22 @@
 # ----------------------------------------------------------------------------
 
 import unittest
+import tempfile
+import os
+import shutil
 
 import skbio
+import yaml
 
 from q2_types.per_sample_sequences import (
     PerSampleDNAIterators, PerSamplePairedDNAIterators,
     SingleLanePerSampleSingleEndFastqDirFmt,
     SingleLanePerSamplePairedEndFastqDirFmt,
-    CasavaOneEightSingleLanePerSampleDirFmt
+    CasavaOneEightSingleLanePerSampleDirFmt,
+    SingleEndFastqManifestPhred33,
+    SingleEndFastqManifestPhred64,
+    PairedEndFastqManifestPhred33,
+    PairedEndFastqManifestPhred64,
 )
 from qiime2.plugin.testing import TestPluginBase
 
@@ -100,6 +108,58 @@ class TestTransformers(TestPluginBase):
 
         for act, exp in zip(obs, input):
             self.assertEqual(act, exp)
+
+
+    def test_single_end_fastq_manifest_phred33_to_slpssefdf(self):
+        transformer = self.get_transformer(
+            SingleEndFastqManifestPhred33,
+            SingleLanePerSampleSingleEndFastqDirFmt)
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            shutil.copy(
+                self.get_data_path('Human-Kneecap_S1_L001_R1_001.fastq.gz'),
+                os.path.join(tmpdir, 'Human-Kneecap_S1_L001_R1_001.fastq.gz'))
+            shutil.copy(
+                self.get_data_path('Human-Armpit.fastq.gz'),
+                os.path.join(tmpdir, 'Human-Armpit.fastq.gz'))
+
+            manifest_fp = os.path.join(tmpdir, 'manifest')
+            with open(manifest_fp, 'w') as fh:
+                fh.write("sample-id,filename,direction\n")
+                fh.write("sampleABC,%s/Human-Kneecap_S1_L001_R1_001.fastq.gz,"
+                         "forward\n" % tmpdir)
+                fh.write("sampleXYZ,%s/Human-Armpit.fastq.gz,forward\n" % tmpdir)
+
+            obs = transformer(SingleEndFastqManifestPhred33(manifest_fp, 'r'))
+
+        fastq_pairs = [('Human-Kneecap_S1_L001_R1_001.fastq.gz',
+                        'sampleABC_0_L001_R1_001.fastq.gz'),
+                       ('Human-Armpit.fastq.gz',
+                        'sampleXYZ_1_L001_R1_001.fastq.gz')]
+        for input_fastq, obs_fastq in fastq_pairs:
+            obs_fh = skbio.io.read(
+                os.path.join(str(obs), obs_fastq),
+                format='fastq', constructor=skbio.DNA
+            )
+            exp_fh = skbio.io.read(
+                self.get_data_path(input_fastq),
+                format='fastq', constructor=skbio.DNA
+            )
+
+            for o, e in zip(obs_fh, exp_fh):
+                self.assertEqual(o, e)
+
+        obs_metadata = yaml.load(open('%s/metadata.yml' % str(obs)))
+        exp_metadata = yaml.load("{'phred-offset': 33}")
+        self.assertEqual(obs_metadata, exp_metadata)
+
+        obs_manifest = open('%s/MANIFEST' % (str(obs))).read()
+        exp_manifest=("sample-id,filename,direction\n"
+                      "sampleABC,sampleABC_0_L001_R1_001.fastq.gz,forward\n"
+                      "sampleXYZ,sampleXYZ_1_L001_R1_001.fastq.gz,forward\n")
+        self.assertEqual(obs_manifest, exp_manifest)
+
+
 
 
 if __name__ == '__main__':

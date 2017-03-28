@@ -6,6 +6,7 @@
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
 
+import shutil
 import os
 import gzip
 
@@ -128,7 +129,7 @@ def _5(dirfmt: SingleLanePerSamplePairedEndFastqDirFmt) \
                 _, relpath, direction = line.rstrip().split(',')
                 if direction == 'forward':
                     manifest_fh.write(line)
-                    os.link(str(dirfmt.path / relpath),
+                    shutil.copy(str(dirfmt.path / relpath),
                             str(result.path / relpath))
 
     result.manifest.write_data(manifest, FastqManifestFormat)
@@ -146,18 +147,19 @@ def _6(fmt: SingleEndFastqManifestPhred33) \
         -> SingleLanePerSampleSingleEndFastqDirFmt:
     result = SingleLanePerSampleSingleEndFastqDirFmt()
     manifest = FastqManifestFormat()
+
     with manifest.open() as manifest_fh:
         with fmt.open() as fh:
             iterator = iter(fh)
             manifest_fh.write(next(iterator))  # header line
             for barcode_id, line in enumerate(iterator):
                 sample_id, path, direction = line.rstrip().split(',')
-                abspath = os.path.abspath(path)
-                manifest_fh.write(line)
-                result_path = '%s_%s_L001_R%d_001.fastq.gz' % \
+                result_path = '%s_%d_L001_R%d_001.fastq.gz' % \
                     (sample_id, barcode_id,
                      _direction_to_read_number[direction])
-                os.link(str(abspath), str(result.path / result_path))
+                manifest_fh.write('%s,%s,%s\n' %
+                                  (sample_id, result_path, direction))
+                shutil.copy(str(path), str(result.path / result_path))
 
     result.manifest.write_data(manifest, FastqManifestFormat)
 
@@ -179,20 +181,20 @@ def _7(fmt: SingleEndFastqManifestPhred64) \
             for barcode_id, line in enumerate(iterator):
                 sample_id, path, direction = line.rstrip().split(',')
                 abspath = os.path.abspath(path)
-                if direction == 'forward':
-                    manifest_fh.write(line)
-                    result_path = '%s_%s_L001_R%d_001.fastq.gz' % \
-                        (sample_id, barcode_id,
-                         _direction_to_read_number[direction])
-                    out_path = str(result.path / result_path)
-                    # convert PHRED 64 to PHRED 33
-                    with open(out_path, 'wb') as out_file:
-                        for seq in skbio.io.read(path, format='fastq',
-                                                 variant='illumina1.3'):
-                            skbio.io.write(seq, into=out_file,
-                                           format='fastq',
-                                           variant='illumina1.8',
-                                           compression='gzip')
+                result_path = '%s_%d_L001_R%d_001.fastq.gz' % \
+                    (sample_id, barcode_id,
+                     _direction_to_read_number[direction])
+                out_path = str(result.path / result_path)
+                manifest_fh.write('%s,%s,%s\n' %
+                                  (sample_id, result_path, direction))
+                # convert PHRED 64 to PHRED 33
+                with open(out_path, 'wb') as out_file:
+                    for seq in skbio.io.read(path, format='fastq',
+                                             variant='illumina1.3'):
+                        skbio.io.write(seq, into=out_file,
+                                       format='fastq',
+                                       variant='illumina1.8',
+                                       compression='gzip')
 
     result.manifest.write_data(manifest, FastqManifestFormat)
 
@@ -214,11 +216,12 @@ def _8(fmt: PairedEndFastqManifestPhred33) \
             for barcode_id, line in enumerate(iterator):
                 sample_id, path, direction = line.rstrip().split(',')
                 abspath = os.path.abspath(path)
-                manifest_fh.write(line)
-                result_path = '%s_%s_L001_R%d_001.fastq.gz' % \
+                result_path = '%s_%d_L001_R%d_001.fastq.gz' % \
                     (sample_id, barcode_id,
                      _direction_to_read_number[direction])
-                os.link(str(abspath), str(result.path / result_path))
+                manifest_fh.write('%s,%s,%s\n' %
+                                  (sample_id, result_path, direction))
+                shutil.copy(str(abspath), str(result.path / result_path))
 
     result.manifest.write_data(manifest, FastqManifestFormat)
 
@@ -240,11 +243,12 @@ def _9(fmt: PairedEndFastqManifestPhred64) \
             for barcode_id, line in enumerate(iterator):
                 sample_id, path, direction = line.rstrip().split(',')
                 abspath = os.path.abspath(path)
-                manifest_fh.write(line)
-                result_path = '%s_%s_L001_R%d_001.fastq.gz' % \
+                result_path = '%s_%d_L001_R%d_001.fastq.gz' % \
                     (sample_id, barcode_id,
                      _direction_to_read_number[direction])
 
+                manifest_fh.write('%s,%s,%s\n' %
+                                  (sample_id, result_path, direction))
                 out_path = str(result.path / result_path)
                 # convert PHRED 64 to PHRED 33
                 with open(out_path, 'wb') as out_file:
