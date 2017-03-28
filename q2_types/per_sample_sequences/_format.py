@@ -61,80 +61,19 @@ class FastqGzFormat(model.BinaryFileFormat):
         return False
 
 
-class SingleEndFastqManifestPhred33(model.TextFileFormat):
-    def sniff(self):
-        first_direction = None
-        with self.open() as fh:
-            header = fh.readline()
-            if header.strip() != 'sample-id,filename,direction':
-                return False
-            for line in fh:
-                line = line.strip()
-                if len(line) == 0:
-                    continue
-                sample_id, path, direction = line.rstrip().split(',')
-                if not os.path.exists(os.path.abspath(path)):
-                    raise FileNotFoundError(
-                        'A path specified in the manifest does not exist: '
-                        '%s' % path)
-
-                if direction not in {'forward', 'reverse'}:
-                    raise ValueError('Direction can only be "forward" or '
-                                     '"reverse", but found: %s' % direction)
-
-                if first_direction is None:
-                    first_direction = direction
-                elif first_direction != direction:
-                    raise ValueError('Manifest for single-end reads can '
-                                     'contain only forward or reverse reads '
-                                     'but both are present.')
-        return True
-
-
-class SingleEndFastqManifestPhred64(SingleEndFastqManifestPhred33):
-    # the manifest format is the same for the two standard Phred offsets
+class SingleEndFastqManifestPhred33(FastqManifestFormat):
     pass
 
 
-class PairedEndFastqManifestPhred33(model.TextFileFormat):
-
-    def sniff(self):
-        forward_direction_sample_ids = []
-        reverse_direction_sample_ids = []
-        with self.open() as fh:
-            header = fh.readline()
-            if header.strip() != 'sample-id,filename,direction':
-                return False
-            for line in fh:
-                line = line.strip()
-                if len(line) == 0:
-                    continue
-                sample_id, path, direction = line.rstrip().split(',')
-                if not os.path.exists(os.path.abspath(path)):
-                    raise FileNotFoundError(
-                        'A path specified in the manifest does not exist: '
-                        '%s' % path)
-
-                if direction == 'forward':
-                    forward_direction_sample_ids.append(sample_id)
-                elif direction == 'reverse':
-                    reverse_direction_sample_ids.append(sample_id)
-                else:
-                    raise ValueError('Direction can only be "forward" or '
-                                     '"reverse", but found: %s' % direction)
-
-            if sorted(forward_direction_sample_ids) != \
-               sorted(reverse_direction_sample_ids):
-                # could do some munging here here to make this error message
-                # more informative
-                raise ValueError('Forward and reverse reads must be provided '
-                                 'exactly one time each for each sample.')
-
-        return True
+class SingleEndFastqManifestPhred64(FastqManifestFormat):
+    pass
 
 
-class PairedEndFastqManifestPhred64(PairedEndFastqManifestPhred33):
-    # the manifest format is the same for the two standard Phred offsets
+class PairedEndFastqManifestPhred33(FastqManifestFormat):
+    pass
+
+
+class PairedEndFastqManifestPhred64(FastqManifestFormat):
     pass
 
 

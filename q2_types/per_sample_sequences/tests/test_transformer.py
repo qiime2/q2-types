@@ -111,8 +111,9 @@ class TestTransformers(TestPluginBase):
 
 
     def test_single_end_fastq_manifest_phred33_to_slpssefdf(self):
+        format_ = SingleEndFastqManifestPhred33
         transformer = self.get_transformer(
-            SingleEndFastqManifestPhred33,
+            format_,
             SingleLanePerSampleSingleEndFastqDirFmt)
 
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -130,7 +131,7 @@ class TestTransformers(TestPluginBase):
                          "forward\n" % tmpdir)
                 fh.write("sampleXYZ,%s/Human-Armpit.fastq.gz,forward\n" % tmpdir)
 
-            obs = transformer(SingleEndFastqManifestPhred33(manifest_fp, 'r'))
+            obs = transformer(format_(manifest_fp, 'r'))
 
         fastq_pairs = [('Human-Kneecap_S1_L001_R1_001.fastq.gz',
                         'sampleABC_0_L001_R1_001.fastq.gz'),
@@ -160,8 +161,9 @@ class TestTransformers(TestPluginBase):
         self.assertEqual(obs_manifest, exp_manifest)
 
     def test_single_end_fastq_manifest_phred64_to_slpssefdf(self):
+        format_ = SingleEndFastqManifestPhred64
         transformer = self.get_transformer(
-            SingleEndFastqManifestPhred64,
+            format_,
             SingleLanePerSampleSingleEndFastqDirFmt)
 
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -179,7 +181,7 @@ class TestTransformers(TestPluginBase):
                          "forward\n" % tmpdir)
                 fh.write("sampleXYZ,%s/s2-phred64.fastq.gz,forward\n" % tmpdir)
 
-            obs = transformer(SingleEndFastqManifestPhred33(manifest_fp, 'r'))
+            obs = transformer(format_(manifest_fp, 'r'))
 
         fastq_pairs = [('s1-phred64.fastq.gz',
                         'sampleABC_0_L001_R1_001.fastq.gz'),
@@ -209,8 +211,9 @@ class TestTransformers(TestPluginBase):
         self.assertEqual(obs_manifest, exp_manifest)
 
     def test_paired_end_fastq_manifest_phred33_to_slpspefdf(self):
+        format_ = PairedEndFastqManifestPhred33
         transformer = self.get_transformer(
-            PairedEndFastqManifestPhred33,
+            format_,
             SingleLanePerSamplePairedEndFastqDirFmt)
 
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -228,7 +231,7 @@ class TestTransformers(TestPluginBase):
                          "forward\n" % tmpdir)
                 fh.write("sampleABC,%s/Human-Armpit.fastq.gz,reverse\n" % tmpdir)
 
-            obs = transformer(SingleEndFastqManifestPhred33(manifest_fp, 'r'))
+            obs = transformer(format_(manifest_fp, 'r'))
 
         fastq_pairs = [('Human-Kneecap_S1_L001_R1_001.fastq.gz',
                         'sampleABC_0_L001_R1_001.fastq.gz'),
@@ -258,8 +261,9 @@ class TestTransformers(TestPluginBase):
         self.assertEqual(obs_manifest, exp_manifest)
 
     def test_paired_end_fastq_manifest_phred64_to_slpspefdf(self):
+        format_ = PairedEndFastqManifestPhred64
         transformer = self.get_transformer(
-            PairedEndFastqManifestPhred64,
+            format_,
             SingleLanePerSamplePairedEndFastqDirFmt)
 
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -277,7 +281,7 @@ class TestTransformers(TestPluginBase):
                          "forward\n" % tmpdir)
                 fh.write("sampleABC,%s/s2-phred64.fastq.gz,reverse\n" % tmpdir)
 
-            obs = transformer(SingleEndFastqManifestPhred33(manifest_fp, 'r'))
+            obs = transformer(format_(manifest_fp, 'r'))
 
         fastq_pairs = [('s1-phred64.fastq.gz',
                         'sampleABC_0_L001_R1_001.fastq.gz'),
@@ -306,6 +310,121 @@ class TestTransformers(TestPluginBase):
                       "sampleABC,sampleABC_1_L001_R2_001.fastq.gz,reverse\n")
         self.assertEqual(obs_manifest, exp_manifest)
 
+    def test_single_end_fastq_manifest_invalid(self):
+        format_ = SingleEndFastqManifestPhred64
+        transformer = self.get_transformer(
+            format_,
+            SingleLanePerSampleSingleEndFastqDirFmt)
+
+        # file specified in manifest doesn't exist
+        with tempfile.TemporaryDirectory() as tmpdir:
+            shutil.copy(
+                self.get_data_path('s1-phred64.fastq.gz'),
+                os.path.join(tmpdir, 's1-phred64.fastq.gz'))
+
+            manifest_fp = os.path.join(tmpdir, 'manifest')
+            with open(manifest_fp, 'w') as fh:
+                fh.write("sample-id,filename,direction\n")
+                fh.write("sampleABC,%s/s1-phred64.fastq.gz,"
+                         "forward\n" % tmpdir)
+                fh.write("sampleXYZ,%s/s2-phred64.fastq.gz,forward\n" % tmpdir)
+
+            with self.assertRaises(FileNotFoundError):
+                transformer(format_(manifest_fp, 'r'))
+
+        # invalid direction in manifest
+        with tempfile.TemporaryDirectory() as tmpdir:
+            shutil.copy(
+                self.get_data_path('s1-phred64.fastq.gz'),
+                os.path.join(tmpdir, 's1-phred64.fastq.gz'))
+            shutil.copy(
+                self.get_data_path('s2-phred64.fastq.gz'),
+                os.path.join(tmpdir, 's2-phred64.fastq.gz'))
+
+            manifest_fp = os.path.join(tmpdir, 'manifest')
+            with open(manifest_fp, 'w') as fh:
+                fh.write("sample-id,filename,direction\n")
+                fh.write("sampleABC,%s/s1-phred64.fastq.gz,"
+                         "middle-out\n" % tmpdir)
+                fh.write("sampleXYZ,%s/s2-phred64.fastq.gz,forward\n" % tmpdir)
+
+            with self.assertRaises(ValueError):
+                transformer(format_(manifest_fp, 'r'))
+
+        # different directions in single-end manifest
+        with tempfile.TemporaryDirectory() as tmpdir:
+            shutil.copy(
+                self.get_data_path('s1-phred64.fastq.gz'),
+                os.path.join(tmpdir, 's1-phred64.fastq.gz'))
+            shutil.copy(
+                self.get_data_path('s2-phred64.fastq.gz'),
+                os.path.join(tmpdir, 's2-phred64.fastq.gz'))
+
+            manifest_fp = os.path.join(tmpdir, 'manifest')
+            with open(manifest_fp, 'w') as fh:
+                fh.write("sample-id,filename,direction\n")
+                fh.write("sampleABC,%s/s1-phred64.fastq.gz,"
+                         "forward\n" % tmpdir)
+                fh.write("sampleXYZ,%s/s2-phred64.fastq.gz,reverse\n" % tmpdir)
+
+            with self.assertRaises(ValueError):
+                transformer(format_(manifest_fp, 'r'))
+
+    def test_paired_end_fastq_manifest_invalid(self):
+        format_ = PairedEndFastqManifestPhred64
+        transformer = self.get_transformer(
+            format_,
+            SingleLanePerSamplePairedEndFastqDirFmt)
+
+        # file specified in manifest doesn't exist
+        with tempfile.TemporaryDirectory() as tmpdir:
+            shutil.copy(
+                self.get_data_path('s1-phred64.fastq.gz'),
+                os.path.join(tmpdir, 's1-phred64.fastq.gz'))
+
+            manifest_fp = os.path.join(tmpdir, 'manifest')
+            with open(manifest_fp, 'w') as fh:
+                fh.write("sample-id,filename,direction\n")
+                fh.write("sampleABC,%s/s1-phred64.fastq.gz,"
+                         "forward\n" % tmpdir)
+                fh.write("sampleABC,%s/s2-phred64.fastq.gz,reverse\n" % tmpdir)
+
+            with self.assertRaises(FileNotFoundError):
+                transformer(format_(manifest_fp, 'r'))
+
+        # invalid direction in manifest
+        with tempfile.TemporaryDirectory() as tmpdir:
+            shutil.copy(
+                self.get_data_path('s1-phred64.fastq.gz'),
+                os.path.join(tmpdir, 's1-phred64.fastq.gz'))
+            shutil.copy(
+                self.get_data_path('s2-phred64.fastq.gz'),
+                os.path.join(tmpdir, 's2-phred64.fastq.gz'))
+
+            manifest_fp = os.path.join(tmpdir, 'manifest')
+            with open(manifest_fp, 'w') as fh:
+                fh.write("sample-id,filename,direction\n")
+                fh.write("sampleABC,%s/s1-phred64.fastq.gz,"
+                         "middle-out\n" % tmpdir)
+                fh.write("sampleABC,%s/s2-phred64.fastq.gz,reverse\n" % tmpdir)
+
+            with self.assertRaises(ValueError):
+                transformer(format_(manifest_fp, 'r'))
+
+        # missing directions in single-end manifest
+        with tempfile.TemporaryDirectory() as tmpdir:
+            shutil.copy(
+                self.get_data_path('s1-phred64.fastq.gz'),
+                os.path.join(tmpdir, 's1-phred64.fastq.gz'))
+
+            manifest_fp = os.path.join(tmpdir, 'manifest')
+            with open(manifest_fp, 'w') as fh:
+                fh.write("sample-id,filename,direction\n")
+                fh.write("sampleABC,%s/s1-phred64.fastq.gz,"
+                         "forward\n" % tmpdir)
+
+            with self.assertRaises(ValueError):
+                transformer(format_(manifest_fp, 'r'))
 
 if __name__ == '__main__':
     unittest.main()

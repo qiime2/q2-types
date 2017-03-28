@@ -142,12 +142,42 @@ def _5(dirfmt: SingleLanePerSamplePairedEndFastqDirFmt) \
 
 _direction_to_read_number = {'forward': 1, 'reverse': 2}
 
+
+def _validate_single_end_fastq_manifest(manifest_fh):
+    first_direction = None
+
+    header = manifest_fh.readline()
+    if header.strip() != 'sample-id,filename,direction':
+        raise ValueError('manifest is missing header line.')
+
+    for line in manifest_fh:
+        line = line.strip()
+        if len(line) == 0:
+            continue
+        sample_id, path, direction = line.split(',')
+        if not os.path.exists(path):
+            raise FileNotFoundError(
+                'A path specified in the manifest does not exist: '
+                '%s' % path)
+
+        if direction not in {'forward', 'reverse'}:
+            raise ValueError('Direction can only be "forward" or '
+                             '"reverse", but found: %s' % direction)
+
+        if first_direction is None:
+            first_direction = direction
+        elif first_direction != direction:
+            raise ValueError('Manifest for single-end reads can '
+                             'contain only forward or reverse reads '
+                             'but both are present.')
+
 @plugin.register_transformer
 def _6(fmt: SingleEndFastqManifestPhred33) \
         -> SingleLanePerSampleSingleEndFastqDirFmt:
+    _validate_single_end_fastq_manifest(fmt.open())
+
     result = SingleLanePerSampleSingleEndFastqDirFmt()
     manifest = FastqManifestFormat()
-
     with manifest.open() as manifest_fh:
         with fmt.open() as fh:
             iterator = iter(fh)
@@ -172,6 +202,8 @@ def _6(fmt: SingleEndFastqManifestPhred33) \
 @plugin.register_transformer
 def _7(fmt: SingleEndFastqManifestPhred64) \
         -> SingleLanePerSampleSingleEndFastqDirFmt:
+    _validate_single_end_fastq_manifest(fmt.open())
+
     result = SingleLanePerSampleSingleEndFastqDirFmt()
     manifest = FastqManifestFormat()
     with manifest.open() as manifest_fh:
@@ -204,9 +236,41 @@ def _7(fmt: SingleEndFastqManifestPhred64) \
 
     return result
 
+def _validate_paired_end_fastq_manifest(manifest_fh):
+    forward_direction_sample_ids = []
+    reverse_direction_sample_ids = []
+    header = manifest_fh.readline()
+    if header.strip() != 'sample-id,filename,direction':
+        raise ValueError('manifest is missing header line.')
+    for line in manifest_fh:
+        line = line.strip()
+        if len(line) == 0:
+            continue
+        sample_id, path, direction = line.rstrip().split(',')
+        if not os.path.exists(path):
+            raise FileNotFoundError(
+                'A path specified in the manifest does not exist: '
+                '%s' % path)
+
+        if direction == 'forward':
+            forward_direction_sample_ids.append(sample_id)
+        elif direction == 'reverse':
+            reverse_direction_sample_ids.append(sample_id)
+        else:
+            raise ValueError('Direction can only be "forward" or '
+                             '"reverse", but found: %s' % direction)
+
+    if sorted(forward_direction_sample_ids) != \
+       sorted(reverse_direction_sample_ids):
+        # could do some munging here here to make this error message
+        # more informative
+        raise ValueError('Forward and reverse reads must be provided '
+                         'exactly one time each for each sample.')
+
 @plugin.register_transformer
 def _8(fmt: PairedEndFastqManifestPhred33) \
         -> SingleLanePerSamplePairedEndFastqDirFmt:
+    _validate_paired_end_fastq_manifest(fmt.open())
     result = SingleLanePerSamplePairedEndFastqDirFmt()
     manifest = FastqManifestFormat()
     with manifest.open() as manifest_fh:
@@ -234,6 +298,7 @@ def _8(fmt: PairedEndFastqManifestPhred33) \
 @plugin.register_transformer
 def _9(fmt: PairedEndFastqManifestPhred64) \
         -> SingleLanePerSamplePairedEndFastqDirFmt:
+    _validate_paired_end_fastq_manifest(fmt.open())
     result = SingleLanePerSamplePairedEndFastqDirFmt()
     manifest = FastqManifestFormat()
     with manifest.open() as manifest_fh:
