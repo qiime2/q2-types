@@ -329,7 +329,8 @@ class TestTransformers(TestPluginBase):
                          "forward\n" % tmpdir)
                 fh.write("sampleXYZ,%s/s2-phred64.fastq.gz,forward\n" % tmpdir)
 
-            with self.assertRaises(FileNotFoundError):
+            with self.assertRaisesRegex(FileNotFoundError,
+                                        "s2-phred64.fastq.gz"):
                 transformer(format_(manifest_fp, 'r'))
 
         # invalid direction in manifest
@@ -348,7 +349,7 @@ class TestTransformers(TestPluginBase):
                          "middle-out\n" % tmpdir)
                 fh.write("sampleXYZ,%s/s2-phred64.fastq.gz,forward\n" % tmpdir)
 
-            with self.assertRaises(ValueError):
+            with self.assertRaisesRegex(ValueError, 'middle-out'):
                 transformer(format_(manifest_fp, 'r'))
 
         # different directions in single-end manifest
@@ -367,7 +368,7 @@ class TestTransformers(TestPluginBase):
                          "forward\n" % tmpdir)
                 fh.write("sampleXYZ,%s/s2-phred64.fastq.gz,reverse\n" % tmpdir)
 
-            with self.assertRaises(ValueError):
+            with self.assertRaisesRegex(ValueError, "only forward or reverse"):
                 transformer(format_(manifest_fp, 'r'))
 
     def test_paired_end_fastq_manifest_invalid(self):
@@ -389,7 +390,8 @@ class TestTransformers(TestPluginBase):
                          "forward\n" % tmpdir)
                 fh.write("sampleABC,%s/s2-phred64.fastq.gz,reverse\n" % tmpdir)
 
-            with self.assertRaises(FileNotFoundError):
+            with self.assertRaisesRegex(FileNotFoundError,
+                                        "s2-phred64.fastq.gz"):
                 transformer(format_(manifest_fp, 'r'))
 
         # invalid direction in manifest
@@ -408,7 +410,7 @@ class TestTransformers(TestPluginBase):
                          "middle-out\n" % tmpdir)
                 fh.write("sampleABC,%s/s2-phred64.fastq.gz,reverse\n" % tmpdir)
 
-            with self.assertRaises(ValueError):
+            with self.assertRaisesRegex(ValueError, 'middle-out'):
                 transformer(format_(manifest_fp, 'r'))
 
         # missing directions in single-end manifest
@@ -423,7 +425,8 @@ class TestTransformers(TestPluginBase):
                 fh.write("sampleABC,%s/s1-phred64.fastq.gz,"
                          "forward\n" % tmpdir)
 
-            with self.assertRaises(ValueError):
+            with self.assertRaisesRegex(ValueError,
+                                        "one time each for each sample"):
                 transformer(format_(manifest_fp, 'r'))
 
 if __name__ == '__main__':
