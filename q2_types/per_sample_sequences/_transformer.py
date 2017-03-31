@@ -174,13 +174,6 @@ def _parse_and_validate_manifest(manifest_fh, single_end):
     return manifest
 
 
-def _get_fastq_fn(sample_id, barcode_id, direction):
-    direction_to_read_number = {'forward': 1, 'reverse': 2}
-    return '%s_%d_L001_R%d_001.fastq.gz' % \
-           (sample_id, barcode_id,
-            direction_to_read_number[direction])
-
-
 def _write_phred64_to_phred33(phred64_path, phred33_path):
     with open(phred64_path, 'rb') as phred64_fh, \
          open(phred33_path, 'wb') as phred33_fh:
@@ -299,6 +292,7 @@ def _validate_paired_end_fastq_manifest_directions(manifest):
 
 
 def _fastq_manifest_helper(fmt, fastq_copy_fn, single_end):
+    direction_to_read_number = {'forward': 1, 'reverse': 2}
     input_manifest = _parse_and_validate_manifest(fmt.open(),
                                                   single_end=single_end)
     if single_end:
@@ -309,15 +303,23 @@ def _fastq_manifest_helper(fmt, fastq_copy_fn, single_end):
     output_manifest_data = []
     for idx, sample_id, input_fastq_fp, direction in \
             input_manifest.itertuples():
-        output_fastq_fn = \
-            _get_fastq_fn(sample_id, idx, direction)
-        output_manifest_data.append([sample_id, output_fastq_fn, direction])
-        output_fastq_fp = str(result.path / output_fastq_fn)
-        fastq_copy_fn(input_fastq_fp, output_fastq_fp)
+        read_number = direction_to_read_number[direction]
+        output_fastq_fp = \
+            result.sequences.path_maker(sample_id=sample_id,
+                                        # the remaining values aren't used
+                                        # internally by QIIME, so their values
+                                        # aren't very important
+                                        barcode_id=idx,
+                                        lane_number=1,
+                                        read_number=read_number)
+        output_manifest_data.append(
+            [sample_id, output_fastq_fp.name, direction])
+        fastq_copy_fn(input_fastq_fp, str(output_fastq_fp))
 
     output_manifest = FastqManifestFormat()
-    output_manifest_df = pd.DataFrame(
-        output_manifest_data, columns=['sample-id', 'filename', 'direction'])
+    output_manifest_df = \
+        pd.DataFrame(output_manifest_data,
+                     columns=['sample-id', 'filename', 'direction'])
     output_manifest_df.to_csv(str(output_manifest), index=False)
     result.manifest.write_data(output_manifest, FastqManifestFormat)
 

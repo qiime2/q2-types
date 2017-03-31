@@ -128,23 +128,23 @@ class TestFastqManifestTransformers(TestPluginBase):
             format_,
             SingleLanePerSampleSingleEndFastqDirFmt)
 
-        with tempfile.TemporaryDirectory() as tmpdir:
-            shutil.copy(
-                self.get_data_path('Human-Kneecap_S1_L001_R1_001.fastq.gz'),
-                os.path.join(tmpdir, 'Human-Kneecap_S1_L001_R1_001.fastq.gz'))
-            shutil.copy(
-                self.get_data_path('Human-Armpit.fastq.gz'),
-                os.path.join(tmpdir, 'Human-Armpit.fastq.gz'))
+        shutil.copy(
+            self.get_data_path('Human-Kneecap_S1_L001_R1_001.fastq.gz'),
+            os.path.join(self.temp_dir.name,
+                         'Human-Kneecap_S1_L001_R1_001.fastq.gz'))
+        shutil.copy(
+            self.get_data_path('Human-Armpit.fastq.gz'),
+            os.path.join(self.temp_dir.name, 'Human-Armpit.fastq.gz'))
 
-            manifest_fp = os.path.join(tmpdir, 'manifest')
-            with open(manifest_fp, 'w') as fh:
-                fh.write("sample-id,absolute-filepath,direction\n")
-                fh.write("sampleABC,%s/Human-Kneecap_S1_L001_R1_001.fastq.gz,"
-                         "forward\n" % tmpdir)
-                fh.write("sampleXYZ,%s/Human-Armpit.fastq.gz,forward\n"
-                         % tmpdir)
+        manifest_fp = os.path.join(self.temp_dir.name, 'manifest')
+        with open(manifest_fp, 'w') as fh:
+            fh.write("sample-id,absolute-filepath,direction\n")
+            fh.write("sampleABC,%s/Human-Kneecap_S1_L001_R1_001.fastq.gz,"
+                     "forward\n" % self.temp_dir.name)
+            fh.write("sampleXYZ,%s/Human-Armpit.fastq.gz,forward\n"
+                     % self.temp_dir.name)
 
-            obs = transformer(format_(manifest_fp, 'r'))
+        obs = transformer(format_(manifest_fp, 'r'))
 
         fastq_pairs = [('Human-Kneecap_S1_L001_R1_001.fastq.gz',
                         'sampleABC_0_L001_R1_001.fastq.gz'),
@@ -179,22 +179,22 @@ class TestFastqManifestTransformers(TestPluginBase):
             format_,
             SingleLanePerSampleSingleEndFastqDirFmt)
 
-        with tempfile.TemporaryDirectory() as tmpdir:
-            shutil.copy(
-                self.get_data_path('s1-phred64.fastq.gz'),
-                os.path.join(tmpdir, 's1-phred64.fastq.gz'))
-            shutil.copy(
-                self.get_data_path('s2-phred64.fastq.gz'),
-                os.path.join(tmpdir, 's2-phred64.fastq.gz'))
+        shutil.copy(
+            self.get_data_path('s1-phred64.fastq.gz'),
+            os.path.join(self.temp_dir.name, 's1-phred64.fastq.gz'))
+        shutil.copy(
+            self.get_data_path('s2-phred64.fastq.gz'),
+            os.path.join(self.temp_dir.name, 's2-phred64.fastq.gz'))
 
-            manifest_fp = os.path.join(tmpdir, 'manifest')
-            with open(manifest_fp, 'w') as fh:
-                fh.write("sample-id,absolute-filepath,direction\n")
-                fh.write("sampleABC,%s/s1-phred64.fastq.gz,"
-                         "forward\n" % tmpdir)
-                fh.write("sampleXYZ,%s/s2-phred64.fastq.gz,forward\n" % tmpdir)
+        manifest_fp = os.path.join(self.temp_dir.name, 'manifest')
+        with open(manifest_fp, 'w') as fh:
+            fh.write("sample-id,absolute-filepath,direction\n")
+            fh.write("sampleABC,%s/s1-phred64.fastq.gz,"
+                     "forward\n" % self.temp_dir.name)
+            fh.write("sampleXYZ,%s/s2-phred64.fastq.gz,forward\n" %
+                     self.temp_dir.name)
 
-            obs = transformer(format_(manifest_fp, 'r'))
+        obs = transformer(format_(manifest_fp, 'r'))
 
         fastq_pairs = [('s1-phred64.fastq.gz',
                         'sampleABC_0_L001_R1_001.fastq.gz'),
@@ -229,23 +229,23 @@ class TestFastqManifestTransformers(TestPluginBase):
             format_,
             SingleLanePerSamplePairedEndFastqDirFmt)
 
-        with tempfile.TemporaryDirectory() as tmpdir:
-            shutil.copy(
-                self.get_data_path('Human-Kneecap_S1_L001_R1_001.fastq.gz'),
-                os.path.join(tmpdir, 'Human-Kneecap_S1_L001_R1_001.fastq.gz'))
-            shutil.copy(
-                self.get_data_path('Human-Armpit.fastq.gz'),
-                os.path.join(tmpdir, 'Human-Armpit.fastq.gz'))
+        shutil.copy(
+            self.get_data_path('Human-Kneecap_S1_L001_R1_001.fastq.gz'),
+            os.path.join(self.temp_dir.name,
+                         'Human-Kneecap_S1_L001_R1_001.fastq.gz'))
+        shutil.copy(
+            self.get_data_path('Human-Armpit.fastq.gz'),
+            os.path.join(self.temp_dir.name, 'Human-Armpit.fastq.gz'))
 
-            manifest_fp = os.path.join(tmpdir, 'manifest')
-            with open(manifest_fp, 'w') as fh:
-                fh.write("sample-id,absolute-filepath,direction\n")
-                fh.write("sampleABC,%s/Human-Kneecap_S1_L001_R1_001.fastq.gz,"
-                         "forward\n" % tmpdir)
-                fh.write("sampleABC,%s/Human-Armpit.fastq.gz,reverse\n"
-                         % tmpdir)
+        manifest_fp = os.path.join(self.temp_dir.name, 'manifest')
+        with open(manifest_fp, 'w') as fh:
+            fh.write("sample-id,absolute-filepath,direction\n")
+            fh.write("sampleABC,%s/Human-Kneecap_S1_L001_R1_001.fastq.gz,"
+                     "forward\n" % self.temp_dir.name)
+            fh.write("sampleABC,%s/Human-Armpit.fastq.gz,reverse\n"
+                     % self.temp_dir.name)
 
-            obs = transformer(format_(manifest_fp, 'r'))
+        obs = transformer(format_(manifest_fp, 'r'))
 
         fastq_pairs = [('Human-Kneecap_S1_L001_R1_001.fastq.gz',
                         'sampleABC_0_L001_R1_001.fastq.gz'),
@@ -280,22 +280,22 @@ class TestFastqManifestTransformers(TestPluginBase):
             format_,
             SingleLanePerSamplePairedEndFastqDirFmt)
 
-        with tempfile.TemporaryDirectory() as tmpdir:
-            shutil.copy(
-                self.get_data_path('s1-phred64.fastq.gz'),
-                os.path.join(tmpdir, 's1-phred64.fastq.gz'))
-            shutil.copy(
-                self.get_data_path('s2-phred64.fastq.gz'),
-                os.path.join(tmpdir, 's2-phred64.fastq.gz'))
+        shutil.copy(
+            self.get_data_path('s1-phred64.fastq.gz'),
+            os.path.join(self.temp_dir.name, 's1-phred64.fastq.gz'))
+        shutil.copy(
+            self.get_data_path('s2-phred64.fastq.gz'),
+            os.path.join(self.temp_dir.name, 's2-phred64.fastq.gz'))
 
-            manifest_fp = os.path.join(tmpdir, 'manifest')
-            with open(manifest_fp, 'w') as fh:
-                fh.write("sample-id,absolute-filepath,direction\n")
-                fh.write("sampleABC,%s/s1-phred64.fastq.gz,"
-                         "forward\n" % tmpdir)
-                fh.write("sampleABC,%s/s2-phred64.fastq.gz,reverse\n" % tmpdir)
+        manifest_fp = os.path.join(self.temp_dir.name, 'manifest')
+        with open(manifest_fp, 'w') as fh:
+            fh.write("sample-id,absolute-filepath,direction\n")
+            fh.write("sampleABC,%s/s1-phred64.fastq.gz,"
+                     "forward\n" % self.temp_dir.name)
+            fh.write("sampleABC,%s/s2-phred64.fastq.gz,reverse\n" %
+                     self.temp_dir.name)
 
-            obs = transformer(format_(manifest_fp, 'r'))
+        obs = transformer(format_(manifest_fp, 'r'))
 
         fastq_pairs = [('s1-phred64.fastq.gz',
                         'sampleABC_0_L001_R1_001.fastq.gz'),
@@ -330,21 +330,21 @@ class TestFastqManifestTransformers(TestPluginBase):
             format_,
             SingleLanePerSampleSingleEndFastqDirFmt)
 
-        with tempfile.TemporaryDirectory() as tmpdir:
-            shutil.copy(
-                self.get_data_path('s1-phred64.fastq.gz'),
-                os.path.join(tmpdir, 's1-phred64.fastq.gz'))
+        shutil.copy(
+            self.get_data_path('s1-phred64.fastq.gz'),
+            os.path.join(self.temp_dir.name, 's1-phred64.fastq.gz'))
 
-            manifest_fp = os.path.join(tmpdir, 'manifest')
-            with open(manifest_fp, 'w') as fh:
-                fh.write("sample-id,absolute-filepath,direction\n")
-                fh.write("sampleABC,%s/s1-phred64.fastq.gz,"
-                         "forward\n" % tmpdir)
-                fh.write("sampleXYZ,%s/s2-phred64.fastq.gz,forward\n" % tmpdir)
+        manifest_fp = os.path.join(self.temp_dir.name, 'manifest')
+        with open(manifest_fp, 'w') as fh:
+            fh.write("sample-id,absolute-filepath,direction\n")
+            fh.write("sampleABC,%s/s1-phred64.fastq.gz,"
+                     "forward\n" % self.temp_dir.name)
+            fh.write("sampleXYZ,%s/s2-phred64.fastq.gz,forward\n" %
+                     self.temp_dir.name)
 
-            with self.assertRaisesRegex(FileNotFoundError,
-                                        "s2-phred64.fastq.gz"):
-                transformer(format_(manifest_fp, 'r'))
+        with self.assertRaisesRegex(FileNotFoundError,
+                                    "s2-phred64.fastq.gz"):
+            transformer(format_(manifest_fp, 'r'))
 
     def test_single_end_fastq_manifest_invalid_direction(self):
         format_ = SingleEndFastqManifestPhred64
@@ -352,23 +352,23 @@ class TestFastqManifestTransformers(TestPluginBase):
             format_,
             SingleLanePerSampleSingleEndFastqDirFmt)
 
-        with tempfile.TemporaryDirectory() as tmpdir:
-            shutil.copy(
-                self.get_data_path('s1-phred64.fastq.gz'),
-                os.path.join(tmpdir, 's1-phred64.fastq.gz'))
-            shutil.copy(
-                self.get_data_path('s2-phred64.fastq.gz'),
-                os.path.join(tmpdir, 's2-phred64.fastq.gz'))
+        shutil.copy(
+            self.get_data_path('s1-phred64.fastq.gz'),
+            os.path.join(self.temp_dir.name, 's1-phred64.fastq.gz'))
+        shutil.copy(
+            self.get_data_path('s2-phred64.fastq.gz'),
+            os.path.join(self.temp_dir.name, 's2-phred64.fastq.gz'))
 
-            manifest_fp = os.path.join(tmpdir, 'manifest')
-            with open(manifest_fp, 'w') as fh:
-                fh.write("sample-id,absolute-filepath,direction\n")
-                fh.write("sampleABC,%s/s1-phred64.fastq.gz,"
-                         "middle-out\n" % tmpdir)
-                fh.write("sampleXYZ,%s/s2-phred64.fastq.gz,forward\n" % tmpdir)
+        manifest_fp = os.path.join(self.temp_dir.name, 'manifest')
+        with open(manifest_fp, 'w') as fh:
+            fh.write("sample-id,absolute-filepath,direction\n")
+            fh.write("sampleABC,%s/s1-phred64.fastq.gz,"
+                     "middle-out\n" % self.temp_dir.name)
+            fh.write("sampleXYZ,%s/s2-phred64.fastq.gz,forward\n" %
+                     self.temp_dir.name)
 
-            with self.assertRaisesRegex(ValueError, 'middle-out'):
-                transformer(format_(manifest_fp, 'r'))
+        with self.assertRaisesRegex(ValueError, 'middle-out'):
+            transformer(format_(manifest_fp, 'r'))
 
     def test_single_end_fastq_manifest_too_many_directions(self):
         format_ = SingleEndFastqManifestPhred64
@@ -376,23 +376,23 @@ class TestFastqManifestTransformers(TestPluginBase):
             format_,
             SingleLanePerSampleSingleEndFastqDirFmt)
 
-        with tempfile.TemporaryDirectory() as tmpdir:
-            shutil.copy(
-                self.get_data_path('s1-phred64.fastq.gz'),
-                os.path.join(tmpdir, 's1-phred64.fastq.gz'))
-            shutil.copy(
-                self.get_data_path('s2-phred64.fastq.gz'),
-                os.path.join(tmpdir, 's2-phred64.fastq.gz'))
+        shutil.copy(
+            self.get_data_path('s1-phred64.fastq.gz'),
+            os.path.join(self.temp_dir.name, 's1-phred64.fastq.gz'))
+        shutil.copy(
+            self.get_data_path('s2-phred64.fastq.gz'),
+            os.path.join(self.temp_dir.name, 's2-phred64.fastq.gz'))
 
-            manifest_fp = os.path.join(tmpdir, 'manifest')
-            with open(manifest_fp, 'w') as fh:
-                fh.write("sample-id,absolute-filepath,direction\n")
-                fh.write("sampleABC,%s/s1-phred64.fastq.gz,"
-                         "forward\n" % tmpdir)
-                fh.write("sampleXYZ,%s/s2-phred64.fastq.gz,reverse\n" % tmpdir)
+        manifest_fp = os.path.join(self.temp_dir.name, 'manifest')
+        with open(manifest_fp, 'w') as fh:
+            fh.write("sample-id,absolute-filepath,direction\n")
+            fh.write("sampleABC,%s/s1-phred64.fastq.gz,"
+                     "forward\n" % self.temp_dir.name)
+            fh.write("sampleXYZ,%s/s2-phred64.fastq.gz,reverse\n" %
+                     self.temp_dir.name)
 
-            with self.assertRaisesRegex(ValueError, "only forward or reverse"):
-                transformer(format_(manifest_fp, 'r'))
+        with self.assertRaisesRegex(ValueError, "only forward or reverse"):
+            transformer(format_(manifest_fp, 'r'))
 
     def test_paired_end_fastq_manifest_missing_fastq(self):
         format_ = PairedEndFastqManifestPhred64
@@ -400,21 +400,21 @@ class TestFastqManifestTransformers(TestPluginBase):
             format_,
             SingleLanePerSamplePairedEndFastqDirFmt)
 
-        with tempfile.TemporaryDirectory() as tmpdir:
-            shutil.copy(
-                self.get_data_path('s1-phred64.fastq.gz'),
-                os.path.join(tmpdir, 's1-phred64.fastq.gz'))
+        shutil.copy(
+            self.get_data_path('s1-phred64.fastq.gz'),
+            os.path.join(self.temp_dir.name, 's1-phred64.fastq.gz'))
 
-            manifest_fp = os.path.join(tmpdir, 'manifest')
-            with open(manifest_fp, 'w') as fh:
-                fh.write("sample-id,absolute-filepath,direction\n")
-                fh.write("sampleABC,%s/s1-phred64.fastq.gz,"
-                         "forward\n" % tmpdir)
-                fh.write("sampleABC,%s/s2-phred64.fastq.gz,reverse\n" % tmpdir)
+        manifest_fp = os.path.join(self.temp_dir.name, 'manifest')
+        with open(manifest_fp, 'w') as fh:
+            fh.write("sample-id,absolute-filepath,direction\n")
+            fh.write("sampleABC,%s/s1-phred64.fastq.gz,"
+                     "forward\n" % self.temp_dir.name)
+            fh.write("sampleABC,%s/s2-phred64.fastq.gz,reverse\n" %
+                     self.temp_dir.name)
 
-            with self.assertRaisesRegex(FileNotFoundError,
-                                        "s2-phred64.fastq.gz"):
-                transformer(format_(manifest_fp, 'r'))
+        with self.assertRaisesRegex(FileNotFoundError,
+                                    "s2-phred64.fastq.gz"):
+            transformer(format_(manifest_fp, 'r'))
 
     def test_paired_end_fastq_manifest_invalid_direction(self):
         format_ = PairedEndFastqManifestPhred64
@@ -422,23 +422,23 @@ class TestFastqManifestTransformers(TestPluginBase):
             format_,
             SingleLanePerSamplePairedEndFastqDirFmt)
 
-        with tempfile.TemporaryDirectory() as tmpdir:
-            shutil.copy(
-                self.get_data_path('s1-phred64.fastq.gz'),
-                os.path.join(tmpdir, 's1-phred64.fastq.gz'))
-            shutil.copy(
-                self.get_data_path('s2-phred64.fastq.gz'),
-                os.path.join(tmpdir, 's2-phred64.fastq.gz'))
+        shutil.copy(
+            self.get_data_path('s1-phred64.fastq.gz'),
+            os.path.join(self.temp_dir.name, 's1-phred64.fastq.gz'))
+        shutil.copy(
+            self.get_data_path('s2-phred64.fastq.gz'),
+            os.path.join(self.temp_dir.name, 's2-phred64.fastq.gz'))
 
-            manifest_fp = os.path.join(tmpdir, 'manifest')
-            with open(manifest_fp, 'w') as fh:
-                fh.write("sample-id,absolute-filepath,direction\n")
-                fh.write("sampleABC,%s/s1-phred64.fastq.gz,"
-                         "middle-out\n" % tmpdir)
-                fh.write("sampleABC,%s/s2-phred64.fastq.gz,reverse\n" % tmpdir)
+        manifest_fp = os.path.join(self.temp_dir.name, 'manifest')
+        with open(manifest_fp, 'w') as fh:
+            fh.write("sample-id,absolute-filepath,direction\n")
+            fh.write("sampleABC,%s/s1-phred64.fastq.gz,"
+                     "middle-out\n" % self.temp_dir.name)
+            fh.write("sampleABC,%s/s2-phred64.fastq.gz,reverse\n" %
+                     self.temp_dir.name)
 
-            with self.assertRaisesRegex(ValueError, 'middle-out'):
-                transformer(format_(manifest_fp, 'r'))
+        with self.assertRaisesRegex(ValueError, 'middle-out'):
+            transformer(format_(manifest_fp, 'r'))
 
     def test_paired_end_fastq_manifest_missing_directions(self):
         format_ = PairedEndFastqManifestPhred64
@@ -446,20 +446,19 @@ class TestFastqManifestTransformers(TestPluginBase):
             format_,
             SingleLanePerSamplePairedEndFastqDirFmt)
 
-        with tempfile.TemporaryDirectory() as tmpdir:
-            shutil.copy(
-                self.get_data_path('s1-phred64.fastq.gz'),
-                os.path.join(tmpdir, 's1-phred64.fastq.gz'))
+        shutil.copy(
+            self.get_data_path('s1-phred64.fastq.gz'),
+            os.path.join(self.temp_dir.name, 's1-phred64.fastq.gz'))
 
-            manifest_fp = os.path.join(tmpdir, 'manifest')
-            with open(manifest_fp, 'w') as fh:
-                fh.write("sample-id,absolute-filepath,direction\n")
-                fh.write("sampleABC,%s/s1-phred64.fastq.gz,"
-                         "forward\n" % tmpdir)
+        manifest_fp = os.path.join(self.temp_dir.name, 'manifest')
+        with open(manifest_fp, 'w') as fh:
+            fh.write("sample-id,absolute-filepath,direction\n")
+            fh.write("sampleABC,%s/s1-phred64.fastq.gz,"
+                     "forward\n" % self.temp_dir.name)
 
-            with self.assertRaisesRegex(ValueError,
-                                        "one time each for each sample"):
-                transformer(format_(manifest_fp, 'r'))
+        with self.assertRaisesRegex(ValueError,
+                                    "one time each for each sample"):
+            transformer(format_(manifest_fp, 'r'))
 
     def test_parse_and_validate_manifest_invalid(self):
         manifest = io.StringIO(
@@ -483,16 +482,17 @@ class TestFastqManifestTransformers(TestPluginBase):
             _parse_and_validate_manifest(manifest, single_end=True)
 
     def test_parse_and_validate_manifest_expand_vars(self):
-        with tempfile.NamedTemporaryFile() as fh:
-            directory, filename = os.path.split(fh.name)
-            os.environ['TESTENVGWAR'] = directory
-            manifest = io.StringIO(
-                'sample-id,absolute-filepath,direction\n'
-                'abc,$TESTENVGWAR/%s,forward' % filename)
-            manifest = _parse_and_validate_manifest(manifest, single_end=True)
-            del os.environ['TESTENVGWAR']
+        expected_fp = os.path.join(self.temp_dir.name, 'manifest.txt')
+        # touch the file - the valdiator will fail if it doesn't exist
+        open(expected_fp, 'w')
+        os.environ['TESTENVGWAR'] = self.temp_dir.name
+        manifest = io.StringIO(
+            'sample-id,absolute-filepath,direction\n'
+            'abc,$TESTENVGWAR/manifest.txt,forward')
+        manifest = _parse_and_validate_manifest(manifest, single_end=True)
+        del os.environ['TESTENVGWAR']
 
-            self.assertEqual(manifest.iloc[0]['absolute-filepath'], fh.name)
+        self.assertEqual(manifest.iloc[0]['absolute-filepath'], expected_fp)
 
     def test_validate_header_valid(self):
         manifest = pd.DataFrame(
