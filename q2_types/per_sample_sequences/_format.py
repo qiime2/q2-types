@@ -60,6 +60,40 @@ class FastqGzFormat(model.BinaryFileFormat):
         return False
 
 
+class FastqAbsolutePathManifestFormat(model.TextFileFormat):
+    """
+    Mapping of sample identifiers to filepaths and read direction.
+
+    """
+    def sniff(self):
+        expected_header = 'sample-id,absolute-filepath,direction'
+        with self.open() as fh:
+            for line in fh:
+                line = line.strip()
+                if line and not line.startswith('#'):
+                    # the first non-blank, non-comment line should be
+                    # the header
+                    return line == expected_header
+        # never found the header
+        return False
+
+
+class SingleEndFastqManifestPhred33(FastqAbsolutePathManifestFormat):
+    pass
+
+
+class SingleEndFastqManifestPhred64(FastqAbsolutePathManifestFormat):
+    pass
+
+
+class PairedEndFastqManifestPhred33(FastqAbsolutePathManifestFormat):
+    pass
+
+
+class PairedEndFastqManifestPhred64(FastqAbsolutePathManifestFormat):
+    pass
+
+
 class CasavaOneEightSingleLanePerSampleDirFmt(model.DirectoryFormat):
     sequences = model.FileCollection(
         r'.+_.+_L[0-9][0-9][0-9]_R[12]_001\.fastq\.gz',
@@ -92,5 +126,7 @@ plugin.register_formats(
     FastqManifestFormat, YamlFormat, FastqGzFormat,
     CasavaOneEightSingleLanePerSampleDirFmt, _SingleLanePerSampleFastqDirFmt,
     SingleLanePerSampleSingleEndFastqDirFmt,
-    SingleLanePerSamplePairedEndFastqDirFmt
+    SingleLanePerSamplePairedEndFastqDirFmt, SingleEndFastqManifestPhred33,
+    SingleEndFastqManifestPhred64, PairedEndFastqManifestPhred33,
+    PairedEndFastqManifestPhred64
 )
