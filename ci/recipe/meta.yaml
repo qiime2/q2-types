@@ -1,6 +1,8 @@
+{% set data = load_setup_py_data() %}
+
 package:
   name: q2-types
-  version: "2017.3.0.dev0"
+  version: {{ data.get('version') }}
 
 source:
   path: ../..
