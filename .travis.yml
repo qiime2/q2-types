@@ -1,36 +1,25 @@
+dist: trusty
 sudo: false
 language: python
-env:
-  - PYTHON_VERSION=3.5
 before_install:
-  - wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
+  - export MPLBACKEND='Agg'
+  - wget -q https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh
   - export MINICONDA_PREFIX="$HOME/miniconda"
   - bash miniconda.sh -b -p $MINICONDA_PREFIX
   - export PATH="$MINICONDA_PREFIX/bin:$PATH"
   - conda config --set always_yes yes
-  - conda update conda
-  - conda install conda-build
+  - conda update -q conda
   - conda info -a
   - git clone https://github.com/qiime2/q2lint ../q2lint
-  - git clone https://github.com/qiime2/qiime2 ../qiime2
 install:
-  - conda create -n test-env
+  - conda create -q -n test-env --file https://raw.githubusercontent.com/qiime2/environment-files/master/latest/staging/qiime2-latest-conda-linux-64.txt
   - source activate test-env
-  # Install testing utils
-  - pip install flake8 coveralls
-  - conda install pytest-cov
-  # Install qiime2 environment
-  - conda env update -f ../qiime2/ci/environment.yaml
-  - cd ../qiime2 && python setup.py install && cd -
-  # Install q2-types environment
-  - conda env update -f ci/environment.yaml
+  - conda install -q pytest-cov
+  - pip install -q flake8 coveralls
   - python setup.py install
-  - 'echo "backend: Agg" > matplotlibrc'
 script:
   - flake8
   - python ../q2lint/q2lint.py
   - py.test --cov=q2_types
-  - conda build -c qiime2 -c defaults --override-channels --python $PYTHON_VERSION --output-folder ../built-deps ../qiime2/ci/recipe
-  - conda build -c ../built-deps -c qiime2 -c biocore -c defaults --override-channels --python $PYTHON_VERSION ci/recipe
 after_success:
   - coveralls
