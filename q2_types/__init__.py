@@ -7,10 +7,11 @@
 # ----------------------------------------------------------------------------
 
 import importlib
-import pkg_resources
 
-__version__ = pkg_resources.get_distribution('q2-types').version
+from ._version import get_versions
 
+__version__ = get_versions()['version']
+del get_versions
 
 importlib.import_module('q2_types.feature_table')
 importlib.import_module('q2_types.distance_matrix')

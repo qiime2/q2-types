@@ -1,33 +1,30 @@
+{% set data = load_setup_py_data() %}
+{% set version = data.get('version') or 'placehold' %}
+{% set release = '.'.join(version.split('.')[:2]) %}
+
 package:
   name: q2-types
-  version: "2017.3.0.dev0"
+  version: {{ version }}
 
 source:
   path: ../..
 build:
-  noarch: python
   script: python setup.py install
 
 requirements:
   build:
     - python 3.5*
     - setuptools
-    - scikit-bio
-    - qiime2 2017.3.*
-    - pandas
-    - biom-format
-    - ijson
-    - h5py
 
   run:
     - python 3.5*
     - setuptools
     - scikit-bio
-    - qiime2 2017.3.*
     - pandas
-    - biom-format
+    - biom-format >=2.1.5,<2.2.0
     - ijson
     - h5py
+    - qiime2 {{ release }}.*
 
 test:
   imports:
