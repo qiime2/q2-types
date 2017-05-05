@@ -8,7 +8,8 @@
 
 import unittest
 
-from q2_types.tree import Phylogeny, Rooted, Unrooted, NewickDirectoryFormat
+from q2_types.tree import (Phylogeny, Rooted, Unrooted,
+                           NewickDirectoryFormat)
 from qiime2.plugin.testing import TestPluginBase
 
 
