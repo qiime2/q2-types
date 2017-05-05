@@ -9,10 +9,10 @@
 import importlib
 
 from ._format import NewickFormat, NewickDirectoryFormat
-from ._type import Phylogeny, Rooted, Unrooted, Hierarchy
+from ._type import Phylogeny, Rooted, Unrooted
 
 __all__ = [
     'NewickFormat', 'NewickDirectoryFormat', 'Phylogeny',
-    'Rooted', 'Unrooted', 'Hierarchy']
+    'Rooted', 'Unrooted']
 
 importlib.import_module('q2_types.tree._transformer')
