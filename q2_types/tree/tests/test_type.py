@@ -25,14 +25,14 @@ class TestTypes(TestPluginBase):
     def test_unrooted_semantic_type_registration(self):
         self.assertRegisteredSemanticType(Unrooted)
 
-    def test_phylogeny_semantic_type_registration(self):
+    def test_hierarchy_semantic_type_registration(self):
         self.assertRegisteredSemanticType(Hierarchy)
 
     def test_phylogeny_rooted_unrooted_to_newick_dir_fmt_registration(self):
         self.assertSemanticTypeRegisteredToFormat(
             Phylogeny[Rooted | Unrooted], NewickDirectoryFormat)
 
-    def test_phylogeny_rooted_unrooted_to_newick_dir_fmt_registration(self):
+    def test_hierarchy_to_newick_dir_fmt_registration(self):
         self.assertSemanticTypeRegisteredToFormat(
             Hierarchy, NewickDirectoryFormat)
 
