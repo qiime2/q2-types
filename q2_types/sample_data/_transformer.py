@@ -23,7 +23,9 @@ def _1(data: pd.Series) -> AlphaDiversityFormat:
 @plugin.register_transformer
 def _2(ff: AlphaDiversityFormat) -> pd.Series:
     with ff.open() as fh:
-        # Since we're wanting to round-trip with pd.Series.to_csv, the pandas
-        # docs recommend using from_csv here (rather than the more commonly
-        # used pd.read_csv).
-        return pd.Series.from_csv(fh, sep='\t', header=0)
+        # Using `dtype=object` and `set_index` to avoid type casting/inference
+        # of any columns or the index.
+        df = pd.read_csv(fh, sep='\t', header=0, dtype=object)
+        df.set_index(df.columns[0], drop=True, append=False, inplace=True)
+        df.index.name = None
+        return df.iloc[:, 0]

@@ -30,11 +30,24 @@ class TestTransformers(TestPluginBase):
 
     def test_alpha_diversity_format_to_pd_series(self):
         filename = 'alpha-diversity.tsv'
-        input, obs = self.transform_format(AlphaDiversityFormat, pd.Series,
-                                           filename)
-        input = pd.Series.from_csv(str(input), sep='\t', header=0)
+        _, obs = self.transform_format(AlphaDiversityFormat, pd.Series,
+                                       filename)
 
-        assert_series_equal(input, obs)
+        exp_index = pd.Index(['Sample1', 'Sample4'], dtype=object)
+        exp = pd.Series(['0.9709505944546688', '0.7219280948873623'],
+                        name='shannon', index=exp_index, dtype=object)
+
+        assert_series_equal(exp, obs)
+
+    def test_alpha_diversity_format_to_pd_series_int_indices(self):
+        filename = 'alpha-diversity-int-indices.tsv'
+        _, obs = self.transform_format(AlphaDiversityFormat, pd.Series,
+                                       filename)
+
+        exp_index = pd.Index(['1', '4'], dtype=object)
+        exp = pd.Series(['0.97', '0.72'], name='foo', index=exp_index,
+                        dtype=object)
+        assert_series_equal(exp, obs)
 
 
 if __name__ == '__main__':
