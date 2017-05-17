@@ -21,20 +21,23 @@ class TestTransformers(TestPluginBase):
     def test_pd_series_to_alpha_diversity_format(self):
         filename = self.get_data_path('alpha-diversity.tsv')
         transformer = self.get_transformer(pd.Series, AlphaDiversityFormat)
-        input = pd.Series.from_csv(filename, sep='\t', header=0)
+        exp_index = pd.Index(['Sample1', 'Sample4'], dtype=object)
+        exp = pd.Series([0.970950594455, 0.721928094887],
+                        name='shannon', index=exp_index)
 
-        obs = transformer(input)
+        obs = transformer(exp)
         obs = pd.Series.from_csv(str(obs), sep='\t', header=0)
 
-        assert_series_equal(input, obs)
+        assert_series_equal(exp, obs)
 
     def test_alpha_diversity_format_to_pd_series(self):
         filename = 'alpha-diversity.tsv'
-        input, obs = self.transform_format(AlphaDiversityFormat, pd.Series,
-                                           filename)
-        input = pd.Series.from_csv(str(input), sep='\t', header=0)
-
-        assert_series_equal(input, obs)
+        _, obs = self.transform_format(AlphaDiversityFormat, pd.Series,
+                                       filename)
+        exp_index = pd.Index(['Sample1', 'Sample4'], dtype=object)
+        exp = pd.Series([0.970950594455, 0.721928094887],
+                        name='shannon', index=exp_index)
+        assert_series_equal(exp, obs)
 
     def test_alpha_diversity_format_to_pd_series_int_indices(self):
         filename = 'alpha-diversity-int-indices.tsv'
