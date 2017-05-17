@@ -28,4 +28,4 @@ def _2(ff: AlphaDiversityFormat) -> pd.Series:
         df = pd.read_csv(fh, sep='\t', header=0, dtype=object)
         df.set_index(df.columns[0], drop=True, append=False, inplace=True)
         df.index.name = None
-        return df.iloc[:, 0]
+        return pd.to_numeric(df.iloc[:, 0])

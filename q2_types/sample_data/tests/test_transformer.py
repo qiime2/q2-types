@@ -30,14 +30,11 @@ class TestTransformers(TestPluginBase):
 
     def test_alpha_diversity_format_to_pd_series(self):
         filename = 'alpha-diversity.tsv'
-        _, obs = self.transform_format(AlphaDiversityFormat, pd.Series,
-                                       filename)
+        input, obs = self.transform_format(AlphaDiversityFormat, pd.Series,
+                                           filename)
+        input = pd.Series.from_csv(str(input), sep='\t', header=0)
 
-        exp_index = pd.Index(['Sample1', 'Sample4'], dtype=object)
-        exp = pd.Series(['0.9709505944546688', '0.7219280948873623'],
-                        name='shannon', index=exp_index, dtype=object)
-
-        assert_series_equal(exp, obs)
+        assert_series_equal(input, obs)
 
     def test_alpha_diversity_format_to_pd_series_int_indices(self):
         filename = 'alpha-diversity-int-indices.tsv'
@@ -45,9 +42,13 @@ class TestTransformers(TestPluginBase):
                                        filename)
 
         exp_index = pd.Index(['1', '4'], dtype=object)
-        exp = pd.Series(['0.97', '0.72'], name='foo', index=exp_index,
-                        dtype=object)
+        exp = pd.Series([0.97, 0.72], name='foo', index=exp_index)
         assert_series_equal(exp, obs)
+
+    def test_non_alpha_diversity(self):
+        filename = 'also-not-alpha-diversity.tsv'
+        with self.assertRaisesRegex(ValueError, 'Unable to parse string'):
+            self.transform_format(AlphaDiversityFormat, pd.Series, filename)
 
 
 if __name__ == '__main__':
