@@ -19,7 +19,6 @@ class TestTransformers(TestPluginBase):
     package = "q2_types.sample_data.tests"
 
     def test_pd_series_to_alpha_diversity_format(self):
-        filename = self.get_data_path('alpha-diversity.tsv')
         transformer = self.get_transformer(pd.Series, AlphaDiversityFormat)
         exp_index = pd.Index(['Sample1', 'Sample4'], dtype=object)
         exp = pd.Series([0.970950594455, 0.721928094887],
