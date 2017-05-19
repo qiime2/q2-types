@@ -10,6 +10,7 @@ import unittest
 
 import pandas as pd
 
+import qiime2
 from pandas.util.testing import assert_series_equal
 from q2_types.sample_data import AlphaDiversityFormat
 from qiime2.plugin.testing import TestPluginBase
@@ -46,6 +47,18 @@ class TestTransformers(TestPluginBase):
         exp_index = pd.Index(['1', '4'], dtype=object)
         exp = pd.Series([0.97, 0.72], name='foo', index=exp_index)
         assert_series_equal(exp, obs)
+
+    def test_alpha_diversity_format_to_metadata(self):
+        filename = 'alpha-diversity.tsv'
+        _, obs = self.transform_format(AlphaDiversityFormat, qiime2.Metadata,
+                                       filename)
+        obs_category = obs.get_category('shannon')
+
+        exp_index = pd.Index(['Sample1', 'Sample4'], dtype=object)
+        # The data should stay as the exact values from the file (no rounding).
+        exp = pd.Series(['0.9709505944546688', '0.7219280948873623'],
+                        name='shannon', index=exp_index)
+        assert_series_equal(exp, obs_category.to_series())
 
     def test_non_alpha_diversity(self):
         filename = 'also-not-alpha-diversity.tsv'
