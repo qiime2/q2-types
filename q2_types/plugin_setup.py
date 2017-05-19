@@ -18,7 +18,10 @@ plugin = qiime2.plugin.Plugin(
     name='types',
     version=__version__,
     website='https://github.com/qiime2/q2-types',
-    package='q2_types'
+    package='q2_types',
+    description=('This QIIME 2 plugin defines semantic types and '
+                 'transformers supporting microbiome analysis.'),
+    short_description='Plugin defining types for microbiome analysis.'
 )
 
 importlib.import_module('q2_types.feature_table')
