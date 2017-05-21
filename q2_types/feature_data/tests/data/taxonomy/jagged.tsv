@@ -1,3 +1,4 @@
 Feature ID	Taxon	Confidence
 SEQUENCE1	k__Bacteria; p__Proteobacteria; c__Alphaproteobacteria; o__Rhodobacterales; f__Rhodobacteraceae; g__Sulfitobacter; s__mediterraneus	-1.0
-SEQUENCE2	k__Bacteria; p__Proteobacteria; c__Alphaproteobacteria; o__Rhodobacterales; f__Rhodobacteraceae; g__Sulfitobacter; s__mediterraneus	-1.0
+SEQUENCE2	k__Bacteria; p__Proteobacteria; c__Alphaproteobacteria; o__Rhodobacterales; f__Rhodobacteraceae; g__; s__	42	43
+SEQUENCE3	k__Bacteria; p__Proteobacteria	-1.0

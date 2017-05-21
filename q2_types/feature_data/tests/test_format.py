@@ -7,43 +7,135 @@
 # ----------------------------------------------------------------------------
 
 import os
+import os.path
 import shutil
 import unittest
 
 from q2_types.feature_data import (
-    TaxonomyFormat, TaxonomyDirectoryFormat, DNAFASTAFormat,
-    DNASequencesDirectoryFormat, PairedDNASequencesDirectoryFormat,
-    AlignedDNAFASTAFormat, AlignedDNASequencesDirectoryFormat
+    TaxonomyFormat, TaxonomyDirectoryFormat, HeaderlessTSVTaxonomyFormat,
+    HeaderlessTSVTaxonomyDirectoryFormat, TSVTaxonomyFormat,
+    TSVTaxonomyDirectoryFormat, DNAFASTAFormat, DNASequencesDirectoryFormat,
+    PairedDNASequencesDirectoryFormat, AlignedDNAFASTAFormat,
+    AlignedDNASequencesDirectoryFormat
 )
 from qiime2.plugin.testing import TestPluginBase
 
 
-class TestFormats(TestPluginBase):
+class TestTaxonomyFormats(TestPluginBase):
     package = 'q2_types.feature_data.tests'
 
-    # Taxonomy Format and Directory Tests
     def test_taxonomy_format_validate_positive(self):
-        filepath = self.get_data_path('taxonomy.tsv')
-        format = TaxonomyFormat(filepath, mode='r')
+        filenames = ['headerless.tsv', '2-column.tsv', '3-column.tsv',
+                     'valid-but-messy.tsv', 'many-rows.tsv']
+        filepaths = [self.get_data_path(os.path.join('taxonomy', filename))
+                     for filename in filenames]
 
-        format.validate()
+        for filepath in filepaths:
+            format = TaxonomyFormat(filepath, mode='r')
 
-    def test_taxonomy_format_validate_negative(self):
-        filepath = self.get_data_path('not-taxonomy')
-        format = TaxonomyFormat(filepath, mode='r')
-
-        with self.assertRaisesRegex(ValueError, 'Taxonomy'):
             format.validate()
 
+    def test_taxonomy_format_validate_negative(self):
+        filenames = ['empty', 'blanks-and-comments', '1-column.tsv']
+        filepaths = [self.get_data_path(os.path.join('taxonomy', filename))
+                     for filename in filenames]
+
+        for filepath in filepaths:
+            format = TaxonomyFormat(filepath, mode='r')
+
+            with self.assertRaisesRegex(ValueError, 'Taxonomy'):
+                format.validate()
+
     def test_taxonomy_directory_format(self):
-        filepath = self.get_data_path('taxonomy.tsv')
+        # Basic test to verify that single-file directory format is working.
+        filepath = self.get_data_path(os.path.join('taxonomy', '2-column.tsv'))
         shutil.copy(filepath,
                     os.path.join(self.temp_dir.name, 'taxonomy.tsv'))
+
         format = TaxonomyDirectoryFormat(self.temp_dir.name, mode='r')
 
         format.validate()
 
-    # FASTA DNA Format and Directory Tests
+    # NOTE: the tests below for HeaderlessTSVTaxonomyFormat use some test files
+    # that have headers. However, it makes no difference to this file format
+    # since the header will be interpreted as data and exercises the correct
+    # codepaths in the sniffer.
+    #
+    # These tests are nearly identical to the tests above for TaxonomyFormat --
+    # the sniffer operates in exactly the same way (the transformers, however,
+    # differ in behavior).
+
+    def test_headerless_tsv_taxonomy_format_validate_positive(self):
+        filenames = ['headerless.tsv', '2-column.tsv', '3-column.tsv',
+                     'valid-but-messy.tsv', 'many-rows.tsv']
+        filepaths = [self.get_data_path(os.path.join('taxonomy', filename))
+                     for filename in filenames]
+
+        for filepath in filepaths:
+            format = HeaderlessTSVTaxonomyFormat(filepath, mode='r')
+
+            format.validate()
+
+    def test_headerless_tsv_taxonomy_format_validate_negative(self):
+        filenames = ['empty', 'blanks-and-comments', '1-column.tsv']
+        filepaths = [self.get_data_path(os.path.join('taxonomy', filename))
+                     for filename in filenames]
+
+        for filepath in filepaths:
+            format = HeaderlessTSVTaxonomyFormat(filepath, mode='r')
+
+            with self.assertRaisesRegex(ValueError, 'HeaderlessTSVTaxonomy'):
+                format.validate()
+
+    def test_headerless_tsv_taxonomy_directory_format(self):
+        # Basic test to verify that single-file directory format is working.
+        filepath = self.get_data_path(os.path.join('taxonomy',
+                                                   'headerless.tsv'))
+        shutil.copy(filepath,
+                    os.path.join(self.temp_dir.name, 'taxonomy.tsv'))
+
+        format = HeaderlessTSVTaxonomyDirectoryFormat(self.temp_dir.name,
+                                                      mode='r')
+
+        format.validate()
+
+    def test_tsv_taxonomy_format_validate_positive(self):
+        filenames = ['2-column.tsv', '3-column.tsv', 'valid-but-messy.tsv',
+                     'many-rows.tsv']
+        filepaths = [self.get_data_path(os.path.join('taxonomy', filename))
+                     for filename in filenames]
+
+        for filepath in filepaths:
+            format = TSVTaxonomyFormat(filepath, mode='r')
+
+            format.validate()
+
+    def test_tsv_taxonomy_format_validate_negative(self):
+        filenames = ['empty', 'blanks-and-comments', '1-column.tsv',
+                     'headerless.tsv', 'header-only.tsv', 'jagged.tsv']
+        filepaths = [self.get_data_path(os.path.join('taxonomy', filename))
+                     for filename in filenames]
+
+        for filepath in filepaths:
+            format = TSVTaxonomyFormat(filepath, mode='r')
+
+            with self.assertRaisesRegex(ValueError, 'TSVTaxonomy'):
+                format.validate()
+
+    def test_tsv_taxonomy_directory_format(self):
+        # Basic test to verify that single-file directory format is working.
+        filepath = self.get_data_path(os.path.join('taxonomy', '2-column.tsv'))
+        shutil.copy(filepath,
+                    os.path.join(self.temp_dir.name, 'taxonomy.tsv'))
+
+        format = TSVTaxonomyDirectoryFormat(self.temp_dir.name, mode='r')
+
+        format.validate()
+
+
+class TestDNAFASTAFormats(TestPluginBase):
+    package = 'q2_types.feature_data.tests'
+
     def test_dna_fasta_format_validate_positive(self):
         filepath = self.get_data_path('dna-sequences.fasta')
         format = DNAFASTAFormat(filepath, mode='r')

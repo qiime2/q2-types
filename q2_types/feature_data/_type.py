@@ -9,7 +9,7 @@
 from qiime2.plugin import SemanticType
 
 from ..plugin_setup import plugin
-from . import (TaxonomyDirectoryFormat, DNASequencesDirectoryFormat,
+from . import (TSVTaxonomyDirectoryFormat, DNASequencesDirectoryFormat,
                PairedDNASequencesDirectoryFormat,
                AlignedDNASequencesDirectoryFormat)
 
@@ -31,7 +31,7 @@ plugin.register_semantic_types(FeatureData, Taxonomy, Sequence,
 
 plugin.register_semantic_type_to_format(
     FeatureData[Taxonomy],
-    artifact_format=TaxonomyDirectoryFormat)
+    artifact_format=TSVTaxonomyDirectoryFormat)
 plugin.register_semantic_type_to_format(
     FeatureData[Sequence],
     artifact_format=DNASequencesDirectoryFormat)
