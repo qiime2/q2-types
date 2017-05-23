@@ -40,6 +40,13 @@ class TestFormats(TestPluginBase):
         with self.assertRaisesRegex(ValueError, 'FastqGzFormat'):
             format.validate()
 
+    def test_fastq_gz_format_validate_uncompressed(self):
+        filepath = self.get_data_path('Human-Kneecap_S1_L001_R1_001.fastq')
+        format = FastqGzFormat(filepath, mode='r')
+
+        with self.assertRaisesRegex(ValueError, 'FastqGzFormat'):
+            format.validate()
+
     def test_yaml_format_validate_positive(self):
         filepath = self.get_data_path('metadata.yml')
         format = YamlFormat(filepath, mode='r')

@@ -44,6 +44,10 @@ class FastqGzFormat(model.BinaryFileFormat):
 
     """
     def sniff(self):
+        with self.open() as fh:
+            if fh.read(2)[:2] != b'\x1f\x8b':
+                return False
+
         filepath = str(self)
         sniffer = skbio.io.io_registry.get_sniffer('fastq')
         if sniffer(str(self))[0]:
