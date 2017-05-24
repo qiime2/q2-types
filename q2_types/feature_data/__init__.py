@@ -9,9 +9,11 @@
 import importlib
 
 from ._format import (
-    TaxonomyFormat, TaxonomyDirectoryFormat, DNAFASTAFormat,
-    DNASequencesDirectoryFormat, PairedDNASequencesDirectoryFormat,
-    AlignedDNAFASTAFormat, AlignedDNASequencesDirectoryFormat)
+    TaxonomyFormat, TaxonomyDirectoryFormat, HeaderlessTSVTaxonomyFormat,
+    HeaderlessTSVTaxonomyDirectoryFormat, TSVTaxonomyFormat,
+    TSVTaxonomyDirectoryFormat, DNAFASTAFormat, DNASequencesDirectoryFormat,
+    PairedDNASequencesDirectoryFormat, AlignedDNAFASTAFormat,
+    AlignedDNASequencesDirectoryFormat)
 from ._type import (
     FeatureData, Taxonomy, Sequence, PairedEndSequence, AlignedSequence)
 
@@ -19,7 +21,9 @@ from ._type import (
 from ._transformer import DNAIterator, PairedDNAIterator, AlignedDNAIterator
 
 __all__ = [
-    'TaxonomyFormat', 'TaxonomyDirectoryFormat', 'DNAFASTAFormat',
+    'TaxonomyFormat', 'TaxonomyDirectoryFormat', 'HeaderlessTSVTaxonomyFormat',
+    'HeaderlessTSVTaxonomyDirectoryFormat', 'TSVTaxonomyFormat',
+    'TSVTaxonomyDirectoryFormat', 'DNAFASTAFormat',
     'DNASequencesDirectoryFormat', 'PairedDNASequencesDirectoryFormat',
     'AlignedDNAFASTAFormat', 'AlignedDNASequencesDirectoryFormat',
     'FeatureData', 'Taxonomy', 'Sequence', 'PairedEndSequence',

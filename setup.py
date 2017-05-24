@@ -27,7 +27,7 @@ setup(
     package_data={
         'q2_types.tests': ['data/*'],
         'q2_types.distance_matrix.tests': ['data/*'],
-        'q2_types.feature_data.tests': ['data/*'],
+        'q2_types.feature_data.tests': ['data/*', 'data/taxonomy/*'],
         'q2_types.feature_table.tests': ['data/*'],
         'q2_types.ordination.tests': ['data/*'],
         'q2_types.per_sample_sequences.tests': ['data/*',

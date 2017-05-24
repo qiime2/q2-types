@@ -10,7 +10,7 @@ import unittest
 
 from q2_types.feature_data import (
     FeatureData, Taxonomy, Sequence, PairedEndSequence, AlignedSequence,
-    TaxonomyDirectoryFormat, DNASequencesDirectoryFormat,
+    TSVTaxonomyDirectoryFormat, DNASequencesDirectoryFormat,
     PairedDNASequencesDirectoryFormat, AlignedDNASequencesDirectoryFormat
 )
 from qiime2.plugin.testing import TestPluginBase
@@ -36,7 +36,7 @@ class TestTypes(TestPluginBase):
 
     def test_taxonomy_semantic_type_to_format_registration(self):
         self.assertSemanticTypeRegisteredToFormat(
-                FeatureData[Taxonomy], TaxonomyDirectoryFormat)
+                FeatureData[Taxonomy], TSVTaxonomyDirectoryFormat)
 
     def test_sequence_semantic_type_to_format_registration(self):
         self.assertSemanticTypeRegisteredToFormat(
