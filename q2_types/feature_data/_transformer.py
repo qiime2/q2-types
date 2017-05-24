@@ -160,8 +160,8 @@ def _4(ff: TaxonomyFormat) -> pd.DataFrame:
 
 @plugin.register_transformer
 def _6(ff: TaxonomyFormat) -> pd.Series:
-    series = _taxonomy_formats_to_dataframe(str(ff), has_header=None)
-    return series.iloc[:, 0]
+    df = _taxonomy_formats_to_dataframe(str(ff), has_header=None)
+    return df.iloc[:, 0]
 
 
 @plugin.register_transformer
@@ -198,7 +198,8 @@ def _26(data: biom.Table) -> TSVTaxonomyFormat:
 
 @plugin.register_transformer
 def _27(ff: BIOMV210Format) -> TSVTaxonomyFormat:
-    # skip _parse_biom_table_v210 because it strips out metadata
+    # not using q2_types.feature_table._transformer._parse_biom_table_v210
+    # because it strips out metadata
     with ff.open() as fh:
         table = biom.Table.from_hdf5(fh)
     return _biom_to_tsv_taxonomy_format(table)
