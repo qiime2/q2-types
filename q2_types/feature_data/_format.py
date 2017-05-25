@@ -183,6 +183,8 @@ AlignedDNASequencesDirectoryFormat = model.SingleFileDirectoryFormat(
 
 
 plugin.register_formats(
+    TSVTaxonomyFormat, TSVTaxonomyDirectoryFormat,
+    HeaderlessTSVTaxonomyFormat, HeaderlessTSVTaxonomyDirectoryFormat,
     TaxonomyFormat, TaxonomyDirectoryFormat, DNAFASTAFormat,
     DNASequencesDirectoryFormat, PairedDNASequencesDirectoryFormat,
     AlignedDNAFASTAFormat, AlignedDNASequencesDirectoryFormat
