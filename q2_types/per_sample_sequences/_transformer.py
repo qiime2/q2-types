@@ -15,6 +15,7 @@ import collections
 import skbio
 import yaml
 import pandas as pd
+import qiime2.util
 
 from ..plugin_setup import plugin
 from . import (SingleLanePerSampleSingleEndFastqDirFmt, FastqManifestFormat,
@@ -132,8 +133,8 @@ def _5(dirfmt: SingleLanePerSamplePairedEndFastqDirFmt) \
                 _, relpath, direction = line.rstrip().split(',')
                 if direction == 'forward':
                     manifest_fh.write(line)
-                    os.link(str(dirfmt.path / relpath),
-                            str(result.path / relpath))
+                    qiime2.util.duplicate(str(dirfmt.path / relpath),
+                                          str(result.path / relpath))
 
     result.manifest.write_data(manifest, FastqManifestFormat)
 
@@ -303,8 +304,7 @@ def _copy_with_compression(src, dst):
                 shutil.copyfileobj(src_fh, dst_fh)
                 return
 
-    # TODO: fix for multi-device filetrees
-    os.link(src, dst)
+    qiime2.util.duplicate(src, dst)
 
 
 def _fastq_manifest_helper(fmt, fastq_copy_fn, single_end):
