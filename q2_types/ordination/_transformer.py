@@ -7,9 +7,24 @@
 # ----------------------------------------------------------------------------
 
 import skbio
+import pandas as pd
+import qiime2
 
 from ..plugin_setup import plugin
 from . import OrdinationFormat
+
+
+def _ordination_format_to_ordination_results(ff):
+    return skbio.OrdinationResults.read(str(ff), format='ordination',
+                                        verify=False)
+
+
+def _ordination_format_to_dataframe(ff):
+    ordination_results = _ordination_format_to_ordination_results(ff)
+    df = ordination_results.samples
+    df.index.name = 'ID'
+    df.columns = ['Column %d' % i for i in range(1, len(df.columns) + 1)]
+    return df
 
 
 @plugin.register_transformer
@@ -21,5 +36,15 @@ def _1(data: skbio.OrdinationResults) -> OrdinationFormat:
 
 @plugin.register_transformer
 def _2(ff: OrdinationFormat) -> skbio.OrdinationResults:
-    return skbio.OrdinationResults.read(str(ff), format='ordination',
-                                        verify=False)
+    return _ordination_format_to_ordination_results(ff)
+
+
+@plugin.register_transformer
+def _3(ff: OrdinationFormat) -> pd.DataFrame:
+    return _ordination_format_to_dataframe(ff)
+
+
+@plugin.register_transformer
+def _4(ff: OrdinationFormat) -> qiime2.Metadata:
+    df = _ordination_format_to_dataframe(ff)
+    return qiime2.Metadata(df)

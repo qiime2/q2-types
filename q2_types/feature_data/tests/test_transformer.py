@@ -13,6 +13,7 @@ import pandas as pd
 import pandas.io.common
 import biom
 import skbio
+import qiime2
 
 from pandas.util.testing import assert_frame_equal, assert_series_equal
 from q2_types.feature_table import BIOMV210Format
@@ -222,6 +223,55 @@ class TestTaxonomyFormatTransformers(TestPluginBase):
             self.transform_format(
                 BIOMV210Format, TSVTaxonomyFormat,
                 filename=os.path.join('taxonomy', 'feature-table_v210.biom'))
+
+    def test_taxonomy_format_to_metadata(self):
+        _, obs = self.transform_format(TaxonomyFormat, qiime2.Metadata,
+                                       os.path.join('taxonomy',
+                                                    '3-column.tsv'))
+
+        index = pd.Index(['seq1', 'seq2'], name='Feature ID', dtype=object)
+        exp = pd.DataFrame([['k__Foo; p__Bar', '-1.0'],
+                            ['k__Foo; p__Baz', '-42.0']], index=index,
+                           columns=['Taxon', 'Confidence'], dtype=object)
+
+        self.assertEqual(set(index), obs.ids())
+
+        for category in ['Taxon', 'Confidence']:
+            assert_series_equal(obs.get_category(category).to_series(),
+                                exp[category])
+
+    def test_headerless_tsv_taxonomy_format_to_metadata(self):
+        _, obs = self.transform_format(HeaderlessTSVTaxonomyFormat,
+                                       qiime2.Metadata,
+                                       os.path.join('taxonomy',
+                                                    '3-column.tsv'))
+
+        index = pd.Index(['seq1', 'seq2'], name='Feature ID', dtype=object)
+        exp = pd.DataFrame([['k__Foo; p__Bar', '-1.0'],
+                            ['k__Foo; p__Baz', '-42.0']], index=index,
+                           columns=['Taxon', 'Confidence'], dtype=object)
+
+        self.assertEqual(set(index), obs.ids())
+
+        for category in ['Taxon', 'Confidence']:
+            assert_series_equal(obs.get_category(category).to_series(),
+                                exp[category])
+
+    def test_tsv_taxonomy_format_to_metadata(self):
+        _, obs = self.transform_format(TSVTaxonomyFormat, qiime2.Metadata,
+                                       os.path.join('taxonomy',
+                                                    '3-column.tsv'))
+
+        index = pd.Index(['seq1', 'seq2'], name='Feature ID', dtype=object)
+        exp = pd.DataFrame([['k__Foo; p__Bar', '-1.0'],
+                            ['k__Foo; p__Baz', '-42.0']], index=index,
+                           columns=['Taxon', 'Confidence'], dtype=object)
+
+        self.assertEqual(set(index), obs.ids())
+
+        for category in ['Taxon', 'Confidence']:
+            assert_series_equal(obs.get_category(category).to_series(),
+                                exp[category])
 
 
 # In-depth testing of the `_taxonomy_formats_to_dataframe` helper function,
@@ -555,6 +605,55 @@ class TestDNAFASTAFormatTransformers(TestPluginBase):
 
         for act, exp in zip(obs, input):
             self.assertEqual(act, exp)
+
+    def test_dnafasta_format_to_series(self):
+        filename = 'dna-sequences.fasta'
+        _, obs = self.transform_format(DNAFASTAFormat, pd.Series, filename)
+
+        seqs_fp = self.get_data_path(filename)
+        exp = skbio.read(seqs_fp, format='fasta', constructor=skbio.DNA)
+
+        for expected, observed in zip(exp, obs):
+            self.assertEqual(expected, observed)
+
+    def test_dnafasta_format_to_metadata(self):
+        filename = 'dna-sequences.fasta'
+        _, obs = self.transform_format(DNAFASTAFormat, qiime2.Metadata,
+                                       filename)
+
+        self.assertEqual({'SEQUENCE1', 'SEQUENCE2'}, obs.ids())
+
+        seqs_fp = self.get_data_path(filename)
+        exp = skbio.read(seqs_fp, format='fasta', constructor=skbio.DNA)
+        obs_category = obs.get_category('Sequence').to_series()
+
+        for expected, observed in zip(exp, obs_category):
+            self.assertEqual(expected, observed)
+
+    def test_aligned_dnafasta_format_to_series(self):
+        filename = 'aligned-dna-sequences.fasta'
+        _, obs = self.transform_format(AlignedDNAFASTAFormat, pd.Series,
+                                       filename)
+
+        seqs_fp = self.get_data_path(filename)
+        exp = skbio.read(seqs_fp, format='fasta', constructor=skbio.DNA)
+
+        for expected, observed in zip(exp, obs):
+            self.assertEqual(expected, observed)
+
+    def test_aligned_dnafasta_format_to_metadata(self):
+        filename = 'aligned-dna-sequences.fasta'
+        _, obs = self.transform_format(AlignedDNAFASTAFormat, qiime2.Metadata,
+                                       filename)
+
+        self.assertEqual({'SEQUENCE1', 'SEQUENCE2'}, obs.ids())
+
+        seqs_fp = self.get_data_path(filename)
+        exp = skbio.read(seqs_fp, format='fasta', constructor=skbio.DNA)
+        obs_category = obs.get_category('Sequence').to_series()
+
+        for expected, observed in zip(exp, obs_category):
+            self.assertEqual(expected, observed)
 
 
 if __name__ == '__main__':
