@@ -13,6 +13,7 @@ import pandas as pd
 import pandas.io.common
 import biom
 import skbio
+import qiime2
 
 from pandas.util.testing import assert_frame_equal, assert_series_equal
 from q2_types.feature_table import BIOMV210Format
@@ -222,6 +223,46 @@ class TestTaxonomyFormatTransformers(TestPluginBase):
             self.transform_format(
                 BIOMV210Format, TSVTaxonomyFormat,
                 filename=os.path.join('taxonomy', 'feature-table_v210.biom'))
+
+    def test_taxonomy_format_with_header_to_metadata(self):
+        _, obs = self.transform_format(TaxonomyFormat, qiime2.Metadata,
+                                       os.path.join('taxonomy',
+                                                    '3-column.tsv'))
+
+        index = pd.Index(['seq1', 'seq2'], name='Feature ID', dtype=object)
+        exp_df = pd.DataFrame([['k__Foo; p__Bar', '-1.0'],
+                               ['k__Foo; p__Baz', '-42.0']], index=index,
+                              columns=['Taxon', 'Confidence'], dtype=object)
+        exp = qiime2.Metadata(exp_df)
+
+        self.assertEqual(exp, obs)
+
+    def test_taxonomy_format_without_header_to_metadata(self):
+        _, obs = self.transform_format(TaxonomyFormat, qiime2.Metadata,
+                                       os.path.join('taxonomy',
+                                                    'headerless.tsv'))
+
+        index = pd.Index(['seq1', 'seq2'], name='Feature ID', dtype=object)
+        columns = ['Taxon', 'Unnamed Column 1', 'Unnamed Column 2']
+        exp_df = pd.DataFrame([['k__Foo; p__Bar', 'some', 'another'],
+                               ['k__Foo; p__Baz', 'column', 'column!']],
+                              index=index, columns=columns, dtype=object)
+        exp = qiime2.Metadata(exp_df)
+
+        self.assertEqual(exp, obs)
+
+    def test_tsv_taxonomy_format_to_metadata(self):
+        _, obs = self.transform_format(TSVTaxonomyFormat, qiime2.Metadata,
+                                       os.path.join('taxonomy',
+                                                    '3-column.tsv'))
+
+        index = pd.Index(['seq1', 'seq2'], name='Feature ID', dtype=object)
+        exp_df = pd.DataFrame([['k__Foo; p__Bar', '-1.0'],
+                               ['k__Foo; p__Baz', '-42.0']], index=index,
+                              columns=['Taxon', 'Confidence'], dtype=object)
+        exp = qiime2.Metadata(exp_df)
+
+        self.assertEqual(exp, obs)
 
 
 # In-depth testing of the `_taxonomy_formats_to_dataframe` helper function,
@@ -555,6 +596,51 @@ class TestDNAFASTAFormatTransformers(TestPluginBase):
 
         for act, exp in zip(obs, input):
             self.assertEqual(act, exp)
+
+    def test_dnafasta_format_to_series(self):
+        _, obs = self.transform_format(DNAFASTAFormat, pd.Series,
+                                       'dna-sequences.fasta')
+
+        obs = obs.astype(str)
+
+        index = pd.Index(['SEQUENCE1', 'SEQUENCE2'])
+        exp = pd.Series(['ACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTA'
+                         'CGTACGTACGTACGTACGT', 'ACGTACGTACGTACGTACGTAC'
+                         'GTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACG'
+                         'TACGTACGTACGTACGTACGT'], index=index, dtype=object)
+
+        assert_series_equal(exp, obs)
+
+    def test_dnafasta_format_with_duplicate_ids_to_series(self):
+        with self.assertRaisesRegex(ValueError, 'unique.*SEQUENCE1'):
+            self.transform_format(DNAFASTAFormat, pd.Series,
+                                  'dna-sequences-with-duplicate-ids.fasta')
+
+    def test_dnafasta_format_to_metadata(self):
+        _, obs = self.transform_format(DNAFASTAFormat, qiime2.Metadata,
+                                       'dna-sequences.fasta')
+        index = pd.Index(['SEQUENCE1', 'SEQUENCE2'], name='Feature ID')
+        exp_df = pd.DataFrame(['ACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTA'
+                               'CGTACGTACGTACGTACGT', 'ACGTACGTACGTACGTACGTAC'
+                               'GTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACG'
+                               'TACGTACGTACGTACGTACGT'], index=index,
+                              columns=['Sequence'], dtype=object)
+        exp = qiime2.Metadata(exp_df)
+
+        self.assertEqual(exp, obs)
+
+    def test_aligned_dnafasta_format_to_metadata(self):
+        _, obs = self.transform_format(AlignedDNAFASTAFormat, qiime2.Metadata,
+                                       'aligned-dna-sequences.fasta')
+        index = pd.Index(['SEQUENCE1', 'SEQUENCE2'], name='Feature ID')
+        exp_df = pd.DataFrame(['------------------------ACGTACGTACGTACGTACGTAC'
+                               'GTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGT',
+                               'ACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTAC'
+                               'GTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGT'],
+                              index=index, columns=['Sequence'], dtype=object)
+        exp = qiime2.Metadata(exp_df)
+
+        self.assertEqual(exp, obs)
 
 
 if __name__ == '__main__':

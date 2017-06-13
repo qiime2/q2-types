@@ -12,6 +12,7 @@ from itertools import zip_longest
 import pandas as pd
 import biom
 import skbio
+import qiime2
 
 from ..plugin_setup import plugin
 from ..feature_table import BIOMV210Format
@@ -165,6 +166,12 @@ def _6(ff: TaxonomyFormat) -> pd.Series:
 
 
 @plugin.register_transformer
+def _28(ff: TaxonomyFormat) -> qiime2.Metadata:
+    df = _taxonomy_formats_to_dataframe(str(ff), has_header=None)
+    return qiime2.Metadata(df)
+
+
+@plugin.register_transformer
 def _20(ff: HeaderlessTSVTaxonomyFormat) -> TSVTaxonomyFormat:
     return _dataframe_to_tsv_taxonomy_format(
         _taxonomy_formats_to_dataframe(str(ff), has_header=False))
@@ -179,6 +186,12 @@ def _22(ff: TSVTaxonomyFormat) -> pd.DataFrame:
 def _23(ff: TSVTaxonomyFormat) -> pd.Series:
     df = _taxonomy_formats_to_dataframe(str(ff), has_header=True)
     return df.iloc[:, 0]
+
+
+@plugin.register_transformer
+def _29(ff: TSVTaxonomyFormat) -> qiime2.Metadata:
+    df = _taxonomy_formats_to_dataframe(str(ff), has_header=True)
+    return qiime2.Metadata(df)
 
 
 @plugin.register_transformer
@@ -225,6 +238,25 @@ class AlignedDNAIterator(DNAIterator):
 
 def _read_dna_fasta(path):
     return skbio.read(path, format='fasta', constructor=skbio.DNA)
+
+
+def _dnafastaformats_to_series(ff):
+    data = {}
+    for sequence in _read_dna_fasta(str(ff)):
+        id_ = sequence.metadata['id']
+        if id_ in data:
+            raise ValueError("FASTA format sequence IDs must be unique. The "
+                             "following ID was found more than once: %s."
+                             % id_)
+        data[id_] = sequence
+    return pd.Series(data)
+
+
+def _dnafastaformats_to_metadata(ff):
+    df = _dnafastaformats_to_series(ff).to_frame()
+    df = df.astype(str)
+    df.index.name, df.columns = 'Feature ID', ['Sequence']
+    return qiime2.Metadata(df)
 
 
 @plugin.register_transformer
@@ -293,10 +325,12 @@ def _14(data: skbio.TabularMSA) -> AlignedDNAFASTAFormat:
 
 @plugin.register_transformer
 def _15(ff: DNAFASTAFormat) -> pd.Series:
-    data = {}
-    for sequence in _read_dna_fasta(str(ff)):
-        data[sequence.metadata['id']] = sequence
-    return pd.Series(data)
+    return _dnafastaformats_to_series(ff)
+
+
+@plugin.register_transformer
+def _31(ff: DNAFASTAFormat) -> qiime2.Metadata:
+    return _dnafastaformats_to_metadata(ff)
 
 
 @plugin.register_transformer
@@ -319,3 +353,8 @@ def _19(data: AlignedDNAIterator) -> AlignedDNAFASTAFormat:
     ff = AlignedDNAFASTAFormat()
     skbio.io.write(iter(data), format='fasta', into=str(ff))
     return ff
+
+
+@plugin.register_transformer
+def _33(ff: AlignedDNAFASTAFormat) -> qiime2.Metadata:
+    return _dnafastaformats_to_metadata(ff)
