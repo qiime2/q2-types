@@ -77,7 +77,7 @@ class TestTransformers(TestPluginBase):
         obs = obs.to_dataframe()
 
         columns = ['Axis %d' % i for i in range(1, 9)]
-        self.assertEqual(columns, sorted(list(obs.columns.values)))
+        self.assertEqual(columns, obs.columns.tolist())
 
 
 if __name__ == "__main__":

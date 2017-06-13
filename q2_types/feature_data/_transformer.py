@@ -245,7 +245,7 @@ def _dnafastaformats_to_series(ff):
     for sequence in _read_dna_fasta(str(ff)):
         id_ = sequence.metadata['id']
         if id_ in data:
-            raise ValueError("FASTA format feature IDs must be unique. The "
+            raise ValueError("FASTA format sequence IDs must be unique. The "
                              "following ID was found more than once: %s."
                              % id_)
         data[id_] = sequence
