@@ -40,7 +40,9 @@ def _1(dirfmt: SingleLanePerSampleSingleEndFastqDirFmt) \
     result = PerSampleDNAIterators()
     # ensure that dirfmt stays in scope as long as result does
     result.__dirfmt = dirfmt
-    fh = iter(dirfmt.manifest.view(FastqManifestFormat).open())
+    manifest = dirfmt.manifest.view(FastqManifestFormat)
+    _validate_relative_manifest(manifest.path)
+    fh = iter(manifest.open())
     next(fh)
     for line in fh:
         sample_id, filename, _ = line.split(',')
@@ -53,7 +55,9 @@ def _1(dirfmt: SingleLanePerSampleSingleEndFastqDirFmt) \
 @plugin.register_transformer
 def _2(dirfmt: SingleLanePerSamplePairedEndFastqDirFmt) \
         -> PerSamplePairedDNAIterators:
-    fh = iter(dirfmt.manifest.view(FastqManifestFormat).open())
+    manifest = dirfmt.manifest.view(FastqManifestFormat)
+    _validate_relative_manifest(manifest.path)
+    fh = iter(manifest.open())
     next(fh)
     forward_paths = {}
     reverse_paths = {}
@@ -97,6 +101,7 @@ def _single_lane_per_sample_fastq_helper(dirfmt, output_cls):
 
     manifest_fh.close()
     result.manifest.write_data(manifest, FastqManifestFormat)
+    _validate_relative_manifest(manifest.path)
 
     metadata = YamlFormat()
     metadata.path.write_text(yaml.dump({'phred-offset': 33}))
@@ -137,6 +142,7 @@ def _5(dirfmt: SingleLanePerSamplePairedEndFastqDirFmt) \
                                           str(result.path / relpath))
 
     result.manifest.write_data(manifest, FastqManifestFormat)
+    _validate_relative_manifest(manifest.path)
 
     metadata = YamlFormat()
     metadata.path.write_text(yaml.dump({'phred-offset': 33}))
@@ -145,17 +151,36 @@ def _5(dirfmt: SingleLanePerSamplePairedEndFastqDirFmt) \
     return result
 
 
-def _parse_and_validate_manifest(manifest_fh, single_end):
+def _validate_manifest_csv(manifest_fh):
     try:
         manifest = pd.read_csv(manifest_fh, comment='#', header=0,
                                skip_blank_lines=True, dtype=object)
+        return manifest
     except pd.io.common.CParserError as e:
         raise ValueError('All records in manifest must contain '
                          'exactly three comma-separated fields, but it '
-                         'that appears at least one record contains more. '
+                         'appears that at least one record contains more. '
                          'Original error message:\n %s' % str(e))
 
-    _validate_header(manifest)
+
+def _validate_relative_manifest(manifest_fh):
+    manifest = _validate_manifest_csv(manifest_fh)
+    expected_header = ['sample-id', 'filename', 'direction']
+    _validate_header(manifest, expected_header)
+    for direction in ['reverse', 'forward']:
+        records = manifest[manifest['direction'] == direction]['sample-id']
+        duplicated_ids = _duplicated_ids(records)
+        if len(duplicated_ids) > 0:
+            raise ValueError('Each sample id can only appear one time in a '
+                             'manifest for %s reads, but the following '
+                             'sample ids were observed more than once: '
+                             '%s' % (direction, ', '.join(duplicated_ids)))
+
+
+def _parse_and_validate_manifest(manifest_fh, single_end):
+    manifest = _validate_manifest_csv(manifest_fh)
+    expected_header = ['sample-id', 'absolute-filepath', 'direction']
+    _validate_header(manifest, expected_header)
 
     for idx in manifest.index:
         record = manifest.loc[idx]
@@ -188,11 +213,10 @@ def _write_phred64_to_phred33(phred64_path, phred33_path):
                            compression='gzip')
 
 
-def _validate_header(manifest):
+def _validate_header(manifest, expected_header):
     header = manifest.columns
     if len(header) != 3:
         raise ValueError('manifest header must contain exactly three columns.')
-    expected_header = ['sample-id', 'absolute-filepath', 'direction']
     for i, is_correct in enumerate(header == expected_header):
         if not is_correct:
             raise ValueError('Expected manifest header column "%s" but '

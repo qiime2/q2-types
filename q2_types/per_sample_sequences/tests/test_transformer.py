@@ -31,7 +31,8 @@ from q2_types.per_sample_sequences._transformer import (
     _validate_direction,
     _validate_single_end_fastq_manifest_directions,
     _validate_paired_end_fastq_manifest_directions,
-    _parse_and_validate_manifest
+    _parse_and_validate_manifest,
+    _validate_relative_manifest
 )
 from qiime2.plugin.testing import TestPluginBase
 
@@ -54,6 +55,27 @@ class TestTransformers(TestPluginBase):
         )
 
         for act, exp in zip(obs, sk):
+            self.assertEqual(act, exp)
+
+    def test_slpspefdf_to_slpssefdf(self):
+        filenames = ('single_end_data/MANIFEST', 'metadata.yml',
+                     'Human-Kneecap_S1_L001_R1_001.fastq.gz')
+        input, obs = self.transform_format(
+            SingleLanePerSamplePairedEndFastqDirFmt,
+            SingleLanePerSampleSingleEndFastqDirFmt,
+            filenames=filenames
+        )
+
+        input = skbio.io.read(
+            '%s/Human-Kneecap_S1_L001_R1_001.fastq.gz' % str(input),
+            format='fastq', constructor=skbio.DNA
+        )
+        obs = skbio.io.read(
+            '%s/Human-Kneecap_S1_L001_R1_001.fastq.gz' % str(obs),
+            format='fastq', constructor=skbio.DNA
+        )
+
+        for act, exp in zip(obs, input):
             self.assertEqual(act, exp)
 
     def test_slpspefdf_to_per_sample_paired_dna_iterators(self):
@@ -697,41 +719,44 @@ class TestFastqManifestTransformers(TestPluginBase):
         self.assertEqual(manifest.iloc[0]['absolute-filepath'], expected_fp)
 
     def test_validate_header_valid(self):
+        expected_header = ['sample-id', 'absolute-filepath', 'direction']
         manifest = pd.DataFrame(
             [['abc', '/hello/world', 'forward'],
              ['xyz', '/hello/world', 'forward']],
-            columns=['sample-id', 'absolute-filepath', 'direction'])
+            columns=expected_header)
         # should not raise an error
-        _validate_header(manifest)
+        _validate_header(manifest, expected_header)
 
     def test_validate_header_invalid(self):
+        expected_header = ['xyz', 'absolute-filepath']
         manifest = pd.DataFrame(
             [['abc', '/hello/world'],
              ['xyz', '/hello/world']],
-            columns=['xyz', 'absolute-filepath'])
+            columns=expected_header)
         with self.assertRaisesRegex(ValueError, 'exactly three'):
-            _validate_header(manifest)
+            _validate_header(manifest, expected_header)
 
+        expected_header = ['sample-id', 'absolute-filepath', 'direction']
         manifest = pd.DataFrame(
             [['abc', '/hello/world', 'forward'],
              ['xyz', '/hello/world', 'forward']],
             columns=['xyz', 'absolute-filepath', 'direction'])
         with self.assertRaisesRegex(ValueError, 'sample-id.*xyz'):
-            _validate_header(manifest)
+            _validate_header(manifest, expected_header)
 
         manifest = pd.DataFrame(
             [['abc', '/hello/world', 'forward'],
              ['xyz', '/hello/world', 'forward']],
             columns=['sample-id', 'xyz', 'direction'])
         with self.assertRaisesRegex(ValueError, 'absolute-filepath.*xyz'):
-            _validate_header(manifest)
+            _validate_header(manifest, expected_header)
 
         manifest = pd.DataFrame(
             [['abc', '/hello/world', 'forward'],
              ['xyz', '/hello/world', 'forward']],
             columns=['sample-id', 'absolute-filepath', 'xyz'])
         with self.assertRaisesRegex(ValueError, 'direction.*xyz'):
-            _validate_header(manifest)
+            _validate_header(manifest, expected_header)
 
     def test_validate_path(self):
         # should not raise an error
@@ -822,6 +847,25 @@ class TestFastqManifestTransformers(TestPluginBase):
             columns=['sample-id', 'absolute-filepath', 'direction'])
         with self.assertRaisesRegex(ValueError, 'reverse read record: xyz'):
             _validate_paired_end_fastq_manifest_directions(manifest)
+
+        manifest = pd.DataFrame(
+            [['xyz', '/hello/world', 'forward'],
+             ['xyz', '/hello/world', 'reverse'],
+             ['xyz', '/hello/world2', 'monkey']],
+            columns=['sample-id', 'absolute-filepath', 'direction'])
+        with self.assertRaisesRegex(ValueError,
+                                    '"reverse", but observed: monkey'):
+            _validate_paired_end_fastq_manifest_directions(manifest)
+
+    def test_FastqManifestFormat_duplicate_ids(self):
+        manifest = io.StringIO(
+            'sample-id,filename,direction\n'
+            'banana,/hello/world,forward\n'
+            'banana,/hello/world,forward\n'
+            'banana,/hello/world,reverse\n'
+            'banana,/hello/world,reverse\n')
+        with self.assertRaisesRegex(ValueError, 'than once: banana'):
+            _validate_relative_manifest(manifest)
 
 
 if __name__ == '__main__':
