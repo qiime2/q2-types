@@ -26,11 +26,26 @@ from . import (SingleLanePerSampleSingleEndFastqDirFmt, FastqManifestFormat,
 
 
 class PerSampleDNAIterators(dict):
-    pass
+    def __getitem__(self, key):
+        return super().__getitem__(key)()
+
+    def items(self):
+        for key, value in super().items():
+            yield (key, value())
 
 
 class PerSamplePairedDNAIterators(dict):
-    pass
+    def __getitem__(self, key):
+        fwd, rev = super().__getitem__(key)
+        return fwd(), rev()
+
+    def items(self):
+        for key, (fwd, rev) in super().items():
+            yield (key, (fwd(), rev()))
+
+
+def _iterator_magic(filepath):
+    yield from skbio.io.read(filepath, format='fastq', constructor=skbio.DNA)
 
 
 def _prepare_manifest(dirfmt):
@@ -39,7 +54,7 @@ def _prepare_manifest(dirfmt):
     manifest.filename = manifest.filename.apply(lambda x: str(dirfmt.path / x))
 
     manifest['data'] = manifest.filename.apply(
-        lambda fp: skbio.io.read(fp, format='fastq', constructor=skbio.DNA))
+        lambda filepath: lambda: _iterator_magic(filepath))
 
     return manifest
 
