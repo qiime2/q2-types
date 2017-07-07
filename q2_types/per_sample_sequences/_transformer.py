@@ -40,39 +40,37 @@ def _1(dirfmt: SingleLanePerSampleSingleEndFastqDirFmt) \
     result = PerSampleDNAIterators()
     # ensure that dirfmt stays in scope as long as result does
     result.__dirfmt = dirfmt
-    fh = iter(dirfmt.manifest.view(FastqManifestFormat).open())
-    next(fh)
-    for line in fh:
-        sample_id, filename, _ = line.split(',')
-        filepath = str(dirfmt.path / filename)
-        result[sample_id] = skbio.io.read(filepath, format='fastq',
-                                          constructor=skbio.DNA)
+    manifest = pd.read_csv(str(dirfmt.path / dirfmt.manifest.pathspec),
+                           header=0, comment='#').set_index('sample-id')
+    manifest.filename = manifest.filename.apply(lambda x: str(dirfmt.path / x))
+
+    manifest['data'] = manifest.filename.apply(
+        lambda fp: skbio.io.read(fp, format='fastq', constructor=skbio.DNA))
+
+    for sample_id, data in manifest.data.iteritems():
+        result[sample_id] = data
+
     return result
 
 
 @plugin.register_transformer
 def _2(dirfmt: SingleLanePerSamplePairedEndFastqDirFmt) \
         -> PerSamplePairedDNAIterators:
-    fh = iter(dirfmt.manifest.view(FastqManifestFormat).open())
-    next(fh)
-    forward_paths = {}
-    reverse_paths = {}
-    for line in fh:
-        sample_id, filename, direction = line.strip().split(',')
-        filepath = str(dirfmt.path / filename)
-        seqs = skbio.io.read(filepath, format='fastq',
-                             constructor=skbio.DNA)
-
-        if direction == 'forward':
-            forward_paths[sample_id] = seqs
-        else:
-            reverse_paths[sample_id] = seqs
-
     result = PerSamplePairedDNAIterators()
     # ensure that dirfmt stays in scope as long as result does
     result.__dirfmt = dirfmt
-    for sample_id in forward_paths:
-        result[sample_id] = forward_paths[sample_id], reverse_paths[sample_id]
+    manifest = pd.read_csv(str(dirfmt.path / dirfmt.manifest.pathspec),
+                           header=0, comment='#').set_index('sample-id')
+    manifest.filename = manifest.filename.apply(lambda x: str(dirfmt.path / x))
+
+    manifest['data'] = manifest.filename.apply(
+        lambda fp: skbio.io.read(fp, format='fastq', constructor=skbio.DNA))
+
+    forward_data = manifest[manifest.direction == 'forward'].data
+    reverse_data = manifest[manifest.direction == 'reverse'].data
+    for sample_id in forward_data.index.tolist():
+        result[sample_id] = forward_data[sample_id], reverse_data[sample_id]
+
     return result
 
 
