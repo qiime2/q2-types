@@ -43,6 +43,7 @@ def _prepare_manifest(dirfmt):
 
     return manifest
 
+
 # Transformers
 @plugin.register_transformer
 def _1(dirfmt: SingleLanePerSampleSingleEndFastqDirFmt) \
