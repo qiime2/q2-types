@@ -33,6 +33,16 @@ class PerSamplePairedDNAIterators(dict):
     pass
 
 
+def _prepare_manifest(dirfmt):
+    manifest = pd.read_csv(str(dirfmt.path / dirfmt.manifest.pathspec),
+                           header=0, comment='#').set_index('sample-id')
+    manifest.filename = manifest.filename.apply(lambda x: str(dirfmt.path / x))
+
+    manifest['data'] = manifest.filename.apply(
+        lambda fp: skbio.io.read(fp, format='fastq', constructor=skbio.DNA))
+
+    return manifest
+
 # Transformers
 @plugin.register_transformer
 def _1(dirfmt: SingleLanePerSampleSingleEndFastqDirFmt) \
@@ -40,12 +50,8 @@ def _1(dirfmt: SingleLanePerSampleSingleEndFastqDirFmt) \
     result = PerSampleDNAIterators()
     # ensure that dirfmt stays in scope as long as result does
     result.__dirfmt = dirfmt
-    manifest = pd.read_csv(str(dirfmt.path / dirfmt.manifest.pathspec),
-                           header=0, comment='#').set_index('sample-id')
-    manifest.filename = manifest.filename.apply(lambda x: str(dirfmt.path / x))
 
-    manifest['data'] = manifest.filename.apply(
-        lambda fp: skbio.io.read(fp, format='fastq', constructor=skbio.DNA))
+    manifest = _prepare_manifest(dirfmt)
 
     for sample_id, data in manifest.data.iteritems():
         result[sample_id] = data
@@ -59,15 +65,11 @@ def _2(dirfmt: SingleLanePerSamplePairedEndFastqDirFmt) \
     result = PerSamplePairedDNAIterators()
     # ensure that dirfmt stays in scope as long as result does
     result.__dirfmt = dirfmt
-    manifest = pd.read_csv(str(dirfmt.path / dirfmt.manifest.pathspec),
-                           header=0, comment='#').set_index('sample-id')
-    manifest.filename = manifest.filename.apply(lambda x: str(dirfmt.path / x))
 
-    manifest['data'] = manifest.filename.apply(
-        lambda fp: skbio.io.read(fp, format='fastq', constructor=skbio.DNA))
+    manifest = _prepare_manifest(dirfmt)
 
-    forward_data = manifest[manifest.direction == 'forward'].data
-    reverse_data = manifest[manifest.direction == 'reverse'].data
+    forward_data = manifest.loc[manifest.direction == 'forward', 'data']
+    reverse_data = manifest.loc[manifest.direction == 'reverse', 'data']
     for sample_id in forward_data.index.tolist():
         result[sample_id] = forward_data[sample_id], reverse_data[sample_id]
 
