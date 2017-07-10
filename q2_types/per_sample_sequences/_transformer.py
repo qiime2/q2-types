@@ -29,9 +29,9 @@ class PerSampleDNAIterators(dict):
     def __getitem__(self, key):
         return super().__getitem__(key)()
 
-    def items(self):
-        for key, value in super().items():
-            yield (key, value())
+    def __iter__(self):
+        for sample_id, seqs in self.items():
+            yield sample_id, seqs()
 
 
 class PerSamplePairedDNAIterators(dict):
@@ -39,9 +39,9 @@ class PerSamplePairedDNAIterators(dict):
         fwd, rev = super().__getitem__(key)
         return fwd(), rev()
 
-    def items(self):
-        for key, (fwd, rev) in super().items():
-            yield (key, (fwd(), rev()))
+    def __iter__(self):
+        for sample_id, (fwd, rev) in self.items():
+            yield sample_id, (fwd(), rev())
 
 
 def _iterator_magic(filepath):
