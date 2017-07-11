@@ -45,7 +45,10 @@ class PerSamplePairedDNAIterators(dict):
 
 
 def _iterator_magic(filepath):
-    yield from skbio.io.read(filepath, format='fastq', constructor=skbio.DNA)
+    def sequence_generator():
+        yield from skbio.io.read(filepath, format='fastq',
+                                 constructor=skbio.DNA)
+    return sequence_generator
 
 
 def _prepare_manifest(dirfmt):
@@ -53,8 +56,7 @@ def _prepare_manifest(dirfmt):
                            header=0, comment='#').set_index('sample-id')
     manifest.filename = manifest.filename.apply(lambda x: str(dirfmt.path / x))
 
-    manifest['data'] = manifest.filename.apply(
-        lambda filepath: lambda: _iterator_magic(filepath))
+    manifest['data'] = manifest.filename.apply(_iterator_magic)
 
     return manifest
 
