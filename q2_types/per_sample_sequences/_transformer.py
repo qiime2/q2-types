@@ -152,7 +152,7 @@ def _parse_and_validate_manifest(manifest_fh, single_end):
     except pd.io.common.CParserError as e:
         raise ValueError('All records in manifest must contain '
                          'exactly three comma-separated fields, but it '
-                         'that appears at least one record contains more. '
+                         'appears that at least one record contains more. '
                          'Original error message:\n %s' % str(e))
 
     _validate_header(manifest)
