@@ -26,11 +26,39 @@ from . import (SingleLanePerSampleSingleEndFastqDirFmt, FastqManifestFormat,
 
 
 class PerSampleDNAIterators(dict):
-    pass
+    def __getitem__(self, key):
+        return super().__getitem__(key)()
+
+    def __iter__(self):
+        for sample_id, seqs in self.items():
+            yield sample_id, seqs()
 
 
 class PerSamplePairedDNAIterators(dict):
-    pass
+    def __getitem__(self, key):
+        fwd, rev = super().__getitem__(key)
+        return fwd(), rev()
+
+    def __iter__(self):
+        for sample_id, (fwd, rev) in self.items():
+            yield sample_id, (fwd(), rev())
+
+
+def _iterator_magic(filepath):
+    def sequence_generator():
+        yield from skbio.io.read(filepath, format='fastq',
+                                 constructor=skbio.DNA)
+    return sequence_generator
+
+
+def _prepare_manifest(dirfmt):
+    manifest = pd.read_csv(str(dirfmt.path / dirfmt.manifest.pathspec),
+                           header=0, comment='#').set_index('sample-id')
+    manifest.filename = manifest.filename.apply(lambda x: str(dirfmt.path / x))
+
+    manifest['data'] = manifest.filename.apply(_iterator_magic)
+
+    return manifest
 
 
 # Transformers
@@ -40,39 +68,29 @@ def _1(dirfmt: SingleLanePerSampleSingleEndFastqDirFmt) \
     result = PerSampleDNAIterators()
     # ensure that dirfmt stays in scope as long as result does
     result.__dirfmt = dirfmt
-    fh = iter(dirfmt.manifest.view(FastqManifestFormat).open())
-    next(fh)
-    for line in fh:
-        sample_id, filename, _ = line.split(',')
-        filepath = str(dirfmt.path / filename)
-        result[sample_id] = skbio.io.read(filepath, format='fastq',
-                                          constructor=skbio.DNA)
+
+    manifest = _prepare_manifest(dirfmt)
+
+    for sample_id, data in manifest.data.iteritems():
+        result[sample_id] = data
+
     return result
 
 
 @plugin.register_transformer
 def _2(dirfmt: SingleLanePerSamplePairedEndFastqDirFmt) \
         -> PerSamplePairedDNAIterators:
-    fh = iter(dirfmt.manifest.view(FastqManifestFormat).open())
-    next(fh)
-    forward_paths = {}
-    reverse_paths = {}
-    for line in fh:
-        sample_id, filename, direction = line.strip().split(',')
-        filepath = str(dirfmt.path / filename)
-        seqs = skbio.io.read(filepath, format='fastq',
-                             constructor=skbio.DNA)
-
-        if direction == 'forward':
-            forward_paths[sample_id] = seqs
-        else:
-            reverse_paths[sample_id] = seqs
-
     result = PerSamplePairedDNAIterators()
     # ensure that dirfmt stays in scope as long as result does
     result.__dirfmt = dirfmt
-    for sample_id in forward_paths:
-        result[sample_id] = forward_paths[sample_id], reverse_paths[sample_id]
+
+    manifest = _prepare_manifest(dirfmt)
+
+    forward_data = manifest.loc[manifest.direction == 'forward', 'data']
+    reverse_data = manifest.loc[manifest.direction == 'reverse', 'data']
+    for sample_id in forward_data.index.tolist():
+        result[sample_id] = forward_data[sample_id], reverse_data[sample_id]
+
     return result
 
 
