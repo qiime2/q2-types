@@ -29,7 +29,7 @@ class FastqManifestFormat(model.TextFileFormat):
                                        skip_blank_lines=True, dtype=object)
                 manifest.columns = ['sample-id', 'filename', 'direction']
                 manifest = manifest.dropna(how='all')
-                if len(manifest.columns) != 3:
+                if manifest.isnull().values.any():
                     return False
                 duplicated = manifest.drop(manifest.columns[1], 1)
                 if True in duplicated.duplicated().values:
