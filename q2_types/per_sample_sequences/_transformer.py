@@ -43,10 +43,11 @@ def _1(dirfmt: SingleLanePerSampleSingleEndFastqDirFmt) \
     fh = iter(dirfmt.manifest.view(FastqManifestFormat).open())
     next(fh)
     for line in fh:
-        sample_id, filename, _ = line.split(',')
-        filepath = str(dirfmt.path / filename)
-        result[sample_id] = skbio.io.read(filepath, format='fastq',
-                                          constructor=skbio.DNA)
+        if not line.startswith('#'):
+            sample_id, filename, _ = line.split(',')
+            filepath = str(dirfmt.path / filename)
+            result[sample_id] = skbio.io.read(filepath, format='fastq',
+                                              constructor=skbio.DNA)
     return result
 
 

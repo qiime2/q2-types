@@ -1,3 +1,4 @@
 sample-id,filename,direction
 # important comment
 Human-Kneecap,Human-Kneecap_S1_L001_R1_001.fastq.gz,forward
+Human-Kneecap,Human-Kneecap_S4_L001_R1_001.fastq.gz,forward
