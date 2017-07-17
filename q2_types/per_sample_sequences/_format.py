@@ -17,6 +17,7 @@ from ..plugin_setup import plugin
 class FastqManifestFormat(model.TextFileFormat):
     """
     Mapping of sample identifiers to filepaths and read direction.
+    Note that we are currently doing exhaustive validation here.
 
     """
     def sniff(self):
