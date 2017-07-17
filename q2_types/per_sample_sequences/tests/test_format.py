@@ -73,6 +73,41 @@ class TestFormats(TestPluginBase):
         with self.assertRaisesRegex(ValueError, 'FastqManifestFormat'):
             format.validate()
 
+    def test_fastq_manifest_format_validate_negative_extra_col(self):
+        filepath = self.get_data_path('extra-MANIFEST')
+        format = FastqManifestFormat(filepath, mode='r')
+
+        with self.assertRaisesRegex(ValueError, 'FastqManifestFormat'):
+            format.validate()
+
+    def test_fastq_manifest_format_validate_negative_extra_col_order(self):
+        filepath = self.get_data_path('extra-opposite-MANIFEST')
+        format = FastqManifestFormat(filepath, mode='r')
+
+        with self.assertRaisesRegex(ValueError, 'FastqManifestFormat'):
+            format.validate()
+
+    def test_fastq_manifest_format_validate_negative_missing_col(self):
+        filepath = self.get_data_path('lesser-MANIFEST')
+        format = FastqManifestFormat(filepath, mode='r')
+
+        with self.assertRaisesRegex(ValueError, 'FastqManifestFormat'):
+            format.validate()
+
+    def test_fastq_manifest_format_validate_negative_missing_col_order(self):
+        filepath = self.get_data_path('lesser-opposite-MANIFEST')
+        format = FastqManifestFormat(filepath, mode='r')
+
+        with self.assertRaisesRegex(ValueError, 'FastqManifestFormat'):
+            format.validate()
+
+    def test_fastq_manifest_format_validate_negative_duplicate_id(self):
+        filepath = self.get_data_path('duplicate-MANIFEST')
+        format = FastqManifestFormat(filepath, mode='r')
+
+        with self.assertRaisesRegex(ValueError, 'FastqManifestFormat'):
+            format.validate()
+
     def test_casava_one_eight_slanepsample_dir_fmt_validate_positive(self):
         filepath = self.get_data_path('Human-Kneecap_S1_L001_R1_001.fastq.gz')
         shutil.copy(filepath, self.temp_dir.name)

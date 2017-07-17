@@ -9,6 +9,7 @@
 import skbio.io
 import yaml
 import qiime2.plugin.model as model
+import pandas as pd
 
 from ..plugin_setup import plugin
 
@@ -16,12 +17,26 @@ from ..plugin_setup import plugin
 class FastqManifestFormat(model.TextFileFormat):
     """
     Mapping of sample identifiers to filepaths and read direction.
+    Note that we are currently doing exhaustive validation here.
 
     """
     def sniff(self):
         with self.open() as fh:
             header = fh.readline()
-            return header.strip() == 'sample-id,filename,direction'
+            if header.strip() != 'sample-id,filename,direction':
+                return False
+            try:
+                manifest = pd.read_csv(fh, comment='#', header=None,
+                                       skip_blank_lines=True, dtype=object)
+                manifest.columns = ['sample-id', 'filename', 'direction']
+                if manifest.isnull().values.any():
+                    return False
+                duplicated = manifest.drop(manifest.columns[1], 1)
+                if True in duplicated.duplicated().values:
+                    return False
+            except Exception as e:
+                return False
+        return True
 
 
 class YamlFormat(model.TextFileFormat):
