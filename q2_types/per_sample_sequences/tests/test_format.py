@@ -80,8 +80,22 @@ class TestFormats(TestPluginBase):
         with self.assertRaisesRegex(ValueError, 'FastqManifestFormat'):
             format.validate()
 
+    def test_fastq_manifest_format_validate_negative_extra_col_order(self):
+        filepath = self.get_data_path('extra-opposite-MANIFEST')
+        format = FastqManifestFormat(filepath, mode='r')
+
+        with self.assertRaisesRegex(ValueError, 'FastqManifestFormat'):
+            format.validate()
+
     def test_fastq_manifest_format_validate_negative_missing_col(self):
         filepath = self.get_data_path('lesser-MANIFEST')
+        format = FastqManifestFormat(filepath, mode='r')
+
+        with self.assertRaisesRegex(ValueError, 'FastqManifestFormat'):
+            format.validate()
+
+    def test_fastq_manifest_format_validate_negative_missing_col_order(self):
+        filepath = self.get_data_path('lesser-opposite-MANIFEST')
         format = FastqManifestFormat(filepath, mode='r')
 
         with self.assertRaisesRegex(ValueError, 'FastqManifestFormat'):

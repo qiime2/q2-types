@@ -28,14 +28,12 @@ class FastqManifestFormat(model.TextFileFormat):
                 manifest = pd.read_csv(fh, comment='#', header=None,
                                        skip_blank_lines=True, dtype=object)
                 manifest.columns = ['sample-id', 'filename', 'direction']
-                manifest = manifest.dropna(how='all')
                 if manifest.isnull().values.any():
                     return False
                 duplicated = manifest.drop(manifest.columns[1], 1)
                 if True in duplicated.duplicated().values:
                     return False
             except Exception as e:
-                raise
                 return False
         return True
 
