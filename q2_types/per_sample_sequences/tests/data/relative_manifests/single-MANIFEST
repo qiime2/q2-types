@@ -1,4 +1,7 @@
-# Compelling observation regarding knee-caps 
+# knee cap
 
 sample-id,filename,direction
+
+# echo charley golf
+
 Human-Kneecap,Human-Kneecap_S1_L001_R1_001.fastq.gz,forward

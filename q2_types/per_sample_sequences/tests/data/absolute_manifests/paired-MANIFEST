@@ -1,0 +1,4 @@
+sample-id,absolute-filepath,direction
+Human-Kneecap,/some/groovy/folder/Human-Kneecap_S1_L001_R1_001.fastq.gz,forward
+# more interesting and relevant comments
+Human-Kneecap,/some/groovy/folder/Human-Kneecap_S1_L001_R2_001.fastq.gz,reverse

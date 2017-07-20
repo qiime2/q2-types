@@ -1,0 +1,18 @@
+
+sample-id,filename,direction
+
+Human-Kneecap,Human-Kneecap_S1_L001_R1_001.fastq.gz,forward
+Human-Kneecap,Human-Kneecap_S1_L001_R1_001.fastq.gz,reverse
+Human-Gut,Human-Gut_S1_L001_R1_001.fastq.gz,forward
+Human-Gut,Human-Gut_S1_L001_R1_001.fastq.gz,reverse
+Human-Elbow,Human-Elbow_S1_L001_R1_001.fastq.gz,forward
+Human-Elbow,Human-Elbow_S1_L001_R1_001.fastq.gz,reverse
+
+# Comment regarding the relevance of cat guts
+
+Human-Hand,Human-Hand_S1_L001_R1_001.fastq.gz,forward
+Human-Hand,Human-Hand_S1_L001_R1_001.fastq.gz,reverse
+Human-Nose,Human-Nose_S1_L001_R1_001.fastq.gz,forward
+Human-Nose,Human-Nose_S1_L001_R1_001.fastq.gz,reverse
+Cat-Gut,Cat-Gut_S1_L001_R1_001.fastq.gz,forward
+Cat-Gut,Cat-Gut_S1_L001_R1_001.fastq.gz,reverse

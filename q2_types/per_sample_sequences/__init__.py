@@ -10,6 +10,7 @@ import importlib
 
 from ._format import (CasavaOneEightSingleLanePerSampleDirFmt, FastqGzFormat,
                       YamlFormat, FastqManifestFormat,
+                      FastqAbsolutePathManifestFormat,
                       SingleLanePerSampleSingleEndFastqDirFmt,
                       SingleLanePerSamplePairedEndFastqDirFmt,
                       SingleEndFastqManifestPhred33,
@@ -21,6 +22,7 @@ from ._transformer import PerSampleDNAIterators, PerSamplePairedDNAIterators
 
 __all__ = ['CasavaOneEightSingleLanePerSampleDirFmt', 'FastqGzFormat',
            'YamlFormat', 'FastqManifestFormat',
+           'FastqAbsolutePathManifestFormat',
            'SingleLanePerSampleSingleEndFastqDirFmt',
            'SingleLanePerSamplePairedEndFastqDirFmt', 'SequencesWithQuality',
            'PairedEndSequencesWithQuality', 'PerSampleDNAIterators',

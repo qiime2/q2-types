@@ -13,15 +13,74 @@ import qiime2.plugin.model as model
 from ..plugin_setup import plugin
 
 
-class FastqManifestFormat(model.TextFileFormat):
+class _FastqManifestBase(model.TextFileFormat):
     """
-    Mapping of sample identifiers to filepaths and read direction.
+    Base class for mapping of sample identifiers to filepaths and read
+    direction.
 
     """
+    EXPECTED_HEADER = None
+
     def sniff(self):
         with self.open() as fh:
-            header = fh.readline()
-            return header.strip() == 'sample-id,filename,direction'
+            data_lines = 0
+            header = None
+            while data_lines < 10:
+                line = fh.readline()
+
+                if line == '':
+                    # EOF
+                    break
+                elif line.lstrip(' ') == '\n':
+                    # Blank line
+                    continue
+                elif line.startswith('#'):
+                    # Comment line
+                    continue
+
+                cells = line.rstrip('\n').split(',')
+                if header is None:
+                    if cells != self.EXPECTED_HEADER:
+                        return False
+                    header = cells
+                else:
+                    if len(cells) != len(header):
+                        return False
+                    data_lines += 1
+
+            return header is not None and data_lines > 0
+
+
+class FastqManifestFormat(_FastqManifestBase):
+    """
+    Mapping of sample identifiers to relative filepaths and read direction.
+
+    """
+    EXPECTED_HEADER = ['sample-id', 'filename', 'direction']
+
+
+class FastqAbsolutePathManifestFormat(_FastqManifestBase):
+    """
+    Mapping of sample identifiers to absolute filepaths and read direction.
+
+    """
+    EXPECTED_HEADER = ['sample-id', 'absolute-filepath', 'direction']
+
+
+class SingleEndFastqManifestPhred33(FastqAbsolutePathManifestFormat):
+    pass
+
+
+class SingleEndFastqManifestPhred64(FastqAbsolutePathManifestFormat):
+    pass
+
+
+class PairedEndFastqManifestPhred33(FastqAbsolutePathManifestFormat):
+    pass
+
+
+class PairedEndFastqManifestPhred64(FastqAbsolutePathManifestFormat):
+    pass
 
 
 class YamlFormat(model.TextFileFormat):
@@ -62,40 +121,6 @@ class FastqGzFormat(model.BinaryFileFormat):
             except ValueError:
                 pass
         return False
-
-
-class FastqAbsolutePathManifestFormat(model.TextFileFormat):
-    """
-    Mapping of sample identifiers to filepaths and read direction.
-
-    """
-    def sniff(self):
-        expected_header = 'sample-id,absolute-filepath,direction'
-        with self.open() as fh:
-            for line in fh:
-                line = line.strip()
-                if line and not line.startswith('#'):
-                    # the first non-blank, non-comment line should be
-                    # the header
-                    return line == expected_header
-        # never found the header
-        return False
-
-
-class SingleEndFastqManifestPhred33(FastqAbsolutePathManifestFormat):
-    pass
-
-
-class SingleEndFastqManifestPhred64(FastqAbsolutePathManifestFormat):
-    pass
-
-
-class PairedEndFastqManifestPhred33(FastqAbsolutePathManifestFormat):
-    pass
-
-
-class PairedEndFastqManifestPhred64(FastqAbsolutePathManifestFormat):
-    pass
 
 
 class CasavaOneEightSingleLanePerSampleDirFmt(model.DirectoryFormat):
