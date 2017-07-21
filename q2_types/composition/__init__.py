@@ -5,3 +5,7 @@
 #
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
+from ._type import Composition, Balance
+
+
+__all__ = ["Composition", "Balance"]
