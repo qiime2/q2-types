@@ -7,12 +7,15 @@
 # ----------------------------------------------------------------------------
 
 import os
+import gzip
+import shutil
 import warnings
 import collections
 
 import skbio
 import yaml
 import pandas as pd
+import qiime2.util
 
 from ..plugin_setup import plugin
 from . import (SingleLanePerSampleSingleEndFastqDirFmt, FastqManifestFormat,
@@ -130,8 +133,8 @@ def _5(dirfmt: SingleLanePerSamplePairedEndFastqDirFmt) \
                 _, relpath, direction = line.rstrip().split(',')
                 if direction == 'forward':
                     manifest_fh.write(line)
-                    os.link(str(dirfmt.path / relpath),
-                            str(result.path / relpath))
+                    qiime2.util.duplicate(str(dirfmt.path / relpath),
+                                          str(result.path / relpath))
 
     result.manifest.write_data(manifest, FastqManifestFormat)
 
@@ -149,7 +152,7 @@ def _parse_and_validate_manifest(manifest_fh, single_end):
     except pd.io.common.CParserError as e:
         raise ValueError('All records in manifest must contain '
                          'exactly three comma-separated fields, but it '
-                         'that appears at least one record contains more. '
+                         'appears that at least one record contains more. '
                          'Original error message:\n %s' % str(e))
 
     _validate_header(manifest)
@@ -291,6 +294,19 @@ def _validate_paired_end_fastq_manifest_directions(manifest):
                              % ', '.join(reverse_but_no_forward))
 
 
+def _copy_with_compression(src, dst):
+    with open(src, 'rb') as src_fh:
+        if src_fh.read(2)[:2] != b'\x1f\x8b':
+            src_fh.seek(0)
+            # SO: http://stackoverflow.com/a/27069578/579416
+            # shutil.copyfileobj will pick a pretty good chunksize for us
+            with gzip.open(dst, 'wb') as dst_fh:
+                shutil.copyfileobj(src_fh, dst_fh)
+                return
+
+    qiime2.util.duplicate(src, dst)
+
+
 def _fastq_manifest_helper(fmt, fastq_copy_fn, single_end):
     direction_to_read_number = {'forward': 1, 'reverse': 2}
     input_manifest = _parse_and_validate_manifest(fmt.open(),
@@ -338,7 +354,7 @@ _phred64_warning = ('Importing of PHRED 64 data is slow as it is converted '
 @plugin.register_transformer
 def _6(fmt: SingleEndFastqManifestPhred33) \
         -> SingleLanePerSampleSingleEndFastqDirFmt:
-    return _fastq_manifest_helper(fmt, os.link, single_end=True)
+    return _fastq_manifest_helper(fmt, _copy_with_compression, single_end=True)
 
 
 @plugin.register_transformer
@@ -352,7 +368,8 @@ def _7(fmt: SingleEndFastqManifestPhred64) \
 @plugin.register_transformer
 def _8(fmt: PairedEndFastqManifestPhred33) \
         -> SingleLanePerSamplePairedEndFastqDirFmt:
-    return _fastq_manifest_helper(fmt, os.link, single_end=False)
+    return _fastq_manifest_helper(fmt, _copy_with_compression,
+                                  single_end=False)
 
 
 @plugin.register_transformer

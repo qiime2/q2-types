@@ -152,7 +152,58 @@ class TestFastqManifestTransformers(TestPluginBase):
                         'sampleXYZ_1_L001_R1_001.fastq.gz')]
         for input_fastq, obs_fastq in fastq_pairs:
             obs_fh = skbio.io.read(
-                os.path.join(str(obs), obs_fastq),
+                os.path.join(str(obs), obs_fastq), compression='gzip',
+                format='fastq', constructor=skbio.DNA, variant='illumina1.8'
+            )
+            exp_fh = skbio.io.read(
+                self.get_data_path(input_fastq),
+                format='fastq', constructor=skbio.DNA, variant='illumina1.8'
+            )
+
+            for o, e in zip(obs_fh, exp_fh):
+                self.assertEqual(o, e)
+
+        obs_metadata = yaml.load(open('%s/metadata.yml' % str(obs)))
+        exp_metadata = yaml.load("{'phred-offset': 33}")
+        self.assertEqual(obs_metadata, exp_metadata)
+
+        obs_manifest = open('%s/MANIFEST' % (str(obs))).read()
+        exp_manifest = ("sample-id,filename,direction\n"
+                        "sampleABC,sampleABC_0_L001_R1_001.fastq.gz,forward\n"
+                        "sampleXYZ,sampleXYZ_1_L001_R1_001.fastq.gz,forward\n")
+        self.assertEqual(obs_manifest, exp_manifest)
+
+    def test_single_end_fastq_manifest_phred33_to_slpssefdf_uncompressed(self):
+        format_ = SingleEndFastqManifestPhred33
+        transformer = self.get_transformer(
+            format_,
+            SingleLanePerSampleSingleEndFastqDirFmt)
+
+        shutil.copy(
+            self.get_data_path('Human-Kneecap_S1_L001_R1_001.fastq'),
+            os.path.join(self.temp_dir.name,
+                         'Human-Kneecap_S1_L001_R1_001.fastq'))
+        shutil.copy(
+            self.get_data_path('Human-Armpit.fastq'),
+            os.path.join(self.temp_dir.name, 'Human-Armpit.fastq'))
+
+        manifest_fp = os.path.join(self.temp_dir.name, 'manifest')
+        with open(manifest_fp, 'w') as fh:
+            fh.write("sample-id,absolute-filepath,direction\n")
+            fh.write("sampleABC,%s/Human-Kneecap_S1_L001_R1_001.fastq,"
+                     "forward\n" % self.temp_dir.name)
+            fh.write("sampleXYZ,%s/Human-Armpit.fastq,forward\n"
+                     % self.temp_dir.name)
+
+        obs = transformer(format_(manifest_fp, 'r'))
+
+        fastq_pairs = [('Human-Kneecap_S1_L001_R1_001.fastq',
+                        'sampleABC_0_L001_R1_001.fastq.gz'),
+                       ('Human-Armpit.fastq',
+                        'sampleXYZ_1_L001_R1_001.fastq.gz')]
+        for input_fastq, obs_fastq in fastq_pairs:
+            obs_fh = skbio.io.read(
+                os.path.join(str(obs), obs_fastq), compression='gzip',
                 format='fastq', constructor=skbio.DNA, variant='illumina1.8'
             )
             exp_fh = skbio.io.read(
@@ -202,7 +253,57 @@ class TestFastqManifestTransformers(TestPluginBase):
                         'sampleXYZ_1_L001_R1_001.fastq.gz')]
         for input_fastq, obs_fastq in fastq_pairs:
             obs_fh = skbio.io.read(
-                os.path.join(str(obs), obs_fastq),
+                os.path.join(str(obs), obs_fastq), compression='gzip',
+                format='fastq', constructor=skbio.DNA, variant='illumina1.8'
+            )
+            exp_fh = skbio.io.read(
+                self.get_data_path(input_fastq),
+                format='fastq', constructor=skbio.DNA, variant='illumina1.3'
+            )
+
+            for o, e in zip(obs_fh, exp_fh):
+                self.assertEqual(o, e)
+
+        obs_metadata = yaml.load(open('%s/metadata.yml' % str(obs)))
+        exp_metadata = yaml.load("{'phred-offset': 33}")
+        self.assertEqual(obs_metadata, exp_metadata)
+
+        obs_manifest = open('%s/MANIFEST' % (str(obs))).read()
+        exp_manifest = ("sample-id,filename,direction\n"
+                        "sampleABC,sampleABC_0_L001_R1_001.fastq.gz,forward\n"
+                        "sampleXYZ,sampleXYZ_1_L001_R1_001.fastq.gz,forward\n")
+        self.assertEqual(obs_manifest, exp_manifest)
+
+    def test_single_end_fastq_manifest_phred64_to_slpssefdf_uncompressed(self):
+        format_ = SingleEndFastqManifestPhred64
+        transformer = self.get_transformer(
+            format_,
+            SingleLanePerSampleSingleEndFastqDirFmt)
+
+        shutil.copy(
+            self.get_data_path('s1-phred64.fastq'),
+            os.path.join(self.temp_dir.name, 's1-phred64.fastq'))
+        shutil.copy(
+            self.get_data_path('s2-phred64.fastq'),
+            os.path.join(self.temp_dir.name, 's2-phred64.fastq'))
+
+        manifest_fp = os.path.join(self.temp_dir.name, 'manifest')
+        with open(manifest_fp, 'w') as fh:
+            fh.write("sample-id,absolute-filepath,direction\n")
+            fh.write("sampleABC,%s/s1-phred64.fastq,"
+                     "forward\n" % self.temp_dir.name)
+            fh.write("sampleXYZ,%s/s2-phred64.fastq,forward\n" %
+                     self.temp_dir.name)
+
+        obs = transformer(format_(manifest_fp, 'r'))
+
+        fastq_pairs = [('s1-phred64.fastq',
+                        'sampleABC_0_L001_R1_001.fastq.gz'),
+                       ('s2-phred64.fastq',
+                        'sampleXYZ_1_L001_R1_001.fastq.gz')]
+        for input_fastq, obs_fastq in fastq_pairs:
+            obs_fh = skbio.io.read(
+                os.path.join(str(obs), obs_fastq), compression='gzip',
                 format='fastq', constructor=skbio.DNA, variant='illumina1.8'
             )
             exp_fh = skbio.io.read(
@@ -253,7 +354,58 @@ class TestFastqManifestTransformers(TestPluginBase):
                         'sampleABC_1_L001_R2_001.fastq.gz')]
         for input_fastq, obs_fastq in fastq_pairs:
             obs_fh = skbio.io.read(
-                os.path.join(str(obs), obs_fastq),
+                os.path.join(str(obs), obs_fastq), compression='gzip',
+                format='fastq', constructor=skbio.DNA, variant='illumina1.8'
+            )
+            exp_fh = skbio.io.read(
+                self.get_data_path(input_fastq),
+                format='fastq', constructor=skbio.DNA, variant='illumina1.8'
+            )
+
+            for o, e in zip(obs_fh, exp_fh):
+                self.assertEqual(o, e)
+
+        obs_metadata = yaml.load(open('%s/metadata.yml' % str(obs)))
+        exp_metadata = yaml.load("{'phred-offset': 33}")
+        self.assertEqual(obs_metadata, exp_metadata)
+
+        obs_manifest = open('%s/MANIFEST' % (str(obs))).read()
+        exp_manifest = ("sample-id,filename,direction\n"
+                        "sampleABC,sampleABC_0_L001_R1_001.fastq.gz,forward\n"
+                        "sampleABC,sampleABC_1_L001_R2_001.fastq.gz,reverse\n")
+        self.assertEqual(obs_manifest, exp_manifest)
+
+    def test_paired_end_fastq_manifest_phred33_to_slpspefdf_uncompressed(self):
+        format_ = PairedEndFastqManifestPhred33
+        transformer = self.get_transformer(
+            format_,
+            SingleLanePerSamplePairedEndFastqDirFmt)
+
+        shutil.copy(
+            self.get_data_path('Human-Kneecap_S1_L001_R1_001.fastq'),
+            os.path.join(self.temp_dir.name,
+                         'Human-Kneecap_S1_L001_R1_001.fastq'))
+        shutil.copy(
+            self.get_data_path('Human-Armpit.fastq'),
+            os.path.join(self.temp_dir.name, 'Human-Armpit.fastq'))
+
+        manifest_fp = os.path.join(self.temp_dir.name, 'manifest')
+        with open(manifest_fp, 'w') as fh:
+            fh.write("sample-id,absolute-filepath,direction\n")
+            fh.write("sampleABC,%s/Human-Kneecap_S1_L001_R1_001.fastq,"
+                     "forward\n" % self.temp_dir.name)
+            fh.write("sampleABC,%s/Human-Armpit.fastq,reverse\n"
+                     % self.temp_dir.name)
+
+        obs = transformer(format_(manifest_fp, 'r'))
+
+        fastq_pairs = [('Human-Kneecap_S1_L001_R1_001.fastq',
+                        'sampleABC_0_L001_R1_001.fastq.gz'),
+                       ('Human-Armpit.fastq',
+                        'sampleABC_1_L001_R2_001.fastq.gz')]
+        for input_fastq, obs_fastq in fastq_pairs:
+            obs_fh = skbio.io.read(
+                os.path.join(str(obs), obs_fastq), compression='gzip',
                 format='fastq', constructor=skbio.DNA, variant='illumina1.8'
             )
             exp_fh = skbio.io.read(
@@ -303,7 +455,57 @@ class TestFastqManifestTransformers(TestPluginBase):
                         'sampleABC_1_L001_R2_001.fastq.gz')]
         for input_fastq, obs_fastq in fastq_pairs:
             obs_fh = skbio.io.read(
-                os.path.join(str(obs), obs_fastq),
+                os.path.join(str(obs), obs_fastq), compression='gzip',
+                format='fastq', constructor=skbio.DNA, variant='illumina1.8'
+            )
+            exp_fh = skbio.io.read(
+                self.get_data_path(input_fastq),
+                format='fastq', constructor=skbio.DNA, variant='illumina1.3'
+            )
+
+            for o, e in zip(obs_fh, exp_fh):
+                self.assertEqual(o, e)
+
+        obs_metadata = yaml.load(open('%s/metadata.yml' % str(obs)))
+        exp_metadata = yaml.load("{'phred-offset': 33}")
+        self.assertEqual(obs_metadata, exp_metadata)
+
+        obs_manifest = open('%s/MANIFEST' % (str(obs))).read()
+        exp_manifest = ("sample-id,filename,direction\n"
+                        "sampleABC,sampleABC_0_L001_R1_001.fastq.gz,forward\n"
+                        "sampleABC,sampleABC_1_L001_R2_001.fastq.gz,reverse\n")
+        self.assertEqual(obs_manifest, exp_manifest)
+
+    def test_paired_end_fastq_manifest_phred64_to_slpspefdf_uncompressed(self):
+        format_ = PairedEndFastqManifestPhred64
+        transformer = self.get_transformer(
+            format_,
+            SingleLanePerSamplePairedEndFastqDirFmt)
+
+        shutil.copy(
+            self.get_data_path('s1-phred64.fastq'),
+            os.path.join(self.temp_dir.name, 's1-phred64.fastq'))
+        shutil.copy(
+            self.get_data_path('s2-phred64.fastq.gz'),
+            os.path.join(self.temp_dir.name, 's2-phred64.fastq'))
+
+        manifest_fp = os.path.join(self.temp_dir.name, 'manifest')
+        with open(manifest_fp, 'w') as fh:
+            fh.write("sample-id,absolute-filepath,direction\n")
+            fh.write("sampleABC,%s/s1-phred64.fastq,"
+                     "forward\n" % self.temp_dir.name)
+            fh.write("sampleABC,%s/s2-phred64.fastq,reverse\n" %
+                     self.temp_dir.name)
+
+        obs = transformer(format_(manifest_fp, 'r'))
+
+        fastq_pairs = [('s1-phred64.fastq',
+                        'sampleABC_0_L001_R1_001.fastq.gz'),
+                       ('s2-phred64.fastq',
+                        'sampleABC_1_L001_R2_001.fastq.gz')]
+        for input_fastq, obs_fastq in fastq_pairs:
+            obs_fh = skbio.io.read(
+                os.path.join(str(obs), obs_fastq), compression='gzip',
                 format='fastq', constructor=skbio.DNA, variant='illumina1.8'
             )
             exp_fh = skbio.io.read(

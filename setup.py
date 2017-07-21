@@ -8,13 +8,13 @@
 
 from setuptools import setup, find_packages
 
+import versioneer
+
 setup(
     name="q2-types",
-    version="2017.3.0.dev",
+    version=versioneer.get_version(),
+    cmdclass=versioneer.get_cmdclass(),
     packages=find_packages(),
-    install_requires=['scikit-bio', 'qiime2 == 2017.3.*', 'pandas',
-                      'biom-format >= 2.1.5, < 2.2.0', 'ijson',
-                      'h5py'],
     author="Greg Caporaso",
     author_email="gregcaporaso@gmail.com",
     description="Common QIIME 2 semantic types.",
@@ -27,7 +27,7 @@ setup(
     package_data={
         'q2_types.tests': ['data/*'],
         'q2_types.distance_matrix.tests': ['data/*'],
-        'q2_types.feature_data.tests': ['data/*'],
+        'q2_types.feature_data.tests': ['data/*', 'data/taxonomy/*'],
         'q2_types.feature_table.tests': ['data/*'],
         'q2_types.ordination.tests': ['data/*'],
         'q2_types.per_sample_sequences.tests': ['data/*',
@@ -36,5 +36,5 @@ setup(
         'q2_types.sample_data.tests': ['data/*'],
         'q2_types.tree.tests': ['data/*']
     },
-    zip_safe=False
+    zip_safe=False,
 )

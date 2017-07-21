@@ -1,0 +1,4 @@
+Feature ID	Taxon
+SEQUENCE1	k__Bacteria; p__Proteobacteria; c__Alphaproteobacteria; o__Rhodobacterales; f__Rhodobacteraceae; g__Sulfitobacter; s__mediterraneus
+SEQUENCE2	k__Bacteria; p__Proteobacteria; c__Alphaproteobacteria; o__Rhodobacterales; f__Rhodobacteraceae; g__; s__
+SEQUENCE1	k__Bacteria
