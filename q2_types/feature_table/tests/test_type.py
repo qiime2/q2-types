@@ -10,6 +10,7 @@ import unittest
 
 from q2_types.feature_table import (FeatureTable, Frequency,
                                     RelativeFrequency,
+                                    Composition, Balance,
                                     PresenceAbsence, BIOMV210DirFmt)
 from qiime2.plugin.testing import TestPluginBase
 
