@@ -8,7 +8,8 @@
 
 import unittest
 
-from q2_types.feature_table import (FeatureTable, Frequency, RelativeFrequency,
+from q2_types.feature_table import (FeatureTable, Frequency,
+                                    RelativeFrequency,
                                     PresenceAbsence, BIOMV210DirFmt)
 from qiime2.plugin.testing import TestPluginBase
 
@@ -39,7 +40,6 @@ class TestTypes(TestPluginBase):
             FeatureTable[Frequency | RelativeFrequency | PresenceAbsence |
                          Composition | Balance],
             BIOMV210DirFmt)
-
 
 
 if __name__ == "__main__":
