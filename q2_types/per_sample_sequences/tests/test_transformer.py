@@ -20,7 +20,7 @@ from q2_types.per_sample_sequences import (
     SingleLanePerSampleSingleEndFastqDirFmt,
     SingleLanePerSamplePairedEndFastqDirFmt,
     CasavaOneEightSingleLanePerSampleDirFmt,
-    MiSeqDemuxDirFmt,
+    CasavaOneEightLanelessPerSampleDirFmt,
     SingleEndFastqManifestPhred33,
     SingleEndFastqManifestPhred64,
     PairedEndFastqManifestPhred33,
@@ -138,7 +138,8 @@ class TestTransformers(TestPluginBase):
 
     def test_miseq_demux_dirfmt_to_slpssefdf(self):
         input, obs = self.transform_format(
-            MiSeqDemuxDirFmt, SingleLanePerSampleSingleEndFastqDirFmt,
+            CasavaOneEightLanelessPerSampleDirFmt,
+            SingleLanePerSampleSingleEndFastqDirFmt,
             filenames=('Human-Kneecap_S1_R1_001.fastq.gz',),
         )
 
@@ -156,7 +157,8 @@ class TestTransformers(TestPluginBase):
 
     def test_miseq_demux_dirfmt_to_slpspefdf(self):
         input, obs = self.transform_format(
-            MiSeqDemuxDirFmt, SingleLanePerSamplePairedEndFastqDirFmt,
+            CasavaOneEightLanelessPerSampleDirFmt,
+            SingleLanePerSamplePairedEndFastqDirFmt,
             filenames=('Human-Kneecap_S1_R1_001.fastq.gz',),
         )
 

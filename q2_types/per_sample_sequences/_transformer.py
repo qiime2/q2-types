@@ -21,7 +21,8 @@ from ..plugin_setup import plugin
 from . import (SingleLanePerSampleSingleEndFastqDirFmt, FastqManifestFormat,
                FastqAbsolutePathManifestFormat, FastqGzFormat,
                SingleLanePerSamplePairedEndFastqDirFmt, YamlFormat,
-               CasavaOneEightSingleLanePerSampleDirFmt, MiSeqDemuxDirFmt,
+               CasavaOneEightSingleLanePerSampleDirFmt,
+               CasavaOneEightLanelessPerSampleDirFmt,
                SingleEndFastqManifestPhred33, SingleEndFastqManifestPhred64,
                PairedEndFastqManifestPhred33, PairedEndFastqManifestPhred64)
 
@@ -124,13 +125,15 @@ def _4(dirfmt: CasavaOneEightSingleLanePerSampleDirFmt) \
 
 
 @plugin.register_transformer
-def _10(dirfmt: MiSeqDemuxDirFmt) -> SingleLanePerSampleSingleEndFastqDirFmt:
+def _10(dirfmt: CasavaOneEightLanelessPerSampleDirFmt) \
+        -> SingleLanePerSampleSingleEndFastqDirFmt:
     return _single_lane_per_sample_fastq_helper(
         dirfmt, SingleLanePerSampleSingleEndFastqDirFmt, parse_lane=False)
 
 
 @plugin.register_transformer
-def _11(dirfmt: MiSeqDemuxDirFmt) -> SingleLanePerSamplePairedEndFastqDirFmt:
+def _11(dirfmt: CasavaOneEightLanelessPerSampleDirFmt) \
+        -> SingleLanePerSamplePairedEndFastqDirFmt:
     return _single_lane_per_sample_fastq_helper(
         dirfmt, SingleLanePerSamplePairedEndFastqDirFmt, parse_lane=False)
 

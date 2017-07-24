@@ -151,7 +151,7 @@ class SingleLanePerSamplePairedEndFastqDirFmt(_SingleLanePerSampleFastqDirFmt):
     pass
 
 
-class MiSeqDemuxDirFmt(model.DirectoryFormat):
+class CasavaOneEightLanelessPerSampleDirFmt(model.DirectoryFormat):
     sequences = model.FileCollection(r'.+_.+_R[12]_001\.fastq\.gz',
                                      format=FastqGzFormat)
 
@@ -162,7 +162,8 @@ class MiSeqDemuxDirFmt(model.DirectoryFormat):
 
 plugin.register_formats(
     FastqManifestFormat, YamlFormat, FastqGzFormat,
-    CasavaOneEightSingleLanePerSampleDirFmt, MiSeqDemuxDirFmt,
+    CasavaOneEightSingleLanePerSampleDirFmt,
+    CasavaOneEightLanelessPerSampleDirFmt,
     _SingleLanePerSampleFastqDirFmt, SingleLanePerSampleSingleEndFastqDirFmt,
     SingleLanePerSamplePairedEndFastqDirFmt, SingleEndFastqManifestPhred33,
     SingleEndFastqManifestPhred64, PairedEndFastqManifestPhred33,
