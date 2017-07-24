@@ -1,0 +1,9 @@
+
+sample-id,absolute-filepath,direction
+Human-Kneecap,/snap/crackle/pop/Human-Kneecap_S1_L001_R1_001.fastq.gz,forward
+Human-Kneecap,/snap/crackle/pop/Human-Kneecap_S1_L001_R1_001.fastq.gz,reverse
+Human-Gut,/snap/crackle/pop/Human-Gut_S1_L001_R1_001.fastq.gz,forward
+Human-Gut,/snap/crackle/pop/Human-Gut_S1_L001_R1_001.fastq.gz,reverse
+Human-Elbow,/snap/crackle/pop/Human-Elbow_S1_L001_R1_001.fastq.gz,forward,hotdog,banana
+Human-Elbow,/snap/crackle/pop/Human-Elbow_S1_L001_R1_001.fastq.gz,reverse
+# Note to self: is this jagged?

@@ -19,8 +19,9 @@ import qiime2.util
 
 from ..plugin_setup import plugin
 from . import (SingleLanePerSampleSingleEndFastqDirFmt, FastqManifestFormat,
-               SingleLanePerSamplePairedEndFastqDirFmt, FastqGzFormat,
-               CasavaOneEightSingleLanePerSampleDirFmt, YamlFormat,
+               FastqAbsolutePathManifestFormat, FastqGzFormat,
+               SingleLanePerSamplePairedEndFastqDirFmt, YamlFormat,
+               CasavaOneEightSingleLanePerSampleDirFmt,
                SingleEndFastqManifestPhred33, SingleEndFastqManifestPhred64,
                PairedEndFastqManifestPhred33, PairedEndFastqManifestPhred64)
 
@@ -37,13 +38,13 @@ class PerSamplePairedDNAIterators(dict):
 @plugin.register_transformer
 def _1(dirfmt: SingleLanePerSampleSingleEndFastqDirFmt) \
         -> PerSampleDNAIterators:
+    fh = dirfmt.manifest.view(FastqManifestFormat).open()
+    manifest = _parse_and_validate_manifest(fh, single_end=True,
+                                            absolute=False)
     result = PerSampleDNAIterators()
     # ensure that dirfmt stays in scope as long as result does
     result.__dirfmt = dirfmt
-    fh = iter(dirfmt.manifest.view(FastqManifestFormat).open())
-    next(fh)
-    for line in fh:
-        sample_id, filename, _ = line.split(',')
+    for _, sample_id, filename, _ in manifest.itertuples():
         filepath = str(dirfmt.path / filename)
         result[sample_id] = skbio.io.read(filepath, format='fastq',
                                           constructor=skbio.DNA)
@@ -53,15 +54,14 @@ def _1(dirfmt: SingleLanePerSampleSingleEndFastqDirFmt) \
 @plugin.register_transformer
 def _2(dirfmt: SingleLanePerSamplePairedEndFastqDirFmt) \
         -> PerSamplePairedDNAIterators:
-    fh = iter(dirfmt.manifest.view(FastqManifestFormat).open())
-    next(fh)
+    fh = dirfmt.manifest.view(FastqManifestFormat).open()
     forward_paths = {}
     reverse_paths = {}
-    for line in fh:
-        sample_id, filename, direction = line.strip().split(',')
+    manifest = _parse_and_validate_manifest(fh, single_end=False,
+                                            absolute=False)
+    for _, sample_id, filename, direction in manifest.itertuples():
         filepath = str(dirfmt.path / filename)
-        seqs = skbio.io.read(filepath, format='fastq',
-                             constructor=skbio.DNA)
+        seqs = skbio.io.read(filepath, format='fastq', constructor=skbio.DNA)
 
         if direction == 'forward':
             forward_paths[sample_id] = seqs
@@ -122,21 +122,20 @@ def _4(dirfmt: CasavaOneEightSingleLanePerSampleDirFmt) \
 @plugin.register_transformer
 def _5(dirfmt: SingleLanePerSamplePairedEndFastqDirFmt) \
         -> SingleLanePerSampleSingleEndFastqDirFmt:
+    with dirfmt.manifest.view(FastqManifestFormat).open() as fh:
+        input_manifest = _parse_and_validate_manifest(fh, single_end=False,
+                                                      absolute=False)
+
+    output_manifest = FastqManifestFormat()
+    output_df = input_manifest[input_manifest.direction == 'forward']
+    with output_manifest.open() as fh:
+        output_df.to_csv(fh, index=False)
+
     result = SingleLanePerSampleSingleEndFastqDirFmt()
-    manifest = FastqManifestFormat()
-
-    with manifest.open() as manifest_fh:
-        with dirfmt.manifest.view(FastqManifestFormat).open() as fh:
-            iterator = iter(fh)
-            manifest_fh.write(next(iterator))  # header line
-            for line in iterator:
-                _, relpath, direction = line.rstrip().split(',')
-                if direction == 'forward':
-                    manifest_fh.write(line)
-                    qiime2.util.duplicate(str(dirfmt.path / relpath),
-                                          str(result.path / relpath))
-
-    result.manifest.write_data(manifest, FastqManifestFormat)
+    result.manifest.write_data(output_manifest, FastqManifestFormat)
+    for _, _, filename, _ in output_df.itertuples():
+        qiime2.util.duplicate(str(dirfmt.path / filename),
+                              str(result.path / filename))
 
     metadata = YamlFormat()
     metadata.path.write_text(yaml.dump({'phred-offset': 33}))
@@ -145,29 +144,42 @@ def _5(dirfmt: SingleLanePerSamplePairedEndFastqDirFmt) \
     return result
 
 
-def _parse_and_validate_manifest(manifest_fh, single_end):
+def _parse_and_validate_manifest(manifest_fh, single_end, absolute):
     try:
         manifest = pd.read_csv(manifest_fh, comment='#', header=0,
                                skip_blank_lines=True, dtype=object)
-    except pd.io.common.CParserError as e:
-        raise ValueError('All records in manifest must contain '
-                         'exactly three comma-separated fields, but it '
-                         'appears that at least one record contains more. '
-                         'Original error message:\n %s' % str(e))
+    except Exception as e:
+        raise ValueError('There was an issue parsing the manifest '
+                         'file as CSV:\n %s' % e)
 
-    _validate_header(manifest)
+    expected_header = (FastqAbsolutePathManifestFormat.EXPECTED_HEADER if
+                       absolute else FastqManifestFormat.EXPECTED_HEADER)
+    _validate_header(manifest, expected_header)
 
     for idx in manifest.index:
         record = manifest.loc[idx]
         if record.isnull().any():
-            raise ValueError('All records in manifest must contain '
-                             'exactly three comma-separated fields, but at '
-                             'least one contains fewer. The data in that '
-                             'record is: %s' % ','.join(map(str, record)))
-        record['absolute-filepath'] = \
-            os.path.expandvars(record['absolute-filepath'])
-        _validate_path(record['absolute-filepath'])
-        _validate_direction(record['direction'])
+            raise ValueError('Empty cells are not supported in '
+                             'manifest files. Found one or more '
+                             'empty cells in this record: %s'
+                             % ','.join(map(str, record)))
+        record[expected_header[1]] = \
+            os.path.expandvars(record[expected_header[1]])
+        path = record[expected_header[1]]
+        if absolute:
+            if not os.path.isabs(path):
+                raise ValueError('All paths provided in manifest must be '
+                                 'absolute but found relative path: %s' % path)
+        else:
+            if os.path.isabs(path):
+                raise ValueError('All paths provided in manifest must be '
+                                 'relative but found absolute path: %s' % path)
+            path = os.path.join(os.path.dirname(manifest_fh.name), path)
+        if not os.path.exists(path):
+            raise FileNotFoundError(
+                'A path specified in the manifest does not exist '
+                'or is not accessible: '
+                '%s' % path)
 
     if single_end:
         _validate_single_end_fastq_manifest_directions(manifest)
@@ -177,43 +189,12 @@ def _parse_and_validate_manifest(manifest_fh, single_end):
     return manifest
 
 
-def _write_phred64_to_phred33(phred64_path, phred33_path):
-    with open(phred64_path, 'rb') as phred64_fh, \
-         open(phred33_path, 'wb') as phred33_fh:
-        for seq in skbio.io.read(phred64_fh, format='fastq',
-                                 variant='illumina1.3'):
-            skbio.io.write(seq, into=phred33_fh,
-                           format='fastq',
-                           variant='illumina1.8',
-                           compression='gzip')
-
-
-def _validate_header(manifest):
-    header = manifest.columns
-    if len(header) != 3:
-        raise ValueError('manifest header must contain exactly three columns.')
-    expected_header = ['sample-id', 'absolute-filepath', 'direction']
-    for i, is_correct in enumerate(header == expected_header):
-        if not is_correct:
-            raise ValueError('Expected manifest header column "%s" but '
-                             'observed "%s".'
-                             % (expected_header[i], header[i]))
-
-
-def _validate_path(path):
-    if not os.path.isabs(path):
-        raise ValueError('All paths provided in manifest must be absolute '
-                         'but observed: %s' % path)
-    if not os.path.exists(path):
-        raise FileNotFoundError(
-            'A path specified in the manifest does not exist: '
-            '%s' % path)
-
-
-def _validate_direction(direction):
-    if direction not in {'forward', 'reverse'}:
-        raise ValueError('Direction can only be "forward" or '
-                         '"reverse", but observed: %s' % direction)
+def _validate_header(manifest, expected_header):
+    header = manifest.columns.tolist()
+    if header != expected_header:
+        raise ValueError('Expected manifest header %r but '
+                         'found %r.'
+                         % (','.join(expected_header), ','.join(header)))
 
 
 def _duplicated_ids(sample_ids):
@@ -228,12 +209,15 @@ def _duplicated_ids(sample_ids):
 
 def _validate_single_end_fastq_manifest_directions(manifest):
     directions = set(manifest['direction'])
+    if not directions.issubset({'forward', 'reverse'}):
+        raise ValueError('Directions can only be "forward" or '
+                         '"reverse", but observed: %s'
+                         % ', '.join(directions))
     if len(directions) > 1:
         raise ValueError('Manifest for single-end reads can '
-                         'contain only forward or reverse reads '
-                         'but the following directions were observed: %s'
-                         % ', '.join(directions))
-
+                         'contain only forward or reverse reads, '
+                         'but not both. The following directions were '
+                         'observed: %s' % ', '.join(directions))
     duplicated_ids = _duplicated_ids(manifest['sample-id'])
     if len(duplicated_ids) > 0:
         raise ValueError('Each sample id can only appear one time in a '
@@ -252,7 +236,7 @@ def _validate_paired_end_fastq_manifest_directions(manifest):
         elif direction == 'reverse':
             reverse_direction_sample_ids.append(sample_id)
         else:
-            raise ValueError('Directions can only be "forward" and '
+            raise ValueError('Directions can only be "forward" or '
                              '"reverse", but observed: %s' % direction)
 
     duplicated_ids_forward = _duplicated_ids(forward_direction_sample_ids)
@@ -277,9 +261,6 @@ def _validate_paired_end_fastq_manifest_directions(manifest):
         forward_but_no_reverse = set(forward_direction_sample_ids) - \
             set(reverse_direction_sample_ids)
 
-        reverse_but_no_forward = set(reverse_direction_sample_ids) - \
-            set(forward_direction_sample_ids)
-
         if len(forward_but_no_reverse) > 0:
             raise ValueError('Forward and reverse reads must be provided '
                              'exactly one time each for each sample. The '
@@ -287,6 +268,8 @@ def _validate_paired_end_fastq_manifest_directions(manifest):
                              'reverse read fastq files: %s'
                              % ', '.join(forward_but_no_reverse))
         else:
+            reverse_but_no_forward = set(reverse_direction_sample_ids) - \
+              set(forward_direction_sample_ids)
             raise ValueError('Forward and reverse reads must be provided '
                              'exactly one time each for each sample. The '
                              'following samples had reverse but not '
@@ -310,7 +293,8 @@ def _copy_with_compression(src, dst):
 def _fastq_manifest_helper(fmt, fastq_copy_fn, single_end):
     direction_to_read_number = {'forward': 1, 'reverse': 2}
     input_manifest = _parse_and_validate_manifest(fmt.open(),
-                                                  single_end=single_end)
+                                                  single_end=single_end,
+                                                  absolute=True)
     if single_end:
         result = SingleLanePerSampleSingleEndFastqDirFmt()
     else:
@@ -335,7 +319,7 @@ def _fastq_manifest_helper(fmt, fastq_copy_fn, single_end):
     output_manifest = FastqManifestFormat()
     output_manifest_df = \
         pd.DataFrame(output_manifest_data,
-                     columns=['sample-id', 'filename', 'direction'])
+                     columns=output_manifest.EXPECTED_HEADER)
     output_manifest_df.to_csv(str(output_manifest), index=False)
     result.manifest.write_data(output_manifest, FastqManifestFormat)
 
@@ -349,6 +333,17 @@ def _fastq_manifest_helper(fmt, fastq_copy_fn, single_end):
 _phred64_warning = ('Importing of PHRED 64 data is slow as it is converted '
                     'internally to PHRED 33. Working with the imported data '
                     'will not be slower than working with PHRED 33 data.')
+
+
+def _write_phred64_to_phred33(phred64_path, phred33_path):
+    with open(phred64_path, 'rb') as phred64_fh, \
+         open(phred33_path, 'wb') as phred33_fh:
+        for seq in skbio.io.read(phred64_fh, format='fastq',
+                                 variant='illumina1.3'):
+            skbio.io.write(seq, into=phred33_fh,
+                           format='fastq',
+                           variant='illumina1.8',
+                           compression='gzip')
 
 
 @plugin.register_transformer

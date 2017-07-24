@@ -1,0 +1,8 @@
+sample-id,filename,direction
+Human-Kneecap,Human-Kneecap_S1_L001_R1_001.fastq.gz,forward
+Human-Kneecap,Human-Kneecap_S1_L001_R1_001.fastq.gz,reverse
+# TODO: Find human gut.
+Human-Gut,Human-Gut_S1_L001_R1_001.fastq.gz,forward
+Human-Gut,Human-Gut_S1_L001_R1_001.fastq.gz,reverse
+Human-Elbow,Human-Elbow_S1_L001_R1_001.fastq.gz,forward,hotdog,banana
+Human-Elbow,Human-Elbow_S1_L001_R1_001.fastq.gz,reverse

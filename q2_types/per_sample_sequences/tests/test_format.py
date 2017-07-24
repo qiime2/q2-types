@@ -11,10 +11,57 @@ import unittest
 
 from q2_types.per_sample_sequences import (
     CasavaOneEightSingleLanePerSampleDirFmt, FastqGzFormat, YamlFormat,
-    FastqManifestFormat, SingleLanePerSampleSingleEndFastqDirFmt,
+    FastqManifestFormat, FastqAbsolutePathManifestFormat,
+    SingleEndFastqManifestPhred33, SingleEndFastqManifestPhred64,
+    PairedEndFastqManifestPhred33, PairedEndFastqManifestPhred64,
+    SingleLanePerSampleSingleEndFastqDirFmt,
     SingleLanePerSamplePairedEndFastqDirFmt
 )
 from qiime2.plugin.testing import TestPluginBase
+
+
+class TestAbsoluteFastqManifestFormats(TestPluginBase):
+    package = 'q2_types.per_sample_sequences.tests'
+
+    def setUp(self):
+        super().setUp()
+        self.formats = [FastqAbsolutePathManifestFormat,
+                        SingleEndFastqManifestPhred33,
+                        SingleEndFastqManifestPhred64,
+                        PairedEndFastqManifestPhred33,
+                        PairedEndFastqManifestPhred64]
+
+    def test_validate_positive(self):
+        for file in ['single-MANIFEST', 'paired-MANIFEST', 'long-MANIFEST']:
+            filepath = self.get_data_path('absolute_manifests/%s' % file)
+            for format in self.formats:
+                format(filepath, mode='r').validate()
+
+    def test_validate_negative(self):
+        files = ['no-data-MANIFEST', 'not-MANIFEST',
+                 'absolute_manifests/jagged-MANIFEST']
+        for file in files:
+            filepath = self.get_data_path(file)
+            for format in self.formats:
+                with self.assertRaisesRegex(ValueError, format.__name__):
+                    format(filepath, mode='r').validate()
+
+
+class TestRelativeFastqManifestFormats(TestPluginBase):
+    package = 'q2_types.per_sample_sequences.tests'
+
+    def test_validate_positive(self):
+        for file in ['single-MANIFEST', 'paired-MANIFEST', 'long-MANIFEST']:
+            filepath = self.get_data_path('relative_manifests/%s' % file)
+            FastqManifestFormat(filepath, mode='r').validate()
+
+    def test_validate_negative(self):
+        files = ['no-data-MANIFEST', 'not-MANIFEST',
+                 'relative_manifests/jagged-MANIFEST']
+        for file in files:
+            filepath = self.get_data_path(file)
+            with self.assertRaisesRegex(ValueError, 'FastqManifestFormat'):
+                FastqManifestFormat(filepath, mode='r').validate()
 
 
 class TestFormats(TestPluginBase):
@@ -58,19 +105,6 @@ class TestFormats(TestPluginBase):
         format = YamlFormat(filepath, mode='r')
 
         with self.assertRaisesRegex(ValueError, 'YamlFormat'):
-            format.validate()
-
-    def test_fastq_manifest_format_validate_positive(self):
-        filepath = self.get_data_path('single_end_data/MANIFEST')
-        format = FastqManifestFormat(filepath, mode='r')
-
-        format.validate()
-
-    def test_fastq_manifest_format_validate_negative(self):
-        filepath = self.get_data_path('not-MANIFEST')
-        format = FastqManifestFormat(filepath, mode='r')
-
-        with self.assertRaisesRegex(ValueError, 'FastqManifestFormat'):
             format.validate()
 
     def test_casava_one_eight_slanepsample_dir_fmt_validate_positive(self):

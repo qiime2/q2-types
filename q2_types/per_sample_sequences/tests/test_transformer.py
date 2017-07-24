@@ -7,7 +7,6 @@
 # ----------------------------------------------------------------------------
 
 import unittest
-import tempfile
 import os
 import shutil
 import io
@@ -27,8 +26,6 @@ from q2_types.per_sample_sequences import (
     PairedEndFastqManifestPhred64)
 from q2_types.per_sample_sequences._transformer import (
     _validate_header,
-    _validate_path,
-    _validate_direction,
     _validate_single_end_fastq_manifest_directions,
     _validate_paired_end_fastq_manifest_directions,
     _parse_and_validate_manifest
@@ -79,6 +76,26 @@ class TestTransformers(TestPluginBase):
         for act, exp in zip(obs, expected):
             for seq1, seq2 in zip(act, exp):
                 self.assertEqual(seq1, seq2)
+
+    def test_slpspefdf_to_slpssefdf(self):
+        filenames = ('paired_end_data/MANIFEST', 'metadata.yml',
+                     'Human-Kneecap_S1_L001_R1_001.fastq.gz',
+                     'paired_end_data/Human-Kneecap_S1_L001_R2_001.fastq.gz')
+        input, obs = self.transform_format(
+            SingleLanePerSamplePairedEndFastqDirFmt,
+            SingleLanePerSampleSingleEndFastqDirFmt, filenames=filenames
+        )
+        expected = skbio.io.read(
+            '%s/Human-Kneecap_S1_L001_R1_001.fastq.gz' % str(input),
+            format='fastq', constructor=skbio.DNA
+        )
+        obs = skbio.io.read(
+            '%s/Human-Kneecap_S1_L001_R1_001.fastq.gz' % str(obs),
+            format='fastq', constructor=skbio.DNA
+        )
+
+        for act, exp in zip(obs, expected):
+            self.assertEqual(act, exp)
 
     def test_casava_one_eight_single_lane_per_sample_dirfmt_to_slpssefdf(self):
         filenames = ('Human-Kneecap_S1_L001_R1_001.fastq.gz',)
@@ -666,22 +683,63 @@ class TestFastqManifestTransformers(TestPluginBase):
         manifest = io.StringIO(
             'sample-id,absolute-filepath\n'
             'abc,/hello/world,forward\n')
-        with self.assertRaisesRegex(ValueError, "header must contain"):
-            _parse_and_validate_manifest(manifest, single_end=True)
+        with self.assertRaisesRegex(
+                ValueError, "Expected.*absolute-filepath.*found "
+                            "'sample-id,absolute-filepath'.$"):
+            _parse_and_validate_manifest(manifest, single_end=True,
+                                         absolute=True)
 
         manifest = io.StringIO(
             'sample-id,absolute-filepath,direction\n'
             'abc,/hello/world\n'
             'abc,/hello/world,forward\n')
-        with self.assertRaisesRegex(ValueError, 'contains fewer'):
-            _parse_and_validate_manifest(manifest, single_end=True)
+        with self.assertRaisesRegex(ValueError, 'Empty cells'):
+            _parse_and_validate_manifest(manifest, single_end=True,
+                                         absolute=True)
 
         manifest = io.StringIO(
             'sample-id,absolute-filepath,direction\n'
             'abc,/hello/world,forward\n'
             'xyz,/hello/world,forward,extra-field')
-        with self.assertRaisesRegex(ValueError, 'contains more'):
-            _parse_and_validate_manifest(manifest, single_end=True)
+        with self.assertRaisesRegex(ValueError, 'issue parsing the manifest'):
+            _parse_and_validate_manifest(manifest, single_end=True,
+                                         absolute=True)
+
+        manifest = io.StringIO(
+            'sample-id,absolute-filepath,direction\n'
+            'abc,world,forward\n'
+            'xyz,world,forward')
+        with self.assertRaisesRegex(ValueError,
+                                    'absolute but found relative path'):
+            _parse_and_validate_manifest(manifest, single_end=True,
+                                         absolute=True)
+
+        manifest = io.StringIO(
+            'sample-id,absolute-filepath,direction\n'
+            'abc,world,forward\n'
+            'abc,world,reverse')
+        with self.assertRaisesRegex(ValueError,
+                                    'absolute but found relative path'):
+            _parse_and_validate_manifest(manifest, single_end=False,
+                                         absolute=True)
+
+        manifest = io.StringIO(
+            'sample-id,filename,direction\n'
+            'abc,/snap/crackle/pop/world,forward\n'
+            'xyz,/snap/crackle/pop/world,forward')
+        with self.assertRaisesRegex(ValueError,
+                                    'relative but found absolute path'):
+            _parse_and_validate_manifest(manifest, single_end=True,
+                                         absolute=False)
+
+        manifest = io.StringIO(
+            'sample-id,filename,direction\n'
+            'abc,/snap/crackle/pop/world,forward\n'
+            'abc,/snap/crackle/pop/world,reverse')
+        with self.assertRaisesRegex(ValueError,
+                                    'relative but found absolute path'):
+            _parse_and_validate_manifest(manifest, single_end=False,
+                                         absolute=False)
 
     def test_parse_and_validate_manifest_expand_vars(self):
         expected_fp = os.path.join(self.temp_dir.name, 'manifest.txt')
@@ -691,67 +749,51 @@ class TestFastqManifestTransformers(TestPluginBase):
         manifest = io.StringIO(
             'sample-id,absolute-filepath,direction\n'
             'abc,$TESTENVGWAR/manifest.txt,forward')
-        manifest = _parse_and_validate_manifest(manifest, single_end=True)
+        manifest = _parse_and_validate_manifest(manifest, single_end=True,
+                                                absolute=True)
         del os.environ['TESTENVGWAR']
 
         self.assertEqual(manifest.iloc[0]['absolute-filepath'], expected_fp)
 
     def test_validate_header_valid(self):
+        columns = ['sample-id', 'absolute-filepath', 'direction']
         manifest = pd.DataFrame(
             [['abc', '/hello/world', 'forward'],
              ['xyz', '/hello/world', 'forward']],
-            columns=['sample-id', 'absolute-filepath', 'direction'])
+            columns=columns)
         # should not raise an error
-        _validate_header(manifest)
+        _validate_header(manifest, expected_header=columns)
 
     def test_validate_header_invalid(self):
+        columns = ['sample-id', 'absolute-filepath', 'direction']
         manifest = pd.DataFrame(
             [['abc', '/hello/world'],
              ['xyz', '/hello/world']],
             columns=['xyz', 'absolute-filepath'])
-        with self.assertRaisesRegex(ValueError, 'exactly three'):
-            _validate_header(manifest)
+        with self.assertRaisesRegex(ValueError, 'Expected manifest.*absolute'
+                                                '-filepath.*but'):
+            _validate_header(manifest, expected_header=columns)
 
         manifest = pd.DataFrame(
             [['abc', '/hello/world', 'forward'],
              ['xyz', '/hello/world', 'forward']],
             columns=['xyz', 'absolute-filepath', 'direction'])
         with self.assertRaisesRegex(ValueError, 'sample-id.*xyz'):
-            _validate_header(manifest)
+            _validate_header(manifest, expected_header=columns)
 
         manifest = pd.DataFrame(
             [['abc', '/hello/world', 'forward'],
              ['xyz', '/hello/world', 'forward']],
             columns=['sample-id', 'xyz', 'direction'])
         with self.assertRaisesRegex(ValueError, 'absolute-filepath.*xyz'):
-            _validate_header(manifest)
+            _validate_header(manifest, expected_header=columns)
 
         manifest = pd.DataFrame(
             [['abc', '/hello/world', 'forward'],
              ['xyz', '/hello/world', 'forward']],
             columns=['sample-id', 'absolute-filepath', 'xyz'])
         with self.assertRaisesRegex(ValueError, 'direction.*xyz'):
-            _validate_header(manifest)
-
-    def test_validate_path(self):
-        # should not raise an error
-        with tempfile.NamedTemporaryFile() as f:
-            _validate_path(f.name)
-
-    def test_validate_path_invalid(self):
-        with self.assertRaisesRegex(ValueError, "must be absolute"):
-            _validate_path('some/relative/path')
-
-        with self.assertRaisesRegex(FileNotFoundError, "does not exist"):
-            _validate_path('/this/path/hopefully/doesnt/exist/gwar')
-
-    def test_validate_direction(self):
-        _validate_direction('forward')
-        _validate_direction('reverse')
-
-    def test_validate_direction_invalid(self):
-        with self.assertRaisesRegex(ValueError, 'middle-out'):
-            _validate_direction('middle-out')
+            _validate_header(manifest, expected_header=columns)
 
     def test_validate_single_end_fastq_manifest_directions(self):
         manifest = pd.DataFrame(
