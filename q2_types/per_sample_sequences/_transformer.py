@@ -22,6 +22,7 @@ from . import (SingleLanePerSampleSingleEndFastqDirFmt, FastqManifestFormat,
                FastqAbsolutePathManifestFormat, FastqGzFormat,
                SingleLanePerSamplePairedEndFastqDirFmt, YamlFormat,
                CasavaOneEightSingleLanePerSampleDirFmt,
+               CasavaOneEightLanelessPerSampleDirFmt,
                SingleEndFastqManifestPhred33, SingleEndFastqManifestPhred64,
                PairedEndFastqManifestPhred33, PairedEndFastqManifestPhred64)
 
@@ -76,18 +77,22 @@ def _2(dirfmt: SingleLanePerSamplePairedEndFastqDirFmt) \
     return result
 
 
-def _single_lane_per_sample_fastq_helper(dirfmt, output_cls):
+def _single_lane_per_sample_fastq_helper(dirfmt, output_cls, parse_lane=True):
     result = output_cls()
     manifest = FastqManifestFormat()
     manifest_fh = manifest.open()
     manifest_fh.write('sample-id,filename,direction\n')
     directions = ['forward', 'reverse']
     for path, view in dirfmt.sequences.iter_views(FastqGzFormat):
-
-        sample_id, barcode_id, lane_number, read_number, _ = \
-            str(path).replace('.fastq.gz', '').rsplit('_', maxsplit=4)
+        filename = str(path).replace('.fastq.gz', '')
+        if parse_lane:
+            sample_id, barcode_id, lane_number, read_number, _ = \
+                filename.rsplit('_', maxsplit=4)
+        else:
+            sample_id, barcode_id, read_number, _ = \
+                filename.rsplit('_', maxsplit=3)
         read_number = int(read_number[1:])
-        lane_number = int(lane_number[1:])
+        lane_number = int(lane_number[1:]) if parse_lane else 1
         direction = directions[read_number - 1]
         result.sequences.write_data(view, FastqGzFormat, sample_id=sample_id,
                                     barcode_id=barcode_id,
@@ -117,6 +122,20 @@ def _4(dirfmt: CasavaOneEightSingleLanePerSampleDirFmt) \
         -> SingleLanePerSamplePairedEndFastqDirFmt:
     return _single_lane_per_sample_fastq_helper(
         dirfmt, SingleLanePerSamplePairedEndFastqDirFmt)
+
+
+@plugin.register_transformer
+def _10(dirfmt: CasavaOneEightLanelessPerSampleDirFmt) \
+        -> SingleLanePerSampleSingleEndFastqDirFmt:
+    return _single_lane_per_sample_fastq_helper(
+        dirfmt, SingleLanePerSampleSingleEndFastqDirFmt, parse_lane=False)
+
+
+@plugin.register_transformer
+def _11(dirfmt: CasavaOneEightLanelessPerSampleDirFmt) \
+        -> SingleLanePerSamplePairedEndFastqDirFmt:
+    return _single_lane_per_sample_fastq_helper(
+        dirfmt, SingleLanePerSamplePairedEndFastqDirFmt, parse_lane=False)
 
 
 @plugin.register_transformer
