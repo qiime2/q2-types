@@ -28,10 +28,8 @@ Composition = SemanticType('Composition',
 Balance = SemanticType('Balance',
                        variant_of=FeatureTable.field['content'])
 
-plugin.register_semantic_types(Composition, Balance)
-
 plugin.register_semantic_types(FeatureTable, Frequency, RelativeFrequency,
-                               PresenceAbsence)
+                               PresenceAbsence, Balance, Composition)
 
 plugin.register_semantic_type_to_format(
     FeatureTable[Frequency | RelativeFrequency |
