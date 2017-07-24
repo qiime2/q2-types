@@ -22,11 +22,17 @@ RelativeFrequency = SemanticType('RelativeFrequency',
 PresenceAbsence = SemanticType('PresenceAbsence',
                                variant_of=FeatureTable.field['content'])
 
+Composition = SemanticType('Composition',
+                           variant_of=FeatureTable.field['content'])
+
+Balance = SemanticType('Balance',
+                       variant_of=FeatureTable.field['content'])
 
 plugin.register_semantic_types(FeatureTable, Frequency, RelativeFrequency,
-                               PresenceAbsence)
+                               PresenceAbsence, Balance, Composition)
 
 plugin.register_semantic_type_to_format(
-    FeatureTable[Frequency | RelativeFrequency | PresenceAbsence],
+    FeatureTable[Frequency | RelativeFrequency |
+                 PresenceAbsence | Balance | Composition],
     artifact_format=BIOMV210DirFmt
 )

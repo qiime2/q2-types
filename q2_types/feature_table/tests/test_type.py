@@ -8,7 +8,9 @@
 
 import unittest
 
-from q2_types.feature_table import (FeatureTable, Frequency, RelativeFrequency,
+from q2_types.feature_table import (FeatureTable, Frequency,
+                                    RelativeFrequency,
+                                    Composition, Balance,
                                     PresenceAbsence, BIOMV210DirFmt)
 from qiime2.plugin.testing import TestPluginBase
 
@@ -28,9 +30,16 @@ class TestTypes(TestPluginBase):
     def test_presence_absence_semantic_type_registration(self):
         self.assertRegisteredSemanticType(PresenceAbsence)
 
+    def test_composition_semantic_type_registration(self):
+        self.assertRegisteredSemanticType(Composition)
+
+    def test_balance_semantic_type_registration(self):
+        self.assertRegisteredSemanticType(Balance)
+
     def test_feature_table_semantic_type_to_v210_format_registration(self):
         self.assertSemanticTypeRegisteredToFormat(
-            FeatureTable[Frequency | RelativeFrequency | PresenceAbsence],
+            FeatureTable[Frequency | RelativeFrequency | PresenceAbsence |
+                         Composition | Balance],
             BIOMV210DirFmt)
 
 
