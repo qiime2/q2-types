@@ -10,8 +10,8 @@ import shutil
 import unittest
 
 from q2_types.per_sample_sequences import (
-    CasavaOneEightSingleLanePerSampleDirFmt, FastqGzFormat, YamlFormat,
-    FastqManifestFormat, FastqAbsolutePathManifestFormat,
+    CasavaOneEightSingleLanePerSampleDirFmt, MiSeqDemuxDirFmt, FastqGzFormat,
+    YamlFormat, FastqManifestFormat, FastqAbsolutePathManifestFormat,
     SingleEndFastqManifestPhred33, SingleEndFastqManifestPhred64,
     PairedEndFastqManifestPhred33, PairedEndFastqManifestPhred64,
     SingleLanePerSampleSingleEndFastqDirFmt,
@@ -124,6 +124,23 @@ class TestFormats(TestPluginBase):
             self.temp_dir.name, mode='r')
 
         with self.assertRaisesRegex(ValueError, 'CasavaOneEightSingleLanePer'):
+            format.validate()
+
+    def test_miseq_demux_dir_fmt_validate_positive(self):
+        filepath = self.get_data_path('Human-Kneecap_S1_R1_001.fastq.gz')
+        shutil.copy(filepath, self.temp_dir.name)
+
+        format = MiSeqDemuxDirFmt(self.temp_dir.name, mode='r')
+
+        format.validate()
+
+    def test_miseq_demux_dir_fmt_validate_negative(self):
+        filepath = self.get_data_path('not-fastq.fastq.gz')
+        shutil.copy(filepath, self.temp_dir.name)
+
+        format = MiSeqDemuxDirFmt(self.temp_dir.name, mode='r')
+
+        with self.assertRaisesRegex(ValueError, 'MiSeqDemuxDirFmt'):
             format.validate()
 
     def test_slanepsample_single_end_fastq_dir_fmt_validate_positive(self):

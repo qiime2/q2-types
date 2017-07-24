@@ -151,10 +151,19 @@ class SingleLanePerSamplePairedEndFastqDirFmt(_SingleLanePerSampleFastqDirFmt):
     pass
 
 
+class MiSeqDemuxDirFmt(model.DirectoryFormat):
+    sequences = model.FileCollection(r'.+_.+_R[12]_001\.fastq\.gz',
+                                     format=FastqGzFormat)
+
+    @sequences.set_path_maker
+    def sequences_path_maker(self, sample_id, barcode_id, read_number):
+        return '%s_%s_R%d_001.fastq.gz' % (sample_id, barcode_id, read_number)
+
+
 plugin.register_formats(
     FastqManifestFormat, YamlFormat, FastqGzFormat,
-    CasavaOneEightSingleLanePerSampleDirFmt, _SingleLanePerSampleFastqDirFmt,
-    SingleLanePerSampleSingleEndFastqDirFmt,
+    CasavaOneEightSingleLanePerSampleDirFmt, MiSeqDemuxDirFmt,
+    _SingleLanePerSampleFastqDirFmt, SingleLanePerSampleSingleEndFastqDirFmt,
     SingleLanePerSamplePairedEndFastqDirFmt, SingleEndFastqManifestPhred33,
     SingleEndFastqManifestPhred64, PairedEndFastqManifestPhred33,
     PairedEndFastqManifestPhred64

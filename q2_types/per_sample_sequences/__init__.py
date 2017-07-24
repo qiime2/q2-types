@@ -8,9 +8,9 @@
 
 import importlib
 
-from ._format import (CasavaOneEightSingleLanePerSampleDirFmt, FastqGzFormat,
-                      YamlFormat, FastqManifestFormat,
-                      FastqAbsolutePathManifestFormat,
+from ._format import (CasavaOneEightSingleLanePerSampleDirFmt,
+                      MiSeqDemuxDirFmt, FastqGzFormat, YamlFormat,
+                      FastqManifestFormat, FastqAbsolutePathManifestFormat,
                       SingleLanePerSampleSingleEndFastqDirFmt,
                       SingleLanePerSamplePairedEndFastqDirFmt,
                       SingleEndFastqManifestPhred33,
@@ -20,8 +20,8 @@ from ._format import (CasavaOneEightSingleLanePerSampleDirFmt, FastqGzFormat,
 from ._type import SequencesWithQuality, PairedEndSequencesWithQuality
 from ._transformer import PerSampleDNAIterators, PerSamplePairedDNAIterators
 
-__all__ = ['CasavaOneEightSingleLanePerSampleDirFmt', 'FastqGzFormat',
-           'YamlFormat', 'FastqManifestFormat',
+__all__ = ['CasavaOneEightSingleLanePerSampleDirFmt', 'MiSeqDemuxDirFmt',
+           'FastqGzFormat', 'YamlFormat', 'FastqManifestFormat',
            'FastqAbsolutePathManifestFormat',
            'SingleLanePerSampleSingleEndFastqDirFmt',
            'SingleLanePerSamplePairedEndFastqDirFmt', 'SequencesWithQuality',

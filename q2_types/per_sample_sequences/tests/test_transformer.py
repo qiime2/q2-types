@@ -20,6 +20,7 @@ from q2_types.per_sample_sequences import (
     SingleLanePerSampleSingleEndFastqDirFmt,
     SingleLanePerSamplePairedEndFastqDirFmt,
     CasavaOneEightSingleLanePerSampleDirFmt,
+    MiSeqDemuxDirFmt,
     SingleEndFastqManifestPhred33,
     SingleEndFastqManifestPhred64,
     PairedEndFastqManifestPhred33,
@@ -125,6 +126,42 @@ class TestTransformers(TestPluginBase):
 
         input = skbio.io.read(
             '%s/Human-Kneecap_S1_L001_R1_001.fastq.gz' % str(input),
+            format='fastq', constructor=skbio.DNA
+        )
+        obs = skbio.io.read(
+            '%s/Human-Kneecap_S1_L001_R1_001.fastq.gz' % str(obs),
+            format='fastq', constructor=skbio.DNA
+        )
+
+        for act, exp in zip(obs, input):
+            self.assertEqual(act, exp)
+
+    def test_miseq_demux_dirfmt_to_slpssefdf(self):
+        input, obs = self.transform_format(
+            MiSeqDemuxDirFmt, SingleLanePerSampleSingleEndFastqDirFmt,
+            filenames=('Human-Kneecap_S1_R1_001.fastq.gz',),
+        )
+
+        input = skbio.io.read(
+            '%s/Human-Kneecap_S1_R1_001.fastq.gz' % str(input),
+            format='fastq', constructor=skbio.DNA
+        )
+        obs = skbio.io.read(
+            '%s/Human-Kneecap_S1_L001_R1_001.fastq.gz' % str(obs),
+            format='fastq', constructor=skbio.DNA
+        )
+
+        for act, exp in zip(obs, input):
+            self.assertEqual(act, exp)
+
+    def test_miseq_demux_dirfmt_to_slpspefdf(self):
+        input, obs = self.transform_format(
+            MiSeqDemuxDirFmt, SingleLanePerSamplePairedEndFastqDirFmt,
+            filenames=('Human-Kneecap_S1_R1_001.fastq.gz',),
+        )
+
+        input = skbio.io.read(
+            '%s/Human-Kneecap_S1_R1_001.fastq.gz' % str(input),
             format='fastq', constructor=skbio.DNA
         )
         obs = skbio.io.read(
