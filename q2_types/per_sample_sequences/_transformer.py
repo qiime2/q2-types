@@ -27,56 +27,6 @@ from . import (SingleLanePerSampleSingleEndFastqDirFmt, FastqManifestFormat,
                PairedEndFastqManifestPhred33, PairedEndFastqManifestPhred64)
 
 
-class PerSampleDNAIterators(dict):
-    pass
-
-
-class PerSamplePairedDNAIterators(dict):
-    pass
-
-
-# Transformers
-@plugin.register_transformer
-def _1(dirfmt: SingleLanePerSampleSingleEndFastqDirFmt) \
-        -> PerSampleDNAIterators:
-    fh = dirfmt.manifest.view(FastqManifestFormat).open()
-    manifest = _parse_and_validate_manifest(fh, single_end=True,
-                                            absolute=False)
-    result = PerSampleDNAIterators()
-    # ensure that dirfmt stays in scope as long as result does
-    result.__dirfmt = dirfmt
-    for _, sample_id, filename, _ in manifest.itertuples():
-        filepath = str(dirfmt.path / filename)
-        result[sample_id] = skbio.io.read(filepath, format='fastq',
-                                          constructor=skbio.DNA)
-    return result
-
-
-@plugin.register_transformer
-def _2(dirfmt: SingleLanePerSamplePairedEndFastqDirFmt) \
-        -> PerSamplePairedDNAIterators:
-    fh = dirfmt.manifest.view(FastqManifestFormat).open()
-    forward_paths = {}
-    reverse_paths = {}
-    manifest = _parse_and_validate_manifest(fh, single_end=False,
-                                            absolute=False)
-    for _, sample_id, filename, direction in manifest.itertuples():
-        filepath = str(dirfmt.path / filename)
-        seqs = skbio.io.read(filepath, format='fastq', constructor=skbio.DNA)
-
-        if direction == 'forward':
-            forward_paths[sample_id] = seqs
-        else:
-            reverse_paths[sample_id] = seqs
-
-    result = PerSamplePairedDNAIterators()
-    # ensure that dirfmt stays in scope as long as result does
-    result.__dirfmt = dirfmt
-    for sample_id in forward_paths:
-        result[sample_id] = forward_paths[sample_id], reverse_paths[sample_id]
-    return result
-
-
 def _single_lane_per_sample_fastq_helper(dirfmt, output_cls, parse_lane=True):
     result = output_cls()
     manifest = FastqManifestFormat()
