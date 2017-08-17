@@ -19,7 +19,6 @@ from ._format import (CasavaOneEightSingleLanePerSampleDirFmt,
                       PairedEndFastqManifestPhred33,
                       PairedEndFastqManifestPhred64)
 from ._type import SequencesWithQuality, PairedEndSequencesWithQuality
-from ._transformer import PerSampleDNAIterators, PerSamplePairedDNAIterators
 
 __all__ = ['CasavaOneEightSingleLanePerSampleDirFmt',
            'CasavaOneEightLanelessPerSampleDirFmt',
@@ -27,8 +26,7 @@ __all__ = ['CasavaOneEightSingleLanePerSampleDirFmt',
            'FastqAbsolutePathManifestFormat',
            'SingleLanePerSampleSingleEndFastqDirFmt',
            'SingleLanePerSamplePairedEndFastqDirFmt', 'SequencesWithQuality',
-           'PairedEndSequencesWithQuality', 'PerSampleDNAIterators',
-           'PerSamplePairedDNAIterators', 'SingleEndFastqManifestPhred33',
+           'PairedEndSequencesWithQuality', 'SingleEndFastqManifestPhred33',
            'SingleEndFastqManifestPhred64', 'PairedEndFastqManifestPhred33',
            'PairedEndFastqManifestPhred64']
 
