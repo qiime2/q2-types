@@ -9,10 +9,9 @@
 import unittest
 
 from q2_types.sample_data import SampleData
-from q2_types.per_sample_sequences import (SequencesWithQuality,
-                                           PairedEndSequencesWithQuality)
 from q2_types.per_sample_sequences import (
-    SingleLanePerSampleSingleEndFastqDirFmt,
+    Sequences, SequencesWithQuality, PairedEndSequencesWithQuality,
+    QIIME1DemuxDirFmt, SingleLanePerSampleSingleEndFastqDirFmt,
     SingleLanePerSamplePairedEndFastqDirFmt
 )
 from qiime2.plugin.testing import TestPluginBase
@@ -21,11 +20,20 @@ from qiime2.plugin.testing import TestPluginBase
 class TestTypes(TestPluginBase):
     package = "q2_types.per_sample_sequences.tests"
 
+    def test_sequences_semantic_type_registration(self):
+        self.assertRegisteredSemanticType(Sequences)
+
     def test_sequences_with_quality_semantic_type_registration(self):
         self.assertRegisteredSemanticType(SequencesWithQuality)
 
     def test_paired_end_sequences_with_qual_semantic_type_registration(self):
         self.assertRegisteredSemanticType(PairedEndSequencesWithQuality)
+
+    def test_sequences_semantic_type_to_format_registration(self):
+        self.assertSemanticTypeRegisteredToFormat(
+            SampleData[Sequences],
+            QIIME1DemuxDirFmt
+        )
 
     def test_sequences_with_quality_semantic_type_to_format_registration(self):
         self.assertSemanticTypeRegisteredToFormat(

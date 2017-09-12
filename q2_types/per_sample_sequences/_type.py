@@ -10,18 +10,23 @@ from qiime2.plugin import SemanticType
 
 from ..plugin_setup import plugin
 from ..sample_data import SampleData
-from . import (SingleLanePerSampleSingleEndFastqDirFmt,
+from . import (QIIME1DemuxDirFmt, SingleLanePerSampleSingleEndFastqDirFmt,
                SingleLanePerSamplePairedEndFastqDirFmt)
 
 
+Sequences = SemanticType('Sequences', variant_of=SampleData.field['type'])
 SequencesWithQuality = SemanticType(
     'SequencesWithQuality', variant_of=SampleData.field['type'])
 PairedEndSequencesWithQuality = SemanticType(
     'PairedEndSequencesWithQuality', variant_of=SampleData.field['type'])
 
-plugin.register_semantic_types(SequencesWithQuality,
+plugin.register_semantic_types(Sequences, SequencesWithQuality,
                                PairedEndSequencesWithQuality)
 
+plugin.register_semantic_type_to_format(
+    SampleData[Sequences],
+    artifact_format=QIIME1DemuxDirFmt
+)
 plugin.register_semantic_type_to_format(
     SampleData[SequencesWithQuality],
     artifact_format=SingleLanePerSampleSingleEndFastqDirFmt

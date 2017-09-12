@@ -34,7 +34,8 @@ setup(
                                                 'data/paired_end_data/*',
                                                 'data/single_end_data/*',
                                                 'data/absolute_manifests/*',
-                                                'data/relative_manifests/*'],
+                                                'data/relative_manifests/*',
+                                                'data/qiime1-demux-format/*'],
         'q2_types.sample_data.tests': ['data/*'],
         'q2_types.tree.tests': ['data/*']
     },

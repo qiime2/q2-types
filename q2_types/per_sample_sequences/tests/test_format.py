@@ -6,6 +6,7 @@
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
 
+import os.path
 import shutil
 import unittest
 
@@ -17,7 +18,8 @@ from q2_types.per_sample_sequences import (
     SingleEndFastqManifestPhred33, SingleEndFastqManifestPhred64,
     PairedEndFastqManifestPhred33, PairedEndFastqManifestPhred64,
     SingleLanePerSampleSingleEndFastqDirFmt,
-    SingleLanePerSamplePairedEndFastqDirFmt
+    SingleLanePerSamplePairedEndFastqDirFmt,
+    QIIME1DemuxFormat, QIIME1DemuxDirFmt
 )
 from qiime2.plugin.testing import TestPluginBase
 
@@ -198,6 +200,59 @@ class TestFormats(TestPluginBase):
 
         with self.assertRaisesRegex(ValueError, 'SingleLanePerSamplePaired'):
             format.validate()
+
+
+class TestQIIME1DemuxFormat(TestPluginBase):
+    package = 'q2_types.per_sample_sequences.tests'
+
+    def setUp(self):
+        super().setUp()
+
+        self.positives = [
+            'short.fna', 'long.fna', 'single-record.fna',
+            'with-descriptions.fna', 'split-libraries-output.fna'
+        ]
+        self.negatives = [
+            'empty', 'incomplete.fna', 'empty-header.fna',
+            'invalid-header.fna', 'description-only.fna', 'blank-line.fna',
+            'no-underscore-in-id.fna', 'no-sample-id.fna',
+            'no-secondary-id.fna', 'duplicate-ids.fna', 'empty-seq.fna',
+            'not-dna.fna'
+        ]
+
+    def test_file_format_validate_positive(self):
+        for file in self.positives:
+            filepath = self.get_data_path('qiime1-demux-format/%s' % file)
+            QIIME1DemuxFormat(filepath, mode='r').validate()
+
+    def test_file_format_validate_negative(self):
+        for file in self.negatives:
+            filepath = self.get_data_path('qiime1-demux-format/%s' % file)
+            with self.assertRaisesRegex(ValueError, 'QIIME1DemuxFormat'):
+                QIIME1DemuxFormat(filepath, mode='r').validate()
+
+    def test_directory_format_validate_positive(self):
+        for file in self.positives:
+            filepath = self.get_data_path('qiime1-demux-format/%s' % file)
+            shutil.copy(filepath, os.path.join(self.temp_dir.name, 'seqs.fna'))
+
+            QIIME1DemuxDirFmt(self.temp_dir.name, mode='r').validate()
+
+    def test_directory_format_validate_negative(self):
+        for file in self.negatives:
+            filepath = self.get_data_path('qiime1-demux-format/%s' % file)
+            shutil.copy(filepath, os.path.join(self.temp_dir.name, 'seqs.fna'))
+
+            with self.assertRaisesRegex(ValueError, 'QIIME1DemuxFormat'):
+                QIIME1DemuxDirFmt(self.temp_dir.name, mode='r').validate()
+
+    def test_directory_format_wrong_filename(self):
+        filepath = self.get_data_path('qiime1-demux-format/short.fna')
+        shutil.copy(filepath, self.temp_dir.name)
+
+        with self.assertRaisesRegex(ValueError,
+                                    'QIIME1DemuxDirFmt.*seqs\.fna'):
+            QIIME1DemuxDirFmt(self.temp_dir.name, mode='r').validate()
 
 
 if __name__ == "__main__":
