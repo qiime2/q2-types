@@ -210,7 +210,7 @@ class TestQIIME1DemuxFormat(TestPluginBase):
 
         self.positives = [
             'short.fna', 'long.fna', 'single-record.fna',
-            'with-descriptions.fna'
+            'with-descriptions.fna', 'split-libraries-output.fna'
         ]
         self.negatives = [
             'empty', 'incomplete.fna', 'empty-header.fna',

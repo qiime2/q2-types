@@ -250,7 +250,7 @@ class QIIME1DemuxFormat(model.TextFileFormat):
 
     def _validate_id(self, id):
         pieces = id.rsplit('_', maxsplit=1)
-        if len(pieces) != 2 or not pieces[0] or not pieces[1]:
+        if len(pieces) != 2 or not all(pieces):
             raise Exception()
 
     def _validate_seq(self, seq):
