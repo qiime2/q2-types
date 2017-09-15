@@ -337,7 +337,8 @@ def _31(ff: DNAFASTAFormat) -> qiime2.Metadata:
 def _16(data: pd.Series) -> DNAFASTAFormat:
     ff = DNAFASTAFormat()
     with ff.open() as f:
-        for sequence in data:
+        for id_, seq in data.iteritems():
+            sequence = skbio.DNA(seq, metadata={'id': id_})
             skbio.io.write(sequence, format='fasta', into=f)
     return ff
 

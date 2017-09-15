@@ -611,6 +611,19 @@ class TestDNAFASTAFormatTransformers(TestPluginBase):
 
         assert_series_equal(exp, obs)
 
+    def test_series_to_dnafasta_format(self):
+        transformer = self.get_transformer(pd.Series, DNAFASTAFormat)
+
+        index = pd.Index(['SEQUENCE1', 'SEQUENCE2'])
+        input = pd.Series(['ACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTA'
+                           'CGTACGTACGTACGTACGT', 'ACGTACGTACGTACGTACGTAC'
+                           'GTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACG'
+                           'TACGTACGTACGTACGTACGT'], index=index, dtype=object)
+
+        obs = transformer(input)
+
+        self.assertIsInstance(obs, DNAFASTAFormat)
+
     def test_dnafasta_format_with_duplicate_ids_to_series(self):
         with self.assertRaisesRegex(ValueError, 'unique.*SEQUENCE1'):
             self.transform_format(DNAFASTAFormat, pd.Series,
