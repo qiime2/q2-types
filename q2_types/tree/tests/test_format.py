@@ -11,6 +11,7 @@ import unittest
 
 from q2_types.tree import NewickFormat, NewickDirectoryFormat
 from qiime2.plugin.testing import TestPluginBase
+from qiime2.plugin import ValidationError
 
 
 class TestFormats(TestPluginBase):
@@ -26,7 +27,7 @@ class TestFormats(TestPluginBase):
         filepath = self.get_data_path('not-tree.nwk')
         format = NewickFormat(filepath, mode='r')
 
-        with self.assertRaisesRegex(ValueError, 'NewickFormat'):
+        with self.assertRaisesRegex(ValidationError, 'NewickFormat'):
             format._validate_()
 
     def test_newick_directory_format_validate_postivie(self):

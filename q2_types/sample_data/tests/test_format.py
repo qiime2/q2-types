@@ -12,6 +12,7 @@ import unittest
 from q2_types.sample_data import (AlphaDiversityDirectoryFormat,
                                   AlphaDiversityFormat)
 from qiime2.plugin.testing import TestPluginBase
+from qiime2.plugin import ValidationError
 
 
 class TestFormats(TestPluginBase):
@@ -27,7 +28,7 @@ class TestFormats(TestPluginBase):
         filepath = self.get_data_path('not-alpha-diversity.tsv')
         format = AlphaDiversityFormat(filepath, mode='r')
 
-        with self.assertRaisesRegex(ValueError, 'AlphaDiversityFormat'):
+        with self.assertRaisesRegex(ValidationError, 'AlphaDiversityFormat'):
             format._validate_()
 
     def test_alpha_diversity_dir_fmt_validate_positive(self):

@@ -22,6 +22,7 @@ from q2_types.per_sample_sequences import (
     QIIME1DemuxFormat, QIIME1DemuxDirFmt
 )
 from qiime2.plugin.testing import TestPluginBase
+from qiime2.plugin import ValidationError
 
 
 class TestAbsoluteFastqManifestFormats(TestPluginBase):
@@ -47,7 +48,7 @@ class TestAbsoluteFastqManifestFormats(TestPluginBase):
         for file in files:
             filepath = self.get_data_path(file)
             for format in self.formats:
-                with self.assertRaisesRegex(ValueError, format.__name__):
+                with self.assertRaisesRegex(ValidationError, format.__name__):
                     format(filepath, mode='r')._validate_()
 
 
@@ -64,7 +65,8 @@ class TestRelativeFastqManifestFormats(TestPluginBase):
                  'relative_manifests/jagged-MANIFEST']
         for file in files:
             filepath = self.get_data_path(file)
-            with self.assertRaisesRegex(ValueError, 'FastqManifestFormat'):
+            with self.assertRaisesRegex(ValidationError,
+                                        'FastqManifestFormat'):
                 FastqManifestFormat(filepath, mode='r')._validate_()
 
 
@@ -81,21 +83,21 @@ class TestFormats(TestPluginBase):
         filepath = self.get_data_path('not-fastq.fastq.gz')
         format = FastqGzFormat(filepath, mode='r')
 
-        with self.assertRaisesRegex(ValueError, 'FastqGzFormat'):
+        with self.assertRaisesRegex(ValidationError, 'FastqGzFormat'):
             format._validate_()
 
     def test_fastq_gz_format_validate_mixed_case(self):
         filepath = self.get_data_path('mixed-case.fastq.gz')
         format = FastqGzFormat(filepath, mode='r')
 
-        with self.assertRaisesRegex(ValueError, 'FastqGzFormat'):
+        with self.assertRaisesRegex(ValidationError, 'FastqGzFormat'):
             format._validate_()
 
     def test_fastq_gz_format_validate_uncompressed(self):
         filepath = self.get_data_path('Human-Kneecap_S1_L001_R1_001.fastq')
         format = FastqGzFormat(filepath, mode='r')
 
-        with self.assertRaisesRegex(ValueError, 'FastqGzFormat'):
+        with self.assertRaisesRegex(ValidationError, 'FastqGzFormat'):
             format._validate_()
 
     def test_yaml_format_validate_positive(self):
@@ -108,7 +110,7 @@ class TestFormats(TestPluginBase):
         filepath = self.get_data_path('not-metadata.yml')
         format = YamlFormat(filepath, mode='r')
 
-        with self.assertRaisesRegex(ValueError, 'YamlFormat'):
+        with self.assertRaisesRegex(ValidationError, 'YamlFormat'):
             format._validate_()
 
     def test_casava_one_eight_slanepsample_dir_fmt_validate_positive(self):
@@ -127,7 +129,8 @@ class TestFormats(TestPluginBase):
         format = CasavaOneEightSingleLanePerSampleDirFmt(
             self.temp_dir.name, mode='r')
 
-        with self.assertRaisesRegex(ValueError, 'CasavaOneEightSingleLanePer'):
+        with self.assertRaisesRegex(ValidationError,
+                                    'CasavaOneEightSingleLanePer'):
             format._validate_()
 
     def test_miseq_demux_dir_fmt_validate_positive(self):
@@ -146,7 +149,7 @@ class TestFormats(TestPluginBase):
         format = CasavaOneEightLanelessPerSampleDirFmt(self.temp_dir.name,
                                                        mode='r')
 
-        with self.assertRaisesRegex(ValueError,
+        with self.assertRaisesRegex(ValidationError,
                                     'CasavaOneEightLanelessPerSampleDirFmt'):
             format._validate_()
 
@@ -172,7 +175,8 @@ class TestFormats(TestPluginBase):
         format = SingleLanePerSampleSingleEndFastqDirFmt(
             self.temp_dir.name, mode='r')
 
-        with self.assertRaisesRegex(ValueError, 'SingleLanePerSampleSingle'):
+        with self.assertRaisesRegex(ValidationError,
+                                    'SingleLanePerSampleSingle'):
             format._validate_()
 
     def test_slanepsample_paired_end_fastq_dir_fmt_validate_positive(self):
@@ -198,7 +202,8 @@ class TestFormats(TestPluginBase):
         format = SingleLanePerSamplePairedEndFastqDirFmt(
             self.temp_dir.name, mode='r')
 
-        with self.assertRaisesRegex(ValueError, 'SingleLanePerSamplePaired'):
+        with self.assertRaisesRegex(ValidationError,
+                                    'SingleLanePerSamplePaired'):
             format._validate_()
 
 
@@ -228,7 +233,7 @@ class TestQIIME1DemuxFormat(TestPluginBase):
     def test_file_format_validate_negative(self):
         for file in self.negatives:
             filepath = self.get_data_path('qiime1-demux-format/%s' % file)
-            with self.assertRaisesRegex(ValueError, 'QIIME1DemuxFormat'):
+            with self.assertRaisesRegex(ValidationError, 'QIIME1DemuxFormat'):
                 QIIME1DemuxFormat(filepath, mode='r')._validate_()
 
     def test_directory_format_validate_positive(self):
@@ -243,14 +248,14 @@ class TestQIIME1DemuxFormat(TestPluginBase):
             filepath = self.get_data_path('qiime1-demux-format/%s' % file)
             shutil.copy(filepath, os.path.join(self.temp_dir.name, 'seqs.fna'))
 
-            with self.assertRaisesRegex(ValueError, 'QIIME1DemuxFormat'):
+            with self.assertRaisesRegex(ValidationError, 'QIIME1DemuxFormat'):
                 QIIME1DemuxDirFmt(self.temp_dir.name, mode='r')._validate_()
 
     def test_directory_format_wrong_filename(self):
         filepath = self.get_data_path('qiime1-demux-format/short.fna')
         shutil.copy(filepath, self.temp_dir.name)
 
-        with self.assertRaisesRegex(ValueError,
+        with self.assertRaisesRegex(ValidationError,
                                     'QIIME1DemuxDirFmt.*seqs\.fna'):
             QIIME1DemuxDirFmt(self.temp_dir.name, mode='r')._validate_()
 

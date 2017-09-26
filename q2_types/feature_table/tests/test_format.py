@@ -13,6 +13,7 @@ import unittest
 from q2_types.feature_table import (BIOMV100Format, BIOMV210Format,
                                     BIOMV100DirFmt, BIOMV210DirFmt)
 from qiime2.plugin.testing import TestPluginBase
+from qiime2.plugin import ValidationError
 
 
 class TestFormats(TestPluginBase):
@@ -28,7 +29,7 @@ class TestFormats(TestPluginBase):
         filepath = self.get_data_path('feature-table_v210.biom')
         format = BIOMV100Format(filepath, mode='r')
 
-        with self.assertRaisesRegex(ValueError, 'BIOMV100Format'):
+        with self.assertRaisesRegex(ValidationError, 'BIOMV100Format'):
             format._validate_()
 
     def test_biomv210_format_validate_positive(self):
@@ -41,7 +42,7 @@ class TestFormats(TestPluginBase):
         filepath = self.get_data_path('feature-table_v100.biom')
         format = BIOMV210Format(filepath, mode='r')
 
-        with self.assertRaisesRegex(ValueError, 'BIOMV210Format'):
+        with self.assertRaisesRegex(ValidationError, 'BIOMV210Format'):
             format._validate_()
 
     def test_biomv100_dir_format_validate_positive(self):

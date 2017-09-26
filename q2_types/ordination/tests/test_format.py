@@ -12,6 +12,7 @@ import unittest
 
 from q2_types.ordination import OrdinationFormat, OrdinationDirectoryFormat
 from qiime2.plugin.testing import TestPluginBase
+from qiime2.plugin import ValidationError
 
 
 class TestFormats(TestPluginBase):
@@ -27,7 +28,7 @@ class TestFormats(TestPluginBase):
         filepath = self.get_data_path('not-pcoa-results.txt')
         format = OrdinationFormat(filepath, mode='r')
 
-        with self.assertRaisesRegex(ValueError, 'OrdinationFormat'):
+        with self.assertRaisesRegex(ValidationError, 'OrdinationFormat'):
             format._validate_()
 
     def test_ordination_dir_format_validate_positive(self):

@@ -19,6 +19,7 @@ from q2_types.feature_data import (
     AlignedDNASequencesDirectoryFormat
 )
 from qiime2.plugin.testing import TestPluginBase
+from qiime2.plugin import ValidationError
 
 
 class TestTaxonomyFormats(TestPluginBase):
@@ -43,7 +44,7 @@ class TestTaxonomyFormats(TestPluginBase):
         for filepath in filepaths:
             format = TaxonomyFormat(filepath, mode='r')
 
-            with self.assertRaisesRegex(ValueError, 'Taxonomy'):
+            with self.assertRaisesRegex(ValidationError, 'Taxonomy'):
                 format._validate_()
 
     def test_taxonomy_directory_format(self):
@@ -84,7 +85,8 @@ class TestTaxonomyFormats(TestPluginBase):
         for filepath in filepaths:
             format = HeaderlessTSVTaxonomyFormat(filepath, mode='r')
 
-            with self.assertRaisesRegex(ValueError, 'HeaderlessTSVTaxonomy'):
+            with self.assertRaisesRegex(ValidationError,
+                                        'HeaderlessTSVTaxonomy'):
                 format._validate_()
 
     def test_headerless_tsv_taxonomy_directory_format(self):
@@ -119,7 +121,7 @@ class TestTaxonomyFormats(TestPluginBase):
         for filepath in filepaths:
             format = TSVTaxonomyFormat(filepath, mode='r')
 
-            with self.assertRaisesRegex(ValueError, 'TSVTaxonomy'):
+            with self.assertRaisesRegex(ValidationError, 'TSVTaxonomy'):
                 format._validate_()
 
     def test_tsv_taxonomy_directory_format(self):
@@ -146,7 +148,7 @@ class TestDNAFASTAFormats(TestPluginBase):
         filepath = self.get_data_path('not-dna-sequences')
         format = DNAFASTAFormat(filepath, mode='r')
 
-        with self.assertRaisesRegex(ValueError, 'DNAFASTA'):
+        with self.assertRaisesRegex(ValidationError, 'DNAFASTA'):
             format._validate_()
 
     def test_dna_sequences_directory_format(self):
@@ -180,7 +182,7 @@ class TestDNAFASTAFormats(TestPluginBase):
         filepath = self.get_data_path('not-dna-sequences')
         format = AlignedDNAFASTAFormat(filepath, mode='r')
 
-        with self.assertRaisesRegex(ValueError, 'AlignedDNAFASTA'):
+        with self.assertRaisesRegex(ValidationError, 'AlignedDNAFASTA'):
             format._validate_()
 
     def test_aligned_dna_sequences_directory_format(self):

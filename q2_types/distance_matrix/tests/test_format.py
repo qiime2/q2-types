@@ -12,6 +12,7 @@ import unittest
 
 from q2_types.distance_matrix import LSMatFormat, DistanceMatrixDirectoryFormat
 from qiime2.plugin.testing import TestPluginBase
+from qiime2.plugin import ValidationError
 
 
 class TestFormats(TestPluginBase):
@@ -31,7 +32,7 @@ class TestFormats(TestPluginBase):
         filepath = self.get_data_path('not-lsmat')
         format = LSMatFormat(filepath, mode='r')
 
-        with self.assertRaisesRegex(ValueError, 'LSMat'):
+        with self.assertRaisesRegex(ValidationError, 'LSMat'):
             format._validate_()
 
     def test_distance_matrix_directory_format(self):
