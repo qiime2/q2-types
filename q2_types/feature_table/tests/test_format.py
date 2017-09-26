@@ -13,6 +13,7 @@ import unittest
 from q2_types.feature_table import (BIOMV100Format, BIOMV210Format,
                                     BIOMV100DirFmt, BIOMV210DirFmt)
 from qiime2.plugin.testing import TestPluginBase
+from qiime2.plugin import ValidationError
 
 
 class TestFormats(TestPluginBase):
@@ -22,27 +23,27 @@ class TestFormats(TestPluginBase):
         filepath = self.get_data_path('feature-table_v100.biom')
         format = BIOMV100Format(filepath, mode='r')
 
-        format.validate()
+        format._validate_()
 
     def test_biomv100_format_validate_negative(self):
         filepath = self.get_data_path('feature-table_v210.biom')
         format = BIOMV100Format(filepath, mode='r')
 
-        with self.assertRaisesRegex(ValueError, 'BIOMV100Format'):
-            format.validate()
+        with self.assertRaisesRegex(ValidationError, 'BIOMV100Format'):
+            format._validate_()
 
     def test_biomv210_format_validate_positive(self):
         filepath = self.get_data_path('feature-table_v210.biom')
         format = BIOMV210Format(filepath, mode='r')
 
-        format.validate()
+        format._validate_()
 
     def test_biomv210_format_validate_negative(self):
         filepath = self.get_data_path('feature-table_v100.biom')
         format = BIOMV210Format(filepath, mode='r')
 
-        with self.assertRaisesRegex(ValueError, 'BIOMV210Format'):
-            format.validate()
+        with self.assertRaisesRegex(ValidationError, 'BIOMV210Format'):
+            format._validate_()
 
     def test_biomv100_dir_format_validate_positive(self):
         filepath = self.get_data_path('feature-table_v100.biom')
@@ -50,7 +51,7 @@ class TestFormats(TestPluginBase):
                     os.path.join(self.temp_dir.name, 'feature-table.biom'))
         format = BIOMV100DirFmt(self.temp_dir.name, mode='r')
 
-        format.validate()
+        format._validate_()
 
     def test_biomv210_dir_format_validate_positive(self):
         filepath = self.get_data_path('feature-table_v210.biom')
@@ -58,7 +59,7 @@ class TestFormats(TestPluginBase):
                     os.path.join(self.temp_dir.name, 'feature-table.biom'))
         format = BIOMV210DirFmt(self.temp_dir.name, mode='r')
 
-        format.validate()
+        format._validate_()
 
 
 if __name__ == "__main__":

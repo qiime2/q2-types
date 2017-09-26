@@ -19,6 +19,7 @@ from q2_types.feature_data import (
     AlignedDNASequencesDirectoryFormat
 )
 from qiime2.plugin.testing import TestPluginBase
+from qiime2.plugin import ValidationError
 
 
 class TestTaxonomyFormats(TestPluginBase):
@@ -33,7 +34,7 @@ class TestTaxonomyFormats(TestPluginBase):
         for filepath in filepaths:
             format = TaxonomyFormat(filepath, mode='r')
 
-            format.validate()
+            format._validate_()
 
     def test_taxonomy_format_validate_negative(self):
         filenames = ['empty', 'blanks-and-comments', '1-column.tsv']
@@ -43,8 +44,8 @@ class TestTaxonomyFormats(TestPluginBase):
         for filepath in filepaths:
             format = TaxonomyFormat(filepath, mode='r')
 
-            with self.assertRaisesRegex(ValueError, 'Taxonomy'):
-                format.validate()
+            with self.assertRaisesRegex(ValidationError, 'Taxonomy'):
+                format._validate_()
 
     def test_taxonomy_directory_format(self):
         # Basic test to verify that single-file directory format is working.
@@ -54,7 +55,7 @@ class TestTaxonomyFormats(TestPluginBase):
 
         format = TaxonomyDirectoryFormat(self.temp_dir.name, mode='r')
 
-        format.validate()
+        format._validate_()
 
     # NOTE: the tests below for HeaderlessTSVTaxonomyFormat use some test files
     # that have headers. However, it makes no difference to this file format
@@ -74,7 +75,7 @@ class TestTaxonomyFormats(TestPluginBase):
         for filepath in filepaths:
             format = HeaderlessTSVTaxonomyFormat(filepath, mode='r')
 
-            format.validate()
+            format._validate_()
 
     def test_headerless_tsv_taxonomy_format_validate_negative(self):
         filenames = ['empty', 'blanks-and-comments', '1-column.tsv']
@@ -84,8 +85,9 @@ class TestTaxonomyFormats(TestPluginBase):
         for filepath in filepaths:
             format = HeaderlessTSVTaxonomyFormat(filepath, mode='r')
 
-            with self.assertRaisesRegex(ValueError, 'HeaderlessTSVTaxonomy'):
-                format.validate()
+            with self.assertRaisesRegex(ValidationError,
+                                        'HeaderlessTSVTaxonomy'):
+                format._validate_()
 
     def test_headerless_tsv_taxonomy_directory_format(self):
         # Basic test to verify that single-file directory format is working.
@@ -97,7 +99,7 @@ class TestTaxonomyFormats(TestPluginBase):
         format = HeaderlessTSVTaxonomyDirectoryFormat(self.temp_dir.name,
                                                       mode='r')
 
-        format.validate()
+        format._validate_()
 
     def test_tsv_taxonomy_format_validate_positive(self):
         filenames = ['2-column.tsv', '3-column.tsv', 'valid-but-messy.tsv',
@@ -108,7 +110,7 @@ class TestTaxonomyFormats(TestPluginBase):
         for filepath in filepaths:
             format = TSVTaxonomyFormat(filepath, mode='r')
 
-            format.validate()
+            format._validate_()
 
     def test_tsv_taxonomy_format_validate_negative(self):
         filenames = ['empty', 'blanks-and-comments', '1-column.tsv',
@@ -119,8 +121,8 @@ class TestTaxonomyFormats(TestPluginBase):
         for filepath in filepaths:
             format = TSVTaxonomyFormat(filepath, mode='r')
 
-            with self.assertRaisesRegex(ValueError, 'TSVTaxonomy'):
-                format.validate()
+            with self.assertRaisesRegex(ValidationError, 'TSVTaxonomy'):
+                format._validate_()
 
     def test_tsv_taxonomy_directory_format(self):
         # Basic test to verify that single-file directory format is working.
@@ -130,7 +132,7 @@ class TestTaxonomyFormats(TestPluginBase):
 
         format = TSVTaxonomyDirectoryFormat(self.temp_dir.name, mode='r')
 
-        format.validate()
+        format._validate_()
 
 
 class TestDNAFASTAFormats(TestPluginBase):
@@ -140,14 +142,14 @@ class TestDNAFASTAFormats(TestPluginBase):
         filepath = self.get_data_path('dna-sequences.fasta')
         format = DNAFASTAFormat(filepath, mode='r')
 
-        format.validate()
+        format._validate_()
 
     def test_dna_fasta_format_validate_negative(self):
         filepath = self.get_data_path('not-dna-sequences')
         format = DNAFASTAFormat(filepath, mode='r')
 
-        with self.assertRaisesRegex(ValueError, 'DNAFASTA'):
-            format.validate()
+        with self.assertRaisesRegex(ValidationError, 'DNAFASTA'):
+            format._validate_()
 
     def test_dna_sequences_directory_format(self):
         filepath = self.get_data_path('dna-sequences.fasta')
@@ -155,7 +157,7 @@ class TestDNAFASTAFormats(TestPluginBase):
                     os.path.join(self.temp_dir.name, 'dna-sequences.fasta'))
         format = DNASequencesDirectoryFormat(self.temp_dir.name, mode='r')
 
-        format.validate()
+        format._validate_()
 
     def test_paired_dna_sequences_directory_format(self):
         filepath = self.get_data_path('dna-sequences.fasta')
@@ -168,20 +170,20 @@ class TestDNAFASTAFormats(TestPluginBase):
 
         format = PairedDNASequencesDirectoryFormat(temp_dir, mode='r')
 
-        format.validate()
+        format._validate_()
 
     def test_aligned_dna_fasta_format_validate_positive(self):
         filepath = self.get_data_path('aligned-dna-sequences.fasta')
         format = AlignedDNAFASTAFormat(filepath, mode='r')
 
-        format.validate()
+        format._validate_()
 
     def test_aligned_dna_fasta_format_validate_negative(self):
         filepath = self.get_data_path('not-dna-sequences')
         format = AlignedDNAFASTAFormat(filepath, mode='r')
 
-        with self.assertRaisesRegex(ValueError, 'AlignedDNAFASTA'):
-            format.validate()
+        with self.assertRaisesRegex(ValidationError, 'AlignedDNAFASTA'):
+            format._validate_()
 
     def test_aligned_dna_sequences_directory_format(self):
         filepath = self.get_data_path('aligned-dna-sequences.fasta')
@@ -190,7 +192,7 @@ class TestDNAFASTAFormats(TestPluginBase):
                     os.path.join(temp_dir, 'aligned-dna-sequences.fasta'))
         format = AlignedDNASequencesDirectoryFormat(temp_dir, mode='r')
 
-        format.validate()
+        format._validate_()
 
 
 if __name__ == '__main__':

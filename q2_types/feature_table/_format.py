@@ -31,7 +31,7 @@ class BIOMV100Format(model.TextFileFormat):
                             return True
                         elif value not in self.top_level_keys:
                             return False
-            except ijson.JSONError:
+            except (ijson.JSONError, UnicodeDecodeError):
                 pass
             return False
 
@@ -68,17 +68,20 @@ class BIOMV210Format(model.BinaryFileFormat):
         return h5py.File(str(self), mode=self._mode)
 
     def sniff(self):
-        with self.open() as fh:
-            for grp in self.groups:
-                if grp not in fh:
-                    return False
-            for ds in self.datasets:
-                if ds not in fh:
-                    return False
-            for attr in self.attrs:
-                if attr not in fh.attrs:
-                    return False
-            return True
+        try:
+            with self.open() as fh:
+                for grp in self.groups:
+                    if grp not in fh:
+                        return False
+                for ds in self.datasets:
+                    if ds not in fh:
+                        return False
+                for attr in self.attrs:
+                    if attr not in fh.attrs:
+                        return False
+                return True
+        except Exception:
+            return False
 
 
 BIOMV100DirFmt = model.SingleFileDirectoryFormat('BIOMV100DirFmt',
