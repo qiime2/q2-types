@@ -20,21 +20,21 @@ class TestFormats(TestPluginBase):
         filepath = self.get_data_path('tree.nwk')
         format = NewickFormat(filepath, mode='r')
 
-        format.validate()
+        format._validate_()
 
     def test_newick_format_validate_negative(self):
         filepath = self.get_data_path('not-tree.nwk')
         format = NewickFormat(filepath, mode='r')
 
         with self.assertRaisesRegex(ValueError, 'NewickFormat'):
-            format.validate()
+            format._validate_()
 
     def test_newick_directory_format_validate_postivie(self):
         filepath = self.get_data_path('tree.nwk')
         shutil.copy(filepath, self.temp_dir.name)
         format = NewickDirectoryFormat(self.temp_dir.name, mode='r')
 
-        format.validate()
+        format._validate_()
 
 
 if __name__ == '__main__':
