@@ -151,6 +151,14 @@ class TestDNAFASTAFormats(TestPluginBase):
         with self.assertRaisesRegex(ValidationError, 'DNAFASTA'):
             format._validate_()
 
+    def test_dna_fasta_format_empty_file(self):
+        filepath = os.path.join(self.temp_dir.name, 'empty')
+        with open(filepath, 'w') as fh:
+            fh.write('\n')
+        format = DNAFASTAFormat(filepath, mode='r')
+
+        format._validate_()
+
     def test_dna_sequences_directory_format(self):
         filepath = self.get_data_path('dna-sequences.fasta')
         shutil.copy(filepath,
