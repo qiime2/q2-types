@@ -8,6 +8,7 @@
 
 import itertools
 import collections
+import gzip
 
 import skbio
 import skbio.io
@@ -107,25 +108,37 @@ class FastqGzFormat(model.BinaryFileFormat):
     A gzipped fastq file.
 
     """
-    def sniff(self):
+    def validate(self):
         with self.open() as fh:
-            if fh.read(2)[:2] != b'\x1f\x8b':
-                return False
+            if fh.peek(2)[:2] != b'\x1f\x8b':
+                raise ValidationError('File is uncompressed')
 
-        filepath = str(self)
-        sniffer = skbio.io.io_registry.get_sniffer('fastq')
-        if sniffer(str(self))[0]:
-            try:
-                generator = skbio.io.read(filepath, constructor=skbio.DNA,
-                                          phred_offset=33, format='fastq',
-                                          verify=False)
-                for seq, _ in zip(generator, range(15)):
-                    pass
-                return True
-            # ValueError raised by skbio if there are invalid DNA chars.
-            except ValueError:
-                pass
-        return False
+        with gzip.open(str(self), mode='rt', encoding='ascii') as fh:
+            for i, record in enumerate(itertools.zip_longest(*[fh] * 4)):
+                header, seq, sep, qual = record
+
+                if not header.startswith('@'):
+                    raise ValidationError('Header on line %d is not FASTQ, '
+                                          'records may be misaligned' %
+                                          (i * 4 + 1))
+
+                if seq is None:
+                    raise ValidationError('Missing sequence for record '
+                                          'beginning on line %d'
+                                          % (i * 4 + 1))
+                elif not seq.isupper():
+                    raise ValidationError('Lowercase case sequence on line %d'
+                                          % (i * 4 + 2))
+
+                if sep is None:
+                    raise ValidationError('Missing separator for record '
+                                          'beginning on line %d'
+                                          % (i * 4 + 1))
+
+                if qual is None:
+                    raise ValidationError('Missing quality for record '
+                                          'beginning on line %d'
+                                          % (i * 4 + 1))
 
 
 class CasavaOneEightSingleLanePerSampleDirFmt(model.DirectoryFormat):
