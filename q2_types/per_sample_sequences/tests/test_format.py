@@ -133,6 +133,69 @@ class TestFormats(TestPluginBase):
                                     'CasavaOneEightSingleLanePer'):
             format._validate_()
 
+    def test_casava_one_eight_slanepsample_dir_fmt_subdirectories(self):
+        bad_dir = os.path.join(self.temp_dir.name, 'Human_Kneecap')
+        os.mkdir(bad_dir)
+        bad_name = os.path.join(bad_dir, 'S1_L001_R1_001.fastq.gz')
+
+        fastq = self.get_data_path('Human-Kneecap_S1_L001_R1_001.fastq.gz')
+        shutil.copy(fastq, bad_name)
+
+        format = CasavaOneEightSingleLanePerSampleDirFmt(self.temp_dir.name,
+                                                         mode='r')
+
+        with self.assertRaisesRegex(ValidationError,
+                                    'subdirectory.*Human_Kneecap'):
+            format._validate_()
+
+    def test_casava_one_eight_slanepsample_dir_fmt_missing_directions(self):
+        f = self.get_data_path('Human-Kneecap_S1_L001_R1_001.fastq.gz')
+        r = self.get_data_path(
+            'paired_end_data/Human-Kneecap_S1_L001_R2_001.fastq.gz')
+
+        shutil.copy(f, self.temp_dir.name)
+        shutil.copy(r, self.temp_dir.name)
+        shutil.copy(
+            f, os.path.join(self.temp_dir.name,
+                            'Human-Other_S1_L001_R1_001.fastq.gz'))
+
+        format = CasavaOneEightSingleLanePerSampleDirFmt(self.temp_dir.name,
+                                                         mode='r')
+
+        with self.assertRaisesRegex(ValidationError, 'matching.*Human-Other'):
+            format._validate_()
+
+    def test_casava_one_eight_slanepsample_dir_fmt_duplicate_forwards(self):
+        f = self.get_data_path('Human-Kneecap_S1_L001_R1_001.fastq.gz')
+
+        shutil.copy(f, self.temp_dir.name)
+        shutil.copy(
+            f, os.path.join(self.temp_dir.name,
+                            'Human-Kneecap_S2_L001_R1_001.fastq.gz'))
+
+        format = CasavaOneEightSingleLanePerSampleDirFmt(self.temp_dir.name,
+                                                         mode='r')
+
+        with self.assertRaisesRegex(ValidationError,
+                                    'Duplicate.*Human-Kneecap'):
+            format._validate_()
+
+    def test_casava_one_eight_slanepsample_dir_fmt_duplicate_reverse(self):
+        r = self.get_data_path(
+            'paired_end_data/Human-Kneecap_S1_L001_R2_001.fastq.gz')
+
+        shutil.copy(r, self.temp_dir.name)
+        shutil.copy(
+            r, os.path.join(self.temp_dir.name,
+                            'Human-Kneecap_S2_L001_R2_001.fastq.gz'))
+
+        format = CasavaOneEightSingleLanePerSampleDirFmt(self.temp_dir.name,
+                                                         mode='r')
+
+        with self.assertRaisesRegex(ValidationError,
+                                    'Duplicate.*Human-Kneecap'):
+            format._validate_()
+
     def test_miseq_demux_dir_fmt_validate_positive(self):
         filepath = self.get_data_path('Human-Kneecap_S1_R1_001.fastq.gz')
         shutil.copy(filepath, self.temp_dir.name)
@@ -179,6 +242,20 @@ class TestFormats(TestPluginBase):
                                     'SingleLanePerSampleSingle'):
             format._validate_()
 
+    def test_slanepsample_single_end_fastq_dir_fmt_validate_bad_paired(self):
+        filenames = ('paired_end_data/MANIFEST', 'metadata.yml',
+                     'Human-Kneecap_S1_L001_R1_001.fastq.gz',
+                     'paired_end_data/Human-Kneecap_S1_L001_R2_001.fastq.gz')
+        for filename in filenames:
+            filepath = self.get_data_path(filename)
+            shutil.copy(filepath, self.temp_dir.name)
+
+        format = SingleLanePerSampleSingleEndFastqDirFmt(
+            self.temp_dir.name, mode='r')
+
+        with self.assertRaisesRegex(ValidationError, 'Forward and reverse'):
+            format._validate_()
+
     def test_slanepsample_paired_end_fastq_dir_fmt_validate_positive(self):
         filenames = ('paired_end_data/MANIFEST', 'metadata.yml',
                      'Human-Kneecap_S1_L001_R1_001.fastq.gz',
@@ -204,6 +281,20 @@ class TestFormats(TestPluginBase):
 
         with self.assertRaisesRegex(ValidationError,
                                     'SingleLanePerSamplePaired'):
+            format._validate_()
+
+    def test_slanepsample_paired_end_fastq_dir_fmt_validate_missing_pair(self):
+        filenames = ('single_end_data/MANIFEST', 'metadata.yml',
+                     'Human-Kneecap_S1_L001_R1_001.fastq.gz')
+        for filename in filenames:
+            filepath = self.get_data_path(filename)
+            shutil.copy(filepath, self.temp_dir.name)
+
+        format = SingleLanePerSamplePairedEndFastqDirFmt(
+            self.temp_dir.name, mode='r')
+
+        with self.assertRaisesRegex(ValidationError,
+                                    'paired'):
             format._validate_()
 
 
