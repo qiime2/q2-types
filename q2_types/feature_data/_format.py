@@ -144,7 +144,10 @@ class DNAFASTAFormat(model.TextFileFormat):
             # ValueError raised by skbio if there are invalid DNA chars.
             except ValueError:
                 pass
-        return False
+
+        # Empty files are ok also
+        empty_sniffer = skbio.io.io_registry.get_sniffer('<emptyfile>')
+        return empty_sniffer(filepath)[0]
 
 
 DNASequencesDirectoryFormat = model.SingleFileDirectoryFormat(
