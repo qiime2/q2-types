@@ -150,6 +150,11 @@ class CasavaOneEightSingleLanePerSampleDirFmt(model.DirectoryFormat):
         reverse = []
         for p in self.path.iterdir():
             if p.is_dir():
+                # This branch happens if you have a filepath that looks roughly
+                # like: Human_Kneecap/S1_L001_R1_001.fastq.gz
+                # This technically matches the regex. It's easier to just
+                # check that there aren't any directories, than making a very
+                # complicated regex. This also produces a nicer error anyways.
                 d = p.relative_to(self.path)
                 raise ValidationError("Contains a subdirectory: %s" % d)
             else:
