@@ -70,35 +70,74 @@ class TestRelativeFastqManifestFormats(TestPluginBase):
                 FastqManifestFormat(filepath, mode='r')._validate_()
 
 
-class TestFormats(TestPluginBase):
+class TestFastqGzFormat(TestPluginBase):
     package = 'q2_types.per_sample_sequences.tests'
 
-    def test_fastq_gz_format_validate_positive(self):
+    def test_validate_positive(self):
         filepath = self.get_data_path('Human-Kneecap_S1_L001_R1_001.fastq.gz')
         format = FastqGzFormat(filepath, mode='r')
 
         format._validate_()
 
-    def test_fastq_gz_format_validate_negative(self):
+    def test_validate_negative(self):
         filepath = self.get_data_path('not-fastq.fastq.gz')
         format = FastqGzFormat(filepath, mode='r')
 
-        with self.assertRaisesRegex(ValidationError, 'FastqGzFormat'):
+        with self.assertRaisesRegex(ValidationError, 'Header.*1'):
             format._validate_()
 
-    def test_fastq_gz_format_validate_mixed_case(self):
+    def test_validate_mixed_case(self):
         filepath = self.get_data_path('mixed-case.fastq.gz')
         format = FastqGzFormat(filepath, mode='r')
 
-        with self.assertRaisesRegex(ValidationError, 'FastqGzFormat'):
+        with self.assertRaisesRegex(ValidationError, 'Lowercase.*2'):
             format._validate_()
 
-    def test_fastq_gz_format_validate_uncompressed(self):
+    def test_validate_uncompressed(self):
         filepath = self.get_data_path('Human-Kneecap_S1_L001_R1_001.fastq')
         format = FastqGzFormat(filepath, mode='r')
 
-        with self.assertRaisesRegex(ValidationError, 'FastqGzFormat'):
+        with self.assertRaisesRegex(ValidationError, 'uncompressed'):
             format._validate_()
+
+    def test_incomplete_record_qual(self):
+        filepath = self.get_data_path('incomplete-quality.fastq.gz')
+        format = FastqGzFormat(filepath, mode='r')
+
+        with self.assertRaisesRegex(ValidationError, 'quality.*9'):
+            format._validate_()
+
+    def test_incomplete_record_sep(self):
+        filepath = self.get_data_path('incomplete-sep.fastq.gz')
+        format = FastqGzFormat(filepath, mode='r')
+
+        with self.assertRaisesRegex(ValidationError, 'separator.*9'):
+            format._validate_()
+
+    def test_incomplete_record_sequence(self):
+        filepath = self.get_data_path('incomplete-sequence.fastq.gz')
+        format = FastqGzFormat(filepath, mode='r')
+
+        with self.assertRaisesRegex(ValidationError, 'sequence.*9'):
+            format._validate_()
+
+    def test_invalid_record_sep(self):
+        filepath = self.get_data_path('invalid-sep.fastq.gz')
+        format = FastqGzFormat(filepath, mode='r')
+
+        with self.assertRaisesRegex(ValidationError, 'separator.*11'):
+            format._validate_()
+
+    def test_invalid_quality_score_length(self):
+        filepath = self.get_data_path('invalid-quality.fastq.gz')
+        format = FastqGzFormat(filepath, mode='r')
+
+        with self.assertRaisesRegex(ValidationError, 'length.*9'):
+            format._validate_()
+
+
+class TestFormats(TestPluginBase):
+    package = 'q2_types.per_sample_sequences.tests'
 
     def test_yaml_format_validate_positive(self):
         filepath = self.get_data_path('metadata.yml')
