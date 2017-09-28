@@ -121,6 +121,20 @@ class TestFastqGzFormat(TestPluginBase):
         with self.assertRaisesRegex(ValidationError, 'sequence.*9'):
             format._validate_()
 
+    def test_invalid_record_sep(self):
+        filepath = self.get_data_path('invalid-sep.fastq.gz')
+        format = FastqGzFormat(filepath, mode='r')
+
+        with self.assertRaisesRegex(ValidationError, 'separator.*11'):
+            format._validate_()
+
+    def test_invalid_quality_score_length(self):
+        filepath = self.get_data_path('invalid-quality.fastq.gz')
+        format = FastqGzFormat(filepath, mode='r')
+
+        with self.assertRaisesRegex(ValidationError, 'length.*9'):
+            format._validate_()
+
 
 class TestFormats(TestPluginBase):
     package = 'q2_types.per_sample_sequences.tests'

@@ -134,9 +134,17 @@ class FastqGzFormat(model.BinaryFileFormat):
                     raise ValidationError('Missing separator for record '
                                           'beginning on line %d'
                                           % (i * 4 + 1))
+                elif not sep.startswith('+'):
+                    raise ValidationError('Invalid separator on line %d'
+                                          % (i * 4 + 3))
 
                 if qual is None:
                     raise ValidationError('Missing quality for record '
+                                          'beginning on line %d'
+                                          % (i * 4 + 1))
+                elif len(qual) != len(seq):
+                    raise ValidationError('Quality score length doesn\'t '
+                                          'match sequence length for record '
                                           'beginning on line %d'
                                           % (i * 4 + 1))
 
