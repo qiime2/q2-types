@@ -7,11 +7,13 @@
 # ----------------------------------------------------------------------------
 
 import itertools
+import collections
 
 import skbio
 import skbio.io
 import yaml
 import qiime2.plugin.model as model
+from qiime2.plugin import ValidationError
 
 from ..plugin_setup import plugin
 
@@ -127,6 +129,9 @@ class FastqGzFormat(model.BinaryFileFormat):
 
 
 class CasavaOneEightSingleLanePerSampleDirFmt(model.DirectoryFormat):
+    _CHECK_PAIRED = True
+    _REQUIRE_PAIRED = False
+
     sequences = model.FileCollection(
         r'.+_.+_L[0-9][0-9][0-9]_R[12]_001\.fastq\.gz',
         format=FastqGzFormat)
@@ -137,6 +142,49 @@ class CasavaOneEightSingleLanePerSampleDirFmt(model.DirectoryFormat):
         return '%s_%s_L%03d_R%d_001.fastq.gz' % (sample_id, barcode_id,
                                                  lane_number, read_number)
 
+    def _find_duplicates(self, ids):
+        return {x for x, c in collections.Counter(ids).items() if c > 1}
+
+    def validate(self):
+        forwards = []
+        reverse = []
+        for p in self.path.iterdir():
+            if p.is_dir():
+                # This branch happens if you have a filepath that looks roughly
+                # like: Human_Kneecap/S1_L001_R1_001.fastq.gz
+                # This technically matches the regex. It's easier to just
+                # check that there aren't any directories, than making a very
+                # complicated regex. This also produces a nicer error anyways.
+                d = p.relative_to(self.path)
+                raise ValidationError("Contains a subdirectory: %s" % d)
+            else:
+                if p.name.endswith('_001.fastq.gz'):
+                    sample_id = p.name.rsplit('_', maxsplit=4)[0]
+                    if p.name.endswith('R1_001.fastq.gz'):
+                        forwards.append(sample_id)
+                    else:
+                        reverse.append(sample_id)
+
+        set_forwards = set(forwards)
+        set_reverse = set(reverse)
+
+        if len(set_forwards) != len(forwards):
+            raise ValidationError('Duplicate samples in forward reads: %r'
+                                  % self._find_duplicates(forwards))
+        if len(set_reverse) != len(reverse):
+            raise ValidationError('Duplicate samples in reverse reads: %r'
+                                  % self._find_duplicates(reverse))
+
+        if forwards and reverse:
+            if not self._CHECK_PAIRED:
+                raise ValidationError("Forward and reverse reads found.")
+            elif set_forwards ^ set_reverse:
+                raise ValidationError(
+                    "These samples do not have matching pairs of forward and "
+                    "reverse reads: %r" % (set_forwards ^ set_reverse))
+        elif self._REQUIRE_PAIRED:
+            raise ValidationError("Reads are not paired end.")
+
 
 class _SingleLanePerSampleFastqDirFmt(CasavaOneEightSingleLanePerSampleDirFmt):
     manifest = model.File('MANIFEST', format=FastqManifestFormat)
@@ -144,14 +192,11 @@ class _SingleLanePerSampleFastqDirFmt(CasavaOneEightSingleLanePerSampleDirFmt):
 
 
 class SingleLanePerSampleSingleEndFastqDirFmt(_SingleLanePerSampleFastqDirFmt):
-    pass
+    _CHECK_PAIRED = False
 
 
 class SingleLanePerSamplePairedEndFastqDirFmt(_SingleLanePerSampleFastqDirFmt):
-    # There is no difference between this and
-    # SingleLanePerSampleSingleEndFastqDirFmt (canonically pronounced,
-    # SLPSSEFDF) until we have validation.
-    pass
+    _REQUIRE_PAIRED = True
 
 
 class CasavaOneEightLanelessPerSampleDirFmt(model.DirectoryFormat):
