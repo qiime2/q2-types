@@ -26,14 +26,14 @@ class TestFormats(TestPluginBase):
             format = LSMatFormat(filepath, mode='r')
 
             # Should not error.
-            format._validate_()
+            format.validate()
 
     def test_lsmat_format_validate_negative(self):
         filepath = self.get_data_path('not-lsmat')
         format = LSMatFormat(filepath, mode='r')
 
         with self.assertRaisesRegex(ValidationError, 'LSMat'):
-            format._validate_()
+            format.validate()
 
     def test_distance_matrix_directory_format(self):
         # This test exists mainly to assert that the single-file directory
@@ -45,7 +45,7 @@ class TestFormats(TestPluginBase):
         format = DistanceMatrixDirectoryFormat(self.temp_dir.name, mode='r')
 
         # Should not error.
-        format._validate_()
+        format.validate()
 
 
 if __name__ == "__main__":
