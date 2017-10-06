@@ -6,6 +6,7 @@
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
 
+import gzip
 import itertools
 import collections
 
@@ -107,25 +108,55 @@ class FastqGzFormat(model.BinaryFileFormat):
     A gzipped fastq file.
 
     """
-    def sniff(self):
-        with self.open() as fh:
-            if fh.read(2)[:2] != b'\x1f\x8b':
-                return False
 
-        filepath = str(self)
-        sniffer = skbio.io.io_registry.get_sniffer('fastq')
-        if sniffer(str(self))[0]:
-            try:
-                generator = skbio.io.read(filepath, constructor=skbio.DNA,
-                                          phred_offset=33, format='fastq',
-                                          verify=False)
-                for seq, _ in zip(generator, range(15)):
-                    pass
-                return True
-            # ValueError raised by skbio if there are invalid DNA chars.
-            except ValueError:
-                pass
-        return False
+    def _check_n_records(self, n=None):
+        with gzip.open(str(self), mode='rt', encoding='ascii') as fh:
+            zipper = itertools.zip_longest(*[fh] * 4)
+            if n is None:
+                file_ = enumerate(zipper)
+            else:
+                file_ = zip(range(1, n), zipper)
+            for i, record in file_:
+                header, seq, sep, qual = record
+
+                if not header.startswith('@'):
+                    raise ValidationError('Header on line %d is not FASTQ, '
+                                          'records may be misaligned' %
+                                          (i * 4 + 1))
+
+                if seq is None:
+                    raise ValidationError('Missing sequence for record '
+                                          'beginning on line %d'
+                                          % (i * 4 + 1))
+                elif not seq.isupper():
+                    raise ValidationError('Lowercase case sequence on line %d'
+                                          % (i * 4 + 2))
+
+                if sep is None:
+                    raise ValidationError('Missing separator for record '
+                                          'beginning on line %d'
+                                          % (i * 4 + 1))
+                elif not sep.startswith('+'):
+                    raise ValidationError('Invalid separator on line %d'
+                                          % (i * 4 + 3))
+
+                if qual is None:
+                    raise ValidationError('Missing quality for record '
+                                          'beginning on line %d'
+                                          % (i * 4 + 1))
+                elif len(qual) != len(seq):
+                    raise ValidationError('Quality score length doesn\'t '
+                                          'match sequence length for record '
+                                          'beginning on line %d'
+                                          % (i * 4 + 1))
+
+    def _validate_(self, level):
+        with self.open() as fh:
+            if fh.peek(2)[:2] != b'\x1f\x8b':
+                raise ValidationError('File is uncompressed')
+
+        record_count_map = {'min': 5, 'max': None}
+        self._check_n_records(record_count_map[level])
 
 
 class CasavaOneEightSingleLanePerSampleDirFmt(model.DirectoryFormat):
@@ -145,7 +176,7 @@ class CasavaOneEightSingleLanePerSampleDirFmt(model.DirectoryFormat):
     def _find_duplicates(self, ids):
         return {x for x, c in collections.Counter(ids).items() if c > 1}
 
-    def validate(self):
+    def _validate_(self, level):
         forwards = []
         reverse = []
         for p in self.path.iterdir():

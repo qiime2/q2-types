@@ -22,14 +22,14 @@ class TestFormats(TestPluginBase):
         filepath = self.get_data_path('pcoa-results-NxN.txt')
         format = OrdinationFormat(filepath, mode='r')
 
-        format._validate_()
+        format.validate()
 
     def test_ordination_format_validate_negative(self):
         filepath = self.get_data_path('not-pcoa-results.txt')
         format = OrdinationFormat(filepath, mode='r')
 
         with self.assertRaisesRegex(ValidationError, 'OrdinationFormat'):
-            format._validate_()
+            format.validate()
 
     def test_ordination_dir_format_validate_positive(self):
         filepath = self.get_data_path('pcoa-results-NxN.txt')
@@ -37,7 +37,7 @@ class TestFormats(TestPluginBase):
                     os.path.join(self.temp_dir.name, 'ordination.txt'))
         format = OrdinationDirectoryFormat(self.temp_dir.name, mode='r')
 
-        format._validate_()
+        format.validate()
 
 
 if __name__ == "__main__":
