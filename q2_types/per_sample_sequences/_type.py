@@ -19,9 +19,12 @@ SequencesWithQuality = SemanticType(
     'SequencesWithQuality', variant_of=SampleData.field['type'])
 PairedEndSequencesWithQuality = SemanticType(
     'PairedEndSequencesWithQuality', variant_of=SampleData.field['type'])
+JoinedSequencesWithQuality = SemanticType(
+    'JoinedSequencesWithQuality', variant_of=SampleData.field['type'])
 
 plugin.register_semantic_types(Sequences, SequencesWithQuality,
-                               PairedEndSequencesWithQuality)
+                               PairedEndSequencesWithQuality,
+                               JoinedSequencesWithQuality)
 
 plugin.register_semantic_type_to_format(
     SampleData[Sequences],
@@ -29,6 +32,10 @@ plugin.register_semantic_type_to_format(
 )
 plugin.register_semantic_type_to_format(
     SampleData[SequencesWithQuality],
+    artifact_format=SingleLanePerSampleSingleEndFastqDirFmt
+)
+plugin.register_semantic_type_to_format(
+    SampleData[JoinedSequencesWithQuality],
     artifact_format=SingleLanePerSampleSingleEndFastqDirFmt
 )
 plugin.register_semantic_type_to_format(

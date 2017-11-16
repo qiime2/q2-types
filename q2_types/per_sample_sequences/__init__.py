@@ -20,7 +20,8 @@ from ._format import (CasavaOneEightSingleLanePerSampleDirFmt,
                       PairedEndFastqManifestPhred64,
                       QIIME1DemuxFormat, QIIME1DemuxDirFmt)
 from ._type import (Sequences, SequencesWithQuality,
-                    PairedEndSequencesWithQuality)
+                    PairedEndSequencesWithQuality,
+                    JoinedSequencesWithQuality)
 
 __all__ = ['CasavaOneEightSingleLanePerSampleDirFmt',
            'CasavaOneEightLanelessPerSampleDirFmt',
@@ -29,8 +30,9 @@ __all__ = ['CasavaOneEightSingleLanePerSampleDirFmt',
            'SingleLanePerSampleSingleEndFastqDirFmt',
            'SingleLanePerSamplePairedEndFastqDirFmt', 'Sequences',
            'SequencesWithQuality', 'PairedEndSequencesWithQuality',
-           'SingleEndFastqManifestPhred33', 'SingleEndFastqManifestPhred64',
-           'PairedEndFastqManifestPhred33', 'PairedEndFastqManifestPhred64',
-           'QIIME1DemuxFormat', 'QIIME1DemuxDirFmt']
+           'JoinedSequencesWithQuality', 'SingleEndFastqManifestPhred33',
+           'SingleEndFastqManifestPhred64', 'PairedEndFastqManifestPhred33',
+           'PairedEndFastqManifestPhred64', 'QIIME1DemuxFormat',
+           'QIIME1DemuxDirFmt']
 
 importlib.import_module('q2_types.per_sample_sequences._transformer')
