@@ -310,10 +310,6 @@ class QIIME1DemuxFormat(model.TextFileFormat):
 
             ids.add(id)
 
-        if not ids:
-            # File was empty.
-            raise Exception()
-
     def _parse_id(self, header):
         if not header.startswith('>'):
             raise Exception()
