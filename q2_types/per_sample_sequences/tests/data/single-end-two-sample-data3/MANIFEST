@@ -1,0 +1,6 @@
+# Quantitative Insights Into Kneecaps and Armpits
+
+sample-id,filename,direction
+Human-Kneecap,Human-Kneecap_S1_L001_R1_001.fastq.gz,forward
+# tab in sample-id
+Human-Armp	it,Human-Armpit_S2_L001_R1_001.fastq.gz,forward

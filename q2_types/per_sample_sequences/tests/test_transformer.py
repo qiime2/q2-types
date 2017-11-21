@@ -23,7 +23,8 @@ from q2_types.per_sample_sequences import (
     SingleEndFastqManifestPhred33,
     SingleEndFastqManifestPhred64,
     PairedEndFastqManifestPhred33,
-    PairedEndFastqManifestPhred64)
+    PairedEndFastqManifestPhred64,
+    QIIME1DemuxDirFmt)
 from q2_types.per_sample_sequences._transformer import (
     _validate_header,
     _validate_single_end_fastq_manifest_directions,
@@ -55,6 +56,62 @@ class TestTransformers(TestPluginBase):
 
         for act, exp in zip(obs, expected):
             self.assertEqual(act, exp)
+
+    def test_slpssefdf_to_qiime1demuxdf(self):
+        filenames = ('single-end-two-sample-data1/MANIFEST',
+                     'metadata.yml',
+                     'Human-Kneecap_S1_L001_R1_001.fastq.gz',
+                     'Human-Armpit_S2_L001_R1_001.fastq.gz')
+        input, observed = self.transform_format(
+            SingleLanePerSampleSingleEndFastqDirFmt,
+            QIIME1DemuxDirFmt, filenames=filenames
+        )
+        expected1 = list(skbio.io.read(
+            '%s/Human-Kneecap_S1_L001_R1_001.fastq.gz' % str(input),
+            format='fastq', constructor=skbio.DNA
+        ))
+        expected2 = list(skbio.io.read(
+            '%s/Human-Armpit_S2_L001_R1_001.fastq.gz' % str(input),
+            format='fastq', constructor=skbio.DNA
+        ))
+        expected = \
+            list(zip(expected1, ['Human-Kneecap'] * len(expected1))) + \
+            list(zip(expected2, ['Human-Armpit'] * len(expected2)))
+        observed = skbio.io.read(
+            '%s/seqs.fna' % str(observed),
+            format='fasta', constructor=skbio.DNA
+        )
+        observed = list(observed)
+
+        self.assertEqual(len(observed), len(expected))
+
+        for i, obs in enumerate(observed):
+            # identifiers are as expected
+            self.assertEqual(obs.metadata['id'],
+                             '%s_%d' % (expected[i][1], i))
+            # sequences are as expected
+            self.assertEqual(str(obs), str(expected[i][0]))
+
+    def test_slpssefdf_to_qiime1demuxdf_bad_sample_ids(self):
+        filenames = ('single-end-two-sample-data2/MANIFEST',
+                     'metadata.yml',
+                     'Human-Kneecap_S1_L001_R1_001.fastq.gz',
+                     'Human-Armpit_S2_L001_R1_001.fastq.gz')
+        with self.assertRaisesRegex(ValueError,
+                                    expected_regex='space.*Human-K'):
+            self.transform_format(
+                SingleLanePerSampleSingleEndFastqDirFmt,
+                QIIME1DemuxDirFmt, filenames=filenames)
+
+        filenames = ('single-end-two-sample-data3/MANIFEST',
+                     'metadata.yml',
+                     'Human-Kneecap_S1_L001_R1_001.fastq.gz',
+                     'Human-Armpit_S2_L001_R1_001.fastq.gz')
+        with self.assertRaisesRegex(ValueError,
+                                    expected_regex='space.*Human-A'):
+            self.transform_format(
+                SingleLanePerSampleSingleEndFastqDirFmt,
+                QIIME1DemuxDirFmt, filenames=filenames)
 
     def test_casava_one_eight_single_lane_per_sample_dirfmt_to_slpssefdf(self):
         filenames = ('Human-Kneecap_S1_L001_R1_001.fastq.gz',)
