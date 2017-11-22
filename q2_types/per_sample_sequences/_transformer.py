@@ -354,7 +354,7 @@ def _12(dirfmt: SingleLanePerSampleSingleEndFastqDirFmt) \
                                                       absolute=False)
 
     result = QIIME1DemuxDirFmt()
-    fp = os.path.join(str(result), 'seqs.fna')
+    fp = str(result.path / 'seqs.fna')
     with open(fp, 'w') as fh:
         i = 0
         for r in input_manifest.iterrows():
@@ -362,8 +362,9 @@ def _12(dirfmt: SingleLanePerSampleSingleEndFastqDirFmt) \
             filename = r[1]['filename']
             if re.search("\s", sample_id) is not None:
                 raise ValueError(
-                    "Sample identifers cannot contain space characters, but "
-                    "an identifier with spaces was found: %s" % sample_id)
+                    "Whitespace was found in the ID for sample %s. Sample "
+                    "IDs with whitespace are incompatible with FASTA."
+                    % sample_id)
             fq_reader = skbio.io.read('%s/%s' % (str(dirfmt), filename),
                                       format='fastq', constructor=skbio.DNA,
                                       phred_offset=33, verify=False)
