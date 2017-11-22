@@ -6,6 +6,7 @@
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
 
+import re
 import os
 import gzip
 import shutil
@@ -24,7 +25,8 @@ from . import (SingleLanePerSampleSingleEndFastqDirFmt, FastqManifestFormat,
                CasavaOneEightSingleLanePerSampleDirFmt,
                CasavaOneEightLanelessPerSampleDirFmt,
                SingleEndFastqManifestPhred33, SingleEndFastqManifestPhred64,
-               PairedEndFastqManifestPhred33, PairedEndFastqManifestPhred64)
+               PairedEndFastqManifestPhred33, PairedEndFastqManifestPhred64,
+               QIIME1DemuxDirFmt)
 
 
 def _single_lane_per_sample_fastq_helper(dirfmt, output_cls, parse_lane=True):
@@ -342,3 +344,33 @@ def _9(fmt: PairedEndFastqManifestPhred64) \
     warnings.warn(_phred64_warning)
     return _fastq_manifest_helper(fmt, _write_phred64_to_phred33,
                                   single_end=False)
+
+
+@plugin.register_transformer
+def _12(dirfmt: SingleLanePerSampleSingleEndFastqDirFmt) \
+        -> QIIME1DemuxDirFmt:
+    with dirfmt.manifest.view(FastqManifestFormat).open() as fh:
+        input_manifest = _parse_and_validate_manifest(fh, single_end=True,
+                                                      absolute=False)
+
+    result = QIIME1DemuxDirFmt()
+    fp = str(result.path / 'seqs.fna')
+    with open(fp, 'w') as fh:
+        i = 0
+        for r in input_manifest.iterrows():
+            sample_id = r[1]['sample-id']
+            filename = r[1]['filename']
+            if re.search("\s", sample_id) is not None:
+                raise ValueError(
+                    "Whitespace was found in the ID for sample %s. Sample "
+                    "IDs with whitespace are incompatible with FASTA."
+                    % sample_id)
+            fq_reader = skbio.io.read('%s/%s' % (str(dirfmt), filename),
+                                      format='fastq', constructor=skbio.DNA,
+                                      phred_offset=33, verify=False)
+            for seq in fq_reader:
+                seq.metadata['id'] = '%s_%d' % (sample_id, i)
+                seq.write(fh)
+                i += 1
+
+    return result
