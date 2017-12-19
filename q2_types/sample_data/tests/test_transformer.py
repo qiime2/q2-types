@@ -52,13 +52,14 @@ class TestTransformers(TestPluginBase):
         filename = 'alpha-diversity.tsv'
         _, obs = self.transform_format(AlphaDiversityFormat, qiime2.Metadata,
                                        filename)
-        obs_category = obs.get_category('shannon')
 
-        exp_index = pd.Index(['Sample1', 'Sample4'], dtype=object)
-        # The data should stay as the exact values from the file (no rounding).
-        exp = pd.Series(['0.9709505944546688', '0.7219280948873623'],
-                        name='shannon', index=exp_index)
-        assert_series_equal(exp, obs_category.to_series())
+        exp_index = pd.Index(['Sample1', 'Sample4'], name='Sample ID',
+                             dtype=object)
+        exp_df = pd.DataFrame([[0.9709505944546688], [0.7219280948873623]],
+                              columns=['shannon'], index=exp_index)
+        exp_md = qiime2.Metadata(exp_df)
+
+        self.assertEqual(obs, exp_md)
 
     def test_non_alpha_diversity(self):
         filename = 'also-not-alpha-diversity.tsv'

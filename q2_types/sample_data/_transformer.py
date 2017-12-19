@@ -20,7 +20,7 @@ def _read_alpha_diversity(fh):
     df = pd.read_csv(fh, sep='\t', header=0, dtype=object)
     df.set_index(df.columns[0], drop=True, append=False, inplace=True)
     df.index.name = None
-    return df
+    return pd.to_numeric(df.iloc[:, 0], errors='raise')
 
 
 @plugin.register_transformer
@@ -34,11 +34,12 @@ def _1(data: pd.Series) -> AlphaDiversityFormat:
 @plugin.register_transformer
 def _2(ff: AlphaDiversityFormat) -> pd.Series:
     with ff.open() as fh:
-        df = _read_alpha_diversity(fh)
-        return pd.to_numeric(df.iloc[:, 0])
+        return _read_alpha_diversity(fh)
 
 
 @plugin.register_transformer
 def _3(ff: AlphaDiversityFormat) -> qiime2.Metadata:
     with ff.open() as fh:
-        return qiime2.Metadata(_read_alpha_diversity(fh))
+        series = _read_alpha_diversity(fh)
+        series.index.name = 'Sample ID'
+        return qiime2.Metadata(series.to_frame())

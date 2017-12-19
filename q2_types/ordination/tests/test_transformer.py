@@ -74,10 +74,9 @@ class TestTransformers(TestPluginBase):
         # functionality of the dynamic column naming (e.g. Axis N).
         _, obs = self.transform_format(OrdinationFormat, qiime2.Metadata,
                                        'pcoa-results-NxN.txt')
-        obs = obs.to_dataframe()
 
         columns = ['Axis %d' % i for i in range(1, 9)]
-        self.assertEqual(columns, obs.columns.tolist())
+        self.assertEqual(columns, list(obs.columns))
 
 
 if __name__ == "__main__":
