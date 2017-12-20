@@ -124,7 +124,7 @@ class FastqGzFormat(model.BinaryFileFormat):
                                           'records may be misaligned' %
                                           (i * 4 + 1))
 
-                if seq is None:
+                if seq is None or seq == '\n':
                     raise ValidationError('Missing sequence for record '
                                           'beginning on line %d'
                                           % (i * 4 + 1))
