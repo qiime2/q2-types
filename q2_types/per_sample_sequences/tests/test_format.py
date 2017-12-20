@@ -135,6 +135,13 @@ class TestFastqGzFormat(TestPluginBase):
         with self.assertRaisesRegex(ValidationError, 'length.*9'):
             format.validate()
 
+    def test_partial_record(self):
+        filepath = self.get_data_path('partial-record.fastq.gz')
+        format = FastqGzFormat(filepath, mode='r')
+
+        with self.assertRaisesRegex(ValidationError, 'sequence.*1'):
+            format.validate()
+
 
 class TestFormats(TestPluginBase):
     package = 'q2_types.per_sample_sequences.tests'
