@@ -8,12 +8,13 @@
 
 import importlib
 
+import pandas as pd
 import qiime2.plugin
 import qiime2.sdk
 
 from q2_types import __version__
 
-
+citations = qiime2.plugin.Citations.load('citations.bib', package='q2_types')
 plugin = qiime2.plugin.Plugin(
     name='types',
     version=__version__,
@@ -23,6 +24,9 @@ plugin = qiime2.plugin.Plugin(
                  'transformers supporting microbiome analysis.'),
     short_description='Plugin defining types for microbiome analysis.'
 )
+
+plugin.register_views(pd.Series, pd.DataFrame,
+                      citations=[citations['mckinney-proc-scipy-2010']])
 
 importlib.import_module('q2_types.feature_table')
 importlib.import_module('q2_types.distance_matrix')

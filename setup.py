@@ -25,6 +25,7 @@ setup(
         ['q2-types=q2_types.plugin_setup:plugin']
     },
     package_data={
+        'q2_types': ['citations.bib'],
         'q2_types.tests': ['data/*'],
         'q2_types.distance_matrix.tests': ['data/*'],
         'q2_types.feature_data.tests': ['data/*', 'data/taxonomy/*'],
