@@ -7,10 +7,11 @@
 # ----------------------------------------------------------------------------
 import ijson
 import h5py
+import biom
 
 import qiime2.plugin.model as model
 
-from ..plugin_setup import plugin
+from ..plugin_setup import plugin, citations
 
 
 class BIOMV100Format(model.TextFileFormat):
@@ -91,6 +92,6 @@ BIOMV210DirFmt = model.SingleFileDirectoryFormat('BIOMV210DirFmt',
                                                  'feature-table.biom',
                                                  BIOMV210Format)
 
-plugin.register_formats(
-    BIOMV100Format, BIOMV210Format, BIOMV100DirFmt, BIOMV210DirFmt
-)
+plugin.register_views(BIOMV100Format, BIOMV210Format, BIOMV100DirFmt,
+                      BIOMV210DirFmt, biom.Table,
+                      citations=[citations['mcdonald2012biological']])
