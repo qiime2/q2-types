@@ -109,6 +109,17 @@ class TestTransformers(TestPluginBase):
         self.assertEqual(obs.ids(axis='sample').all(),
                          exp.ids(axis='sample').all())
 
+    def test_biom_v210_format_to_biom_v100_format(self):
+        input, obs = self.transform_format(BIOMV210Format, BIOMV100Format,
+                                           filename='feature-table_v210.biom')
+        exp = biom.load_table(str(input))
+        obs = biom.load_table(str(obs))
+
+        self.assertEqual(obs.ids(axis='observation').all(),
+                         exp.ids(axis='observation').all())
+        self.assertEqual(obs.ids(axis='sample').all(),
+                         exp.ids(axis='sample').all())
+
     def test_to_pandas_data_frame_to_biom_v210_format(self):
         filepath = self.get_data_path('feature-table_v100.biom')
         transformer1 = self.get_transformer(BIOMV100Format, pd.DataFrame)

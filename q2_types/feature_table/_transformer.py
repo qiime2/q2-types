@@ -67,6 +67,13 @@ def _table_to_v210(data):
     return ff
 
 
+def _table_to_v100(data):
+    ff = BIOMV100Format()
+    with ff.open() as fh:
+        data.to_json(generated_by=_get_generated_by(), direct_io=fh)
+    return ff
+
+
 def _dataframe_to_table(df):
     if df.index.inferred_type != 'string':
         raise TypeError("Please provide a DataFrame with a string-based Index")
@@ -137,3 +144,9 @@ def _9(df: pd.DataFrame) -> biom.Table:
 @plugin.register_transformer
 def _10(df: pd.DataFrame) -> BIOMV210Format:
     return _table_to_v210(_dataframe_to_table(df))
+
+
+@plugin.register_transformer
+def _11(ff: BIOMV210Format) -> BIOMV100Format:
+    data = _parse_biom_table_v210(ff)
+    return _table_to_v100(data)
