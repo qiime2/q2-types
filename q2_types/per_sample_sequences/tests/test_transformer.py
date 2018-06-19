@@ -189,6 +189,37 @@ class TestTransformers(TestPluginBase):
         for act, exp in zip(obs, input):
             self.assertEqual(act, exp)
 
+    def test_fastqmanifest_single(self):
+        _, dirfmt = self.transform_format(
+            CasavaOneEightSingleLanePerSampleDirFmt,
+            SingleLanePerSamplePairedEndFastqDirFmt,
+            filenames=('Human-Kneecap_S1_L001_R1_001.fastq.gz',
+                       'Human-Armpit_S2_L001_R1_001.fastq.gz'),
+        )
+
+        df = dirfmt.manifest.view(pd.DataFrame)
+
+        self.assertEqual(set(df.index), {'Human-Kneecap', 'Human-Armpit'})
+        self.assertEqual(set(df.columns), {'forward'})
+        self.assertTrue(os.path.exists(df['forward'].loc['Human-Kneecap']))
+        self.assertTrue(os.path.exists(df['forward'].loc['Human-Armpit']))
+
+    def test_fastqmanifest_paired(self):
+        _, dirfmt = self.transform_format(
+            CasavaOneEightSingleLanePerSampleDirFmt,
+            SingleLanePerSamplePairedEndFastqDirFmt,
+            filenames=(
+                'Human-Kneecap_S1_L001_R1_001.fastq.gz',
+                'paired_end_data/Human-Kneecap_S1_L001_R2_001.fastq.gz'),
+        )
+
+        df = dirfmt.manifest.view(pd.DataFrame)
+
+        self.assertEqual(set(df.index), {'Human-Kneecap'})
+        self.assertEqual(set(df.columns), {'forward', 'reverse'})
+        self.assertTrue(os.path.exists(df['forward'].loc['Human-Kneecap']))
+        self.assertTrue(os.path.exists(df['reverse'].loc['Human-Kneecap']))
+
 
 class TestFastqManifestTransformers(TestPluginBase):
     package = "q2_types.per_sample_sequences.tests"
