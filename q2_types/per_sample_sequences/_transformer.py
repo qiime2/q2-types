@@ -374,3 +374,16 @@ def _12(dirfmt: SingleLanePerSampleSingleEndFastqDirFmt) \
                 i += 1
 
     return result
+
+
+@plugin.register_transformer
+def _21(ff: FastqManifestFormat) -> pd.DataFrame:
+    current_dir = os.path.dirname(str(ff))
+    manifest = pd.read_csv(str(ff), header=0, comment='#')
+    manifest.filename = manifest.filename.apply(
+        lambda f: os.path.join(current_dir, f))
+
+    df = manifest.pivot(index='sample-id', columns='direction',
+                        values='filename')
+    df.columns.name = None
+    return df
