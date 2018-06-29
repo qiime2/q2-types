@@ -10,13 +10,15 @@ import unittest
 
 import biom
 import pandas as pd
+import qiime2
 
 from pandas.util.testing import assert_frame_equal
 from q2_types.feature_table import BIOMV100Format, BIOMV210Format
 from qiime2.plugin.testing import TestPluginBase
 from q2_types.feature_table._transformer import (_parse_biom_table_v100,
                                                  _parse_biom_table_v210,
-                                                 _table_to_dataframe)
+                                                 _table_to_dataframe,
+                                                 _table_to_metadata)
 
 
 class TestTransformers(TestPluginBase):
@@ -150,6 +152,33 @@ class TestTransformers(TestPluginBase):
         transformer2 = self.get_transformer(pd.DataFrame, biom.Table)
         obs = transformer2(df)
         self.assertIsInstance(obs, biom.Table)
+
+    def test_biom_table_to_metadata(self):
+        filepath = self.get_data_path('feature-table_v100.biom')
+        transformer = self.get_transformer(biom.Table, qiime2.Metadata)
+        input = biom.load_table(filepath)
+
+        obs = transformer(input)
+
+        self.assertIsInstance(obs, qiime2.Metadata)
+
+    def test_biom_v100_format_to_metadata(self):
+        input, obs = self.transform_format(BIOMV100Format, qiime2.Metadata,
+                                           filename='feature-table_v100.biom')
+
+        table = _parse_biom_table_v100(input)
+        df = _table_to_metadata(table)
+
+        self.assertEqual(df, obs)
+
+    def test_biom_v210_format_to_metadata(self):
+        input, obs = self.transform_format(BIOMV210Format, qiime2.Metadata,
+                                           filename='feature-table_v210.biom')
+
+        table = _parse_biom_table_v210(input)
+        df = _table_to_metadata(table)
+
+        self.assertEqual(df, obs)
 
 
 if __name__ == "__main__":
