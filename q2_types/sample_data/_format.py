@@ -16,7 +16,7 @@ class AlphaDiversityFormat(model.TextFileFormat):
         with self.open() as fh:
             for line, _ in zip(fh, range(10)):
                 cells = line.split('\t')
-                if len(cells) != 2:
+                if len(cells) < 2:
                     return False
             return True
 
