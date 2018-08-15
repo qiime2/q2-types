@@ -28,11 +28,16 @@ Composition = SemanticType('Composition',
 Balance = SemanticType('Balance',
                        variant_of=FeatureTable.field['content'])
 
+PercentileNormalized = SemanticType('PercentileNormalized',
+                                     variant_of=FeatureTable.field['content'])
+
 plugin.register_semantic_types(FeatureTable, Frequency, RelativeFrequency,
-                               PresenceAbsence, Balance, Composition)
+                               PresenceAbsence, Balance, Composition,
+                               PercentileNormalized)
 
 plugin.register_semantic_type_to_format(
     FeatureTable[Frequency | RelativeFrequency |
-                 PresenceAbsence | Balance | Composition],
+                 PresenceAbsence | Balance | Composition |
+                 PercentileNormalized],
     artifact_format=BIOMV210DirFmt
 )
