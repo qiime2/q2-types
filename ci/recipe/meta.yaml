@@ -19,7 +19,7 @@ requirements:
   run:
     - python 3.5*
     - setuptools
-    - scikit-bio >=0.5.2
+    - scikit-bio >=0.5.3
     - pandas
     - biom-format >=2.1.5,<2.2.0
     - ijson
