@@ -29,7 +29,7 @@ Balance = SemanticType('Balance',
                        variant_of=FeatureTable.field['content'])
 
 PercentileNormalized = SemanticType('PercentileNormalized',
-                                     variant_of=FeatureTable.field['content'])
+                                    variant_of=FeatureTable.field['content'])
 
 plugin.register_semantic_types(FeatureTable, Frequency, RelativeFrequency,
                                PresenceAbsence, Balance, Composition,
