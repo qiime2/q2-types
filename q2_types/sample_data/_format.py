@@ -14,11 +14,12 @@ from ..plugin_setup import plugin
 class AlphaDiversityFormat(model.TextFileFormat):
     def sniff(self):
         with self.open() as fh:
-            for line, _ in zip(fh, range(10)):
+            i = 0
+            for line, i in zip(fh, range(10)):
                 cells = line.split('\t')
-                if len(cells) != 2:
+                if len(cells) < 2:
                     return False
-            return True
+            return i > 1
 
 
 AlphaDiversityDirectoryFormat = model.SingleFileDirectoryFormat(
