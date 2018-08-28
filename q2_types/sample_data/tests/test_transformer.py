@@ -72,7 +72,7 @@ class TestTransformers(TestPluginBase):
 
     def test_non_alpha_diversity(self):
         filename = 'also-not-alpha-diversity.tsv'
-        with self.assertRaisesRegex(ValueError, 'Unable to parse string'):
+        with self.assertRaisesRegex(ValueError, 'Non-numeric values '):
             self.transform_format(AlphaDiversityFormat, pd.Series, filename)
 
 
