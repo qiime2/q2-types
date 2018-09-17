@@ -3,4 +3,6 @@ sample-id,absolute-filepath,direction
 
 # another comment
 
-Human-Kneecap,/banana/mango/orange/Human-Kneecap_S1_L001_R1_001.fastq.gz,forward
+Human-Kneecap,$path/Human-Kneecap_S1_L001_R1_001.fastq.gz,forward
+# surrounding whitespace below is deliberate
+Peanut-Eyeball,$path/Human-Kneecap_S1_L001_R1_001.fastq.gz,  forward  
