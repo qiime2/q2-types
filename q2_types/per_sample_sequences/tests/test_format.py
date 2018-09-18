@@ -57,6 +57,18 @@ class TestAbsoluteFastqManifestFormats(TestPluginBase):
             with self.assertRaisesRegex(ValidationError, 'No header found'):
                 format(filepath, mode='r').validate()
 
+    def test_validate_negative_empty(self):
+        filepath = self.get_data_path('empty-MANIFEST')
+        for format in self.formats:
+            with self.assertRaisesRegex(ValidationError, 'No header found'):
+                format(filepath, mode='r').validate()
+
+    def test_validate_negative_header_no_records(self):
+        filepath = self.get_data_path('empty-records-MANIFEST')
+        for format in self.formats:
+            with self.assertRaisesRegex(ValidationError, 'No sample records'):
+                format(filepath, mode='r').validate()
+
     def test_validate_negative_not_manifest(self):
         filepath = self.get_data_path('not-MANIFEST')
         for format in self.formats:
@@ -69,6 +81,19 @@ class TestAbsoluteFastqManifestFormats(TestPluginBase):
             with self.assertRaisesRegex(ValidationError,
                                         'line 3.*could not be found'):
                 format(filepath, mode='r').validate()
+
+    def test_validate_negative_invalid_direction(self):
+        s1 = self.get_data_path('Human-Kneecap_S1_L001_R1_001.fastq.gz')
+
+        with open(self.get_data_path('invalid-direction-MANIFEST')) as fh:
+            tmpl = string.Template(fh.read())
+        file_ = os.path.join(self.temp_dir.name, 'invalid-direction-MANIFEST')
+        with open(file_, 'w') as fh:
+            fh.write(tmpl.substitute(path=os.path.dirname(s1)))
+
+        for format in self.formats:
+            with self.assertRaisesRegex(ValidationError, 'direction.*peanut'):
+                format(file_, mode='r').validate()
 
 
 class TestRelativeFastqManifestFormats(TestPluginBase):

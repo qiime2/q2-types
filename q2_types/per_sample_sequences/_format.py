@@ -34,10 +34,11 @@ class _FastqManifestBase(model.TextFileFormat):
             header = None
             records_seen = 0
             if n is None:
-                file_ = enumerate(fh, start=1)
+                file_ = enumerate(fh)
             else:
-                file_ = zip(range(1, n), fh)
+                file_ = zip(range(n), fh)
             for i, line in file_:
+                i = i + 1  # For easier reporting
                 if line == '':
                     break  # EOF
                 elif line.lstrip(' ') == '\n':
@@ -78,7 +79,8 @@ class _FastqManifestBase(model.TextFileFormat):
                     records_seen += 1
 
             if header is None:
-                raise ValidationError('No header found.')
+                raise ValidationError('No header found, expected: %s.'
+                                      % self.EXPECTED_HEADER)
 
             if records_seen == 0:
                 raise ValidationError('No sample records found in manifest, '
