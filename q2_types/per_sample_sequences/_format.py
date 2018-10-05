@@ -62,13 +62,13 @@ class _FastqManifestBase(model.TextFileFormat):
                     # TODO: a bunch of tests in this subpackage aren't well
                     # behaved --- many tests fail on this check because the
                     # test data isn't constructed correctly.
-                    if root == '':
+                    if True:  # root == '':
                         fp = os.path.join(root, cells[self.PATH_HEADER_LABEL])
                         if not os.path.exists(fp):
                             raise ValidationError(
                                 'File referenced on line %d could not be '
                                 'found (%s).'
-                                % (i, cells[self.PATH_HEADER_LABEL]))
+                                % (i, fp))
 
                     if cells['direction'] not in ('forward', 'reverse'):
                         raise ValidationError(

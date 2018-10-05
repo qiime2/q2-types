@@ -53,6 +53,8 @@ def _single_lane_per_sample_fastq_helper(dirfmt, output_cls, parse_lane=True):
         manifest_fh.write('%s,%s,%s\n' % (sample_id, path, direction))
 
     manifest_fh.close()
+    print(str(result.path))
+    print(os.listdir(str(result.path)))
     result.manifest.write_data(manifest, FastqManifestFormat)
 
     metadata = YamlFormat()
