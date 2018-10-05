@@ -66,8 +66,9 @@ class _FastqManifestBase(model.TextFileFormat):
                         fp = os.path.join(root, cells[self.PATH_HEADER_LABEL])
                         if not os.path.exists(fp):
                             raise ValidationError(
-                                'File referenced on line %d could not be found '
-                                '(%s).' % (i, cells[self.PATH_HEADER_LABEL]))
+                                'File referenced on line %d could not be '
+                                'found (%s).'
+                                % (i, cells[self.PATH_HEADER_LABEL]))
 
                     if cells['direction'] not in ('forward', 'reverse'):
                         raise ValidationError(
