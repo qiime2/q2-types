@@ -61,8 +61,11 @@ class _FastqManifestBase(model.TextFileFormat):
 
                     # TODO: a bunch of tests in this subpackage aren't well
                     # behaved --- many tests fail on this check because the
-                    # test data isn't constructed correctly.
-                    if True:  # root == '':
+                    # test data isn't constructed correctly. As well, there
+                    # appear to be framework-related issues preventing us from
+                    # making this kind of validation work for the relative
+                    # manifest formats at this time.
+                    if root == '':
                         fp = os.path.join(root, cells[self.PATH_HEADER_LABEL])
                         if not os.path.exists(fp):
                             raise ValidationError(
