@@ -29,19 +29,14 @@ class _FastqManifestBase(model.TextFileFormat):
     EXPECTED_HEADER = None
     PATH_HEADER_LABEL = None
 
-    def _check_n_records(self, check_file_exists=False, n=None):
+    def _check_n_records(self, root=None, n=None):
         with self.open() as fh:
             header = None
             records_seen = 0
-            if n is None:
-                file_ = enumerate(fh)
-            else:
-                file_ = zip(range(n), fh)
+            file_ = enumerate(fh) if n is None else zip(range(n), fh)
             for i, line in file_:
                 i = i + 1  # For easier reporting
-                if line == '':
-                    break  # EOF
-                elif line.lstrip(' ') == '\n':
+                if line.lstrip(' ') == '\n':
                     continue  # Blank line
                 elif line.startswith('#'):
                     continue  # Comment line
@@ -64,8 +59,13 @@ class _FastqManifestBase(model.TextFileFormat):
                     # Structure checks out, so let's make lookup easy
                     cells = dict(zip(header, cells))
 
-                    if check_file_exists and not \
-                            os.path.exists(cells[self.PATH_HEADER_LABEL]):
+                    print('hello', root, root.is_dir())
+                    print(list(root.parent.glob('**/*')))
+                    root = '' if root is None else str(root.parent)
+
+                    fp = os.path.join(root, cells[self.PATH_HEADER_LABEL])
+                    print(fp)
+                    if not os.path.exists(fp):
                         raise ValidationError(
                             'File referenced on line %d could not be found '
                             '(%s).' % (i, cells[self.PATH_HEADER_LABEL]))
@@ -97,7 +97,7 @@ class FastqManifestFormat(_FastqManifestBase):
     PATH_HEADER_LABEL = 'filename'
 
     def _validate_(self, level):
-        self._check_n_records(n={'min': 10, 'max': None}[level])
+        self._check_n_records(n={'min': 10, 'max': None}[level], root=self.path)
 
 
 class FastqAbsolutePathManifestFormat(_FastqManifestBase):
@@ -111,7 +111,7 @@ class FastqAbsolutePathManifestFormat(_FastqManifestBase):
     def _validate_(self, level):
         # This is effectively only invoked on import, so let's just
         # validate the whole file!
-        self._check_n_records(check_file_exists=True, n=None)
+        self._check_n_records(n=None)
 
 
 class SingleEndFastqManifestPhred33(FastqAbsolutePathManifestFormat):
