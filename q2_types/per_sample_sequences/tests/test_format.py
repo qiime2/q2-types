@@ -100,14 +100,9 @@ class TestRelativeFastqManifestFormats(TestPluginBase):
     package = 'q2_types.per_sample_sequences.tests'
 
     def test_validate_positive(self):
-        s1 = self.get_data_path('Human-Kneecap_S1_L001_R1_001.fastq.gz')
-        shutil.copy(s1, self.temp_dir.name)
-
         for file in ['single-MANIFEST', 'paired-MANIFEST', 'long-MANIFEST']:
             filepath = self.get_data_path('relative_manifests/%s' % file)
-            shutil.copy(filepath, self.temp_dir.name)
-            fp = os.path.join(self.temp_dir.name, file)
-            FastqManifestFormat(fp, mode='r').validate()
+            FastqManifestFormat(filepath, mode='r').validate()
 
     def test_validate_negative(self):
         files = ['no-data-MANIFEST', 'not-MANIFEST',
