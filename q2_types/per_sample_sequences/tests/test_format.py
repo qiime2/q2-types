@@ -393,7 +393,7 @@ class TestQIIME1DemuxFormat(TestPluginBase):
         shutil.copy(filepath, self.temp_dir.name)
 
         with self.assertRaisesRegex(ValidationError,
-                                    'QIIME1DemuxDirFmt.*seqs\.fna'):
+                                    r'QIIME1DemuxDirFmt.*seqs\.fna'):
             QIIME1DemuxDirFmt(self.temp_dir.name, mode='r').validate()
 
 
