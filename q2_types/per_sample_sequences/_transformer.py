@@ -360,7 +360,7 @@ def _12(dirfmt: SingleLanePerSampleSingleEndFastqDirFmt) \
         for r in input_manifest.iterrows():
             sample_id = r[1]['sample-id']
             filename = r[1]['filename']
-            if re.search("\s", sample_id) is not None:
+            if re.search(r"\s", sample_id) is not None:
                 raise ValueError(
                     "Whitespace was found in the ID for sample %s. Sample "
                     "IDs with whitespace are incompatible with FASTA."
