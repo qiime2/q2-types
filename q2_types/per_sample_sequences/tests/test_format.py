@@ -9,6 +9,7 @@
 import os.path
 import shutil
 import unittest
+import string
 
 from q2_types.per_sample_sequences import (
     CasavaOneEightSingleLanePerSampleDirFmt,
@@ -37,19 +38,62 @@ class TestAbsoluteFastqManifestFormats(TestPluginBase):
                         PairedEndFastqManifestPhred64]
 
     def test_validate_positive(self):
+        s1 = self.get_data_path('Human-Kneecap_S1_L001_R1_001.fastq.gz')
+
         for file in ['single-MANIFEST', 'paired-MANIFEST', 'long-MANIFEST']:
             filepath = self.get_data_path('absolute_manifests/%s' % file)
+            with open(filepath) as fh:
+                tmpl = string.Template(fh.read())
+            file_ = os.path.join(self.temp_dir.name, file)
+            with open(file_, 'w') as fh:
+                fh.write(tmpl.substitute(path=os.path.dirname(s1)))
+
             for format in self.formats:
+                format(file_, mode='r').validate()
+
+    def test_validate_negative_no_data(self):
+        filepath = self.get_data_path('no-data-MANIFEST')
+        for format in self.formats:
+            with self.assertRaisesRegex(ValidationError, 'No header found'):
                 format(filepath, mode='r').validate()
 
-    def test_validate_negative(self):
-        files = ['no-data-MANIFEST', 'not-MANIFEST',
-                 'absolute_manifests/jagged-MANIFEST']
-        for file in files:
-            filepath = self.get_data_path(file)
-            for format in self.formats:
-                with self.assertRaisesRegex(ValidationError, format.__name__):
-                    format(filepath, mode='r').validate()
+    def test_validate_negative_empty(self):
+        filepath = self.get_data_path('empty-MANIFEST')
+        for format in self.formats:
+            with self.assertRaisesRegex(ValidationError, 'No header found'):
+                format(filepath, mode='r').validate()
+
+    def test_validate_negative_header_no_records(self):
+        filepath = self.get_data_path('empty-records-MANIFEST')
+        for format in self.formats:
+            with self.assertRaisesRegex(ValidationError, 'No sample records'):
+                format(filepath, mode='r').validate()
+
+    def test_validate_negative_not_manifest(self):
+        filepath = self.get_data_path('not-MANIFEST')
+        for format in self.formats:
+            with self.assertRaisesRegex(ValidationError, 'line 1.*filename'):
+                format(filepath, mode='r').validate()
+
+    def test_validate_negative_jagged_manifest(self):
+        filepath = self.get_data_path('absolute_manifests/jagged-MANIFEST')
+        for format in self.formats:
+            with self.assertRaisesRegex(ValidationError,
+                                        'line 3.*could not be found'):
+                format(filepath, mode='r').validate()
+
+    def test_validate_negative_invalid_direction(self):
+        s1 = self.get_data_path('Human-Kneecap_S1_L001_R1_001.fastq.gz')
+
+        with open(self.get_data_path('invalid-direction-MANIFEST')) as fh:
+            tmpl = string.Template(fh.read())
+        file_ = os.path.join(self.temp_dir.name, 'invalid-direction-MANIFEST')
+        with open(file_, 'w') as fh:
+            fh.write(tmpl.substitute(path=os.path.dirname(s1)))
+
+        for format in self.formats:
+            with self.assertRaisesRegex(ValidationError, 'direction.*peanut'):
+                format(file_, mode='r').validate()
 
 
 class TestRelativeFastqManifestFormats(TestPluginBase):

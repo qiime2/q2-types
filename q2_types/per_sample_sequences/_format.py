@@ -6,6 +6,7 @@
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
 
+import os
 import gzip
 import itertools
 import collections
@@ -26,35 +27,68 @@ class _FastqManifestBase(model.TextFileFormat):
 
     """
     EXPECTED_HEADER = None
+    PATH_HEADER_LABEL = None
 
-    def sniff(self):
+    def _check_n_records(self, root, n=None):
         with self.open() as fh:
-            data_lines = 0
             header = None
-            while data_lines < 10:
-                line = fh.readline()
-
-                if line == '':
-                    # EOF
-                    break
-                elif line.lstrip(' ') == '\n':
-                    # Blank line
-                    continue
+            records_seen = 0
+            file_ = enumerate(fh) if n is None else zip(range(n), fh)
+            for i, line in file_:
+                i = i + 1  # For easier reporting
+                if line.lstrip(' ') == '\n':
+                    continue  # Blank line
                 elif line.startswith('#'):
-                    # Comment line
-                    continue
+                    continue  # Comment line
 
-                cells = line.rstrip('\n').split(',')
+                cells = [c.strip() for c in line.rstrip('\n').split(',')]
                 if header is None:
                     if cells != self.EXPECTED_HEADER:
-                        return False
-                    header = cells
+                        raise ValidationError(
+                            'Found header on line %d with the following '
+                            'labels: %s, expected: %s'
+                            % (i, cells, self.EXPECTED_HEADER))
+                    else:
+                        header = cells
                 else:
                     if len(cells) != len(header):
-                        return False
-                    data_lines += 1
+                        raise ValidationError(
+                            'Line %d has %s cells (%s), expected %s.'
+                            % (i, len(cells), cells, len(header)))
 
-            return header is not None and data_lines > 0
+                    # Structure checks out, so let's make lookup easy
+                    cells = dict(zip(header, cells))
+
+                    # TODO: a bunch of tests in this subpackage aren't well
+                    # behaved --- many tests fail on this check because the
+                    # test data isn't constructed correctly. As well, there
+                    # appear to be framework-related issues preventing us from
+                    # making this kind of validation work for the relative
+                    # manifest formats at this time.
+                    if root == '':
+                        fp = os.path.join(root, cells[self.PATH_HEADER_LABEL])
+                        if not os.path.exists(fp):
+                            raise ValidationError(
+                                'File referenced on line %d could not be '
+                                'found (%s).'
+                                % (i, fp))
+
+                    if cells['direction'] not in ('forward', 'reverse'):
+                        raise ValidationError(
+                            'Read direction declared on line %d was %s, '
+                            'expected `forward` or `reverse`.'
+                            % (i, cells['direction']))
+
+                    records_seen += 1
+
+            if header is None:
+                raise ValidationError('No header found, expected: %s.'
+                                      % self.EXPECTED_HEADER)
+
+            if records_seen == 0:
+                raise ValidationError('No sample records found in manifest, '
+                                      'only observed comments, blank lines, '
+                                      'and/or a header row.')
 
 
 class FastqManifestFormat(_FastqManifestBase):
@@ -63,6 +97,11 @@ class FastqManifestFormat(_FastqManifestBase):
 
     """
     EXPECTED_HEADER = ['sample-id', 'filename', 'direction']
+    PATH_HEADER_LABEL = 'filename'
+
+    def _validate_(self, level):
+        self._check_n_records(root=str(self.path.parent),
+                              n={'min': 10, 'max': None}[level])
 
 
 class FastqAbsolutePathManifestFormat(_FastqManifestBase):
@@ -71,6 +110,12 @@ class FastqAbsolutePathManifestFormat(_FastqManifestBase):
 
     """
     EXPECTED_HEADER = ['sample-id', 'absolute-filepath', 'direction']
+    PATH_HEADER_LABEL = 'absolute-filepath'
+
+    def _validate_(self, level):
+        # This is effectively only invoked on import, so let's just
+        # validate the whole file!
+        self._check_n_records(root='', n=None)
 
 
 class SingleEndFastqManifestPhred33(FastqAbsolutePathManifestFormat):
