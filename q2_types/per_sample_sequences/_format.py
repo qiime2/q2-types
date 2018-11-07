@@ -67,7 +67,7 @@ class _FastqManifestBase(model.TextFileFormat):
                     # manifest formats at this time.
                     if root == '':
                         fp = os.path.join(root, cells[self.PATH_HEADER_LABEL])
-                        if not os.path.exists(fp):
+                        if not os.path.exists(os.path.expandvars(fp)):
                             raise ValidationError(
                                 'File referenced on line %d could not be '
                                 'found (%s).'
