@@ -62,7 +62,7 @@ def _table_to_dataframe(table: biom.Table) -> pd.DataFrame:
 
 def _table_to_metadata(table: biom.Table) -> qiime2.Metadata:
     table = _table_to_dataframe(table)
-    table.index.name = '#SampleID'
+    table.index.name = 'id'
     return qiime2.Metadata(table)
 
 
