@@ -12,13 +12,12 @@ build:
   script: make install
 
 requirements:
-  build:
-    - python 3.5*
+  host:
+    - python {{ python }}
     - setuptools
 
   run:
-    - python 3.5*
-    - setuptools
+    - python {{ python }}
     - scikit-bio >=0.5.4
     - pandas
     - biom-format >=2.1.5,<2.2.0
