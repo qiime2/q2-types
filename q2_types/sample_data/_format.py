@@ -7,19 +7,48 @@
 # ----------------------------------------------------------------------------
 
 import qiime2.plugin.model as model
+from qiime2.plugin import ValidationError
 
 from ..plugin_setup import plugin
 
 
 class AlphaDiversityFormat(model.TextFileFormat):
-    def sniff(self):
+    def _validate_(self, level):
         with self.open() as fh:
-            i = 0
-            for line, i in zip(fh, range(10)):
-                cells = line.split('\t')
-                if len(cells) < 2:
-                    return False
-            return i > 1
+            header = None
+            records_seen = 0
+            file_ = enumerate(fh) if level == 'min' else zip(range(10), fh)
+            for i, line in file_:
+                i = i + 1  # For easier reporting
+                if line.lstrip(' ') == '\n':
+                    continue  # Blank line
+                elif line.startswith('#'):
+                    continue  # Comment line
+                cells = [c.strip() for c in line.rstrip('\n').split('\t')]
+
+                if header is None:
+                    if len(cells) < 2:
+                        raise ValidationError(
+                            'Found header on line %d with the following '
+                            'columns: %s (length: %d), expected at least 2 '
+                            'columns.' % (i, cells, len(cells)))
+                    else:
+                        header = cells
+                else:
+                    if len(cells) != len(header):
+                        raise ValidationError(
+                            'Line %d has %s cells (%s), expected %s.'
+                            % (i, len(cells), cells, len(header)))
+
+                    records_seen += 1
+
+            if header is None:
+                raise ValidationError('No header found.')
+
+            if records_seen == 0:
+                raise ValidationError('No records found in file, only '
+                                      'observed comments, blank lines, and/or '
+                                      'a header row.')
 
 
 AlphaDiversityDirectoryFormat = model.SingleFileDirectoryFormat(
