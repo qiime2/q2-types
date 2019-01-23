@@ -60,6 +60,12 @@ def _table_to_dataframe(table: biom.Table) -> pd.DataFrame:
     return pd.DataFrame(array, index=sample_ids, columns=feature_ids)
 
 
+def _table_to_metadata(table: biom.Table) -> qiime2.Metadata:
+    table = _table_to_dataframe(table)
+    table.index.name = 'id'
+    return qiime2.Metadata(table)
+
+
 def _table_to_v210(data):
     ff = BIOMV210Format()
     with ff.open() as fh:
@@ -150,3 +156,20 @@ def _10(df: pd.DataFrame) -> BIOMV210Format:
 def _11(ff: BIOMV210Format) -> BIOMV100Format:
     data = _parse_biom_table_v210(ff)
     return _table_to_v100(data)
+
+
+@plugin.register_transformer
+def _12(data: biom.Table) -> qiime2.Metadata:
+    return _table_to_metadata(data)
+
+
+@plugin.register_transformer
+def _13(ff: BIOMV100Format) -> qiime2.Metadata:
+    table = _parse_biom_table_v100(ff)
+    return _table_to_metadata(table)
+
+
+@plugin.register_transformer
+def _14(ff: BIOMV210Format) -> qiime2.Metadata:
+    table = _parse_biom_table_v210(ff)
+    return _table_to_metadata(table)
