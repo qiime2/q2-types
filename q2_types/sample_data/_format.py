@@ -42,8 +42,10 @@ class AlphaDiversityFormat(model.TextFileFormat):
 
                     records_seen += 1
 
-            if header is None:
-                raise ValidationError('No header found.')
+            # The first non-comment and non-blank row observed will always be
+            # the header row, and since we have no requirement on the field
+            # names (because they are dynamically defined), so no need to check
+            # for the presence (or validity) of a header row at this point.
 
             if records_seen == 0:
                 raise ValidationError('No records found in file, only '

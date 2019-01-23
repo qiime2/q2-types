@@ -47,6 +47,13 @@ class TestFormats(TestPluginBase):
         # Should succeed
         format.validate()
 
+    def test_alpha_diversity_format_validate_positive_comment_rows(self):
+        filepath = self.get_data_path('alpha-diversity-comments.tsv')
+        format = AlphaDiversityFormat(filepath, mode='r')
+
+        # Should succeed
+        format.validate()
+
     def test_alpha_diversity_format_validate_negative_no_records(self):
         filepath = self.get_data_path('alpha-diversity-missing-records.tsv')
         format = AlphaDiversityFormat(filepath, mode='r')
