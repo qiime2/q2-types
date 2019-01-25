@@ -19,7 +19,8 @@ requirements:
   run:
     - python {{ python }}
     - scikit-bio >=0.5.4
-    - pandas
+    # TODO: unset this pin once pandas 0.24.x is sorted out upstream
+    - pandas 0.23.4
     - biom-format >=2.1.5,<2.2.0
     - ijson
     - h5py
