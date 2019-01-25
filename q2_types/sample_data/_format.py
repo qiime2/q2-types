@@ -17,9 +17,9 @@ from ..plugin_setup import plugin
 class AlphaDiversityFormat(model.TextFileFormat):
     def _validate_(self, level):
         with self.open() as fh:
-            header, records_seen, isMin = None, 0, level == 'min'
+            header, records_seen, is_min = None, 0, level == 'min'
             fh_ = csv.reader(fh, delimiter='\t')
-            file_ = enumerate(fh_, 1) if isMin else zip(range(1, 11), fh_)
+            file_ = enumerate(fh_, 1) if is_min else zip(range(1, 11), fh_)
             for i, cells in file_:
                 if header is None:
                     if len(cells) < 2:
