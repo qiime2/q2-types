@@ -6,6 +6,8 @@
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
 
+import csv
+
 import qiime2.plugin.model as model
 from qiime2.plugin import ValidationError
 
@@ -15,17 +17,10 @@ from ..plugin_setup import plugin
 class AlphaDiversityFormat(model.TextFileFormat):
     def _validate_(self, level):
         with self.open() as fh:
-            header = None
-            records_seen = 0
-            file_ = enumerate(fh) if level == 'min' else zip(range(10), fh)
-            for i, line in file_:
-                i = i + 1  # For easier reporting
-                if line.lstrip(' ') == '\n':
-                    continue  # Blank line
-                elif line.startswith('#'):
-                    continue  # Comment line
-                cells = [c.strip() for c in line.rstrip('\n').split('\t')]
-
+            header, records_seen, isMin = None, 0, level == 'min'
+            fh_ = csv.reader(fh, delimiter='\t')
+            file_ = enumerate(fh_, 1) if isMin else zip(range(1, 11), fh_)
+            for i, cells in file_:
                 if header is None:
                     if len(cells) < 2:
                         raise ValidationError(

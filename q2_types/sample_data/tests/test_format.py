@@ -47,32 +47,25 @@ class TestFormats(TestPluginBase):
         # Should succeed
         format.validate()
 
-    def test_alpha_diversity_format_validate_positive_comment_rows(self):
-        filepath = self.get_data_path('alpha-diversity-comments.tsv')
-        format = AlphaDiversityFormat(filepath, mode='r')
-
-        # Should succeed
-        format.validate()
-
     def test_alpha_diversity_format_validate_negative_no_records(self):
         filepath = self.get_data_path('alpha-diversity-missing-records.tsv')
         format = AlphaDiversityFormat(filepath, mode='r')
 
-        with self.assertRaisesRegex(ValidationError, 'No records found.*'):
+        with self.assertRaisesRegex(ValidationError, 'No records found'):
             format.validate()
 
     def test_alpha_diversity_format_validate_negative_too_few_cols(self):
         filepath = self.get_data_path('alpha-diversity-one-column.tsv')
         format = AlphaDiversityFormat(filepath, mode='r')
 
-        with self.assertRaisesRegex(ValidationError, '.*Sample1.*: 1.*'):
+        with self.assertRaisesRegex(ValidationError, 'line 1.*2 columns'):
             format.validate()
 
     def test_alpha_diversity_format_validate_negative_jagged_rows(self):
         filepath = self.get_data_path('alpha-diversity-jagged-rows.tsv')
         format = AlphaDiversityFormat(filepath, mode='r')
 
-        with self.assertRaisesRegex(ValidationError, 'Line 3.*expected 3.*'):
+        with self.assertRaisesRegex(ValidationError, 'Line 3.*expected 3'):
             format.validate()
 
 
