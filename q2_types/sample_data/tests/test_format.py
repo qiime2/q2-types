@@ -22,21 +22,51 @@ class TestFormats(TestPluginBase):
         filepath = self.get_data_path('alpha-diversity.tsv')
         format = AlphaDiversityFormat(filepath, mode='r')
 
+        # Should succeed
         format.validate()
-
-    def test_alpha_diversity_format_validate_negative(self):
-        filepath = self.get_data_path('not-alpha-diversity.tsv')
-        format = AlphaDiversityFormat(filepath, mode='r')
-
-        with self.assertRaisesRegex(ValidationError, 'AlphaDiversityFormat'):
-            format.validate()
 
     def test_alpha_diversity_dir_fmt_validate_positive(self):
         filepath = self.get_data_path('alpha-diversity.tsv')
         shutil.copy(filepath, self.temp_dir.name)
         format = AlphaDiversityDirectoryFormat(self.temp_dir.name, mode='r')
 
+        # Should succeed
         format.validate()
+
+    def test_alpha_diversity_format_validate_positive_one_sample(self):
+        filepath = self.get_data_path('alpha-diversity-one-sample.tsv')
+        format = AlphaDiversityFormat(filepath, mode='r')
+
+        # Should succeed
+        format.validate()
+
+    def test_alpha_diversity_format_validate_positive_md_columns(self):
+        filepath = self.get_data_path('alpha-diversity-with-metadata.tsv')
+        format = AlphaDiversityFormat(filepath, mode='r')
+
+        # Should succeed
+        format.validate()
+
+    def test_alpha_diversity_format_validate_negative_no_records(self):
+        filepath = self.get_data_path('alpha-diversity-missing-records.tsv')
+        format = AlphaDiversityFormat(filepath, mode='r')
+
+        with self.assertRaisesRegex(ValidationError, 'No records found'):
+            format.validate()
+
+    def test_alpha_diversity_format_validate_negative_too_few_cols(self):
+        filepath = self.get_data_path('alpha-diversity-one-column.tsv')
+        format = AlphaDiversityFormat(filepath, mode='r')
+
+        with self.assertRaisesRegex(ValidationError, 'line 1.*2 columns'):
+            format.validate()
+
+    def test_alpha_diversity_format_validate_negative_jagged_rows(self):
+        filepath = self.get_data_path('alpha-diversity-jagged-rows.tsv')
+        format = AlphaDiversityFormat(filepath, mode='r')
+
+        with self.assertRaisesRegex(ValidationError, 'Line 3.*expected 3'):
+            format.validate()
 
 
 if __name__ == '__main__':
