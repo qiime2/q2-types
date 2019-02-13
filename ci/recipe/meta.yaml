@@ -21,6 +21,8 @@ requirements:
     - scikit-bio >=0.5.4
     # TODO: unset this pin once pandas 0.24.x is sorted out upstream
     - pandas 0.23.4
+    - numpy
+    - blas=*=openblas
     - biom-format >=2.1.5,<2.2.0
     - ijson
     - h5py
