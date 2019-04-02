@@ -10,6 +10,7 @@ import unittest
 import os
 import shutil
 import io
+import string
 
 import skbio
 import yaml
@@ -24,6 +25,11 @@ from q2_types.per_sample_sequences import (
     SingleEndFastqManifestPhred64,
     PairedEndFastqManifestPhred33,
     PairedEndFastqManifestPhred64,
+    FastqManifestFormat,
+    SingleEndFastqManifestPhred33V2,
+    SingleEndFastqManifestPhred64V2,
+    PairedEndFastqManifestPhred33V2,
+    PairedEndFastqManifestPhred64V2,
     QIIME1DemuxDirFmt)
 from q2_types.per_sample_sequences._transformer import (
     _validate_header,
@@ -331,7 +337,6 @@ class TestFastqManifestTransformers(TestPluginBase):
         transformer = self.get_transformer(
             format_,
             SingleLanePerSampleSingleEndFastqDirFmt)
-
         shutil.copy(
             self.get_data_path('s1-phred64.fastq.gz'),
             os.path.join(self.temp_dir.name, 's1-phred64.fastq.gz'))
@@ -949,6 +954,87 @@ class TestFastqManifestTransformers(TestPluginBase):
             columns=['sample-id', 'absolute-filepath', 'direction'])
         with self.assertRaisesRegex(ValueError, 'reverse read record: xyz'):
             _validate_paired_end_fastq_manifest_directions(manifest)
+
+
+# A quick note about this test suite: we are really only interested in the
+# manifest, since this transformer primarily transforms the new MD-manifest to
+# the old CSV-style on, do the only things asserted are facts about the
+# manifest.
+class TestFastqManifestV2Transformers(TestPluginBase):
+    package = "q2_types.per_sample_sequences.tests"
+
+    def setUp(self):
+        super().setUp()
+        self.se_formats = [SingleEndFastqManifestPhred33V2,
+                           SingleEndFastqManifestPhred64V2]
+        self.pe_formats = [PairedEndFastqManifestPhred33V2,
+                           PairedEndFastqManifestPhred64V2]
+        self.exp_se_manifest = (
+            "sample-id,filename,direction\n"
+            "Human-Kneecap,Human-Kneecap_0_L001_R1_001.fastq.gz,forward\n"
+            "Peanut-Eyeball,Peanut-Eyeball_1_L001_R1_001.fastq.gz,forward\n")
+        self.exp_pe_manifest = (
+            "sample-id,filename,direction\n"
+            "Human-Kneecap,Human-Kneecap_0_L001_R1_001.fastq.gz,forward\n"
+            "Peanut-Eyeball,Peanut-Eyeball_1_L001_R1_001.fastq.gz,forward\n"
+            "Human-Kneecap,Human-Kneecap_2_L001_R2_001.fastq.gz,reverse\n"
+            "Peanut-Eyeball,Peanut-Eyeball_3_L001_R2_001.fastq.gz,reverse\n")
+
+    def template_manifest(self, filepath, ctx):
+        with open(filepath) as fh:
+            tmpl = string.Template(fh.read())
+        basename = os.path.basename(filepath)
+        file_ = os.path.join(self.temp_dir.name, basename)
+        with open(file_, 'w') as fh:
+            fh.write(tmpl.substitute(**ctx))
+        return file_
+
+    def apply_transformation(self, from_fmt, to_fmt, datafile_fp, manifest_fp):
+        transformer = self.get_transformer(from_fmt, to_fmt)
+        manifest = self.template_manifest(
+            self.get_data_path(manifest_fp),
+            {'path': self.get_data_path(datafile_fp)})
+        return transformer(from_fmt(manifest, 'r'))
+
+    def test_single_end_fastq_manifest_phred33_to_slpssefdf(self):
+        obs = self.apply_transformation(
+            SingleEndFastqManifestPhred33V2,
+            SingleLanePerSampleSingleEndFastqDirFmt,
+            'Human-Kneecap_S1_L001_R1_001.fastq.gz',
+            'absolute_manifests_v2/single-MANIFEST')
+
+        with obs.manifest.view(FastqManifestFormat).open() as obs_manifest:
+            self.assertEqual(obs_manifest.read(), self.exp_se_manifest)
+
+    def test_single_end_fastq_manifest_phred64_to_slpssefdf(self):
+        obs = self.apply_transformation(
+            SingleEndFastqManifestPhred64V2,
+            SingleLanePerSampleSingleEndFastqDirFmt,
+            's1-phred64.fastq.gz',
+            'absolute_manifests_v2/single-MANIFEST')
+
+        with obs.manifest.view(FastqManifestFormat).open() as obs_manifest:
+            self.assertEqual(obs_manifest.read(), self.exp_se_manifest)
+
+    def test_paired_end_fastq_manifest_phred33_to_slpspefdf(self):
+        obs = self.apply_transformation(
+            PairedEndFastqManifestPhred33V2,
+            SingleLanePerSamplePairedEndFastqDirFmt,
+            'Human-Kneecap_S1_L001_R1_001.fastq.gz',
+            'absolute_manifests_v2/paired-MANIFEST')
+
+        with obs.manifest.view(FastqManifestFormat).open() as obs_manifest:
+            self.assertEqual(obs_manifest.read(), self.exp_pe_manifest)
+
+    def test_paired_end_fastq_manifest_phred64_to_slpspefdf(self):
+        obs = self.apply_transformation(
+            PairedEndFastqManifestPhred64V2,
+            SingleLanePerSamplePairedEndFastqDirFmt,
+            's1-phred64.fastq.gz',
+            'absolute_manifests_v2/paired-MANIFEST')
+
+        with obs.manifest.view(FastqManifestFormat).open() as obs_manifest:
+            self.assertEqual(obs_manifest.read(), self.exp_pe_manifest)
 
 
 if __name__ == '__main__':

@@ -11,13 +11,75 @@ import gzip
 import itertools
 import collections
 
+import pandas as pd
 import skbio
 import skbio.io
 import yaml
+import qiime2
 import qiime2.plugin.model as model
 from qiime2.plugin import ValidationError
 
 from ..plugin_setup import plugin
+
+
+class FastqAbsolutePathManifestFormatV2(model.TextFileFormat):
+    METADATA_COLUMNS = None
+
+    def _validate_(self, level):
+        try:
+            md = qiime2.Metadata.load(str(self))
+        except qiime2.metadata.MetadataFileError as md_exc:
+            raise ValidationError(md_exc) from md_exc
+
+        md = md.filter_columns(column_type='categorical')
+
+        for column in self.METADATA_COLUMNS.keys():
+            try:
+                md.get_column(column)
+            except ValueError as md_exc:
+                raise ValidationError(md_exc) from md_exc
+
+        df = md.to_dataframe()
+        df = df[list(self.METADATA_COLUMNS.keys())]
+
+        for i, row in enumerate(df.itertuples(), start=1):
+            for column in self.METADATA_COLUMNS.keys():
+                fp = getattr(row, column)
+                # QIIME 2 represents empty cells as np.nan once normalized
+                if pd.isna(fp):
+                    raise ValidationError(
+                        'Missing filepath on line %d and column %s.'
+                        % (i, column))
+                if not os.path.exists(os.path.expandvars(fp)):
+                    raise ValidationError(
+                        'Filepath on line %d and column %s could not '
+                        'be found (%s) for sample %s.'
+                        % (i, column, fp, row.Index))
+
+
+class _SingleEndFastqManifestV2(FastqAbsolutePathManifestFormatV2):
+    METADATA_COLUMNS = {'AbsoluteFilepath': 'forward'}
+
+
+class SingleEndFastqManifestPhred33V2(_SingleEndFastqManifestV2):
+    pass
+
+
+class SingleEndFastqManifestPhred64V2(_SingleEndFastqManifestV2):
+    pass
+
+
+class _PairedEndFastqManifestV2(FastqAbsolutePathManifestFormatV2):
+    METADATA_COLUMNS = {'ForwardAbsoluteFilepath': 'forward',
+                        'ReverseAbsoluteFilepath': 'reverse'}
+
+
+class PairedEndFastqManifestPhred33V2(_PairedEndFastqManifestV2):
+    pass
+
+
+class PairedEndFastqManifestPhred64V2(_PairedEndFastqManifestV2):
+    pass
 
 
 class _FastqManifestBase(model.TextFileFormat):
