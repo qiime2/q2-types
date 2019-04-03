@@ -452,5 +452,7 @@ plugin.register_formats(
     _SingleLanePerSampleFastqDirFmt, SingleLanePerSampleSingleEndFastqDirFmt,
     SingleLanePerSamplePairedEndFastqDirFmt, SingleEndFastqManifestPhred33,
     SingleEndFastqManifestPhred64, PairedEndFastqManifestPhred33,
-    PairedEndFastqManifestPhred64, QIIME1DemuxFormat, QIIME1DemuxDirFmt
+    PairedEndFastqManifestPhred64, SingleEndFastqManifestPhred33V2,
+    SingleEndFastqManifestPhred64V2, PairedEndFastqManifestPhred33V2,
+    PairedEndFastqManifestPhred64V2, QIIME1DemuxFormat, QIIME1DemuxDirFmt
 )
