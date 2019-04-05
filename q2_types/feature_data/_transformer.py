@@ -18,7 +18,7 @@ from ..plugin_setup import plugin
 from ..feature_table import BIOMV210Format
 from . import (TaxonomyFormat, HeaderlessTSVTaxonomyFormat, TSVTaxonomyFormat,
                DNAFASTAFormat, PairedDNASequencesDirectoryFormat,
-               AlignedDNAFASTAFormat)
+               AlignedDNAFASTAFormat, DifferentialFormat)
 
 
 # Taxonomy format transformers
@@ -359,3 +359,18 @@ def _19(data: AlignedDNAIterator) -> AlignedDNAFASTAFormat:
 @plugin.register_transformer
 def _33(ff: AlignedDNAFASTAFormat) -> qiime2.Metadata:
     return _dnafastaformats_to_metadata(ff)
+
+
+# differential types
+@plugin.register_transformer
+def _222(ff: DifferentialFormat) -> pd.DataFrame:
+    df = pd.read_csv(str(ff), sep='\t', comment='#', skip_blank_lines=True,
+                     header=0, dtype=object, index_col=0)
+    return df
+
+
+@plugin.register_transformer
+def _223(df: pd.DataFrame) -> DifferentialFormat:
+    ff = DifferentialFormat()
+    df.to_csv(str(ff), sep='\t', header=True, index=True)
+    return ff

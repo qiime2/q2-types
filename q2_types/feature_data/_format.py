@@ -185,10 +185,19 @@ AlignedDNASequencesDirectoryFormat = model.SingleFileDirectoryFormat(
     AlignedDNAFASTAFormat)
 
 
+class DifferentialFormat(model.TextFileFormat):
+    def validate(*args):
+        pass
+
+
+DifferentialDirectoryFormat = model.SingleFileDirectoryFormat(
+    'DifferentialDirectoryFormat', 'differentials.tsv', DifferentialFormat)
+
 plugin.register_formats(
     TSVTaxonomyFormat, TSVTaxonomyDirectoryFormat,
     HeaderlessTSVTaxonomyFormat, HeaderlessTSVTaxonomyDirectoryFormat,
     TaxonomyFormat, TaxonomyDirectoryFormat, DNAFASTAFormat,
     DNASequencesDirectoryFormat, PairedDNASequencesDirectoryFormat,
-    AlignedDNAFASTAFormat, AlignedDNASequencesDirectoryFormat
+    AlignedDNAFASTAFormat, AlignedDNASequencesDirectoryFormat,
+    DifferentialFormat, DifferentialDirectoryFormat
 )
