@@ -680,6 +680,5 @@ class TestDifferentialTransformer(TestPluginBase):
         self.assertIsInstance(obs, DifferentialFormat)
 
 
-
 if __name__ == '__main__':
     unittest.main()
