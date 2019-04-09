@@ -131,14 +131,6 @@ class TestTaxonomyFormats(TestPluginBase):
                     os.path.join(self.temp_dir.name, 'taxonomy.tsv'))
 
         format = TSVTaxonomyDirectoryFormat(self.temp_dir.name, mode='r')
-
-        filepath = self.get_data_path('aligned-dna-sequences.fasta')
-        temp_dir = self.temp_dir.name
-        shutil.copy(filepath,
-                    os.path.join(temp_dir, 'aligned-dna-sequences.fasta'))
-        format = AlignedDNASequencesDirectoryFormat(temp_dir, mode='r')
-
-        format.validate()
         format.validate()
 
 
