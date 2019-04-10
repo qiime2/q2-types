@@ -956,10 +956,10 @@ class TestFastqManifestTransformers(TestPluginBase):
             _validate_paired_end_fastq_manifest_directions(manifest)
 
 
-# A quick note about this test suite: we are really only interested in the
-# manifest, since this transformer primarily transforms the new MD-manifest to
-# the old CSV-style on, do the only things asserted are facts about the
-# manifest.
+# NOTE: we are really only interested in the manifest, since these transformers
+# primarily transform the V2 TSV manifests to the (older) CSV manifests. The
+# only things asserted here are facts about the manifest and not the actual
+# data assets, themselves.
 class TestFastqManifestV2Transformers(TestPluginBase):
     package = "q2_types.per_sample_sequences.tests"
 
