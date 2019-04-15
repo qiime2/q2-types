@@ -45,6 +45,7 @@ class FastqAbsolutePathManifestFormatV2(model.TextFileFormat):
             except ValueError as md_exc:
                 raise ValidationError(md_exc) from md_exc
 
+        filepaths = dict()
         for column_name, column in md_cols.items():
             column = column.to_series()
             for i, (id_, fp) in enumerate(column.iteritems(), start=1):
@@ -58,6 +59,15 @@ class FastqAbsolutePathManifestFormatV2(model.TextFileFormat):
                         'Filepath on line %d and column "%s" could not '
                         'be found (%s) for sample "%s".'
                         % (i, column_name, fp, id_))
+                if fp in filepaths:
+                    old_id, old_col_name, old_row = filepaths[fp]
+                    raise ValidationError(
+                        'Filepath on line %d and column "%s" (sample "%s") '
+                        'has already been registered on line %d and column '
+                        '"%s" (sample "%s").'
+                        % (i, column_name, id_, old_row, old_col_name, old_id))
+                else:
+                    filepaths[fp] = (id_, column_name, i)
 
 
 class _SingleEndFastqManifestV2(FastqAbsolutePathManifestFormatV2):

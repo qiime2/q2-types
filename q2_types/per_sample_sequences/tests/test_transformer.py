@@ -991,9 +991,10 @@ class TestFastqManifestV2Transformers(TestPluginBase):
 
     def apply_transformation(self, from_fmt, to_fmt, datafile_fp, manifest_fp):
         transformer = self.get_transformer(from_fmt, to_fmt)
+        fp = self.get_data_path(datafile_fp)
         manifest = self.template_manifest(
             self.get_data_path(manifest_fp),
-            {'path': self.get_data_path(datafile_fp)})
+            {k: fp for k in ['s1', 's2', 's1f', 's1r', 's2f', 's2r']})
         return transformer(from_fmt(manifest, 'r'))
 
     def test_single_end_fastq_manifest_phred33_to_slpssefdf(self):

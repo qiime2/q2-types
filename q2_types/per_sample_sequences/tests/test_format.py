@@ -49,24 +49,35 @@ class TestAbsoluteFastqManifestV2Formats(TestPluginBase):
 
     def test_validate_se_positive(self):
         s1 = self.get_data_path('Human-Kneecap_S1_L001_R1_001.fastq.gz')
+        s2 = self.get_data_path('Human-Armpit.fastq.gz')
         fp = self.get_data_path('absolute_manifests_v2/single-MANIFEST')
-        manifest = self.template_manifest(fp, {'path': s1})
+        manifest = self.template_manifest(fp, {'s1': s1, 's2': s2})
 
         for fmt in self.se_formats:
             fmt(manifest, mode='r').validate()
 
     def test_validate_pe_positive(self):
-        s1 = self.get_data_path('Human-Kneecap_S1_L001_R1_001.fastq.gz')
+        s1f = self.get_data_path('Human-Kneecap_S1_L001_R1_001.fastq.gz')
+        s1r = self.get_data_path('Human-Armpit.fastq.gz')
+        s2f = self.get_data_path('Human-Armpit_S2_L001_R1_001.fastq.gz')
+        s2r = self.get_data_path('Human-Kneecap_S1_R1_001.fastq.gz')
+
         fp = self.get_data_path('absolute_manifests_v2/paired-MANIFEST')
-        manifest = self.template_manifest(fp, {'path': s1})
+        manifest = self.template_manifest(fp, {'s1f': s1f, 's1r': s1r,
+                                               's2f': s2f, 's2r': s2r})
 
         for fmt in self.pe_formats:
             fmt(manifest, mode='r').validate()
 
     def test_extra_columns(self):
-        s1 = self.get_data_path('Human-Kneecap_S1_L001_R1_001.fastq.gz')
+        s1f = self.get_data_path('Human-Kneecap_S1_L001_R1_001.fastq.gz')
+        s1r = self.get_data_path('Human-Armpit.fastq.gz')
+        s2f = self.get_data_path('Human-Armpit_S2_L001_R1_001.fastq.gz')
+        s2r = self.get_data_path('Human-Kneecap_S1_R1_001.fastq.gz')
+
         fp = self.get_data_path('absolute_manifests_v2/multicol-MANIFEST')
-        manifest = self.template_manifest(fp, {'path': s1})
+        manifest = self.template_manifest(fp, {'s1f': s1f, 's1r': s1r,
+                                               's2f': s2f, 's2r': s2r})
 
         for fmt in self.se_formats:
             fmt(manifest, mode='r').validate()
@@ -115,6 +126,18 @@ class TestAbsoluteFastqManifestV2Formats(TestPluginBase):
         for fmt in self.se_formats:
             with self.assertRaisesRegex(
                     ValidationError,
+                    'line 1.*absolute-filepath.*Human-Kneecap'):
+                fmt(manifest, mode='r').validate()
+
+    def test_duplicate_filepaths(self):
+        s1 = self.get_data_path('Human-Kneecap_S1_L001_R1_001.fastq.gz')
+        fp = self.get_data_path('absolute_manifests_v2/single-MANIFEST')
+        manifest = self.template_manifest(fp, {'s1': s1, 's2': s1})
+
+        for fmt in self.se_formats:
+            with self.assertRaisesRegex(
+                    ValidationError,
+                    'line 2.*absolute-filepath.*Peanut-Eyeball.*'
                     'line 1.*absolute-filepath.*Human-Kneecap'):
                 fmt(manifest, mode='r').validate()
 

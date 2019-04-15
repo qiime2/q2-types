@@ -1,3 +1,3 @@
 sample-id	absolute-filepath	reverse-absolute-filepath	foo
-Human-Kneecap	$path	$path	1
-Peanut-Eyeball	$path	$path	2
+Human-Kneecap	$s1f	$s1r	1
+Peanut-Eyeball	$s2f	$s2r	2
