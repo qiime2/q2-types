@@ -105,7 +105,7 @@ class TestAbsoluteFastqManifestV2Formats(TestPluginBase):
         for fmt in self.pe_formats:
             with self.assertRaisesRegex(
                     ValidationError,
-                    'Missing.*line 1.*AbsoluteFilepath'):
+                    'Missing.*line 1.*absolute-filepath'):
                 fmt(manifest, mode='r').validate()
 
     def test_path_not_found(self):
@@ -115,7 +115,7 @@ class TestAbsoluteFastqManifestV2Formats(TestPluginBase):
         for fmt in self.se_formats:
             with self.assertRaisesRegex(
                     ValidationError,
-                    'line 1.*AbsoluteFilepath.*Human-Kneecap'):
+                    'line 1.*absolute-filepath.*Human-Kneecap'):
                 fmt(manifest, mode='r').validate()
 
 

@@ -1,3 +1,3 @@
-sample-id	ForwardAbsoluteFilepath	ReverseAbsoluteFilepath
+sample-id	forward-absolute-filepath	reverse-absolute-filepath
 Human-Kneecap		Human-Kneecap_S1_L001_R1_001.fastq.gz
 Peanut-Eyeball	Human-Kneecap_S1_L001_R1_001.fastq.gz	Human-Kneecap_S1_L001_R1_001.fastq.gz

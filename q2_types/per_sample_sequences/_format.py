@@ -23,6 +23,11 @@ from ..plugin_setup import plugin
 
 
 class FastqAbsolutePathManifestFormatV2(model.TextFileFormat):
+    """
+    Base class for mapping of sample identifies to filepaths. This format
+    relies heavily on the qiime2.Metadata on-disk format, as well as the
+    validation rules and behavior.
+    """
     METADATA_COLUMNS = None
 
     def _validate_(self, level):
@@ -33,32 +38,30 @@ class FastqAbsolutePathManifestFormatV2(model.TextFileFormat):
 
         md = md.filter_columns(column_type='categorical')
 
+        md_cols = dict()
         for column in self.METADATA_COLUMNS.keys():
             try:
-                md.get_column(column)
+                md_cols[column] = md.get_column(column)
             except ValueError as md_exc:
                 raise ValidationError(md_exc) from md_exc
 
-        df = md.to_dataframe()
-        df = df[list(self.METADATA_COLUMNS.keys())]
-
-        for i, row in enumerate(df.itertuples(), start=1):
-            for column in self.METADATA_COLUMNS.keys():
-                fp = getattr(row, column)
+        for column_name, column in md_cols.items():
+            column = column.to_series()
+            for i, (id_, fp) in enumerate(column.iteritems(), start=1):
                 # QIIME 2 represents empty cells as np.nan once normalized
                 if pd.isna(fp):
                     raise ValidationError(
-                        'Missing filepath on line %d and column %s.'
-                        % (i, column))
+                        'Missing filepath on line %d and column "%s".'
+                        % (i, column_name))
                 if not os.path.exists(os.path.expandvars(fp)):
                     raise ValidationError(
-                        'Filepath on line %d and column %s could not '
-                        'be found (%s) for sample %s.'
-                        % (i, column, fp, row.Index))
+                        'Filepath on line %d and column "%s" could not '
+                        'be found (%s) for sample "%s".'
+                        % (i, column_name, fp, id_))
 
 
 class _SingleEndFastqManifestV2(FastqAbsolutePathManifestFormatV2):
-    METADATA_COLUMNS = {'AbsoluteFilepath': 'forward'}
+    METADATA_COLUMNS = {'absolute-filepath': 'forward'}
 
 
 class SingleEndFastqManifestPhred33V2(_SingleEndFastqManifestV2):
@@ -70,8 +73,8 @@ class SingleEndFastqManifestPhred64V2(_SingleEndFastqManifestV2):
 
 
 class _PairedEndFastqManifestV2(FastqAbsolutePathManifestFormatV2):
-    METADATA_COLUMNS = {'ForwardAbsoluteFilepath': 'forward',
-                        'ReverseAbsoluteFilepath': 'reverse'}
+    METADATA_COLUMNS = {'forward-absolute-filepath': 'forward',
+                        'reverse-absolute-filepath': 'reverse'}
 
 
 class PairedEndFastqManifestPhred33V2(_PairedEndFastqManifestV2):
