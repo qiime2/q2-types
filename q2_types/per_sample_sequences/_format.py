@@ -11,13 +11,88 @@ import gzip
 import itertools
 import collections
 
+import pandas as pd
 import skbio
 import skbio.io
 import yaml
+import qiime2
 import qiime2.plugin.model as model
 from qiime2.plugin import ValidationError
 
 from ..plugin_setup import plugin
+
+
+class FastqAbsolutePathManifestFormatV2(model.TextFileFormat):
+    """
+    Base class for mapping of sample identifies to filepaths. This format
+    relies heavily on the qiime2.Metadata on-disk format, as well as the
+    validation rules and behavior.
+    """
+    METADATA_COLUMNS = None
+
+    def _validate_(self, level):
+        try:
+            md = qiime2.Metadata.load(str(self))
+        except qiime2.metadata.MetadataFileError as md_exc:
+            raise ValidationError(md_exc) from md_exc
+
+        md = md.filter_columns(column_type='categorical')
+
+        md_cols = dict()
+        for column in self.METADATA_COLUMNS.keys():
+            try:
+                md_cols[column] = md.get_column(column)
+            except ValueError as md_exc:
+                raise ValidationError(md_exc) from md_exc
+
+        filepaths = dict()
+        for column_name, column in md_cols.items():
+            column = column.to_series()
+            for i, (id_, fp) in enumerate(column.iteritems(), start=1):
+                # QIIME 2 represents empty cells as np.nan once normalized
+                if pd.isna(fp):
+                    raise ValidationError(
+                        'Missing filepath on line %d and column "%s".'
+                        % (i, column_name))
+                if not os.path.exists(os.path.expandvars(fp)):
+                    raise ValidationError(
+                        'Filepath on line %d and column "%s" could not '
+                        'be found (%s) for sample "%s".'
+                        % (i, column_name, fp, id_))
+                if fp in filepaths:
+                    old_id, old_col_name, old_row = filepaths[fp]
+                    raise ValidationError(
+                        'Filepath on line %d and column "%s" (sample "%s") '
+                        'has already been registered on line %d and column '
+                        '"%s" (sample "%s").'
+                        % (i, column_name, id_, old_row, old_col_name, old_id))
+                else:
+                    filepaths[fp] = (id_, column_name, i)
+
+
+class _SingleEndFastqManifestV2(FastqAbsolutePathManifestFormatV2):
+    METADATA_COLUMNS = {'absolute-filepath': 'forward'}
+
+
+class SingleEndFastqManifestPhred33V2(_SingleEndFastqManifestV2):
+    pass
+
+
+class SingleEndFastqManifestPhred64V2(_SingleEndFastqManifestV2):
+    pass
+
+
+class _PairedEndFastqManifestV2(FastqAbsolutePathManifestFormatV2):
+    METADATA_COLUMNS = {'forward-absolute-filepath': 'forward',
+                        'reverse-absolute-filepath': 'reverse'}
+
+
+class PairedEndFastqManifestPhred33V2(_PairedEndFastqManifestV2):
+    pass
+
+
+class PairedEndFastqManifestPhred64V2(_PairedEndFastqManifestV2):
+    pass
 
 
 class _FastqManifestBase(model.TextFileFormat):
@@ -390,5 +465,7 @@ plugin.register_formats(
     _SingleLanePerSampleFastqDirFmt, SingleLanePerSampleSingleEndFastqDirFmt,
     SingleLanePerSamplePairedEndFastqDirFmt, SingleEndFastqManifestPhred33,
     SingleEndFastqManifestPhred64, PairedEndFastqManifestPhred33,
-    PairedEndFastqManifestPhred64, QIIME1DemuxFormat, QIIME1DemuxDirFmt
+    PairedEndFastqManifestPhred64, SingleEndFastqManifestPhred33V2,
+    SingleEndFastqManifestPhred64V2, PairedEndFastqManifestPhred33V2,
+    PairedEndFastqManifestPhred64V2, QIIME1DemuxFormat, QIIME1DemuxDirFmt
 )

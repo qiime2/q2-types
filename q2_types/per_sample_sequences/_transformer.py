@@ -26,6 +26,10 @@ from . import (SingleLanePerSampleSingleEndFastqDirFmt, FastqManifestFormat,
                CasavaOneEightLanelessPerSampleDirFmt,
                SingleEndFastqManifestPhred33, SingleEndFastqManifestPhred64,
                PairedEndFastqManifestPhred33, PairedEndFastqManifestPhred64,
+               SingleEndFastqManifestPhred33V2,
+               SingleEndFastqManifestPhred64V2,
+               PairedEndFastqManifestPhred33V2,
+               PairedEndFastqManifestPhred64V2,
                QIIME1DemuxDirFmt)
 
 
@@ -387,3 +391,57 @@ def _21(ff: FastqManifestFormat) -> pd.DataFrame:
                         values='filename')
     df.columns.name = None
     return df
+
+
+def _manifest_v2_to_v1(fmt):
+    df = qiime2.Metadata.load(str(fmt)).to_dataframe()
+    # Drop unneccessary metadata columns
+    df = df[list(fmt.METADATA_COLUMNS.keys())]
+    denormalized_dfs = []
+    for column, direction in fmt.METADATA_COLUMNS.items():
+        denormalized_df = df[[column]]
+        original_index_name = denormalized_df.index.name
+        denormalized_df.reset_index(drop=False, inplace=True)
+        denormalized_df.rename(columns={
+            original_index_name: 'sample-id',
+            column: 'absolute-filepath'
+        }, inplace=True)
+        denormalized_df['direction'] = direction
+        denormalized_dfs.append(denormalized_df)
+    old_fmt = FastqManifestFormat()
+    pd.concat(denormalized_dfs, axis=0).to_csv(str(old_fmt), index=False)
+    return old_fmt
+
+
+@plugin.register_transformer
+def _23(fmt: SingleEndFastqManifestPhred33V2) \
+        -> SingleLanePerSampleSingleEndFastqDirFmt:
+    old_fmt = _manifest_v2_to_v1(fmt)
+    return _fastq_manifest_helper(old_fmt, _copy_with_compression,
+                                  single_end=True)
+
+
+@plugin.register_transformer
+def _24(fmt: SingleEndFastqManifestPhred64V2) \
+        -> SingleLanePerSampleSingleEndFastqDirFmt:
+    warnings.warn(_phred64_warning)
+    old_fmt = _manifest_v2_to_v1(fmt)
+    return _fastq_manifest_helper(old_fmt, _write_phred64_to_phred33,
+                                  single_end=True)
+
+
+@plugin.register_transformer
+def _25(fmt: PairedEndFastqManifestPhred33V2) \
+        -> SingleLanePerSamplePairedEndFastqDirFmt:
+    old_fmt = _manifest_v2_to_v1(fmt)
+    return _fastq_manifest_helper(old_fmt, _copy_with_compression,
+                                  single_end=False)
+
+
+@plugin.register_transformer
+def _26(fmt: PairedEndFastqManifestPhred64V2) \
+        -> SingleLanePerSamplePairedEndFastqDirFmt:
+    warnings.warn(_phred64_warning)
+    old_fmt = _manifest_v2_to_v1(fmt)
+    return _fastq_manifest_helper(old_fmt, _write_phred64_to_phred33,
+                                  single_end=False)
