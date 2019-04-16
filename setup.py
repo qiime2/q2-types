@@ -37,6 +37,7 @@ setup(
              'data/paired_end_data/*',
              'data/single_end_data/*',
              'data/absolute_manifests/*',
+             'data/absolute_manifests_v2/*',
              'data/relative_manifests/*',
              'data/qiime1-demux-format/*',
              'data/single-end-two-sample-data1/*',
