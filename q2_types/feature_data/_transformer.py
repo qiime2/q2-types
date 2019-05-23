@@ -364,13 +364,14 @@ def _33(ff: AlignedDNAFASTAFormat) -> qiime2.Metadata:
 # differential types
 @plugin.register_transformer
 def _222(ff: DifferentialFormat) -> pd.DataFrame:
-    df = pd.read_csv(str(ff), sep='\t', comment='#', skip_blank_lines=True,
-                     header=0, dtype=object, index_col=0)
-    return df
-
+    return Metadata.load(str(ff)).to_dataframe()
 
 @plugin.register_transformer
-def _223(df: pd.DataFrame) -> DifferentialFormat:
+def _223(ff: DifferentialFormat) -> Metadata:
+    return Metadata.load(str(ff))
+
+@plugin.register_transformer
+def _224(df: pd.DataFrame) -> DifferentialFormat:
     ff = DifferentialFormat()
-    df.to_csv(str(ff), sep='\t', header=True, index=True)
+    Metadata(data).save(str(ff))
     return ff
