@@ -8,7 +8,9 @@
 
 import skbio.io
 import qiime2.plugin.model as model
-
+import qiime2
+import pandas as pd
+import numpy as np
 from ..plugin_setup import plugin
 
 
@@ -186,31 +188,28 @@ AlignedDNASequencesDirectoryFormat = model.SingleFileDirectoryFormat(
 
 
 class DifferentialFormat(model.TextFileFormat):
-    def validate(*args):
-
+    def validate(self, *args):
         try:
             md = qiime2.Metadata.load(str(self))
         except qiime2.metadata.MetadataFileError as md_exc:
             raise ValidationError(md_exc) from md_exc
 
-       md = md.to_dataframe()
-       if len(md.columns) == 0:
-               raise ValidationError(
-                   ValueError(
-                       ('Differential format must contain'
-                        'at least 1 column')
-                   )
-               )
+        if md.column_count == 0:
+            raise ValueError(
+                    ('Differential format must contain'
+                     'at least 1 column')
+            )
 
-       types = md.dtypes
-       for t in types:
-           if t != np.float64 or t != np.float32:
-               raise ValidationError(
-                   ValueError(
-                       ('Differential types must only contain '
-                        'continuously valued quantities')
-                   )
-               )
+
+        md = md.to_dataframe()
+        types = md.dtypes
+        for t in types:
+            if np.issubdtype(np.number, t):
+                raise ValueError(
+                        ('Differential types must only contain '
+                         'continuously valued quantities')
+                )
+
 
 
 DifferentialDirectoryFormat = model.SingleFileDirectoryFormat(
