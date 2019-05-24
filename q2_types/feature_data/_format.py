@@ -5,9 +5,12 @@
 #
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
-
+import numpy as np
+import pandas as pd
 import skbio.io
+import qiime2
 import qiime2.plugin.model as model
+from qiime2.plugin import ValidationError
 
 from ..plugin_setup import plugin
 
@@ -186,33 +189,38 @@ AlignedDNASequencesDirectoryFormat = model.SingleFileDirectoryFormat(
 
 
 class DifferentialFormat(model.TextFileFormat):
-    def validate(*args):
+    def validate(self, *args):
 
         try:
             md = qiime2.Metadata.load(str(self))
         except qiime2.metadata.MetadataFileError as md_exc:
             raise ValidationError(md_exc) from md_exc
 
-       md = md.to_dataframe()
-       if len(md.columns) == 0:
-               raise ValidationError(
-                   ValueError(
-                       ('Differential format must contain'
-                        'at least 1 column')
-                   )
-               )
+        md = md.to_dataframe()
+        if len(md.columns) == 0:
+                raise ValueError(
+                        ('Differential format must contain'
+                         'at least 1 column')
+                )
 
-       types = md.dtypes
-       for t in types:
-           if t != np.float64 or t != np.float32:
-               raise ValidationError(
-                   ValueError(
-                       ('Differential types must only contain '
-                        'continuously valued quantities')
-                   )
-               )
+ 
+        types = md.dtypes
+        for t in types:
+            if not np.issubdtype(t, np.number):
+                raise ValueError(
+                        ('Differential types must only contain '
+                         'continuously valued quantities')
+                )
 
-
+            
+        for c in md.columns:
+            if (np.isinf(md[c].values).sum() > 0 or
+                pd.isnull(md[c]).sum() > 0):
+                raise ValueError(
+                        ('Differential contains infs or nans.')
+                )
+            
+        
 DifferentialDirectoryFormat = model.SingleFileDirectoryFormat(
     'DifferentialDirectoryFormat', 'differentials.tsv', DifferentialFormat)
 
