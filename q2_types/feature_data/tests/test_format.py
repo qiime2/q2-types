@@ -16,7 +16,7 @@ from q2_types.feature_data import (
     HeaderlessTSVTaxonomyDirectoryFormat, TSVTaxonomyFormat,
     TSVTaxonomyDirectoryFormat, DNAFASTAFormat, DNASequencesDirectoryFormat,
     PairedDNASequencesDirectoryFormat, AlignedDNAFASTAFormat,
-    AlignedDNASequencesDirectoryFormat
+    AlignedDNASequencesDirectoryFormat, DifferentialDirectoryFormat
 )
 from qiime2.plugin.testing import TestPluginBase
 from qiime2.plugin import ValidationError
@@ -131,7 +131,6 @@ class TestTaxonomyFormats(TestPluginBase):
                     os.path.join(self.temp_dir.name, 'taxonomy.tsv'))
 
         format = TSVTaxonomyDirectoryFormat(self.temp_dir.name, mode='r')
-
         format.validate()
 
 
@@ -199,6 +198,19 @@ class TestDNAFASTAFormats(TestPluginBase):
         shutil.copy(filepath,
                     os.path.join(temp_dir, 'aligned-dna-sequences.fasta'))
         format = AlignedDNASequencesDirectoryFormat(temp_dir, mode='r')
+
+        format.validate()
+
+
+class TestDifferentialFormat(TestPluginBase):
+    package = 'q2_types.feature_data.tests'
+
+    def test_differential_format(self):
+        filepath = self.get_data_path('differentials.tsv')
+        temp_dir = self.temp_dir.name
+        shutil.copy(filepath,
+                    os.path.join(temp_dir, 'differentials.tsv'))
+        format = DifferentialDirectoryFormat(temp_dir, mode='r')
 
         format.validate()
 
