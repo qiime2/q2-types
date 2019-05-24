@@ -371,7 +371,7 @@ def _223(ff: DifferentialFormat) -> qiime2.Metadata:
     return qiime2.Metadata.load(str(ff))
 
 @plugin.register_transformer
-def _224(df: pd.DataFrame) -> DifferentialFormat:
+def _224(data: pd.DataFrame) -> DifferentialFormat:
     ff = DifferentialFormat()
     qiime2.Metadata(data).save(str(ff))
     return ff

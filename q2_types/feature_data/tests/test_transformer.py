@@ -673,7 +673,10 @@ class TestDifferentialTransformer(TestPluginBase):
         transformer = self.get_transformer(pd.DataFrame, DifferentialFormat)
 
         index = pd.Index(['SEQUENCE1', 'SEQUENCE2', 'SEQUENCE3'])
-        input = pd.Series([-1.3, 0.1, 1.2], index=index, dtype=float)
+        index.name = 'featureid'
+        input = pd.DataFrame(
+            [-1.3, 0.1, 1.2], index=index, columns=['differential'],
+            dtype=float)
 
         obs = transformer(input)
 
