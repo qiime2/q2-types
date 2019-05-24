@@ -220,7 +220,7 @@ class TestDifferentialFormat(TestPluginBase):
         shutil.copy(filepath,
                     os.path.join(temp_dir, 'empty_differential.tsv'))
         format = DifferentialDirectoryFormat(temp_dir, mode='r')
-        
+
         with self.assertRaisesRegex(ValidationError, 'Differential'):
             format.validate()
 
@@ -230,8 +230,8 @@ class TestDifferentialFormat(TestPluginBase):
         shutil.copy(filepath,
                     os.path.join(temp_dir, 'bad_differential.tsv'))
         format = DifferentialDirectoryFormat(temp_dir, mode='r')
-        
-        with self.assertRaisesRegex(ValidationError, 'Differential'):                                    
+
+        with self.assertRaisesRegex(ValidationError, 'Differential'):
             format.validate()
 
     def test_differential_format_inf(self):
@@ -240,20 +240,20 @@ class TestDifferentialFormat(TestPluginBase):
         shutil.copy(filepath,
                     os.path.join(temp_dir, 'inf_differential.tsv'))
         format = DifferentialDirectoryFormat(temp_dir, mode='r')
-        
-        with self.assertRaisesRegex(ValidationError, 'Differential'):                        
+
+        with self.assertRaisesRegex(ValidationError, 'Differential'):
             format.validate()
 
-    def test_differential_format_inf(self):
+    def test_differential_format_nan(self):
         filepath = self.get_data_path('nan_differential.tsv')
         temp_dir = self.temp_dir.name
         shutil.copy(filepath,
                     os.path.join(temp_dir, 'nan_differential.tsv'))
         format = DifferentialDirectoryFormat(temp_dir, mode='r')
-        
-        with self.assertRaisesRegex(ValidationError, 'Differential'):            
+
+        with self.assertRaisesRegex(ValidationError, 'Differential'):
             format.validate()
-            
-            
+
+
 if __name__ == '__main__':
     unittest.main()
