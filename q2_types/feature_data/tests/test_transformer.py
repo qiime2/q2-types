@@ -669,6 +669,16 @@ class TestDifferentialTransformer(TestPluginBase):
         obs = list(obs.index[:4])
         self.assertListEqual(exp, obs)
 
+    def test_differential_to_md(self):
+
+        _, obs = self.transform_format(DifferentialFormat, qiime2.Metadata,
+                                       filename='differentials.tsv')
+        obs = obs.to_dataframe()
+        # sniff to see if the first 4 feature ids are the same
+        exp = ['F0', 'F1', 'F2', 'F3']
+        obs = list(obs.index[:4])
+        self.assertListEqual(exp, obs)
+
     def test_df_to_differential(self):
         transformer = self.get_transformer(pd.DataFrame, DifferentialFormat)
 
