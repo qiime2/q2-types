@@ -7,10 +7,10 @@
 # ----------------------------------------------------------------------------
 
 import skbio.io
+import numpy as np
 import qiime2.plugin.model as model
 import qiime2
-import pandas as pd
-import numpy as np
+from qiime2.plugin import ValidationError
 from ..plugin_setup import plugin
 
 
@@ -200,7 +200,6 @@ class DifferentialFormat(model.TextFileFormat):
                      'at least 1 column')
             )
 
-
         md = md.to_dataframe()
         types = md.dtypes
         for t in types:
@@ -211,9 +210,9 @@ class DifferentialFormat(model.TextFileFormat):
                 )
 
 
-
 DifferentialDirectoryFormat = model.SingleFileDirectoryFormat(
     'DifferentialDirectoryFormat', 'differentials.tsv', DifferentialFormat)
+
 
 plugin.register_formats(
     TSVTaxonomyFormat, TSVTaxonomyDirectoryFormat,
