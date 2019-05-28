@@ -195,7 +195,7 @@ class DifferentialFormat(model.TextFileFormat):
             raise ValidationError(md_exc) from md_exc
 
         if md.column_count == 0:
-            raise ValueError(
+            raise ValidationError(
                     ('Differential format must contain'
                      'at least 1 column')
             )
@@ -203,8 +203,8 @@ class DifferentialFormat(model.TextFileFormat):
         md = md.to_dataframe()
         types = md.dtypes
         for t in types:
-            if np.issubdtype(np.number, t):
-                raise ValueError(
+            if not np.issubdtype(t, np.number):
+                raise ValidationError(
                         ('Differential types must only contain '
                          'continuously valued quantities')
                 )
