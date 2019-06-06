@@ -159,6 +159,27 @@ class TestDNAFASTAFormats(TestPluginBase):
 
         format.validate()
 
+    def test_dna_fasta_format_consecutive_IDs(self):
+        filepath = self.get_data_path('dna-sequences-consecutive-ids.fasta')
+        format = DNAFASTAFormat(filepath, mode='r')
+
+        with self.assertRaisesRegex(ValidationError, 'consecutive IDs.*1'):
+            format.validate()
+
+    def test_dna_fasta_format_missing_initial_ID(self):
+        filepath = self.get_data_path('dna-sequences-first-line-not-id.fasta')
+        format = DNAFASTAFormat(filepath, mode='r')
+
+        with self.assertRaisesRegex(ValidationError, 'First line'):
+            format.validate()
+
+    def test_dna_fasta_format_corrupt_characters(self):
+        filepath = self.get_data_path('dna-sequences-corrupt-characters.fasta')
+        format = DNAFASTAFormat(filepath, mode='r')
+
+        with self.assertRaisesRegex(ValidationError, 'Unicode.*2'):
+            format.validate()
+
     def test_dna_sequences_directory_format(self):
         filepath = self.get_data_path('dna-sequences.fasta')
         shutil.copy(filepath,
