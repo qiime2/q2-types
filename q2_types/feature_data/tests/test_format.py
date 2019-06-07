@@ -177,7 +177,7 @@ class TestDNAFASTAFormats(TestPluginBase):
         filepath = self.get_data_path('dna-sequences-corrupt-characters.fasta')
         format = DNAFASTAFormat(filepath, mode='r')
 
-        with self.assertRaisesRegex(ValidationError, 'Unicode.*2'):
+        with self.assertRaisesRegex(ValidationError, 'utf-8.*2'):
             format.validate()
 
     def test_dna_sequences_directory_format(self):

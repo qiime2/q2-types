@@ -7,8 +7,6 @@
 # ----------------------------------------------------------------------------
 
 import re
-import io
-import math
 
 import skbio.io
 import qiime2.plugin.model as model
@@ -136,82 +134,44 @@ TSVTaxonomyDirectoryFormat = model.SingleFileDirectoryFormat(
 
 
 class DNAFASTAFormat(model.TextFileFormat):
-    def _check(self, level):
+    def _validate_lines(self, max_lines):
         FASTADNAValidator = re.compile(r'[ACGTURYKMSWBDHVN\-\.]+\n?')
         last_line_was_ID = False
 
-        with open(str(self)) as fh:
+        with open(str(self), 'rb') as fh:
             try:
-                line_number = 1
-                # If we read 2 and only get one \n we have only one \n in the
-                # file
                 first = fh.read(2)
-                # Empty files should pass
+                first = first.decode('utf-8')
+                # Empty files should validate
                 if first == '\n' or first == '':
                     return
                 if first[0] != '>':
-                    raise ValidationError(
-                        "First line of file is not a valid FASTA ID. FASTA "
-                        "IDs must start with '>'")
+                    raise ValidationError("First line of file is not a valid "
+                                          "FASTA ID. FASTA IDs must start "
+                                          "with '>'")
                 fh.seek(0)
-                line = fh.readline()
-                while line != '' and line_number < level:
+                for line_number, line in enumerate(fh):
+                    if line_number >= max_lines:
+                        return
+                    line = line.decode('utf-8')
                     if line.startswith('>'):
                         if last_line_was_ID:
-                            raise ValidationError(
-                                'Multiple consecutive IDs starting on line '
-                                f'{line_number-1!r}')
+                            raise ValidationError('Multiple consecutive IDs '
+                                                  'starting on line '
+                                                  f'{line_number!r}')
                         last_line_was_ID = True
                     elif re.fullmatch(FASTADNAValidator, line):
                         last_line_was_ID = False
                     else:
-                        raise ValidationError(
-                            f'Invalid sequence on line {line_number}')
-                    line_number += 1
-                    line = fh.readline()
+                        raise ValidationError('Invalid characters on line '
+                                              f'{line_number+1}')
             except UnicodeDecodeError as e:
-                # We tell() on the buffer because we want the actual buffer the
-                # error occured in, tell() on the file handle will report being
-                # at the end of the last buffer when the error occured well
-                # into the next buffer
-                buffer = fh.buffer
-                pos = buffer.tell()
-                # We want to start our read from the beginning of the buffer we
-                # encountered the error on because we have yet to count any
-                # lines in that buffer
-                pos = (math.ceil(pos / io.DEFAULT_BUFFER_SIZE) - 1) * \
-                    io.DEFAULT_BUFFER_SIZE
-                buffer.seek(pos)
-                # e.start reports the position of the bad byte in the current
-                # buffer not the file, this is the cause of all the pain
-                # determining which buffer in the file the error occured in so
-                # we can find the bad byte's position in the file not just the
-                # buffer. If the bad byte is the final byte in a buffer it will
-                # report it as being the first byte in the next buffer. This is
-                # likely due to the fact that e.start reports the buffer
-                # position of the bad byte, and e.end reports the buffer
-                # position of the next good byte. If the last byte in a buffer
-                # is bad then e.start should be 8192 and e.end should be byte 0
-                # of the next buffer, but end being less than start doesn't
-                # really make sense, so this is handled by bumping e.start to 0
-                # and e.end to 1
-                fh_error = io.TextIOWrapper(io.BytesIO(buffer.read(e.start)),
-                                            errors='ignore')
-                # We need to count the lines in the buffer the error occured in
-                # only counting newline terminated lines to ensure we do not
-                # double count the line the error occured on, the line count is
-                # initialized to one which accounts for the error line, and the
-                # error line will always terminate with the bad byte not a
-                # newline
-                for line in fh_error:
-                    if line[-1] == '\n':
-                        line_number += 1
-                raise ValidationError('Unicode cannot decode byte on line '
-                                      f'{line_number}') from e
+                raise ValidationError(f'utf-8 cannot decode byte on line '
+                                      f'{line_number+1}') from e
 
-    def _validate_(self, level):
+    def _validate_(self, max_lines):
         level_map = {'min': 100, 'max': float('inf')}
-        self._check(level_map[level])
+        self._validate_lines(level_map[max_lines])
 
 
 DNASequencesDirectoryFormat = model.SingleFileDirectoryFormat(
