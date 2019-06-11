@@ -200,14 +200,13 @@ class DifferentialFormat(model.TextFileFormat):
                      'at least 1 column')
             )
 
-        md = md.to_dataframe()
-        types = md.dtypes
-        for t in types:
-            if not np.issubdtype(t, np.number):
-                raise ValidationError(
+
+        filtered_md = md.filter_columns(column_type='numeric')
+        if filtered_md.column_count != md.column_count:
+            raise ValidationError(
                         ('Differential types must only contain '
                          'continuously valued quantities')
-                )
+            )
 
 
 DifferentialDirectoryFormat = model.SingleFileDirectoryFormat(
