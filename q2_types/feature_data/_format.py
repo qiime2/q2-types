@@ -7,7 +7,6 @@
 # ----------------------------------------------------------------------------
 
 import skbio.io
-import numpy as np
 import qiime2.plugin.model as model
 import qiime2
 from qiime2.plugin import ValidationError
@@ -199,7 +198,6 @@ class DifferentialFormat(model.TextFileFormat):
                     ('Differential format must contain '
                      'at least 1 column')
             )
-
 
         filtered_md = md.filter_columns(column_type='numeric')
         if filtered_md.column_count != md.column_count:
