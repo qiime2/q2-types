@@ -196,7 +196,7 @@ class DifferentialFormat(model.TextFileFormat):
 
         if md.column_count == 0:
             raise ValidationError(
-                    ('Differential format must contain'
+                    ('Differential format must contain '
                      'at least 1 column')
             )
 
