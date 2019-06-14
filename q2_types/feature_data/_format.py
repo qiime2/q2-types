@@ -135,39 +135,42 @@ TSVTaxonomyDirectoryFormat = model.SingleFileDirectoryFormat(
 
 class DNAFASTAFormat(model.TextFileFormat):
     def _validate_lines(self, max_lines):
-        FASTADNAValidator = re.compile(r'[ACGTURYKMSWBDHVN\-\.]+\n?')
+        FASTADNAValidator = re.compile(r'[ACGTURYKMSWBDHVN]+\n?')
         last_line_was_ID = False
 
         with open(str(self), 'rb') as fh:
             try:
-                first = fh.read(2)
-                first = first.decode('utf-8')
+                first = fh.read(6)
+                if first[:3] == b'\xEF\xBB\xBF':
+                    first = first[3:]
                 # Empty files should validate
-                if first == '\n' or first == '':
+                if len(first) < 3:
                     return
-                if first[0] != '>':
+                if first[0] != ord(b'>'):
                     raise ValidationError("First line of file is not a valid "
                                           "FASTA ID. FASTA IDs must start "
                                           "with '>'")
                 fh.seek(0)
-                for line_number, line in enumerate(fh):
+                for line_number, line in enumerate(fh, 1):
                     if line_number >= max_lines:
                         return
-                    line = line.decode('utf-8')
+                    line = line.decode('utf-8-sig')
                     if line.startswith('>'):
                         if last_line_was_ID:
                             raise ValidationError('Multiple consecutive IDs '
                                                   'starting on line '
-                                                  f'{line_number!r}')
+                                                  f'{line_number-1!r}')
                         last_line_was_ID = True
                     elif re.fullmatch(FASTADNAValidator, line):
                         last_line_was_ID = False
                     else:
                         raise ValidationError('Invalid characters on line '
-                                              f'{line_number+1}')
+                                              f'{line_number} (does not match '
+                                              'IUPAC characters for a DNA '
+                                              'sequence).')
             except UnicodeDecodeError as e:
                 raise ValidationError(f'utf-8 cannot decode byte on line '
-                                      f'{line_number+1}') from e
+                                      f'{line_number}') from e
 
     def _validate_(self, max_lines):
         level_map = {'min': 100, 'max': float('inf')}

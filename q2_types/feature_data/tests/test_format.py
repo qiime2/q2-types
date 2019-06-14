@@ -144,12 +144,11 @@ class TestDNAFASTAFormats(TestPluginBase):
 
         format.validate()
 
-    def test_dna_fasta_format_validate_negative(self):
-        filepath = self.get_data_path('not-dna-sequences')
+    def test_dna_fasta_format_bom_passes(self):
+        filepath = self.get_data_path('dna-with-bom-passes.fasta')
         format = DNAFASTAFormat(filepath, mode='r')
 
-        with self.assertRaisesRegex(ValidationError, 'DNAFASTA'):
-            format.validate()
+        format.validate()
 
     def test_dna_fasta_format_empty_file(self):
         filepath = os.path.join(self.temp_dir.name, 'empty')
@@ -158,6 +157,13 @@ class TestDNAFASTAFormats(TestPluginBase):
         format = DNAFASTAFormat(filepath, mode='r')
 
         format.validate()
+
+    def test_dna_fasta_format_validate_negative(self):
+        filepath = self.get_data_path('not-dna-sequences')
+        format = DNAFASTAFormat(filepath, mode='r')
+
+        with self.assertRaisesRegex(ValidationError, 'DNAFASTA'):
+            format.validate()
 
     def test_dna_fasta_format_consecutive_IDs(self):
         filepath = self.get_data_path('dna-sequences-consecutive-ids.fasta')
@@ -178,6 +184,13 @@ class TestDNAFASTAFormats(TestPluginBase):
         format = DNAFASTAFormat(filepath, mode='r')
 
         with self.assertRaisesRegex(ValidationError, 'utf-8.*2'):
+            format.validate()
+
+    def test_dna_fasta_format_bom_fails(self):
+        filepath = self.get_data_path('dna-with-bom-fails.fasta')
+        format = DNAFASTAFormat(filepath, mode='r')
+
+        with self.assertRaisesRegex(ValidationError, 'First line'):
             format.validate()
 
     def test_dna_sequences_directory_format(self):
