@@ -135,7 +135,7 @@ TSVTaxonomyDirectoryFormat = model.SingleFileDirectoryFormat(
 
 class DNAFASTAFormat(model.TextFileFormat):
     def _validate_lines(self, max_lines):
-        FASTADNAValidator = re.compile(r'[ACGTURYKMSWBDHVN]+\n?')
+        FASTADNAValidator = re.compile(r'[ACGTURYKMSWBDHVN]+\r?\n?')
         last_line_was_ID = False
 
         with open(str(self), 'rb') as fh:
@@ -144,7 +144,7 @@ class DNAFASTAFormat(model.TextFileFormat):
                 if first[:3] == b'\xEF\xBB\xBF':
                     first = first[3:]
                 # Empty files should validate
-                if len(first) < 3:
+                if first.strip() == b'':
                     return
                 if first[0] != ord(b'>'):
                     raise ValidationError("First line of file is not a valid "
