@@ -7,10 +7,11 @@
 # ----------------------------------------------------------------------------
 
 import re
-
 import skbio.io
+
 import qiime2.plugin.model as model
 from qiime2.plugin import ValidationError
+import qiime2
 
 from ..plugin_setup import plugin
 
@@ -212,10 +213,30 @@ AlignedDNASequencesDirectoryFormat = model.SingleFileDirectoryFormat(
     AlignedDNAFASTAFormat)
 
 
+class DifferentialFormat(model.TextFileFormat):
+    def validate(self, *args):
+        try:
+            md = qiime2.Metadata.load(str(self))
+        except qiime2.metadata.MetadataFileError as md_exc:
+            raise ValidationError(md_exc) from md_exc
+
+        if md.column_count == 0:
+            raise ValidationError('Format must contain at least 1 column')
+
+        filtered_md = md.filter_columns(column_type='numeric')
+        if filtered_md.column_count != md.column_count:
+            raise ValidationError('Must only contain numeric values.')
+
+
+DifferentialDirectoryFormat = model.SingleFileDirectoryFormat(
+    'DifferentialDirectoryFormat', 'differentials.tsv', DifferentialFormat)
+
+
 plugin.register_formats(
     TSVTaxonomyFormat, TSVTaxonomyDirectoryFormat,
     HeaderlessTSVTaxonomyFormat, HeaderlessTSVTaxonomyDirectoryFormat,
     TaxonomyFormat, TaxonomyDirectoryFormat, DNAFASTAFormat,
     DNASequencesDirectoryFormat, PairedDNASequencesDirectoryFormat,
-    AlignedDNAFASTAFormat, AlignedDNASequencesDirectoryFormat
+    AlignedDNAFASTAFormat, AlignedDNASequencesDirectoryFormat,
+    DifferentialFormat, DifferentialDirectoryFormat
 )

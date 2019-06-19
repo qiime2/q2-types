@@ -16,7 +16,7 @@ from q2_types.feature_data import (
     HeaderlessTSVTaxonomyDirectoryFormat, TSVTaxonomyFormat,
     TSVTaxonomyDirectoryFormat, DNAFASTAFormat, DNASequencesDirectoryFormat,
     PairedDNASequencesDirectoryFormat, AlignedDNAFASTAFormat,
-    AlignedDNASequencesDirectoryFormat
+    AlignedDNASequencesDirectoryFormat, DifferentialDirectoryFormat
 )
 from qiime2.plugin.testing import TestPluginBase
 from qiime2.plugin import ValidationError
@@ -235,6 +235,59 @@ class TestDNAFASTAFormats(TestPluginBase):
         format = AlignedDNASequencesDirectoryFormat(temp_dir, mode='r')
 
         format.validate()
+
+
+class TestDifferentialFormat(TestPluginBase):
+    package = 'q2_types.feature_data.tests'
+
+    def test_differential_format(self):
+        filepath = self.get_data_path('differentials.tsv')
+        temp_dir = self.temp_dir.name
+        shutil.copy(filepath,
+                    os.path.join(temp_dir, 'differentials.tsv'))
+        format = DifferentialDirectoryFormat(temp_dir, mode='r')
+        format.validate()
+        self.assertTrue(True)
+
+    def test_differential_format_empty(self):
+        filepath = self.get_data_path('empty_differential.tsv')
+        temp_dir = self.temp_dir.name
+        shutil.copy(filepath,
+                    os.path.join(temp_dir, 'differentials.tsv'))
+
+        with self.assertRaisesRegex(ValidationError, 'least 1 column'):
+            format = DifferentialDirectoryFormat(temp_dir, mode='r')
+            format.validate()
+
+    def test_differential_format_not(self):
+        filepath = self.get_data_path('not_differential.tsv')
+        temp_dir = self.temp_dir.name
+        shutil.copy(filepath,
+                    os.path.join(temp_dir, 'differentials.tsv'))
+
+        with self.assertRaises(ValidationError):
+            format = DifferentialDirectoryFormat(temp_dir, mode='r')
+            format.validate()
+
+    def test_differential_format_inf(self):
+        filepath = self.get_data_path('inf_differential.tsv')
+        temp_dir = self.temp_dir.name
+        shutil.copy(filepath,
+                    os.path.join(temp_dir, 'differentials.tsv'))
+
+        with self.assertRaisesRegex(ValidationError, 'numeric'):
+            format = DifferentialDirectoryFormat(temp_dir, mode='r')
+            format.validate()
+
+    def test_differential_format_bad_type(self):
+        filepath = self.get_data_path('bad_differential.tsv')
+        temp_dir = self.temp_dir.name
+        shutil.copy(filepath,
+                    os.path.join(temp_dir, 'differentials.tsv'))
+
+        with self.assertRaisesRegex(ValidationError, 'numeric'):
+            format = DifferentialDirectoryFormat(temp_dir, mode='r')
+            format.validate()
 
 
 if __name__ == '__main__':

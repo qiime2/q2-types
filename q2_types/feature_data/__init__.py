@@ -13,9 +13,11 @@ from ._format import (
     HeaderlessTSVTaxonomyDirectoryFormat, TSVTaxonomyFormat,
     TSVTaxonomyDirectoryFormat, DNAFASTAFormat, DNASequencesDirectoryFormat,
     PairedDNASequencesDirectoryFormat, AlignedDNAFASTAFormat,
-    AlignedDNASequencesDirectoryFormat)
+    AlignedDNASequencesDirectoryFormat, DifferentialFormat,
+    DifferentialDirectoryFormat)
 from ._type import (
-    FeatureData, Taxonomy, Sequence, PairedEndSequence, AlignedSequence)
+    FeatureData, Taxonomy, Sequence, PairedEndSequence, AlignedSequence,
+    Differential)
 
 # TODO remove these imports when tests are rewritten. Remove from __all__ too
 from ._transformer import DNAIterator, PairedDNAIterator, AlignedDNAIterator
@@ -23,11 +25,11 @@ from ._transformer import DNAIterator, PairedDNAIterator, AlignedDNAIterator
 __all__ = [
     'TaxonomyFormat', 'TaxonomyDirectoryFormat', 'HeaderlessTSVTaxonomyFormat',
     'HeaderlessTSVTaxonomyDirectoryFormat', 'TSVTaxonomyFormat',
-    'TSVTaxonomyDirectoryFormat', 'DNAFASTAFormat',
+    'TSVTaxonomyDirectoryFormat', 'DNAFASTAFormat', 'DifferentialFormat',
     'DNASequencesDirectoryFormat', 'PairedDNASequencesDirectoryFormat',
     'AlignedDNAFASTAFormat', 'AlignedDNASequencesDirectoryFormat',
     'FeatureData', 'Taxonomy', 'Sequence', 'PairedEndSequence',
     'AlignedSequence', 'DNAIterator', 'PairedDNAIterator',
-    'AlignedDNAIterator']
+    'AlignedDNAIterator', 'Differential', 'DifferentialDirectoryFormat']
 
 importlib.import_module('q2_types.feature_data._transformer')
