@@ -11,7 +11,8 @@ from qiime2.plugin import SemanticType
 from ..plugin_setup import plugin
 from . import (TSVTaxonomyDirectoryFormat, DNASequencesDirectoryFormat,
                PairedDNASequencesDirectoryFormat,
-               AlignedDNASequencesDirectoryFormat)
+               AlignedDNASequencesDirectoryFormat,
+               DifferentialDirectoryFormat)
 
 
 FeatureData = SemanticType('FeatureData', field_names='type')
@@ -26,8 +27,13 @@ PairedEndSequence = SemanticType('PairedEndSequence',
 AlignedSequence = SemanticType('AlignedSequence',
                                variant_of=FeatureData.field['type'])
 
+Differential = SemanticType('Differential',
+                            variant_of=FeatureData.field['type'])
+
 plugin.register_semantic_types(FeatureData, Taxonomy, Sequence,
-                               PairedEndSequence, AlignedSequence)
+                               PairedEndSequence, AlignedSequence,
+                               Differential)
+
 
 plugin.register_semantic_type_to_format(
     FeatureData[Taxonomy],
@@ -41,3 +47,5 @@ plugin.register_semantic_type_to_format(
 plugin.register_semantic_type_to_format(
     FeatureData[AlignedSequence],
     artifact_format=AlignedDNASequencesDirectoryFormat)
+plugin.register_semantic_type_to_format(
+    FeatureData[Differential], DifferentialDirectoryFormat)
