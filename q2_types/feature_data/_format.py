@@ -194,17 +194,11 @@ class DifferentialFormat(model.TextFileFormat):
             raise ValidationError(md_exc) from md_exc
 
         if md.column_count == 0:
-            raise ValidationError(
-                    ('Differential format must contain '
-                     'at least 1 column')
-            )
+            raise ValidationError('Format must contain at least 1 column')
 
         filtered_md = md.filter_columns(column_type='numeric')
         if filtered_md.column_count != md.column_count:
-            raise ValidationError(
-                        ('Differential types must only contain '
-                         'continuously valued quantities')
-            )
+            raise ValidationError('Must only contain numeric values.')
 
 
 DifferentialDirectoryFormat = model.SingleFileDirectoryFormat(

@@ -131,6 +131,7 @@ class TestTaxonomyFormats(TestPluginBase):
                     os.path.join(self.temp_dir.name, 'taxonomy.tsv'))
 
         format = TSVTaxonomyDirectoryFormat(self.temp_dir.name, mode='r')
+
         format.validate()
 
 
@@ -212,6 +213,7 @@ class TestDifferentialFormat(TestPluginBase):
                     os.path.join(temp_dir, 'differentials.tsv'))
         format = DifferentialDirectoryFormat(temp_dir, mode='r')
         format.validate()
+        self.assertTrue(True)
 
     def test_differential_format_empty(self):
         filepath = self.get_data_path('empty_differential.tsv')
