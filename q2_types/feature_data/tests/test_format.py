@@ -221,7 +221,7 @@ class TestDifferentialFormat(TestPluginBase):
         shutil.copy(filepath,
                     os.path.join(temp_dir, 'differentials.tsv'))
 
-        with self.assertRaisesRegex(ValidationError, 'Differential'):
+        with self.assertRaisesRegex(ValidationError, 'least 1 column'):
             format = DifferentialDirectoryFormat(temp_dir, mode='r')
             format.validate()
 
@@ -241,7 +241,7 @@ class TestDifferentialFormat(TestPluginBase):
         shutil.copy(filepath,
                     os.path.join(temp_dir, 'differentials.tsv'))
 
-        with self.assertRaisesRegex(ValidationError, 'Differential'):
+        with self.assertRaisesRegex(ValidationError, 'numeric'):
             format = DifferentialDirectoryFormat(temp_dir, mode='r')
             format.validate()
 
@@ -251,7 +251,7 @@ class TestDifferentialFormat(TestPluginBase):
         shutil.copy(filepath,
                     os.path.join(temp_dir, 'differentials.tsv'))
 
-        with self.assertRaisesRegex(ValidationError, 'Differential'):
+        with self.assertRaisesRegex(ValidationError, 'numeric'):
             format = DifferentialDirectoryFormat(temp_dir, mode='r')
             format.validate()
 
