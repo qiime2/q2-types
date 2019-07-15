@@ -47,7 +47,7 @@ def _taxonomy_formats_to_dataframe(filepath, has_header=None):
     """
     # Using `dtype=object` and `set_index()` to avoid type casting/inference of
     # any columns or the index.
-    df = pd.read_csv(filepath, sep='\t', comment='#', skip_blank_lines=True,
+    df = pd.read_csv(filepath, sep='\t', skip_blank_lines=True,
                      header=None, dtype=object)
 
     if len(df.columns) < 2:
@@ -191,6 +191,9 @@ def _23(ff: TSVTaxonomyFormat) -> pd.Series:
 @plugin.register_transformer
 def _29(ff: TSVTaxonomyFormat) -> qiime2.Metadata:
     df = _taxonomy_formats_to_dataframe(str(ff), has_header=True)
+    taxCol = df['Taxon']
+    for index in range(len(taxCol)):
+        taxCol[index].strip()
     return qiime2.Metadata(df)
 
 
