@@ -191,9 +191,8 @@ def _23(ff: TSVTaxonomyFormat) -> pd.Series:
 @plugin.register_transformer
 def _29(ff: TSVTaxonomyFormat) -> qiime2.Metadata:
     df = _taxonomy_formats_to_dataframe(str(ff), has_header=True)
-    taxCol = df['Taxon']
-    for index in range(len(taxCol)):
-        taxCol[index].strip()
+    for index in range(len(df['Taxon'])):
+        df['Taxon'][index] = df['Taxon'][index].strip()
     return qiime2.Metadata(df)
 
 
