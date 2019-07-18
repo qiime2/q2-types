@@ -6,8 +6,12 @@
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
 
+import re
 import skbio.io
+
 import qiime2.plugin.model as model
+from qiime2.plugin import ValidationError
+import qiime2
 
 from ..plugin_setup import plugin
 
@@ -139,27 +143,47 @@ TSVTaxonomyDirectoryFormat = model.SingleFileDirectoryFormat(
 
 
 class DNAFASTAFormat(model.TextFileFormat):
-    def _check_dna_fasta_format(self, root, n=None):
-        filepath = str(self)
-        sniffer = skbio.io.io_registry.get_sniffer('fasta')
-        if sniffer(filepath)[0]:
-            generator = skbio.io.read(filepath, constructor=skbio.DNA,
-                                      format='fasta', verify=False)
+    def _validate_lines(self, max_lines):
+        FASTADNAValidator = re.compile(r'[ACGTURYKMSWBDHVN]+\r?\n?')
+        last_line_was_ID = False
+
+        with open(str(self), 'rb') as fh:
             try:
-                for seq, _ in zip(generator, range(5)):
-                    pass
-                return True
-            # ValueError raised by skbio if there are invalid DNA chars.
-            except ValueError:
-                pass
+                first = fh.read(6)
+                if first[:3] == b'\xEF\xBB\xBF':
+                    first = first[3:]
+                # Empty files should validate
+                if first.strip() == b'':
+                    return
+                if first[0] != ord(b'>'):
+                    raise ValidationError("First line of file is not a valid "
+                                          "FASTA ID. FASTA IDs must start "
+                                          "with '>'")
+                fh.seek(0)
+                for line_number, line in enumerate(fh, 1):
+                    if line_number >= max_lines:
+                        return
+                    line = line.decode('utf-8-sig')
+                    if line.startswith('>'):
+                        if last_line_was_ID:
+                            raise ValidationError('Multiple consecutive IDs '
+                                                  'starting on line '
+                                                  f'{line_number-1!r}')
+                        last_line_was_ID = True
+                    elif re.fullmatch(FASTADNAValidator, line):
+                        last_line_was_ID = False
+                    else:
+                        raise ValidationError('Invalid characters on line '
+                                              f'{line_number} (does not match '
+                                              'IUPAC characters for a DNA '
+                                              'sequence).')
+            except UnicodeDecodeError as e:
+                raise ValidationError(f'utf-8 cannot decode byte on line '
+                                      f'{line_number}') from e
 
-        # Empty files are ok also
-        empty_sniffer = skbio.io.io_registry.get_sniffer('<emptyfile>')
-        return empty_sniffer(filepath)[0]
-
-    def _validate_(self, level):
-        self._check_dna_fasta_format(root=str(self.path.parent),
-                                     n={'min': 10, 'max': None}[level])
+    def _validate_(self, max_lines):
+        level_map = {'min': 100, 'max': float('inf')}
+        self._validate_lines(level_map[max_lines])
 
 
 DNASequencesDirectoryFormat = model.SingleFileDirectoryFormat(
@@ -201,10 +225,30 @@ AlignedDNASequencesDirectoryFormat = model.SingleFileDirectoryFormat(
     AlignedDNAFASTAFormat)
 
 
+class DifferentialFormat(model.TextFileFormat):
+    def validate(self, *args):
+        try:
+            md = qiime2.Metadata.load(str(self))
+        except qiime2.metadata.MetadataFileError as md_exc:
+            raise ValidationError(md_exc) from md_exc
+
+        if md.column_count == 0:
+            raise ValidationError('Format must contain at least 1 column')
+
+        filtered_md = md.filter_columns(column_type='numeric')
+        if filtered_md.column_count != md.column_count:
+            raise ValidationError('Must only contain numeric values.')
+
+
+DifferentialDirectoryFormat = model.SingleFileDirectoryFormat(
+    'DifferentialDirectoryFormat', 'differentials.tsv', DifferentialFormat)
+
+
 plugin.register_formats(
     TSVTaxonomyFormat, TSVTaxonomyDirectoryFormat,
     HeaderlessTSVTaxonomyFormat, HeaderlessTSVTaxonomyDirectoryFormat,
     TaxonomyFormat, TaxonomyDirectoryFormat, DNAFASTAFormat,
     DNASequencesDirectoryFormat, PairedDNASequencesDirectoryFormat,
-    AlignedDNAFASTAFormat, AlignedDNASequencesDirectoryFormat
+    AlignedDNAFASTAFormat, AlignedDNASequencesDirectoryFormat,
+    DifferentialFormat, DifferentialDirectoryFormat
 )
