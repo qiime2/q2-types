@@ -138,6 +138,7 @@ class DNAFASTAFormat(model.TextFileFormat):
     def _validate_lines(self, max_lines):
         FASTADNAValidator = re.compile(r'[ACGTURYKMSWBDHVN]+\r?\n?')
         last_line_was_ID = False
+        ids = set()
 
         with open(str(self), 'rb') as fh:
             try:
@@ -161,6 +162,11 @@ class DNAFASTAFormat(model.TextFileFormat):
                             raise ValidationError('Multiple consecutive IDs '
                                                   'starting on line '
                                                   f'{line_number-1!r}')
+                        if line in ids:
+                            raise ValidationError(f'Id on line {line_number} '
+                                                  'is a duplicate of another '
+                                                  'id.')
+                        ids.add(line)
                         last_line_was_ID = True
                     elif re.fullmatch(FASTADNAValidator, line):
                         last_line_was_ID = False
