@@ -38,7 +38,8 @@ class TaxonomyFormat(model.TextFileFormat):
 
     """
 
-    def sniff(self):
+    # Was formerly a sniff method that I renamed
+    def _check_file_format(self, root, n=None):
         with self.open() as fh:
             count = 0
             while count < 10:
@@ -60,6 +61,9 @@ class TaxonomyFormat(model.TextFileFormat):
                     count += 1
 
             return False if count == 0 else True
+
+    def _validate_(self, level):
+        self._check_file_format(self, n={'min': 10, 'max': None}[level])
 
 
 TaxonomyDirectoryFormat = model.SingleFileDirectoryFormat(
@@ -96,7 +100,7 @@ class TSVTaxonomyFormat(model.TextFileFormat):
     """
     HEADER = ['Feature ID', 'Taxon']
 
-    def sniff(self):
+    def _check_tsv_tax_format(self, root, n=None):
         with self.open() as fh:
             data_lines = 0
             header = None
@@ -125,13 +129,17 @@ class TSVTaxonomyFormat(model.TextFileFormat):
 
             return header is not None and data_lines > 0
 
+    def _validate_(self, level):
+        self._check_tsv_tax_format(root=str(self.path.parent),
+                                   n={'min': 10, 'max': None}[level])
+
 
 TSVTaxonomyDirectoryFormat = model.SingleFileDirectoryFormat(
     'TSVTaxonomyDirectoryFormat', 'taxonomy.tsv', TSVTaxonomyFormat)
 
 
 class DNAFASTAFormat(model.TextFileFormat):
-    def sniff(self):
+    def _check_dna_fasta_format(self, root, n=None):
         filepath = str(self)
         sniffer = skbio.io.io_registry.get_sniffer('fasta')
         if sniffer(filepath)[0]:
@@ -149,6 +157,10 @@ class DNAFASTAFormat(model.TextFileFormat):
         empty_sniffer = skbio.io.io_registry.get_sniffer('<emptyfile>')
         return empty_sniffer(filepath)[0]
 
+    def _validate_(self, level):
+        self._check_dna_fasta_format(root=str(self.path.parent),
+                                     n={'min': 10, 'max': None}[level])
+
 
 DNASequencesDirectoryFormat = model.SingleFileDirectoryFormat(
     'DNASequencesDirectoryFormat', 'dna-sequences.fasta', DNAFASTAFormat)
@@ -162,7 +174,7 @@ class PairedDNASequencesDirectoryFormat(model.DirectoryFormat):
 
 
 class AlignedDNAFASTAFormat(model.TextFileFormat):
-    def sniff(self):
+    def _check_aligned_dna_fasta_format(self, root, n=None):
         filepath = str(self)
         sniffer = skbio.io.io_registry.get_sniffer('fasta')
         if sniffer(filepath)[0]:
@@ -178,6 +190,10 @@ class AlignedDNAFASTAFormat(model.TextFileFormat):
             except (StopIteration, ValueError):
                 pass
         return False
+
+    def _validate_(self, level):
+        self._check_aligned_dna_fasta_format(root=str(self.path.parent),
+                                             n={'min': 10, 'max': None}[level])
 
 
 AlignedDNASequencesDirectoryFormat = model.SingleFileDirectoryFormat(
