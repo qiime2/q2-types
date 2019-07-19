@@ -21,7 +21,7 @@ class BIOMV100Format(model.TextFileFormat):
         'shape', 'data', 'comment'
     }
 
-    def _check_biomv100_format(self, root, n=None):
+    def sniff(self):
         with self.open() as fh:
             try:
                 parser = ijson.parse(fh)
@@ -35,10 +35,6 @@ class BIOMV100Format(model.TextFileFormat):
             except (ijson.JSONError, UnicodeDecodeError):
                 pass
             return False
-
-    def _validate_(self, level):
-        self._check_biomv100_format(root=str(self.path.parent),
-                                    n={'min': 10, 'max': None}[level])
 
 
 class BIOMV210Format(model.BinaryFileFormat):
@@ -72,7 +68,7 @@ class BIOMV210Format(model.BinaryFileFormat):
     def open(self):
         return h5py.File(str(self), mode=self._mode)
 
-    def _check_biomv210_format(self, root, n=None):
+    def sniff(self):
         try:
             with self.open() as fh:
                 for grp in self.groups:
@@ -87,10 +83,6 @@ class BIOMV210Format(model.BinaryFileFormat):
                 return True
         except Exception:
             return False
-
-    def _validate_(self, level):
-        self._check_biomv210_format(root=str(self.path.parent),
-                                    n={'min': 10, 'max': None}[level])
 
 
 BIOMV100DirFmt = model.SingleFileDirectoryFormat('BIOMV100DirFmt',

@@ -42,8 +42,7 @@ class TaxonomyFormat(model.TextFileFormat):
 
     """
 
-    # Was formerly a sniff method that I renamed
-    def _check_file_format(self, root, n=None):
+    def sniff(self):
         with self.open() as fh:
             count = 0
             while count < 10:
@@ -65,9 +64,6 @@ class TaxonomyFormat(model.TextFileFormat):
                     count += 1
 
             return False if count == 0 else True
-
-    def _validate_(self, level):
-        self._check_file_format(self, n={'min': 10, 'max': None}[level])
 
 
 TaxonomyDirectoryFormat = model.SingleFileDirectoryFormat(
@@ -108,34 +104,47 @@ class TSVTaxonomyFormat(model.TextFileFormat):
         with self.open() as fh:
             data_lines = 0
             header = None
-            while data_lines < 10:
-                line = fh.readline()
+
+            file_ = enumerate(fh) if n is None else zip(range(n), fh)
+
+            for iter, line in file_:
+                iter = iter + 1
 
                 if line == '':
                     # EOF
                     break
-                elif line.lstrip(' ') == '\n':
-                    # Blank line
+                elif line.strip(' ') == '\n':
                     continue
                 elif line.startswith('#'):
                     # Comment line
                     continue
 
-                cells = line.rstrip('\n').split('\t')
+                cells = line.strip('\n').split('\t')
+
                 if header is None:
                     if cells[:2] != self.HEADER:
-                        return False
+                        raise ValidationError("Anthony TSVTaxonomy")
                     header = cells
                 else:
                     if len(cells) != len(header):
-                        return False
+                        raise ValidationError("Number of headers are not the "
+                                              "same as number of colums in "
+                                              "the file.")
                     data_lines += 1
 
-            return header is not None and data_lines > 0
+            if header is None:
+                raise ValidationError("This file must contain 'Feature ID' "
+                                      "and 'Taxon' as header values to "
+                                      "meet formatting requirements.")
+
+            if data_lines == 0:
+                raise ValidationError("No sample records found in manifest, "
+                                      "only observed comments, blank lines, "
+                                      "and/or a header row.")
 
     def _validate_(self, level):
-        self._check_tsv_tax_format(root=str(self.path.parent),
-                                   n={'min': 10, 'max': None}[level])
+        self._check_tsv_tax_format(root=str(self.path.parent), n={'min': 1,
+                                   'max': None}[level])
 
 
 TSVTaxonomyDirectoryFormat = model.SingleFileDirectoryFormat(
@@ -198,7 +207,7 @@ class PairedDNASequencesDirectoryFormat(model.DirectoryFormat):
 
 
 class AlignedDNAFASTAFormat(model.TextFileFormat):
-    def _check_aligned_dna_fasta_format(self, root, n=None):
+    def sniff(self):
         filepath = str(self)
         sniffer = skbio.io.io_registry.get_sniffer('fasta')
         if sniffer(filepath)[0]:
@@ -214,10 +223,6 @@ class AlignedDNAFASTAFormat(model.TextFileFormat):
             except (StopIteration, ValueError):
                 pass
         return False
-
-    def _validate_(self, level):
-        self._check_aligned_dna_fasta_format(root=str(self.path.parent),
-                                             n={'min': 10, 'max': None}[level])
 
 
 AlignedDNASequencesDirectoryFormat = model.SingleFileDirectoryFormat(
