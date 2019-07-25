@@ -7,6 +7,7 @@
 # ----------------------------------------------------------------------------
 
 import re
+import textwrap
 import skbio.io
 
 import qiime2.plugin.model as model
@@ -132,11 +133,10 @@ class TSVTaxonomyFormat(model.TextFileFormat):
                     if len(cells) != len(header):
                         raise ValidationError('Number of headers are not the '
                                               'same as number of columns in '
-                                              'the file. \nNumber of headers: '
-                                              '{} \nNumber of columns: {} '
+                                              'the file. \nHeader values: '
+                                              '{} \nColumn values: {} '
                                               '\nIssue on line: {}'
-                                              .format(len(header), len(cells),
-                                                      i))
+                                              .format(header, cells[:], i))
 
                     data_lines += 1
 
