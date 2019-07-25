@@ -100,15 +100,15 @@ class TSVTaxonomyFormat(model.TextFileFormat):
     """
     HEADER = ['Feature ID', 'Taxon']
 
-    def _check_tsv_tax_format(self, root, n=None):
+    def _check_tsv_tax_format(self, n=None):
         with self.open() as fh:
             data_lines = 0
             header = None
 
             file_ = enumerate(fh) if n is None else zip(range(n), fh)
 
-            for iter, line in file_:
-                iter = iter + 1
+            for i, line in file_:
+                i = i + 1
 
                 if line == '':
                     # EOF
@@ -123,19 +123,22 @@ class TSVTaxonomyFormat(model.TextFileFormat):
 
                 if header is None:
                     if cells[:2] != self.HEADER:
-                        raise ValidationError("Anthony TSVTaxonomy")
+                        raise ValidationError("'Feature ID' and 'Taxon' must"
+                                              " be included as headers to be"
+                                              " a valid TSV file. Please check"
+                                              " header values in your file.")
                     header = cells
                 else:
                     if len(cells) != len(header):
-                        raise ValidationError("Number of headers are not the "
-                                              "same as number of colums in "
-                                              "the file.")
-                    data_lines += 1
+                        raise ValidationError('Number of headers are not the '
+                                              'same as number of columns in '
+                                              'the file. \nNumber of headers: '
+                                              '{} \nNumber of columns: {} '
+                                              '\nIssue on line: {}'
+                                              .format(len(header), len(cells),
+                                                      i))
 
-            if header is None:
-                raise ValidationError("This file must contain 'Feature ID' "
-                                      "and 'Taxon' as header values to "
-                                      "meet formatting requirements.")
+                    data_lines += 1
 
             if data_lines == 0:
                 raise ValidationError("No sample records found in manifest, "
@@ -143,8 +146,7 @@ class TSVTaxonomyFormat(model.TextFileFormat):
                                       "and/or a header row.")
 
     def _validate_(self, level):
-        self._check_tsv_tax_format(root=str(self.path.parent), n={'min': 1,
-                                   'max': None}[level])
+        self._check_tsv_tax_format(n={'min': 10, 'max': None}[level])
 
 
 TSVTaxonomyDirectoryFormat = model.SingleFileDirectoryFormat(
