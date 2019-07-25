@@ -7,7 +7,6 @@
 # ----------------------------------------------------------------------------
 
 import re
-import textwrap
 import skbio.io
 
 import qiime2.plugin.model as model
