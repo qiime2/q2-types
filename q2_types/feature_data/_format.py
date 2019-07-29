@@ -100,7 +100,7 @@ class TSVTaxonomyFormat(model.TextFileFormat):
     """
     HEADER = ['Feature ID', 'Taxon']
 
-    def _check_tsv_tax_format(self, n=None):
+    def _check_n_records(self, n=None):
         with self.open() as fh:
             data_lines = 0
             header = None
@@ -123,10 +123,12 @@ class TSVTaxonomyFormat(model.TextFileFormat):
 
                 if header is None:
                     if cells[:2] != self.HEADER:
-                        raise ValidationError("'Feature ID' and 'Taxon' must"
-                                              " be included as headers to be"
-                                              " a valid TSV file. Please check"
-                                              " header values in your file.")
+                        raise ValidationError("['Feature ID' and 'Taxon'] "
+                                              "must be the first two header "
+                                              "values to be a valid axonomy "
+                                              "file.\n\nThe first two header "
+                                              "values provided are: {}."
+                                              .format(cells[:2]))
                     header = cells
                 else:
                     if len(cells) != len(header):
@@ -134,18 +136,17 @@ class TSVTaxonomyFormat(model.TextFileFormat):
                                               'same as number of columns in '
                                               'the file. \nHeader values: '
                                               '{} \nColumn values: {} '
-                                              '\nIssue on line: {}'
                                               .format(header, cells[:], i))
 
                     data_lines += 1
 
             if data_lines == 0:
-                raise ValidationError("No sample records found in manifest, "
+                raise ValidationError("No feature records found in manifest, "
                                       "only observed comments, blank lines, "
                                       "and/or a header row.")
 
     def _validate_(self, level):
-        self._check_tsv_tax_format(n={'min': 10, 'max': None}[level])
+        self._check_n_records(n={'min': 10, 'max': None}[level])
 
 
 TSVTaxonomyDirectoryFormat = model.SingleFileDirectoryFormat(
