@@ -5,13 +5,36 @@
 #
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
-
+import ijson
 import h5py
 import biom
 
 import qiime2.plugin.model as model
 
 from ..plugin_setup import plugin, citations
+
+
+class BIOMV100Format(model.TextFileFormat):
+    top_level_keys = {
+        'id', 'format', 'format_url', 'type', 'generated_by',
+        'date', 'rows', 'columns', 'matrix_type', 'matrix_element_type',
+        'shape', 'data', 'comment'
+    }
+
+    def sniff(self):
+        with self.open() as fh:
+            try:
+                parser = ijson.parse(fh)
+                for prefix, event, value in parser:
+                    if (prefix, event) == ('', 'map_key'):
+                        # `format_url` seems pretty unique to BIOM 1.0.
+                        if value == 'format_url':
+                            return True
+                        elif value not in self.top_level_keys:
+                            return False
+            except (ijson.JSONError, UnicodeDecodeError):
+                pass
+            return False
 
 
 class BIOMV210Format(model.BinaryFileFormat):
@@ -62,9 +85,13 @@ class BIOMV210Format(model.BinaryFileFormat):
             return False
 
 
+BIOMV100DirFmt = model.SingleFileDirectoryFormat('BIOMV100DirFmt',
+                                                 'feature-table.biom',
+                                                 BIOMV100Format)
 BIOMV210DirFmt = model.SingleFileDirectoryFormat('BIOMV210DirFmt',
                                                  'feature-table.biom',
                                                  BIOMV210Format)
 
-plugin.register_views(BIOMV210Format, BIOMV210DirFmt, biom.Table,
+plugin.register_views(BIOMV100Format, BIOMV210Format, BIOMV100DirFmt,
+                      BIOMV210DirFmt, biom.Table,
                       citations=[citations['mcdonald2012biological']])
