@@ -125,7 +125,7 @@ class TSVTaxonomyFormat(model.TextFileFormat):
                     if cells[:2] != self.HEADER:
                         raise ValidationError("['Feature ID' and 'Taxon'] "
                                               "must be the first two header "
-                                              "values to be a valid axonomy "
+                                              "values to be a valid taxonomy "
                                               "file.\n\nThe first two header "
                                               "values provided are: {}."
                                               .format(cells[:2]))
