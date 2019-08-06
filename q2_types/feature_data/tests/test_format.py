@@ -16,7 +16,7 @@ from q2_types.feature_data import (
     HeaderlessTSVTaxonomyDirectoryFormat, TSVTaxonomyFormat,
     TSVTaxonomyDirectoryFormat, DNAFASTAFormat, DNASequencesDirectoryFormat,
     PairedDNASequencesDirectoryFormat, AlignedDNAFASTAFormat,
-    AlignedDNASequencesDirectoryFormat
+    AlignedDNASequencesDirectoryFormat, DifferentialDirectoryFormat
 )
 from qiime2.plugin.testing import TestPluginBase
 from qiime2.plugin import ValidationError
@@ -144,12 +144,11 @@ class TestDNAFASTAFormats(TestPluginBase):
 
         format.validate()
 
-    def test_dna_fasta_format_validate_negative(self):
-        filepath = self.get_data_path('not-dna-sequences')
+    def test_dna_fasta_format_bom_passes(self):
+        filepath = self.get_data_path('dna-with-bom-passes.fasta')
         format = DNAFASTAFormat(filepath, mode='r')
 
-        with self.assertRaisesRegex(ValidationError, 'DNAFASTA'):
-            format.validate()
+        format.validate()
 
     def test_dna_fasta_format_empty_file(self):
         filepath = os.path.join(self.temp_dir.name, 'empty')
@@ -158,6 +157,41 @@ class TestDNAFASTAFormats(TestPluginBase):
         format = DNAFASTAFormat(filepath, mode='r')
 
         format.validate()
+
+    def test_dna_fasta_format_validate_negative(self):
+        filepath = self.get_data_path('not-dna-sequences')
+        format = DNAFASTAFormat(filepath, mode='r')
+
+        with self.assertRaisesRegex(ValidationError, 'DNAFASTA'):
+            format.validate()
+
+    def test_dna_fasta_format_consecutive_IDs(self):
+        filepath = self.get_data_path('dna-sequences-consecutive-ids.fasta')
+        format = DNAFASTAFormat(filepath, mode='r')
+
+        with self.assertRaisesRegex(ValidationError, 'consecutive IDs.*1'):
+            format.validate()
+
+    def test_dna_fasta_format_missing_initial_ID(self):
+        filepath = self.get_data_path('dna-sequences-first-line-not-id.fasta')
+        format = DNAFASTAFormat(filepath, mode='r')
+
+        with self.assertRaisesRegex(ValidationError, 'First line'):
+            format.validate()
+
+    def test_dna_fasta_format_corrupt_characters(self):
+        filepath = self.get_data_path('dna-sequences-corrupt-characters.fasta')
+        format = DNAFASTAFormat(filepath, mode='r')
+
+        with self.assertRaisesRegex(ValidationError, 'utf-8.*2'):
+            format.validate()
+
+    def test_dna_fasta_format_bom_fails(self):
+        filepath = self.get_data_path('dna-with-bom-fails.fasta')
+        format = DNAFASTAFormat(filepath, mode='r')
+
+        with self.assertRaisesRegex(ValidationError, 'First line'):
+            format.validate()
 
     def test_dna_sequences_directory_format(self):
         filepath = self.get_data_path('dna-sequences.fasta')
@@ -201,6 +235,59 @@ class TestDNAFASTAFormats(TestPluginBase):
         format = AlignedDNASequencesDirectoryFormat(temp_dir, mode='r')
 
         format.validate()
+
+
+class TestDifferentialFormat(TestPluginBase):
+    package = 'q2_types.feature_data.tests'
+
+    def test_differential_format(self):
+        filepath = self.get_data_path('differentials.tsv')
+        temp_dir = self.temp_dir.name
+        shutil.copy(filepath,
+                    os.path.join(temp_dir, 'differentials.tsv'))
+        format = DifferentialDirectoryFormat(temp_dir, mode='r')
+        format.validate()
+        self.assertTrue(True)
+
+    def test_differential_format_empty(self):
+        filepath = self.get_data_path('empty_differential.tsv')
+        temp_dir = self.temp_dir.name
+        shutil.copy(filepath,
+                    os.path.join(temp_dir, 'differentials.tsv'))
+
+        with self.assertRaisesRegex(ValidationError, 'least 1 column'):
+            format = DifferentialDirectoryFormat(temp_dir, mode='r')
+            format.validate()
+
+    def test_differential_format_not(self):
+        filepath = self.get_data_path('not_differential.tsv')
+        temp_dir = self.temp_dir.name
+        shutil.copy(filepath,
+                    os.path.join(temp_dir, 'differentials.tsv'))
+
+        with self.assertRaises(ValidationError):
+            format = DifferentialDirectoryFormat(temp_dir, mode='r')
+            format.validate()
+
+    def test_differential_format_inf(self):
+        filepath = self.get_data_path('inf_differential.tsv')
+        temp_dir = self.temp_dir.name
+        shutil.copy(filepath,
+                    os.path.join(temp_dir, 'differentials.tsv'))
+
+        with self.assertRaisesRegex(ValidationError, 'numeric'):
+            format = DifferentialDirectoryFormat(temp_dir, mode='r')
+            format.validate()
+
+    def test_differential_format_bad_type(self):
+        filepath = self.get_data_path('bad_differential.tsv')
+        temp_dir = self.temp_dir.name
+        shutil.copy(filepath,
+                    os.path.join(temp_dir, 'differentials.tsv'))
+
+        with self.assertRaisesRegex(ValidationError, 'numeric'):
+            format = DifferentialDirectoryFormat(temp_dir, mode='r')
+            format.validate()
 
 
 if __name__ == '__main__':
