@@ -168,6 +168,7 @@ def _6(ff: TaxonomyFormat) -> pd.Series:
 @plugin.register_transformer
 def _28(ff: TaxonomyFormat) -> qiime2.Metadata:
     df = _taxonomy_formats_to_dataframe(str(ff), has_header=None)
+    df['Taxon'] = df['Taxon'].str.strip()
     return qiime2.Metadata(df)
 
 
@@ -191,8 +192,7 @@ def _23(ff: TSVTaxonomyFormat) -> pd.Series:
 @plugin.register_transformer
 def _29(ff: TSVTaxonomyFormat) -> qiime2.Metadata:
     df = _taxonomy_formats_to_dataframe(str(ff), has_header=True)
-    for index in range(len(df['Taxon'])):
-        df['Taxon'][index] = df['Taxon'][index].strip()
+    df['Taxon'] = df['Taxon'].str.strip()
     return qiime2.Metadata(df)
 
 
