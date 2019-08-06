@@ -314,11 +314,11 @@ class TestTaxonomyFormatsToDataFrame(TestPluginBase):
             _taxonomy_formats_to_dataframe(
                 self.get_data_path(os.path.join('taxonomy', '1-column.tsv')))
 
-    def test_blanks_and_comments(self):
+    def test_blanks(self):
         with self.assertRaises(pandas.io.common.EmptyDataError):
             _taxonomy_formats_to_dataframe(
                 self.get_data_path(os.path.join('taxonomy',
-                                                'blanks-and-comments')))
+                                                'blanks')))
 
     def test_empty(self):
         with self.assertRaises(pandas.io.common.EmptyDataError):
