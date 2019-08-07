@@ -88,6 +88,7 @@ def _taxonomy_formats_to_dataframe(filepath, has_header=None):
             "column names are duplicated: %s" %
             ', '.join(df.columns.get_duplicates()))
 
+    df['Taxon'] = df['Taxon'].str.strip()
     return df
 
 
@@ -168,7 +169,6 @@ def _6(ff: TaxonomyFormat) -> pd.Series:
 @plugin.register_transformer
 def _28(ff: TaxonomyFormat) -> qiime2.Metadata:
     df = _taxonomy_formats_to_dataframe(str(ff), has_header=None)
-    df['Taxon'] = df['Taxon'].str.strip()
     return qiime2.Metadata(df)
 
 
@@ -192,7 +192,6 @@ def _23(ff: TSVTaxonomyFormat) -> pd.Series:
 @plugin.register_transformer
 def _29(ff: TSVTaxonomyFormat) -> qiime2.Metadata:
     df = _taxonomy_formats_to_dataframe(str(ff), has_header=True)
-    df['Taxon'] = df['Taxon'].str.strip()
     return qiime2.Metadata(df)
 
 
