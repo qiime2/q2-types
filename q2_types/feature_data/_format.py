@@ -93,9 +93,9 @@ class TSVTaxonomyFormat(model.TextFileFormat):
 
     Optionally followed by other arbitrary columns.
 
-    This format supports comment lines starting with #, and blank lines. The
-    expected header must be the first non-comment, non-blank line. In addition
-    to the header, there must be at least one line of data.
+    This format supports blank lines. The expected header must be the first
+    non-blank line. In addition to the header, there must be at least one line
+    of data.
 
     """
     HEADER = ['Feature ID', 'Taxon']
@@ -109,11 +109,12 @@ class TSVTaxonomyFormat(model.TextFileFormat):
 
             for i, line in file_:
                 i = i + 1
-
+                # Checks rows in the file, excludes header row
                 if line == '':
                     # EOF
                     break
-                elif line.strip(' ') == '\n':
+                elif line.lstrip(' ') == '\n':
+                    # Blank line
                     continue
                 elif line.startswith('#'):
                     # Comment line
@@ -125,15 +126,15 @@ class TSVTaxonomyFormat(model.TextFileFormat):
                     if cells[:2] != self.HEADER:
                         raise ValidationError("['Feature ID' and 'Taxon'] "
                                               "must be the first two header "
-                                              "values to be a valid taxonomy "
-                                              "file.\n\nThe first two header "
-                                              "values provided are: {}."
+                                              "values to be valid.\n\n The "
+                                              "first two header values "
+                                              "provided are: {}."
                                               .format(cells[:2]))
                     header = cells
                 else:
                     if len(cells) != len(header):
-                        raise ValidationError('Number of headers are not the '
-                                              'same as number of columns in '
+                        raise ValidationError('Number of columns are not the '
+                                              'same as number of headers in '
                                               'the file. \nHeader values: '
                                               '{} \nColumn values: {} '
                                               .format(header, cells[:], i))
@@ -141,9 +142,8 @@ class TSVTaxonomyFormat(model.TextFileFormat):
                     data_lines += 1
 
             if data_lines == 0:
-                raise ValidationError("No feature records found in manifest, "
-                                      "only observed comments, blank lines, "
-                                      "and/or a header row.")
+                raise ValidationError("No feature records found, only blank "
+                                      "lines and/or a header row.")
 
     def _validate_(self, level):
         self._check_n_records(n={'min': 10, 'max': None}[level])
