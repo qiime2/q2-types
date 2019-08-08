@@ -264,6 +264,45 @@ class TestTaxonomyFormatTransformers(TestPluginBase):
 
         self.assertEqual(exp, obs)
 
+    def test_tsv_taxonomy_to_metadata_trailing_whitespace_taxon(self):
+        _, obs = self.transform_format(TSVTaxonomyFormat, qiime2.Metadata,
+                                       os.path.join(
+                                           'taxonomy',
+                                           'trailing_space_taxon.tsv'))
+
+        index = pd.Index(['seq1'], name='Feature ID', dtype=object)
+        exp_df = pd.DataFrame([['k__Foo; p__Bar', '-1.0']], index=index,
+                              columns=['Taxon', 'Confidence'], dtype=object)
+        exp = qiime2.Metadata(exp_df)
+
+        self.assertEqual(exp, obs)
+
+    def test_tsv_taxonomy_to_metadata_leading_whitespace_taxon(self):
+        _, obs = self.transform_format(TSVTaxonomyFormat, qiime2.Metadata,
+                                       os.path.join(
+                                           'taxonomy',
+                                           'leading_space_taxon.tsv'))
+
+        index = pd.Index(['seq1'], name='Feature ID', dtype=object)
+        exp_df = pd.DataFrame([['k__Foo; p__Bar', '-1.0']], index=index,
+                              columns=['Taxon', 'Confidence'], dtype=object)
+        exp = qiime2.Metadata(exp_df)
+
+        self.assertEqual(exp, obs)
+
+    def test_tsv_taxonomy_to_metadata_trailing_leading_whitespace_taxon(self):
+        _, obs = self.transform_format(TSVTaxonomyFormat, qiime2.Metadata,
+                                       os.path.join(
+                                           'taxonomy',
+                                           'start_end_space_taxon.tsv'))
+
+        index = pd.Index(['seq1'], name='Feature ID', dtype=object)
+        exp_df = pd.DataFrame([['k__Foo; p__Bar', '-1.0']], index=index,
+                              columns=['Taxon', 'Confidence'], dtype=object)
+        exp = qiime2.Metadata(exp_df)
+
+        self.assertEqual(exp, obs)
+
 
 # In-depth testing of the `_taxonomy_formats_to_dataframe` helper function,
 # which does the heavy lifting for the transformers.
@@ -275,11 +314,11 @@ class TestTaxonomyFormatsToDataFrame(TestPluginBase):
             _taxonomy_formats_to_dataframe(
                 self.get_data_path(os.path.join('taxonomy', '1-column.tsv')))
 
-    def test_blanks_and_comments(self):
+    def test_blanks(self):
         with self.assertRaises(pandas.io.common.EmptyDataError):
             _taxonomy_formats_to_dataframe(
                 self.get_data_path(os.path.join('taxonomy',
-                                                'blanks-and-comments')))
+                                                'blanks')))
 
     def test_empty(self):
         with self.assertRaises(pandas.io.common.EmptyDataError):

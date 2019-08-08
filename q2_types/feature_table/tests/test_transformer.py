@@ -24,20 +24,6 @@ from q2_types.feature_table._transformer import (_parse_biom_table_v100,
 class TestTransformers(TestPluginBase):
     package = 'q2_types.feature_table.tests'
 
-    def test_biom_table_to_biom_v100_format(self):
-        filepath = self.get_data_path('feature-table_v100.biom')
-        transformer = self.get_transformer(biom.Table, BIOMV100Format)
-        input = biom.load_table(filepath)
-
-        obs = transformer(input)
-        obs = biom.load_table(str(obs))
-
-        exp = input
-        self.assertEqual(obs.ids(axis='observation').all(),
-                         exp.ids(axis='observation').all())
-        self.assertEqual(obs.ids(axis='sample').all(),
-                         exp.ids(axis='sample').all())
-
     def test_biom_v100_format_to_biom_table(self):
         input, obs = self.transform_format(BIOMV100Format, biom.Table,
                                            filename='feature-table_v100.biom')
@@ -103,17 +89,6 @@ class TestTransformers(TestPluginBase):
     def test_biom_v100_format_to_biom_v210_format(self):
         input, obs = self.transform_format(BIOMV100Format, BIOMV210Format,
                                            filename='feature-table_v100.biom')
-        exp = biom.load_table(str(input))
-        obs = biom.load_table(str(obs))
-
-        self.assertEqual(obs.ids(axis='observation').all(),
-                         exp.ids(axis='observation').all())
-        self.assertEqual(obs.ids(axis='sample').all(),
-                         exp.ids(axis='sample').all())
-
-    def test_biom_v210_format_to_biom_v100_format(self):
-        input, obs = self.transform_format(BIOMV210Format, BIOMV100Format,
-                                           filename='feature-table_v210.biom')
         exp = biom.load_table(str(input))
         obs = biom.load_table(str(obs))
 
