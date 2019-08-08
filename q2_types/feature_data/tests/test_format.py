@@ -201,6 +201,13 @@ class TestDNAFASTAFormats(TestPluginBase):
 
         format.validate()
 
+    def test_dna_fasta_format_duplicate_ids(self):
+        filepath = self.get_data_path('dna-sequences-duplicate-id.fasta')
+        format = DNAFASTAFormat(filepath, mode='r')
+
+        with self.assertRaisesRegex(ValidationError, '3.*duplicate.*1'):
+            format.validate()
+
     def test_paired_dna_sequences_directory_format(self):
         filepath = self.get_data_path('dna-sequences.fasta')
         temp_dir = self.temp_dir.name
