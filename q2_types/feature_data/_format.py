@@ -105,8 +105,8 @@ class TSVTaxonomyFormat(model.TextFileFormat):
             file_ = enumerate(fh) if n is None else zip(range(n), fh)
 
             for i, line in file_:
-                i = i + 1
                 # Checks rows in the file, excludes header row
+                i = i + 1
                 if line == '':
                     # EOF
                     break
