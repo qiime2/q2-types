@@ -37,7 +37,7 @@ class TestTaxonomyFormats(TestPluginBase):
             format.validate()
 
     def test_taxonomy_format_validate_negative(self):
-        filenames = ['empty', 'blanks-and-comments', '1-column.tsv']
+        filenames = ['empty', 'blanks', '1-column.tsv']
         filepaths = [self.get_data_path(os.path.join('taxonomy', filename))
                      for filename in filenames]
 
@@ -78,7 +78,7 @@ class TestTaxonomyFormats(TestPluginBase):
             format.validate()
 
     def test_headerless_tsv_taxonomy_format_validate_negative(self):
-        filenames = ['empty', 'blanks-and-comments', '1-column.tsv']
+        filenames = ['empty', 'blanks', '1-column.tsv']
         filepaths = [self.get_data_path(os.path.join('taxonomy', filename))
                      for filename in filenames]
 
@@ -113,7 +113,7 @@ class TestTaxonomyFormats(TestPluginBase):
             format.validate()
 
     def test_tsv_taxonomy_format_validate_negative(self):
-        filenames = ['empty', 'blanks-and-comments', '1-column.tsv',
+        filenames = ['empty', 'blanks', '1-column.tsv',
                      'headerless.tsv', 'header-only.tsv', 'jagged.tsv']
         filepaths = [self.get_data_path(os.path.join('taxonomy', filename))
                      for filename in filenames]

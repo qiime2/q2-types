@@ -54,9 +54,6 @@ class TaxonomyFormat(model.TextFileFormat):
                 elif line.lstrip(' ') == '\n':
                     # Blank line
                     continue
-                elif line.startswith('#'):
-                    # Comment line
-                    continue
                 else:
                     cells = line.split('\t')
                     if len(cells) < 2:
@@ -112,9 +109,6 @@ class TSVTaxonomyFormat(model.TextFileFormat):
                     break
                 elif line.lstrip(' ') == '\n':
                     # Blank line
-                    continue
-                elif line.startswith('#'):
-                    # Comment line
                     continue
 
                 cells = line.rstrip('\n').split('\t')
