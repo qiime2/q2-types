@@ -105,7 +105,7 @@ class TSVTaxonomyFormat(model.TextFileFormat):
             file_ = enumerate(fh) if n is None else zip(range(n), fh)
 
             for i, line in file_:
-                # Checks rows in the file, excludes header row
+                # Tracks line count for error reporting
                 i = i + 1
                 if line == '':
                     # EOF
@@ -122,15 +122,17 @@ class TSVTaxonomyFormat(model.TextFileFormat):
                                               "must be the first two header "
                                               "values to be valid.\n\n The "
                                               "first two header values "
-                                              "provided are: {}."
-                                              .format(cells[:2]))
+                                              "provided are: {}.\nIssue on "
+                                              "line {}"
+                                              .format(cells[:2], i))
                     header = cells
                 else:
                     if len(cells) != len(header):
-                        raise ValidationError('Number of columns are not the '
-                                              'same as number of headers in '
-                                              'the file. \nHeader values: '
-                                              '{} \nColumn values: {} '
+                        raise ValidationError("Number of columns are not the "
+                                              "same as number of headers in "
+                                              "the file. \nHeader values: "
+                                              "{} \nColumn values: {}\nIssue "
+                                              "on line: {}"
                                               .format(header, cells[:], i))
 
                     data_lines += 1
