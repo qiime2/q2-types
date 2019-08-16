@@ -105,7 +105,7 @@ class TSVTaxonomyFormat(model.TextFileFormat):
             file_ = enumerate(fh) if n is None else zip(range(n), fh)
 
             for i, line in file_:
-                # Tracks line count for error reporting
+                # Tracks line number for error reporting
                 i = i + 1
                 if line == '':
                     # EOF
@@ -138,7 +138,7 @@ class TSVTaxonomyFormat(model.TextFileFormat):
                     data_lines += 1
 
             if data_lines == 0:
-                raise ValidationError("No feature records found, only blank "
+                raise ValidationError("No taxonomy records found, only blank "
                                       "lines and/or a header row.")
 
     def _validate_(self, level):
