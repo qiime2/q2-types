@@ -150,8 +150,8 @@ class DNAFASTAFormat(model.TextFileFormat):
                     return
                 if first[0] != ord(b'>'):
                     raise ValidationError("First line of file is not a valid "
-                                          "refline. reflines must start with "
-                                          "'>'")
+                                          "description. Descriptions must "
+                                          "start with '>'")
                 fh.seek(0)
                 for line_number, line in enumerate(fh, 1):
                     if line_number >= max_lines:
@@ -160,13 +160,13 @@ class DNAFASTAFormat(model.TextFileFormat):
                     if line.startswith('>'):
                         if last_line_was_ID:
                             raise ValidationError('Multiple consecutive '
-                                                  'reflines starting on line '
-                                                  f'{line_number-1!r}')
+                                                  'descriptions starting on '
+                                                  f'line {line_number-1!r}')
                         line = line.split()
                         if line[0] == '>':
                             if len(line) == 1:
                                 raise ValidationError(
-                                    f'Refline on line {line_number} is '
+                                    f'Description on line {line_number} is '
                                     'missing an ID.')
                             else:
                                 raise ValidationError(

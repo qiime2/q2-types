@@ -170,7 +170,7 @@ class TestDNAFASTAFormats(TestPluginBase):
         format = DNAFASTAFormat(filepath, mode='r')
 
         with self.assertRaisesRegex(
-                ValidationError, 'consecutive reflines.*1'):
+                ValidationError, 'consecutive descriptions.*1'):
             format.validate()
 
     def test_dna_fasta_format_missing_initial_ID(self):
