@@ -118,22 +118,22 @@ class TSVTaxonomyFormat(model.TextFileFormat):
 
                 if header is None:
                     if cells[:2] != self.HEADER:
-                        raise ValidationError("['Feature ID' and 'Taxon'] "
-                                              "must be the first two header "
-                                              "values to be valid.\n\n The "
-                                              "first two header values "
-                                              "provided are: {}.\nIssue on "
-                                              "line {}"
-                                              .format(cells[:2], i))
+                        raise ValidationError("Header row on line {} is "
+                                              "invalid. ['Feature ID', "
+                                              "'Taxon'] must be the first two "
+                                              "header values to be valid."
+                                              "\n\nThe first two header "
+                                              "values provided are: {}."
+                                              .format(i, cells[:2]))
                     header = cells
                 else:
                     if len(cells) != len(header):
-                        raise ValidationError("Number of columns are not the "
-                                              "same as number of headers in "
-                                              "the file. \nHeader values: "
-                                              "{} \nColumn values: {}\nIssue "
-                                              "on line: {}"
-                                              .format(header, cells[:], i))
+                        raise ValidationError("Invalid format starting on "
+                                              "line {}. Number of columns are "
+                                              "not the same as number of "
+                                              "headers in the file.\nHeader "
+                                              "values: {}\nColumn values: {}"
+                                              .format(i, header, cells[:]))
 
                     data_lines += 1
 
