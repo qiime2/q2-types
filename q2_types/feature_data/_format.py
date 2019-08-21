@@ -147,6 +147,7 @@ class DNAFASTAFormat(model.TextFileFormat):
     def _validate_lines(self, max_lines):
         FASTADNAValidator = re.compile(r'[ACGTURYKMSWBDHVN]+\r?\n?')
         last_line_was_ID = False
+        ids = {}
 
         with open(str(self), 'rb') as fh:
             try:
@@ -158,8 +159,8 @@ class DNAFASTAFormat(model.TextFileFormat):
                     return
                 if first[0] != ord(b'>'):
                     raise ValidationError("First line of file is not a valid "
-                                          "FASTA ID. FASTA IDs must start "
-                                          "with '>'")
+                                          "description. Descriptions must "
+                                          "start with '>'")
                 fh.seek(0)
                 for line_number, line in enumerate(fh, 1):
                     if line_number >= max_lines:
@@ -167,9 +168,24 @@ class DNAFASTAFormat(model.TextFileFormat):
                     line = line.decode('utf-8-sig')
                     if line.startswith('>'):
                         if last_line_was_ID:
-                            raise ValidationError('Multiple consecutive IDs '
-                                                  'starting on line '
-                                                  f'{line_number-1!r}')
+                            raise ValidationError('Multiple consecutive '
+                                                  'descriptions starting on '
+                                                  f'line {line_number-1!r}')
+                        line = line.split()
+                        if line[0] == '>':
+                            if len(line) == 1:
+                                raise ValidationError(
+                                    f'Description on line {line_number} is '
+                                    'missing an ID.')
+                            else:
+                                raise ValidationError(
+                                    f'ID on line {line_number} starts with a '
+                                    'space. IDs may not start with spaces')
+                        if line[0] in ids:
+                            raise ValidationError(
+                                f'ID on line {line_number} is a duplicate of '
+                                f'another ID on line {ids[line[0]]}.')
+                        ids[line[0]] = line_number
                         last_line_was_ID = True
                     elif re.fullmatch(FASTADNAValidator, line):
                         last_line_was_ID = False
