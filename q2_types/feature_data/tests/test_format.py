@@ -169,7 +169,8 @@ class TestDNAFASTAFormats(TestPluginBase):
         filepath = self.get_data_path('dna-sequences-consecutive-ids.fasta')
         format = DNAFASTAFormat(filepath, mode='r')
 
-        with self.assertRaisesRegex(ValidationError, 'consecutive IDs.*1'):
+        with self.assertRaisesRegex(
+                ValidationError, 'consecutive descriptions.*1'):
             format.validate()
 
     def test_dna_fasta_format_missing_initial_ID(self):
@@ -200,6 +201,28 @@ class TestDNAFASTAFormats(TestPluginBase):
         format = DNASequencesDirectoryFormat(self.temp_dir.name, mode='r')
 
         format.validate()
+
+    def test_dna_fasta_format_duplicate_ids(self):
+        filepath = self.get_data_path('dna-sequences-duplicate-id.fasta')
+        format = DNAFASTAFormat(filepath, mode='r')
+
+        with self.assertRaisesRegex(ValidationError, '3.*duplicate.*1'):
+            format.validate()
+
+    def test_dna_fasta_format_no_id(self):
+        filepath = self.get_data_path('dna-sequences-no-id.fasta')
+        format = DNAFASTAFormat(filepath, mode='r')
+
+        with self.assertRaisesRegex(ValidationError, '1.*missing an ID'):
+            format.validate()
+
+    def test_dna_fasta_format_id_starts_with_space(self):
+        filepath = self.get_data_path(
+            'dna-sequences-id-starts-with-space.fasta')
+        format = DNAFASTAFormat(filepath, mode='r')
+
+        with self.assertRaisesRegex(ValidationError, '1 starts with a space'):
+            format.validate()
 
     def test_paired_dna_sequences_directory_format(self):
         filepath = self.get_data_path('dna-sequences.fasta')
