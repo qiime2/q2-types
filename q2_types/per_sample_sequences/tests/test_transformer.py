@@ -138,25 +138,6 @@ class TestTransformers(TestPluginBase):
         for act, exp in zip(obs, input):
             self.assertEqual(act, exp)
 
-    def test_casava_one_eight_single_lane_per_sample_dirfmt_to_slpssefdf(self):
-        filenames = ('Human-Kneecap_S1_L001_R1_001.fastq.gz',)
-        input, obs = self.transform_format(
-            CasavaOneEightSingleLanePerSampleDirFmt,
-            SingleLanePerSamplePairedEndFastqDirFmt, filenames=filenames
-        )
-
-        input = skbio.io.read(
-            '%s/Human-Kneecap_S1_L001_R1_001.fastq.gz' % str(input),
-            format='fastq', constructor=skbio.DNA
-        )
-        obs = skbio.io.read(
-            '%s/Human-Kneecap_S1_L001_R1_001.fastq.gz' % str(obs),
-            format='fastq', constructor=skbio.DNA
-        )
-
-        for act, exp in zip(obs, input):
-            self.assertEqual(act, exp)
-
     def test_slpssefdf_to_casava_one_eight_single_lane_per_sample_dirfmt(self):
         filenames = ('Human-Kneecap_S1_L001_R1_001.fastq.gz',)
         input, obs = self.transform_format(
