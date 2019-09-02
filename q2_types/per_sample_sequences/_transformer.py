@@ -11,6 +11,7 @@ import os
 import gzip
 import shutil
 import warnings
+import tempfile
 import collections
 
 import skbio
@@ -97,7 +98,11 @@ def _11(dirfmt: CasavaOneEightLanelessPerSampleDirFmt) \
 @plugin.register_transformer
 def _12(dirfmt: SingleLanePerSampleSingleEndFastqDirFmt) \
         -> CasavaOneEightSingleLanePerSampleDirFmt:
-    return CasavaOneEightSingleLanePerSampleDirFmt(str(dirfmt), mode='r')
+    casavaDir = tempfile.mkdtemp()
+    for file in os.listdir(str(dirfmt)):
+        if 'MANIFEST' not in file and 'metadata' not in file:
+            shutil.copy(os.path.join(str(dirfmt), file), casavaDir)
+    return CasavaOneEightSingleLanePerSampleDirFmt(casavaDir, mode='r')
 
 
 @plugin.register_transformer
