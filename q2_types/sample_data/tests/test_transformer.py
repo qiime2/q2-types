@@ -26,6 +26,10 @@ class TestTransformers(TestPluginBase):
                         name='shannon', index=exp_index)
 
         obs = transformer(exp)
+        '''
+        Squeeze equals true in function call below to convert single column
+        dataframe to series
+        '''
         obs = pd.read_csv(str(obs), sep='\t', header=0, index_col=0,
                           squeeze=True)
 
