@@ -26,8 +26,8 @@ class TestTransformers(TestPluginBase):
                         name='shannon', index=exp_index)
 
         obs = transformer(exp)
-        obs = pd.read_csv(str(obs), sep='\t', parse_dates=True, header=0,
-                          index_col=0, squeeze=True)
+        obs = pd.read_csv(str(obs), sep='\t', header=0, index_col=0,
+                          squeeze=True)
 
         assert_series_equal(exp, obs)
 
