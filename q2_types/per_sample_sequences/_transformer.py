@@ -98,11 +98,12 @@ def _11(dirfmt: CasavaOneEightLanelessPerSampleDirFmt) \
 @plugin.register_transformer
 def _12(dirfmt: SingleLanePerSampleSingleEndFastqDirFmt) \
         -> CasavaOneEightSingleLanePerSampleDirFmt:
-    casavaDir = tempfile.mkdtemp()
+    casava = CasavaOneEightSingleLanePerSampleDirFmt(mode='w')
     for file in os.listdir(str(dirfmt)):
         if 'MANIFEST' not in file and 'metadata' not in file:
-            shutil.copy(os.path.join(str(dirfmt), file), casavaDir)
-    return CasavaOneEightSingleLanePerSampleDirFmt(casavaDir, mode='r')
+            shutil.copy(os.path.join(str(dirfmt), file), str(casava))
+    return casava
+
 
 
 @plugin.register_transformer
