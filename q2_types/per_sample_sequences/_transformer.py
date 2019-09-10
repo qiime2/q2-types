@@ -11,7 +11,6 @@ import os
 import gzip
 import shutil
 import warnings
-import tempfile
 import collections
 
 import skbio
@@ -102,7 +101,6 @@ def _12(dirfmt: SingleLanePerSampleSingleEndFastqDirFmt) \
     for fastq in dirfmt.path.glob('*.fastq.gz'):
         shutil.copy(os.path.join(str(dirfmt), fastq), str(casava))
     return casava
-
 
 
 @plugin.register_transformer
