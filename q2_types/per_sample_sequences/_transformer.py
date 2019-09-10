@@ -99,9 +99,8 @@ def _11(dirfmt: CasavaOneEightLanelessPerSampleDirFmt) \
 def _12(dirfmt: SingleLanePerSampleSingleEndFastqDirFmt) \
         -> CasavaOneEightSingleLanePerSampleDirFmt:
     casava = CasavaOneEightSingleLanePerSampleDirFmt(mode='w')
-    for file in dirfmt.path.iterdir():
-        if 'MANIFEST' not in str(file) and 'metadata' not in str(file):
-            shutil.copy(os.path.join(str(dirfmt), file), str(casava))
+    for fastq in dirfmt.path.glob('*.fastq.gz'):
+        shutil.copy(os.path.join(str(dirfmt), fastq), str(casava))
     return casava
 
 
