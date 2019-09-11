@@ -95,7 +95,7 @@ def _11(dirfmt: CasavaOneEightLanelessPerSampleDirFmt) \
 
 
 @plugin.register_transformer
-def _12(dirfmt: SingleLanePerSampleSingleEndFastqDirFmt) \
+def _27(dirfmt: SingleLanePerSampleSingleEndFastqDirFmt) \
         -> CasavaOneEightSingleLanePerSampleDirFmt:
     casava = CasavaOneEightSingleLanePerSampleDirFmt(mode='w')
     for fastq in dirfmt.path.glob('*.fastq.gz'):
@@ -360,7 +360,7 @@ def _9(fmt: PairedEndFastqManifestPhred64) \
 
 
 @plugin.register_transformer
-def _27(dirfmt: SingleLanePerSampleSingleEndFastqDirFmt) \
+def _12(dirfmt: SingleLanePerSampleSingleEndFastqDirFmt) \
         -> QIIME1DemuxDirFmt:
     with dirfmt.manifest.view(FastqManifestFormat).open() as fh:
         input_manifest = _parse_and_validate_manifest(fh, single_end=True,
