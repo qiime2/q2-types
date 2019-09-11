@@ -107,10 +107,8 @@ class TSVTaxonomyFormat(model.TextFileFormat):
             for i, line in file_:
                 # Tracks line number for error reporting
                 i = i + 1
-                if line == '':
-                    # EOF
-                    break
-                elif line.lstrip(' ') == '\n':
+
+                if line.lstrip(' ') == '\n':
                     # Blank line
                     continue
 
