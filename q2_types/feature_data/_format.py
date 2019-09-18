@@ -121,7 +121,7 @@ class TSVTaxonomyFormat(model.TextFileFormat):
                                               "'Taxon'] must be the first two "
                                               "header values to be valid."
                                               "\n\nThe first two header "
-                                              "values provided are: {}."
+                                              "values observed are: {}."
                                               .format(i, cells[:2]))
                     header = cells
                 else:
@@ -129,8 +129,9 @@ class TSVTaxonomyFormat(model.TextFileFormat):
                         raise ValidationError("Invalid format starting on "
                                               "line {}. Number of columns are "
                                               "not the same as number of "
-                                              "headers in the file.\nHeader "
-                                              "values: {}\nColumn values: {}"
+                                              "header values in the file.\n "
+                                              "Header values: {}\nColumn "
+                                              "values: {}"
                                               .format(i, header, cells[:]))
 
                     data_lines += 1
