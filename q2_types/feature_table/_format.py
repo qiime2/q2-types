@@ -22,7 +22,8 @@ class BIOMV100Format(model.TextFileFormat):
     }
 
     def sniff(self):
-        with self.open() as fh:
+        # Can't self.open(mode='rb'), so we defer to the backing pathlib object
+        with self.path.open(mode='rb') as fh:
             try:
                 parser = ijson.parse(fh)
                 for prefix, event, value in parser:
