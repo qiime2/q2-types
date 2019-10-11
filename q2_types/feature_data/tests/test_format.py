@@ -143,7 +143,8 @@ class TestTaxonomyFormats(TestPluginBase):
         for filepath in filepaths:
             format = TSVTaxonomyFormat(filepath, mode='r')
 
-            with self.assertRaisesRegex(ValidationError, 'Number of columns'):
+            with self.assertRaisesRegex(ValidationError,
+                                        'line 2.*3 values.*expected 2'):
                 format.validate()
 
 

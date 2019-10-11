@@ -99,7 +99,7 @@ class TSVTaxonomyFormat(model.TextFileFormat):
 
     def _check_n_records(self, n=None):
         with self.open() as fh:
-            data_lines = 0
+            data_line_count = 0
             header = None
 
             file_ = enumerate(fh) if n is None else zip(range(n), fh)
@@ -116,29 +116,24 @@ class TSVTaxonomyFormat(model.TextFileFormat):
 
                 if header is None:
                     if cells[:2] != self.HEADER:
-                        raise ValidationError("Header row on line {} is "
-                                              "invalid. ['Feature ID', "
-                                              "'Taxon'] must be the first two "
-                                              "header values to be valid."
-                                              "\n\nThe first two header "
-                                              "values observed are: {}."
-                                              .format(i, cells[:2]))
+                        raise ValidationError(
+                            '%s must be the first two header values. The '
+                            'first two header values provided are: %s (on '
+                            'line %s).' % (self.HEADER, cells[:2], i))
                     header = cells
                 else:
                     if len(cells) != len(header):
-                        raise ValidationError("Invalid format starting on "
-                                              "line {}. Number of columns are "
-                                              "not the same as number of "
-                                              "header values in the file.\n "
-                                              "Header values: {}\nColumn "
-                                              "values: {}"
-                                              .format(i, header, cells[:]))
+                        raise ValidationError(
+                            'Number of values on line %s are not the same as '
+                            'number of header values. Found %s values '
+                            '(%s), expected %s.' % (i, len(cells), cells,
+                                                    len(self.HEADER)))
 
-                    data_lines += 1
+                    data_line_count += 1
 
-            if data_lines == 0:
-                raise ValidationError("No taxonomy records found, only blank "
-                                      "lines and/or a header row.")
+            if data_line_count == 0:
+                raise ValidationError('No taxonomy records found, only blank '
+                                      'lines and/or a header row.')
 
     def _validate_(self, level):
         self._check_n_records(n={'min': 10, 'max': None}[level])
