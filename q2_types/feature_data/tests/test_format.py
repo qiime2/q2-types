@@ -134,6 +134,19 @@ class TestTaxonomyFormats(TestPluginBase):
 
         format.validate()
 
+    def test_tsv_taxonomy_format_column_header_lengths(self):
+        filenames = ['greater-column-length.tsv', 'greater-header-length.tsv']
+
+        filepaths = [self.get_data_path(os.path.join('taxonomy', filename))
+                     for filename in filenames]
+
+        for filepath in filepaths:
+            format = TSVTaxonomyFormat(filepath, mode='r')
+
+            with self.assertRaisesRegex(ValidationError,
+                                        'line 2.*3 values.*expected 2'):
+                format.validate()
+
 
 class TestDNAFASTAFormats(TestPluginBase):
     package = 'q2_types.feature_data.tests'

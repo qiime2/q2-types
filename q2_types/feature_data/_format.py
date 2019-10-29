@@ -90,38 +90,53 @@ class TSVTaxonomyFormat(model.TextFileFormat):
 
     Optionally followed by other arbitrary columns.
 
-    This format supports comment lines starting with #, and blank lines. The
-    expected header must be the first non-comment, non-blank line. In addition
-    to the header, there must be at least one line of data.
+    This format supports blank lines. The expected header must be the first
+    non-blank line. In addition to the header, there must be at least one line
+    of data.
 
     """
     HEADER = ['Feature ID', 'Taxon']
 
-    def sniff(self):
+    def _check_n_records(self, n=None):
         with self.open() as fh:
-            data_lines = 0
+            data_line_count = 0
             header = None
-            while data_lines < 10:
-                line = fh.readline()
 
-                if line == '':
-                    # EOF
-                    break
-                elif line.lstrip(' ') == '\n':
+            file_ = enumerate(fh) if n is None else zip(range(n), fh)
+
+            for i, line in file_:
+                # Tracks line number for error reporting
+                i = i + 1
+
+                if line.lstrip(' ') == '\n':
                     # Blank line
                     continue
 
-                cells = line.rstrip('\n').split('\t')
+                cells = line.strip('\n').split('\t')
+
                 if header is None:
                     if cells[:2] != self.HEADER:
-                        return False
+                        raise ValidationError(
+                            '%s must be the first two header values. The '
+                            'first two header values provided are: %s (on '
+                            'line %s).' % (self.HEADER, cells[:2], i))
                     header = cells
                 else:
                     if len(cells) != len(header):
-                        return False
-                    data_lines += 1
+                        raise ValidationError(
+                            'Number of values on line %s are not the same as '
+                            'number of header values. Found %s values '
+                            '(%s), expected %s.' % (i, len(cells), cells,
+                                                    len(self.HEADER)))
 
-            return header is not None and data_lines > 0
+                    data_line_count += 1
+
+            if data_line_count == 0:
+                raise ValidationError('No taxonomy records found, only blank '
+                                      'lines and/or a header row.')
+
+    def _validate_(self, level):
+        self._check_n_records(n={'min': 10, 'max': None}[level])
 
 
 TSVTaxonomyDirectoryFormat = model.SingleFileDirectoryFormat(
