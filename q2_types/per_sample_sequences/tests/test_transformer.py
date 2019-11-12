@@ -32,6 +32,13 @@ from q2_types.per_sample_sequences import (
     PairedEndFastqManifestPhred64V2,
     QIIME1DemuxDirFmt)
 from q2_types.per_sample_sequences._transformer import (
+    _7,
+    _23,
+    _24,
+    _25,
+    _26,
+)
+from q2_types.per_sample_sequences._transformer import (
     _validate_header,
     _validate_single_end_fastq_manifest_directions,
     _validate_paired_end_fastq_manifest_directions,
@@ -139,7 +146,8 @@ class TestTransformers(TestPluginBase):
             self.assertEqual(act, exp)
 
     def test_casava_one_eight_single_lane_per_sample_dirfmt_to_slpspefdf(self):
-        filenames = ('Human-Kneecap_S1_L001_R1_001.fastq.gz',)
+        filenames = ('Human-Kneecap_S1_L001_R1_001.fastq.gz',
+                     'paired_end_data/Human-Kneecap_S1_L001_R2_001.fastq.gz')
         input, obs = self.transform_format(
             CasavaOneEightSingleLanePerSampleDirFmt,
             SingleLanePerSamplePairedEndFastqDirFmt, filenames=filenames
@@ -180,8 +188,8 @@ class TestTransformers(TestPluginBase):
         input, obs = self.transform_format(
             CasavaOneEightLanelessPerSampleDirFmt,
             SingleLanePerSamplePairedEndFastqDirFmt,
-            filenames=('Human-Kneecap_S1_R1_001.fastq.gz',),
-        )
+            filenames=('Human-Kneecap_S1_R1_001.fastq.gz',
+                       'paired_end_data/Human-Kneecap_S1_R2_001.fastq.gz'))
 
         input = skbio.io.read(
             '%s/Human-Kneecap_S1_R1_001.fastq.gz' % str(input),
@@ -198,7 +206,7 @@ class TestTransformers(TestPluginBase):
     def test_fastqmanifest_single(self):
         _, dirfmt = self.transform_format(
             CasavaOneEightSingleLanePerSampleDirFmt,
-            SingleLanePerSamplePairedEndFastqDirFmt,
+            SingleLanePerSampleSingleEndFastqDirFmt,
             filenames=('Human-Kneecap_S1_L001_R1_001.fastq.gz',
                        'Human-Armpit_S2_L001_R1_001.fastq.gz'),
         )
@@ -635,9 +643,6 @@ class TestFastqManifestTransformers(TestPluginBase):
 
     def test_single_end_fastq_manifest_missing_fastq(self):
         format_ = SingleEndFastqManifestPhred64
-        transformer = self.get_transformer(
-            format_,
-            SingleLanePerSampleSingleEndFastqDirFmt)
 
         shutil.copy(
             self.get_data_path('s1-phred64.fastq.gz'),
@@ -653,13 +658,10 @@ class TestFastqManifestTransformers(TestPluginBase):
 
         with self.assertRaisesRegex(FileNotFoundError,
                                     "s2-phred64.fastq.gz"):
-            transformer(format_(manifest_fp, 'r'))
+            _7(format_(manifest_fp, 'r'))
 
     def test_single_end_fastq_manifest_invalid_direction(self):
         format_ = SingleEndFastqManifestPhred64
-        transformer = self.get_transformer(
-            format_,
-            SingleLanePerSampleSingleEndFastqDirFmt)
 
         shutil.copy(
             self.get_data_path('s1-phred64.fastq.gz'),
@@ -677,7 +679,7 @@ class TestFastqManifestTransformers(TestPluginBase):
                      self.temp_dir.name)
 
         with self.assertRaisesRegex(ValueError, 'middle-out'):
-            transformer(format_(manifest_fp, 'r'))
+            _7(format_(manifest_fp, 'r'))
 
     def test_single_end_fastq_manifest_too_many_directions(self):
         format_ = SingleEndFastqManifestPhred64
@@ -705,9 +707,6 @@ class TestFastqManifestTransformers(TestPluginBase):
 
     def test_paired_end_fastq_manifest_missing_fastq(self):
         format_ = PairedEndFastqManifestPhred64
-        transformer = self.get_transformer(
-            format_,
-            SingleLanePerSamplePairedEndFastqDirFmt)
 
         shutil.copy(
             self.get_data_path('s1-phred64.fastq.gz'),
@@ -723,13 +722,10 @@ class TestFastqManifestTransformers(TestPluginBase):
 
         with self.assertRaisesRegex(FileNotFoundError,
                                     "s2-phred64.fastq.gz"):
-            transformer(format_(manifest_fp, 'r'))
+            _7(format_(manifest_fp, 'r'))
 
     def test_paired_end_fastq_manifest_invalid_direction(self):
         format_ = PairedEndFastqManifestPhred64
-        transformer = self.get_transformer(
-            format_,
-            SingleLanePerSamplePairedEndFastqDirFmt)
 
         shutil.copy(
             self.get_data_path('s1-phred64.fastq.gz'),
@@ -747,7 +743,7 @@ class TestFastqManifestTransformers(TestPluginBase):
                      self.temp_dir.name)
 
         with self.assertRaisesRegex(ValueError, 'middle-out'):
-            transformer(format_(manifest_fp, 'r'))
+            _7(format_(manifest_fp, 'r'))
 
     def test_paired_end_fastq_manifest_missing_directions(self):
         format_ = PairedEndFastqManifestPhred64
@@ -960,7 +956,7 @@ class TestFastqManifestTransformers(TestPluginBase):
 # primarily transform the V2 TSV manifests to the (older) CSV manifests. The
 # only things asserted here are facts about the manifest and not the actual
 # data assets, themselves.
-class TestFastqManifestV2Transformers(TestPluginBase):
+class TestFastqManifestV2TransformationFunctions(TestPluginBase):
     package = "q2_types.per_sample_sequences.tests"
 
     def setUp(self):
@@ -989,18 +985,18 @@ class TestFastqManifestV2Transformers(TestPluginBase):
             fh.write(tmpl.substitute(**ctx))
         return file_
 
-    def apply_transformation(self, from_fmt, to_fmt, datafile_fp, manifest_fp):
-        transformer = self.get_transformer(from_fmt, to_fmt)
+    def apply_transformation(self, transformer_func, from_fmt, datafile_fp,
+                             manifest_fp):
         fp = self.get_data_path(datafile_fp)
         manifest = self.template_manifest(
             self.get_data_path(manifest_fp),
             {k: fp for k in ['s1', 's2', 's1f', 's1r', 's2f', 's2r']})
-        return transformer(from_fmt(manifest, 'r'))
+        return transformer_func(from_fmt(manifest, 'r'))
 
     def test_single_end_fastq_manifest_phred33_to_slpssefdf(self):
         obs = self.apply_transformation(
+            _23,
             SingleEndFastqManifestPhred33V2,
-            SingleLanePerSampleSingleEndFastqDirFmt,
             'Human-Kneecap_S1_L001_R1_001.fastq.gz',
             'absolute_manifests_v2/single-MANIFEST')
 
@@ -1009,8 +1005,8 @@ class TestFastqManifestV2Transformers(TestPluginBase):
 
     def test_single_end_fastq_manifest_phred64_to_slpssefdf(self):
         obs = self.apply_transformation(
+            _24,
             SingleEndFastqManifestPhred64V2,
-            SingleLanePerSampleSingleEndFastqDirFmt,
             's1-phred64.fastq.gz',
             'absolute_manifests_v2/single-MANIFEST')
 
@@ -1019,8 +1015,8 @@ class TestFastqManifestV2Transformers(TestPluginBase):
 
     def test_paired_end_fastq_manifest_phred33_to_slpspefdf(self):
         obs = self.apply_transformation(
+            _25,
             PairedEndFastqManifestPhred33V2,
-            SingleLanePerSamplePairedEndFastqDirFmt,
             'Human-Kneecap_S1_L001_R1_001.fastq.gz',
             'absolute_manifests_v2/paired-MANIFEST')
 
@@ -1029,8 +1025,8 @@ class TestFastqManifestV2Transformers(TestPluginBase):
 
     def test_paired_end_fastq_manifest_phred64_to_slpspefdf(self):
         obs = self.apply_transformation(
+            _26,
             PairedEndFastqManifestPhred64V2,
-            SingleLanePerSamplePairedEndFastqDirFmt,
             's1-phred64.fastq.gz',
             'absolute_manifests_v2/paired-MANIFEST')
 

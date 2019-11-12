@@ -24,7 +24,7 @@ from q2_types.feature_data import (
     DifferentialFormat, AlignedDNAIterator
 )
 from q2_types.feature_data._transformer import (
-    _taxonomy_formats_to_dataframe, _dataframe_to_tsv_taxonomy_format)
+    _taxonomy_formats_to_dataframe, _dataframe_to_tsv_taxonomy_format, _15)
 from qiime2.plugin.testing import TestPluginBase
 
 
@@ -664,9 +664,12 @@ class TestDNAFASTAFormatTransformers(TestPluginBase):
         self.assertIsInstance(obs, DNAFASTAFormat)
 
     def test_dnafasta_format_with_duplicate_ids_to_series(self):
+        filename = 'dna-sequences-with-duplicate-ids.fasta'
+        source_path = self.get_data_path(filename)
+        input_ = DNAFASTAFormat(source_path, mode='r')
+
         with self.assertRaisesRegex(ValueError, 'unique.*SEQUENCE1'):
-            self.transform_format(DNAFASTAFormat, pd.Series,
-                                  'dna-sequences-with-duplicate-ids.fasta')
+            _15(input_)
 
     def test_dnafasta_format_to_metadata(self):
         _, obs = self.transform_format(DNAFASTAFormat, qiime2.Metadata,
