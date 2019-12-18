@@ -30,7 +30,8 @@ from q2_types.per_sample_sequences import (
     SingleEndFastqManifestPhred64V2,
     PairedEndFastqManifestPhred33V2,
     PairedEndFastqManifestPhred64V2,
-    QIIME1DemuxDirFmt)
+    QIIME1DemuxDirFmt,
+    FastqGzFormat)
 from q2_types.per_sample_sequences._transformer import (
     _validate_header,
     _validate_single_end_fastq_manifest_directions,
@@ -118,6 +119,24 @@ class TestTransformers(TestPluginBase):
             self.transform_format(
                 SingleLanePerSampleSingleEndFastqDirFmt,
                 QIIME1DemuxDirFmt, filenames=filenames)
+
+    def test_casava_one_eight_laneless_per_sample_dirfmt_to_slpspefd(self):
+        filenames = ('Human-Kneecap_S1_R1_001.fastq.gz',
+                     'Human-Armpit_S2_R1_001.fastq.gz')
+
+        input, dirfmt = self.transform_format(
+            CasavaOneEightLanelessPerSampleDirFmt,
+            SingleLanePerSamplePairedEndFastqDirFmt, filenames=filenames
+        )
+        expected_filepaths = ['Human-Kneecap_S1_L001_R1_001.fastq.gz',
+                              'Human-Armpit_S2_L001_R1_001.fastq.gz']
+
+        for path, view in dirfmt.sequences.iter_views(FastqGzFormat):
+            self.assertIn(path.name, expected_filepaths)
+
+        df = dirfmt.manifest.view(pd.DataFrame)
+        for name in df['forward']:
+            self.assertTrue((dirfmt.path / name).exists())
 
     def test_casava_one_eight_single_lane_per_sample_dirfmt_to_slpssefdf(self):
         filenames = ('Human-Kneecap_S1_L001_R1_001.fastq.gz',)
