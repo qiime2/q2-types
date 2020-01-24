@@ -193,10 +193,11 @@ class DNAFASTAFormat(model.TextFileFormat):
                     elif re.fullmatch(FASTADNAValidator, line):
                         last_line_was_ID = False
                     else:
-                        for character in line:
+                        for position, character in enumerate(line):
                             if character not in ValidationSet:
                                 raise ValidationError(
-                                    f"Invalid character '{character}' on line "
+                                    f"Invalid character '{character}' at "
+                                    f"position {position} on line "
                                     f"{line_number} (does not match IUPAC "
                                     "characters for a DNA sequence).")
             except UnicodeDecodeError as e:
