@@ -171,6 +171,14 @@ class TestDNAFASTAFormats(TestPluginBase):
 
         format.validate()
 
+    def test_dna_fasta_format_invalid_characters(self):
+        filepath = self.get_data_path('not-dna-sequences.fasta')
+        format = DNAFASTAFormat(filepath, mode='r')
+
+        with self.assertRaisesRegex(ValidationError, "Invalid character '1' "
+                                                     "on line 2"):
+            format.validate()
+
     def test_dna_fasta_format_validate_negative(self):
         filepath = self.get_data_path('not-dna-sequences')
         format = DNAFASTAFormat(filepath, mode='r')

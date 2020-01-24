@@ -146,6 +146,9 @@ TSVTaxonomyDirectoryFormat = model.SingleFileDirectoryFormat(
 class DNAFASTAFormat(model.TextFileFormat):
     def _validate_lines(self, max_lines):
         FASTADNAValidator = re.compile(r'[ACGTURYKMSWBDHVN]+\r?\n?')
+        ValidationSet = frozenset(('A', 'C', 'G', 'T', 'U', 'R', 'Y', 'K', 'M',
+                                   'S', 'W', 'B', 'D', 'H', 'V', 'N'))
+
         last_line_was_ID = False
         ids = {}
 
@@ -190,10 +193,12 @@ class DNAFASTAFormat(model.TextFileFormat):
                     elif re.fullmatch(FASTADNAValidator, line):
                         last_line_was_ID = False
                     else:
-                        raise ValidationError('Invalid characters on line '
-                                              f'{line_number} (does not match '
-                                              'IUPAC characters for a DNA '
-                                              'sequence).')
+                        for character in line:
+                            if character not in ValidationSet:
+                                raise ValidationError(
+                                    f"Invalid character '{character}' on line "
+                                    f"{line_number} (does not match IUPAC "
+                                    "characters for a DNA sequence).")
             except UnicodeDecodeError as e:
                 raise ValidationError(f'utf-8 cannot decode byte on line '
                                       f'{line_number}') from e
