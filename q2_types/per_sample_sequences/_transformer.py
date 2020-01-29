@@ -54,7 +54,14 @@ def _single_lane_per_sample_fastq_helper(dirfmt, output_cls, parse_lane=True):
                                     barcode_id=barcode_id,
                                     lane_number=lane_number,
                                     read_number=read_number)
-        manifest_fh.write('%s,%s,%s\n' % (sample_id, path, direction))
+
+        filepath = result.sequences.path_maker(sample_id=sample_id,
+                                               barcode_id=barcode_id,
+                                               lane_number=lane_number,
+                                               read_number=read_number)
+        name = filepath.name
+
+        manifest_fh.write('%s,%s,%s\n' % (sample_id, name, direction))
 
     manifest_fh.close()
     result.manifest.write_data(manifest, FastqManifestFormat)
