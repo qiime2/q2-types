@@ -80,13 +80,14 @@ def _taxonomy_formats_to_dataframe(filepath, has_header=None):
     if df.index.has_duplicates:
         raise ValueError(
             "Taxonomy format feature IDs must be unique. The following IDs "
-            "are duplicated: %s" % ', '.join(df.index.get_duplicates()))
+            "are duplicated: %s" %
+            ', '.join(df.index[df.index.duplicated()].unique()))
 
     if df.columns.has_duplicates:
         raise ValueError(
             "Taxonomy format column names must be unique. The following "
             "column names are duplicated: %s" %
-            ', '.join(df.columns.get_duplicates()))
+            ', '.join(df.columns[df.columns.duplicated()].unique()))
 
     df['Taxon'] = df['Taxon'].str.strip()
     return df
@@ -117,13 +118,14 @@ def _dataframe_to_tsv_taxonomy_format(df):
     if df.index.has_duplicates:
         raise ValueError(
             "Taxonomy format feature IDs must be unique. The following IDs "
-            "are duplicated: %s" % ', '.join(df.index.get_duplicates()))
+            "are duplicated: %s" %
+            ', '.join(df.index[df.index.duplicated()].unique()))
 
     if df.columns.has_duplicates:
         raise ValueError(
             "Taxonomy format column names must be unique. The following "
             "column names are duplicated: %s" %
-            ', '.join(df.columns.get_duplicates()))
+            ', '.join(df.columns[df.columns.duplicated()].unique()))
 
     ff = TSVTaxonomyFormat()
     df.to_csv(str(ff), sep='\t', header=True, index=True)

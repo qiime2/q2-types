@@ -338,7 +338,7 @@ class TestTaxonomyFormatsToDataFrame(TestPluginBase):
                 has_header=True)
 
     def test_jagged(self):
-        with self.assertRaises(pandas.io.common.CParserError):
+        with self.assertRaises(pandas.io.common.ParserError):
             _taxonomy_formats_to_dataframe(
                 self.get_data_path(os.path.join('taxonomy', 'jagged.tsv')))
 

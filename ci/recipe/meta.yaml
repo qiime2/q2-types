@@ -21,7 +21,7 @@ requirements:
     - scikit-bio >=0.5.4
     - numpy
     - blas=*=openblas
-    - pandas
+    - pandas >=1
     - biom-format >=2.1.5,<2.2.0
     - ijson
     - h5py
