@@ -217,7 +217,7 @@ class TestTransformers(TestPluginBase):
     def test_fastqmanifest_single(self):
         _, dirfmt = self.transform_format(
             CasavaOneEightSingleLanePerSampleDirFmt,
-            SingleLanePerSamplePairedEndFastqDirFmt,
+            SingleLanePerSampleSingleEndFastqDirFmt,
             filenames=('Human-Kneecap_S1_L001_R1_001.fastq.gz',
                        'Human-Armpit_S2_L001_R1_001.fastq.gz'),
         )
