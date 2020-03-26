@@ -48,5 +48,3 @@ def _get_prefix(strings):
 
 plugin.register_views(Bowtie2IndexDirFmt,
                       citations=[citations['langmead2012fast']])
-plugin.register_semantic_types(Bowtie2Index)
-plugin.register_semantic_type_to_format(Bowtie2Index, Bowtie2IndexDirFmt)

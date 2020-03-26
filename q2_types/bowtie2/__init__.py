@@ -10,7 +10,4 @@ from ._formats import (Bowtie2IndexFileFormat, Bowtie2IndexDirFmt)
 from ._types import Bowtie2Index
 
 
-__version__ = get_versions()['version']
-del get_versions
-
 __all__ = ['Bowtie2IndexFileFormat', 'Bowtie2IndexDirFmt', 'Bowtie2Index']
