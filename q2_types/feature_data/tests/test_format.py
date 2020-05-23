@@ -157,6 +157,12 @@ class TestDNAFASTAFormats(TestPluginBase):
 
         format.validate()
 
+    def test_dna_fasta_format_zipped_validate_positive(self):
+        filepath = self.get_data_path('dna-sequences.fasta.gz')
+        format = DNAFASTAFormat(filepath, mode='r')
+
+        format.validate()
+
     def test_dna_fasta_format_bom_passes(self):
         filepath = self.get_data_path('dna-with-bom-passes.fasta')
         format = DNAFASTAFormat(filepath, mode='r')

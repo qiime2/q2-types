@@ -5,10 +5,11 @@
 #
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
-
+import gzip
 import re
 import skbio.io
 
+import qiime2.core.path as qpath
 import qiime2.plugin.model as model
 from qiime2.plugin import ValidationError
 import qiime2
@@ -152,7 +153,16 @@ class DNAFASTAFormat(model.TextFileFormat):
         last_line_was_ID = False
         ids = {}
 
-        with open(str(self), 'rb') as fh:
+        zipped = True if str(self.path).endswith('.fasta.gz') else False
+        if zipped:
+            unzipped_path = str(self.path)[:-3]
+            with gzip.open(str(self), 'rb') as fin, \
+                    open(unzipped_path, 'wb') as fout:
+                fout.writelines(line for line in fin)
+            # Update path to the unzipped one
+            self.path = qpath.InPath(unzipped_path)
+
+        with open(str(self.path), 'rb') as fh:
             try:
                 first = fh.read(6)
                 if first[:3] == b'\xEF\xBB\xBF':
