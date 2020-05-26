@@ -10,6 +10,7 @@ import os
 import gzip
 import itertools
 import collections
+import pathlib
 
 import pandas as pd
 import skbio
@@ -17,7 +18,7 @@ import skbio.io
 import yaml
 import qiime2
 import qiime2.plugin.model as model
-from qiime2.plugin import ValidationError
+from qiime2.plugin import ValidationError, util
 
 from ..plugin_setup import plugin
 
@@ -295,6 +296,27 @@ class CasavaOneEightSingleLanePerSampleDirFmt(model.DirectoryFormat):
 
     def _find_duplicates(self, ids):
         return {x for x, c in collections.Counter(ids).items() if c > 1}
+
+    @property
+    def manifest(self):
+        # Invoke via the transformation API to
+        # a) prevent circular import issues
+        # b) potentially tie into provenance
+        tmp_manifest = util.transform(self, to_type=FastqManifestFormat)
+        df = util.transform(tmp_manifest, to_type=pd.DataFrame)
+
+        if 'reverse' not in df:
+            df['reverse'] = None
+
+        def munge_fn_closure(val):
+            if val is not None:
+                return str(self.path / pathlib.Path(val).name)
+            return val
+
+        for column in {'forward', 'reverse'}:
+            df[column] = df[column].apply(munge_fn_closure)
+
+        return df
 
     def _validate_(self, level):
         forwards = []

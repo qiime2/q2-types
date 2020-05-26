@@ -33,23 +33,31 @@ from . import (SingleLanePerSampleSingleEndFastqDirFmt, FastqManifestFormat,
                QIIME1DemuxDirFmt)
 
 
+def _util_parse_casava_filename(path, parse_lane=True):
+    directions = ['forward', 'reverse']
+    filename = str(path).replace('.fastq.gz', '')
+    if parse_lane:
+        sample_id, barcode_id, lane_number, read_number, _ = \
+            filename.rsplit('_', maxsplit=4)
+    else:
+        sample_id, barcode_id, read_number, _ = \
+            filename.rsplit('_', maxsplit=3)
+    read_number = int(read_number[1:])
+    lane_number = int(lane_number[1:]) if parse_lane else 1
+    direction = directions[read_number - 1]
+
+    return sample_id, barcode_id, lane_number, read_number, direction
+
+
 def _single_lane_per_sample_fastq_helper(dirfmt, output_cls, parse_lane=True):
     result = output_cls()
     manifest = FastqManifestFormat()
     manifest_fh = manifest.open()
     manifest_fh.write('sample-id,filename,direction\n')
-    directions = ['forward', 'reverse']
     for path, view in dirfmt.sequences.iter_views(FastqGzFormat):
-        filename = str(path).replace('.fastq.gz', '')
-        if parse_lane:
-            sample_id, barcode_id, lane_number, read_number, _ = \
-                filename.rsplit('_', maxsplit=4)
-        else:
-            sample_id, barcode_id, read_number, _ = \
-                filename.rsplit('_', maxsplit=3)
-        read_number = int(read_number[1:])
-        lane_number = int(lane_number[1:]) if parse_lane else 1
-        direction = directions[read_number - 1]
+        parsed = _util_parse_casava_filename(path, parse_lane)
+        sample_id, barcode_id, lane_number, read_number, direction = parsed
+
         result.sequences.write_data(view, FastqGzFormat, sample_id=sample_id,
                                     barcode_id=barcode_id,
                                     lane_number=lane_number,
@@ -73,6 +81,27 @@ def _single_lane_per_sample_fastq_helper(dirfmt, output_cls, parse_lane=True):
     return result
 
 
+def _util_dirfmt_to_casava(dirfmt_in):
+    dirfmt_out = CasavaOneEightSingleLanePerSampleDirFmt()
+    for fastq, _ in dirfmt_in.sequences.iter_views(FastqGzFormat):
+        from_fp = str(dirfmt_in.path / fastq.name)
+        to_fp = str(dirfmt_out.path / fastq.name)
+        qiime2.util.duplicate(from_fp, to_fp)
+    return dirfmt_out
+
+
+@plugin.register_transformer
+def _2_and_a_half(dirfmt: CasavaOneEightSingleLanePerSampleDirFmt) \
+        -> FastqManifestFormat:
+    manifest = FastqManifestFormat()
+    with manifest.open() as fh:
+        fh.write('sample-id,filename,direction\n')
+        for fp, _ in dirfmt.sequences.iter_views(FastqGzFormat):
+            sample_id, _, _, _, direction = _util_parse_casava_filename(fp)
+            fh.write('%s,%s,%s\n' % (sample_id, fp.name, direction))
+    return manifest
+
+
 @plugin.register_transformer
 def _3(dirfmt: CasavaOneEightSingleLanePerSampleDirFmt) \
         -> SingleLanePerSampleSingleEndFastqDirFmt:
@@ -81,10 +110,22 @@ def _3(dirfmt: CasavaOneEightSingleLanePerSampleDirFmt) \
 
 
 @plugin.register_transformer
+def _3_and_a_half(dirfmt_in: SingleLanePerSampleSingleEndFastqDirFmt) \
+        -> CasavaOneEightSingleLanePerSampleDirFmt:
+    return _util_dirfmt_to_casava(dirfmt_in)
+
+
+@plugin.register_transformer
 def _4(dirfmt: CasavaOneEightSingleLanePerSampleDirFmt) \
         -> SingleLanePerSamplePairedEndFastqDirFmt:
     return _single_lane_per_sample_fastq_helper(
         dirfmt, SingleLanePerSamplePairedEndFastqDirFmt)
+
+
+@plugin.register_transformer
+def _4_and_a_half(dirfmt_in: SingleLanePerSamplePairedEndFastqDirFmt) \
+        -> CasavaOneEightSingleLanePerSampleDirFmt:
+    return _util_dirfmt_to_casava(dirfmt_in)
 
 
 @plugin.register_transformer

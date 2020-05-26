@@ -11,6 +11,7 @@ import shutil
 import unittest
 import string
 
+import pandas as pd
 from q2_types.per_sample_sequences import (
     CasavaOneEightSingleLanePerSampleDirFmt,
     CasavaOneEightLanelessPerSampleDirFmt,
@@ -327,6 +328,17 @@ class TestFormats(TestPluginBase):
             self.temp_dir.name, mode='r')
 
         format.validate()
+
+    def test_casava_one_eight_slanepsample_dir_fmt_manifest_property(self):
+        filepath = self.get_data_path('Human-Kneecap_S1_L001_R1_001.fastq.gz')
+        shutil.copy(filepath, self.temp_dir.name)
+
+        format = CasavaOneEightSingleLanePerSampleDirFmt(
+            self.temp_dir.name, mode='r')
+
+        format.validate()
+        self.assertTrue(True)
+        self.assertIsInstance(format.manifest, pd.DataFrame)
 
     def test_casava_one_eight_slanepsample_dir_fmt_validate_negative(self):
         filepath = self.get_data_path('not-fastq.fastq.gz')
