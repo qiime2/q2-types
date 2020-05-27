@@ -18,9 +18,13 @@ import skbio.io
 import yaml
 import qiime2
 import qiime2.plugin.model as model
-from qiime2.plugin import ValidationError, util
+from qiime2.plugin import ValidationError
 
 from ..plugin_setup import plugin
+from ._util import (
+    _parse_casava_filename,
+    _manifest_to_df,
+)
 
 
 class FastqAbsolutePathManifestFormatV2(model.TextFileFormat):
@@ -299,11 +303,14 @@ class CasavaOneEightSingleLanePerSampleDirFmt(model.DirectoryFormat):
 
     @property
     def manifest(self):
-        # Invoke via the transformation API to
-        # a) prevent circular import issues
-        # b) potentially tie into provenance
-        tmp_manifest = util.transform(self, to_type=FastqManifestFormat)
-        df = util.transform(tmp_manifest, to_type=pd.DataFrame)
+        tmp_manifest = FastqManifestFormat()
+        with tmp_manifest.open() as fh:
+            fh.write('sample-id,filename,direction\n')
+            for fp, _ in self.sequences.iter_views(FastqGzFormat):
+                sample_id, _, _, _, direction = _parse_casava_filename(fp)
+                fh.write('%s,%s,%s\n' % (sample_id, fp.name, direction))
+
+        df = _manifest_to_df(tmp_manifest, self.path.parent)
 
         if 'reverse' not in df:
             df['reverse'] = None

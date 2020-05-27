@@ -6,12 +6,9 @@
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
 
+import functools
 import re
-import os
-import gzip
-import shutil
 import warnings
-import collections
 
 import skbio
 import yaml
@@ -19,126 +16,101 @@ import pandas as pd
 import qiime2.util
 
 from ..plugin_setup import plugin
-from . import (SingleLanePerSampleSingleEndFastqDirFmt, FastqManifestFormat,
-               FastqAbsolutePathManifestFormat, FastqGzFormat,
-               SingleLanePerSamplePairedEndFastqDirFmt, YamlFormat,
-               CasavaOneEightSingleLanePerSampleDirFmt,
-               CasavaOneEightLanelessPerSampleDirFmt,
-               SingleEndFastqManifestPhred33, SingleEndFastqManifestPhred64,
-               PairedEndFastqManifestPhred33, PairedEndFastqManifestPhred64,
-               SingleEndFastqManifestPhred33V2,
-               SingleEndFastqManifestPhred64V2,
-               PairedEndFastqManifestPhred33V2,
-               PairedEndFastqManifestPhred64V2,
-               QIIME1DemuxDirFmt)
+from . import (
+    SingleLanePerSampleSingleEndFastqDirFmt,
+    FastqAbsolutePathManifestFormat,
+    FastqManifestFormat,
+    FastqGzFormat,
+    SingleLanePerSamplePairedEndFastqDirFmt,
+    YamlFormat,
+    CasavaOneEightSingleLanePerSampleDirFmt,
+    CasavaOneEightLanelessPerSampleDirFmt,
+    SingleEndFastqManifestPhred33,
+    SingleEndFastqManifestPhred64,
+    PairedEndFastqManifestPhred33,
+    PairedEndFastqManifestPhred64,
+    SingleEndFastqManifestPhred33V2,
+    SingleEndFastqManifestPhred64V2,
+    PairedEndFastqManifestPhred33V2,
+    PairedEndFastqManifestPhred64V2,
+    QIIME1DemuxDirFmt,
+)
+from ._util import (
+    _single_lane_per_sample_fastq_helper,
+    _dirfmt_to_casava,
+    _parse_and_validate_manifest,
+    _copy_with_compression,
+    _fastq_manifest_helper,
+    _phred64_warning,
+    _write_phred64_to_phred33,
+    _manifest_v2_to_v1,
+    _manifest_to_df,
+)
 
 
-def _util_parse_casava_filename(path, parse_lane=True):
-    directions = ['forward', 'reverse']
-    filename = str(path).replace('.fastq.gz', '')
-    if parse_lane:
-        sample_id, barcode_id, lane_number, read_number, _ = \
-            filename.rsplit('_', maxsplit=4)
-    else:
-        sample_id, barcode_id, read_number, _ = \
-            filename.rsplit('_', maxsplit=3)
-    read_number = int(read_number[1:])
-    lane_number = int(lane_number[1:]) if parse_lane else 1
-    direction = directions[read_number - 1]
+# Partially apply the helpers here, to cut down on boilerplate.
 
-    return sample_id, barcode_id, lane_number, read_number, direction
+_fastq_manifest_helper_partial = functools.partial(
+    _fastq_manifest_helper,
+    se_fmt=SingleLanePerSampleSingleEndFastqDirFmt,
+    pe_fmt=SingleLanePerSamplePairedEndFastqDirFmt,
+    abs_manifest_fmt=FastqAbsolutePathManifestFormat,
+    manifest_fmt=FastqManifestFormat,
+    yaml_fmt=YamlFormat,
+)
 
-
-def _single_lane_per_sample_fastq_helper(dirfmt, output_cls, parse_lane=True):
-    result = output_cls()
-    manifest = FastqManifestFormat()
-    manifest_fh = manifest.open()
-    manifest_fh.write('sample-id,filename,direction\n')
-    for path, view in dirfmt.sequences.iter_views(FastqGzFormat):
-        parsed = _util_parse_casava_filename(path, parse_lane)
-        sample_id, barcode_id, lane_number, read_number, direction = parsed
-
-        result.sequences.write_data(view, FastqGzFormat, sample_id=sample_id,
-                                    barcode_id=barcode_id,
-                                    lane_number=lane_number,
-                                    read_number=read_number)
-
-        filepath = result.sequences.path_maker(sample_id=sample_id,
-                                               barcode_id=barcode_id,
-                                               lane_number=lane_number,
-                                               read_number=read_number)
-        name = filepath.name
-
-        manifest_fh.write('%s,%s,%s\n' % (sample_id, name, direction))
-
-    manifest_fh.close()
-    result.manifest.write_data(manifest, FastqManifestFormat)
-
-    metadata = YamlFormat()
-    metadata.path.write_text(yaml.dump({'phred-offset': 33}))
-    result.metadata.write_data(metadata, YamlFormat)
-
-    return result
+_parse_and_validate_manifest_partial = functools.partial(
+    _parse_and_validate_manifest,
+    abs_manifest_fmt=FastqAbsolutePathManifestFormat,
+    manifest_fmt=FastqManifestFormat,
+)
 
 
-def _util_dirfmt_to_casava(dirfmt_in):
-    dirfmt_out = CasavaOneEightSingleLanePerSampleDirFmt()
-    for fastq, _ in dirfmt_in.sequences.iter_views(FastqGzFormat):
-        from_fp = str(dirfmt_in.path / fastq.name)
-        to_fp = str(dirfmt_out.path / fastq.name)
-        qiime2.util.duplicate(from_fp, to_fp)
-    return dirfmt_out
-
-
-@plugin.register_transformer
-def _2_and_a_half(dirfmt: CasavaOneEightSingleLanePerSampleDirFmt) \
-        -> FastqManifestFormat:
-    manifest = FastqManifestFormat()
-    with manifest.open() as fh:
-        fh.write('sample-id,filename,direction\n')
-        for fp, _ in dirfmt.sequences.iter_views(FastqGzFormat):
-            sample_id, _, _, _, direction = _util_parse_casava_filename(fp)
-            fh.write('%s,%s,%s\n' % (sample_id, fp.name, direction))
-    return manifest
+_single_lane_per_sample_fastq_helper_partial = functools.partial(
+    _single_lane_per_sample_fastq_helper,
+    manifest_fmt=FastqManifestFormat,
+    fastq_fmt=FastqGzFormat,
+    yaml_fmt=YamlFormat,
+)
 
 
 @plugin.register_transformer
 def _3(dirfmt: CasavaOneEightSingleLanePerSampleDirFmt) \
         -> SingleLanePerSampleSingleEndFastqDirFmt:
-    return _single_lane_per_sample_fastq_helper(
+    return _single_lane_per_sample_fastq_helper_partial(
         dirfmt, SingleLanePerSampleSingleEndFastqDirFmt)
 
 
 @plugin.register_transformer
 def _3_and_a_half(dirfmt_in: SingleLanePerSampleSingleEndFastqDirFmt) \
         -> CasavaOneEightSingleLanePerSampleDirFmt:
-    return _util_dirfmt_to_casava(dirfmt_in)
+    return _dirfmt_to_casava(dirfmt_in)
 
 
 @plugin.register_transformer
 def _4(dirfmt: CasavaOneEightSingleLanePerSampleDirFmt) \
         -> SingleLanePerSamplePairedEndFastqDirFmt:
-    return _single_lane_per_sample_fastq_helper(
+    return _single_lane_per_sample_fastq_helper_partial(
         dirfmt, SingleLanePerSamplePairedEndFastqDirFmt)
 
 
 @plugin.register_transformer
 def _4_and_a_half(dirfmt_in: SingleLanePerSamplePairedEndFastqDirFmt) \
         -> CasavaOneEightSingleLanePerSampleDirFmt:
-    return _util_dirfmt_to_casava(dirfmt_in)
+    return _dirfmt_to_casava(dirfmt_in)
 
 
 @plugin.register_transformer
 def _10(dirfmt: CasavaOneEightLanelessPerSampleDirFmt) \
         -> SingleLanePerSampleSingleEndFastqDirFmt:
-    return _single_lane_per_sample_fastq_helper(
+    return _single_lane_per_sample_fastq_helper_partial(
         dirfmt, SingleLanePerSampleSingleEndFastqDirFmt, parse_lane=False)
 
 
 @plugin.register_transformer
 def _11(dirfmt: CasavaOneEightLanelessPerSampleDirFmt) \
         -> SingleLanePerSamplePairedEndFastqDirFmt:
-    return _single_lane_per_sample_fastq_helper(
+    return _single_lane_per_sample_fastq_helper_partial(
         dirfmt, SingleLanePerSamplePairedEndFastqDirFmt, parse_lane=False)
 
 
@@ -146,8 +118,8 @@ def _11(dirfmt: CasavaOneEightLanelessPerSampleDirFmt) \
 def _5(dirfmt: SingleLanePerSamplePairedEndFastqDirFmt) \
         -> SingleLanePerSampleSingleEndFastqDirFmt:
     with dirfmt.manifest.view(FastqManifestFormat).open() as fh:
-        input_manifest = _parse_and_validate_manifest(fh, single_end=False,
-                                                      absolute=False)
+        input_manifest = _parse_and_validate_manifest_partial(
+            fh, single_end=False, absolute=False)
 
     output_manifest = FastqManifestFormat()
     output_df = input_manifest[input_manifest.direction == 'forward']
@@ -167,243 +139,42 @@ def _5(dirfmt: SingleLanePerSamplePairedEndFastqDirFmt) \
     return result
 
 
-def _parse_and_validate_manifest(manifest_fh, single_end, absolute):
-    try:
-        manifest = pd.read_csv(manifest_fh, comment='#', header=0,
-                               skip_blank_lines=True, dtype=object)
-    except Exception as e:
-        raise ValueError('There was an issue parsing the manifest '
-                         'file as CSV:\n %s' % e)
-
-    expected_header = (FastqAbsolutePathManifestFormat.EXPECTED_HEADER if
-                       absolute else FastqManifestFormat.EXPECTED_HEADER)
-    _validate_header(manifest, expected_header)
-
-    for idx in manifest.index:
-        record = manifest.loc[idx]
-        if record.isnull().any():
-            raise ValueError('Empty cells are not supported in '
-                             'manifest files. Found one or more '
-                             'empty cells in this record: %s'
-                             % ','.join(map(str, record)))
-        record[expected_header[1]] = \
-            os.path.expandvars(record[expected_header[1]])
-        path = record[expected_header[1]]
-        if absolute:
-            if not os.path.isabs(path):
-                raise ValueError('All paths provided in manifest must be '
-                                 'absolute but found relative path: %s' % path)
-        else:
-            if os.path.isabs(path):
-                raise ValueError('All paths provided in manifest must be '
-                                 'relative but found absolute path: %s' % path)
-            path = os.path.join(os.path.dirname(manifest_fh.name), path)
-        if not os.path.exists(path):
-            raise FileNotFoundError(
-                'A path specified in the manifest does not exist '
-                'or is not accessible: '
-                '%s' % path)
-
-    if single_end:
-        _validate_single_end_fastq_manifest_directions(manifest)
-    else:
-        _validate_paired_end_fastq_manifest_directions(manifest)
-
-    return manifest
-
-
-def _validate_header(manifest, expected_header):
-    header = manifest.columns.tolist()
-    if header != expected_header:
-        raise ValueError('Expected manifest header %r but '
-                         'found %r.'
-                         % (','.join(expected_header), ','.join(header)))
-
-
-def _duplicated_ids(sample_ids):
-    counts = collections.Counter(sample_ids).most_common()
-    if len(counts) == 0 or counts[0][1] == 1:
-        # if there were no sample ids provided, or the most frequent sample id
-        # was only observed once, there are no duplicates
-        return []
-    else:
-        return [e[0] for e in counts if e[1] > 1]
-
-
-def _validate_single_end_fastq_manifest_directions(manifest):
-    directions = set(manifest['direction'])
-    if not directions.issubset({'forward', 'reverse'}):
-        raise ValueError('Directions can only be "forward" or '
-                         '"reverse", but observed: %s'
-                         % ', '.join(directions))
-    if len(directions) > 1:
-        raise ValueError('Manifest for single-end reads can '
-                         'contain only forward or reverse reads, '
-                         'but not both. The following directions were '
-                         'observed: %s' % ', '.join(directions))
-    duplicated_ids = _duplicated_ids(manifest['sample-id'])
-    if len(duplicated_ids) > 0:
-        raise ValueError('Each sample id can only appear one time in a '
-                         'manifest for single-end reads, but the following '
-                         'sample ids were observed more than once: '
-                         '%s' % ', '.join(duplicated_ids))
-
-
-def _validate_paired_end_fastq_manifest_directions(manifest):
-    forward_direction_sample_ids = []
-    reverse_direction_sample_ids = []
-
-    for _, sample_id, _, direction in manifest.itertuples():
-        if direction == 'forward':
-            forward_direction_sample_ids.append(sample_id)
-        elif direction == 'reverse':
-            reverse_direction_sample_ids.append(sample_id)
-        else:
-            raise ValueError('Directions can only be "forward" or '
-                             '"reverse", but observed: %s' % direction)
-
-    duplicated_ids_forward = _duplicated_ids(forward_direction_sample_ids)
-    if len(duplicated_ids_forward) > 0:
-        raise ValueError('Each sample id can have only one forward read '
-                         'record in a paired-end read manifest, but the '
-                         'following sample ids were associated with more '
-                         'than one forward read record: '
-                         '%s' % ', '.join(duplicated_ids_forward))
-
-    duplicated_ids_reverse = _duplicated_ids(reverse_direction_sample_ids)
-    if len(duplicated_ids_reverse) > 0:
-        raise ValueError('Each sample id can have only one reverse read '
-                         'record in a paired-end read manifest, but the '
-                         'following sample ids were associated with more '
-                         'than one reverse read record: '
-                         '%s' % ', '.join(duplicated_ids_reverse))
-
-    if sorted(forward_direction_sample_ids) != \
-       sorted(reverse_direction_sample_ids):
-
-        forward_but_no_reverse = set(forward_direction_sample_ids) - \
-            set(reverse_direction_sample_ids)
-
-        if len(forward_but_no_reverse) > 0:
-            raise ValueError('Forward and reverse reads must be provided '
-                             'exactly one time each for each sample. The '
-                             'following samples had forward but not '
-                             'reverse read fastq files: %s'
-                             % ', '.join(forward_but_no_reverse))
-        else:
-            reverse_but_no_forward = set(reverse_direction_sample_ids) - \
-              set(forward_direction_sample_ids)
-            raise ValueError('Forward and reverse reads must be provided '
-                             'exactly one time each for each sample. The '
-                             'following samples had reverse but not '
-                             'forward read fastq files: %s'
-                             % ', '.join(reverse_but_no_forward))
-
-
-def _copy_with_compression(src, dst):
-    with open(src, 'rb') as src_fh:
-        if src_fh.read(2)[:2] != b'\x1f\x8b':
-            src_fh.seek(0)
-            # SO: http://stackoverflow.com/a/27069578/579416
-            # shutil.copyfileobj will pick a pretty good chunksize for us
-            with gzip.open(dst, 'wb') as dst_fh:
-                shutil.copyfileobj(src_fh, dst_fh)
-                return
-
-    qiime2.util.duplicate(src, dst)
-
-
-def _fastq_manifest_helper(fmt, fastq_copy_fn, single_end):
-    direction_to_read_number = {'forward': 1, 'reverse': 2}
-    input_manifest = _parse_and_validate_manifest(fmt.open(),
-                                                  single_end=single_end,
-                                                  absolute=True)
-    if single_end:
-        result = SingleLanePerSampleSingleEndFastqDirFmt()
-    else:
-        result = SingleLanePerSamplePairedEndFastqDirFmt()
-
-    output_manifest_data = []
-    for idx, sample_id, input_fastq_fp, direction in \
-            input_manifest.itertuples():
-        read_number = direction_to_read_number[direction]
-        output_fastq_fp = \
-            result.sequences.path_maker(sample_id=sample_id,
-                                        # the remaining values aren't used
-                                        # internally by QIIME, so their values
-                                        # aren't very important
-                                        barcode_id=idx,
-                                        lane_number=1,
-                                        read_number=read_number)
-        output_manifest_data.append(
-            [sample_id, output_fastq_fp.name, direction])
-        fastq_copy_fn(input_fastq_fp, str(output_fastq_fp))
-
-    output_manifest = FastqManifestFormat()
-    output_manifest_df = \
-        pd.DataFrame(output_manifest_data,
-                     columns=output_manifest.EXPECTED_HEADER)
-    output_manifest_df.to_csv(str(output_manifest), index=False)
-    result.manifest.write_data(output_manifest, FastqManifestFormat)
-
-    metadata = YamlFormat()
-    metadata.path.write_text(yaml.dump({'phred-offset': 33}))
-    result.metadata.write_data(metadata, YamlFormat)
-
-    return result
-
-
-_phred64_warning = ('Importing of PHRED 64 data is slow as it is converted '
-                    'internally to PHRED 33. Working with the imported data '
-                    'will not be slower than working with PHRED 33 data.')
-
-
-def _write_phred64_to_phred33(phred64_path, phred33_path):
-    with open(phred64_path, 'rb') as phred64_fh, \
-         open(phred33_path, 'wb') as phred33_fh:
-        for seq in skbio.io.read(phred64_fh, format='fastq',
-                                 variant='illumina1.3'):
-            skbio.io.write(seq, into=phred33_fh,
-                           format='fastq',
-                           variant='illumina1.8',
-                           compression='gzip')
-
-
 @plugin.register_transformer
 def _6(fmt: SingleEndFastqManifestPhred33) \
         -> SingleLanePerSampleSingleEndFastqDirFmt:
-    return _fastq_manifest_helper(fmt, _copy_with_compression, single_end=True)
+    return _fastq_manifest_helper_partial(fmt, _copy_with_compression,
+                                          single_end=True)
 
 
 @plugin.register_transformer
 def _7(fmt: SingleEndFastqManifestPhred64) \
         -> SingleLanePerSampleSingleEndFastqDirFmt:
     warnings.warn(_phred64_warning)
-    return _fastq_manifest_helper(fmt, _write_phred64_to_phred33,
-                                  single_end=True)
+    return _fastq_manifest_helper_partial(fmt, _write_phred64_to_phred33,
+                                          single_end=True)
 
 
 @plugin.register_transformer
 def _8(fmt: PairedEndFastqManifestPhred33) \
         -> SingleLanePerSamplePairedEndFastqDirFmt:
-    return _fastq_manifest_helper(fmt, _copy_with_compression,
-                                  single_end=False)
+    return _fastq_manifest_helper_partial(fmt, _copy_with_compression,
+                                          single_end=False)
 
 
 @plugin.register_transformer
 def _9(fmt: PairedEndFastqManifestPhred64) \
         -> SingleLanePerSamplePairedEndFastqDirFmt:
     warnings.warn(_phred64_warning)
-    return _fastq_manifest_helper(fmt, _write_phred64_to_phred33,
-                                  single_end=False)
+    return _fastq_manifest_helper_partial(fmt, _write_phred64_to_phred33,
+                                          single_end=False)
 
 
 @plugin.register_transformer
 def _12(dirfmt: SingleLanePerSampleSingleEndFastqDirFmt) \
         -> QIIME1DemuxDirFmt:
     with dirfmt.manifest.view(FastqManifestFormat).open() as fh:
-        input_manifest = _parse_and_validate_manifest(fh, single_end=True,
-                                                      absolute=False)
+        input_manifest = _parse_and_validate_manifest_partial(
+            fh, single_end=True, absolute=False)
 
     result = QIIME1DemuxDirFmt()
     fp = str(result.path / 'seqs.fna')
@@ -430,66 +201,38 @@ def _12(dirfmt: SingleLanePerSampleSingleEndFastqDirFmt) \
 
 @plugin.register_transformer
 def _21(ff: FastqManifestFormat) -> pd.DataFrame:
-    current_dir = os.path.dirname(str(ff))
-    manifest = pd.read_csv(str(ff), header=0, comment='#')
-    manifest.filename = manifest.filename.apply(
-        lambda f: os.path.join(current_dir, f))
-
-    df = manifest.pivot(index='sample-id', columns='direction',
-                        values='filename')
-    df.columns.name = None
-    return df
-
-
-def _manifest_v2_to_v1(fmt):
-    df = qiime2.Metadata.load(str(fmt)).to_dataframe()
-    # Drop unneccessary metadata columns
-    df = df[list(fmt.METADATA_COLUMNS.keys())]
-    denormalized_dfs = []
-    for column, direction in fmt.METADATA_COLUMNS.items():
-        denormalized_df = df[[column]]
-        original_index_name = denormalized_df.index.name
-        denormalized_df.reset_index(drop=False, inplace=True)
-        denormalized_df.rename(columns={
-            original_index_name: 'sample-id',
-            column: 'absolute-filepath'
-        }, inplace=True)
-        denormalized_df['direction'] = direction
-        denormalized_dfs.append(denormalized_df)
-    old_fmt = FastqManifestFormat()
-    pd.concat(denormalized_dfs, axis=0).to_csv(str(old_fmt), index=False)
-    return old_fmt
+    return _manifest_to_df(ff, ff.path.parent)
 
 
 @plugin.register_transformer
 def _23(fmt: SingleEndFastqManifestPhred33V2) \
         -> SingleLanePerSampleSingleEndFastqDirFmt:
-    old_fmt = _manifest_v2_to_v1(fmt)
-    return _fastq_manifest_helper(old_fmt, _copy_with_compression,
-                                  single_end=True)
+    old_fmt = _manifest_v2_to_v1(fmt, FastqManifestFormat)
+    return _fastq_manifest_helper_partial(old_fmt, _copy_with_compression,
+                                          single_end=True)
 
 
 @plugin.register_transformer
 def _24(fmt: SingleEndFastqManifestPhred64V2) \
         -> SingleLanePerSampleSingleEndFastqDirFmt:
     warnings.warn(_phred64_warning)
-    old_fmt = _manifest_v2_to_v1(fmt)
-    return _fastq_manifest_helper(old_fmt, _write_phred64_to_phred33,
-                                  single_end=True)
+    old_fmt = _manifest_v2_to_v1(fmt, FastqManifestFormat)
+    return _fastq_manifest_helper_partial(old_fmt, _write_phred64_to_phred33,
+                                          single_end=True)
 
 
 @plugin.register_transformer
 def _25(fmt: PairedEndFastqManifestPhred33V2) \
         -> SingleLanePerSamplePairedEndFastqDirFmt:
-    old_fmt = _manifest_v2_to_v1(fmt)
-    return _fastq_manifest_helper(old_fmt, _copy_with_compression,
-                                  single_end=False)
+    old_fmt = _manifest_v2_to_v1(fmt, FastqManifestFormat)
+    return _fastq_manifest_helper_partial(old_fmt, _copy_with_compression,
+                                          single_end=False)
 
 
 @plugin.register_transformer
 def _26(fmt: PairedEndFastqManifestPhred64V2) \
         -> SingleLanePerSamplePairedEndFastqDirFmt:
     warnings.warn(_phred64_warning)
-    old_fmt = _manifest_v2_to_v1(fmt)
-    return _fastq_manifest_helper(old_fmt, _write_phred64_to_phred33,
-                                  single_end=False)
+    old_fmt = _manifest_v2_to_v1(fmt, FastqManifestFormat)
+    return _fastq_manifest_helper_partial(old_fmt, _write_phred64_to_phred33,
+                                          single_end=False)
