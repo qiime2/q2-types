@@ -73,6 +73,14 @@ _single_lane_per_sample_fastq_helper_partial = functools.partial(
     yaml_fmt=YamlFormat,
 )
 
+_dirfmt_to_casava_partial = functools.partial(
+    _dirfmt_to_casava,
+    manifest_fmt=FastqManifestFormat,
+    abs_manifest_fmt=FastqAbsolutePathManifestFormat,
+    fastq_fmt=FastqGzFormat,
+    casava_fmt=CasavaOneEightSingleLanePerSampleDirFmt,
+)
+
 
 @plugin.register_transformer
 def _3(dirfmt: CasavaOneEightSingleLanePerSampleDirFmt) \
@@ -84,7 +92,7 @@ def _3(dirfmt: CasavaOneEightSingleLanePerSampleDirFmt) \
 @plugin.register_transformer
 def _3_and_a_half(dirfmt_in: SingleLanePerSampleSingleEndFastqDirFmt) \
         -> CasavaOneEightSingleLanePerSampleDirFmt:
-    return _dirfmt_to_casava(dirfmt_in)
+    return _dirfmt_to_casava_partial(dirfmt_in)
 
 
 @plugin.register_transformer
@@ -97,7 +105,7 @@ def _4(dirfmt: CasavaOneEightSingleLanePerSampleDirFmt) \
 @plugin.register_transformer
 def _4_and_a_half(dirfmt_in: SingleLanePerSamplePairedEndFastqDirFmt) \
         -> CasavaOneEightSingleLanePerSampleDirFmt:
-    return _dirfmt_to_casava(dirfmt_in)
+    return _dirfmt_to_casava_partial(dirfmt_in)
 
 
 @plugin.register_transformer
