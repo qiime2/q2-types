@@ -254,6 +254,32 @@ class TestTransformers(TestPluginBase):
         self.assertTrue(os.path.exists(df['forward'].loc['Human-Kneecap']))
         self.assertTrue(os.path.exists(df['reverse'].loc['Human-Kneecap']))
 
+    def test_slpssefdf_to_casava_one_eight_single_lane_per_sample_dirfmt(self):
+        filenames = ('Human-Kneecap_S1_L001_R1_001.fastq.gz',)
+        _, obs = self.transform_format(
+            SingleLanePerSampleSingleEndFastqDirFmt,
+            CasavaOneEightSingleLanePerSampleDirFmt, filenames=filenames
+        )
+
+        exp_fp = ['Human-Kneecap_S1_L001_R1_001.fastq.gz']
+        obs_fp = [str(fp) for fp, _ in obs.sequences.iter_views(FastqGzFormat)]
+
+        self.assertEqual(obs_fp, exp_fp)
+
+    def test_slpspefdf_to_casava_one_eight_single_lane_per_sample_dirfmt(self):
+        filenames = ('Human-Kneecap_S1_L001_R1_001.fastq.gz',
+                     'paired_end_data/Human-Kneecap_S1_L001_R2_001.fastq.gz')
+        _, obs = self.transform_format(
+            SingleLanePerSamplePairedEndFastqDirFmt,
+            CasavaOneEightSingleLanePerSampleDirFmt, filenames=filenames
+        )
+
+        exp_fp = ['Human-Kneecap_S1_L001_R1_001.fastq.gz',
+                  'Human-Kneecap_S1_L001_R2_001.fastq.gz']
+        obs_fp = [str(fp) for fp, _ in obs.sequences.iter_views(FastqGzFormat)]
+
+        self.assertEqual(obs_fp, exp_fp)
+
 
 class TestFastqManifestTransformers(TestPluginBase):
     package = "q2_types.per_sample_sequences.tests"
@@ -1064,32 +1090,6 @@ class TestFastqManifestV2Transformers(TestPluginBase):
 
         with obs.manifest.view(FastqManifestFormat).open() as obs_manifest:
             self.assertEqual(obs_manifest.read(), self.exp_pe_manifest)
-
-    def test_slpssefdf_to_casava_one_eight_single_lane_per_sample_dirfmt(self):
-        filenames = ('Human-Kneecap_S1_L001_R1_001.fastq.gz',)
-        _, obs = self.transform_format(
-            SingleLanePerSampleSingleEndFastqDirFmt,
-            CasavaOneEightSingleLanePerSampleDirFmt, filenames=filenames
-        )
-
-        exp_fp = ['Human-Kneecap_S1_L001_R1_001.fastq.gz']
-        obs_fp = [str(fp) for fp, _ in obs.sequences.iter_views(FastqGzFormat)]
-
-        self.assertEqual(obs_fp, exp_fp)
-
-    def test_slpspefdf_to_casava_one_eight_single_lane_per_sample_dirfmt(self):
-        filenames = ('Human-Kneecap_S1_L001_R1_001.fastq.gz',
-                     'paired_end_data/Human-Kneecap_S1_L001_R2_001.fastq.gz')
-        _, obs = self.transform_format(
-            SingleLanePerSamplePairedEndFastqDirFmt,
-            CasavaOneEightSingleLanePerSampleDirFmt, filenames=filenames
-        )
-
-        exp_fp = ['Human-Kneecap_S1_L001_R1_001.fastq.gz',
-                  'Human-Kneecap_S1_L001_R2_001.fastq.gz']
-        obs_fp = [str(fp) for fp, _ in obs.sequences.iter_views(FastqGzFormat)]
-
-        self.assertEqual(obs_fp, exp_fp)
 
 
 if __name__ == '__main__':
