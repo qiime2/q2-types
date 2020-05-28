@@ -255,24 +255,35 @@ class TestTransformers(TestPluginBase):
         self.assertTrue(os.path.exists(df['reverse'].loc['Human-Kneecap']))
 
     def test_slpssefdf_to_casava_one_eight_single_lane_per_sample_dirfmt(self):
-        filenames = ('Human-Kneecap_S1_L001_R1_001.fastq.gz',)
-        _, obs = self.transform_format(
+        filenames = ('single-end-two-sample-data1/MANIFEST',
+                     'metadata.yml',
+                     'Human-Kneecap_S1_L001_R1_001.fastq.gz',
+                     'Human-Armpit_S2_L001_R1_001.fastq.gz')
+
+        input, obs = self.transform_format(
             SingleLanePerSampleSingleEndFastqDirFmt,
             CasavaOneEightSingleLanePerSampleDirFmt, filenames=filenames
         )
 
-        exp_fp = ['Human-Kneecap_S1_L001_R1_001.fastq.gz']
+        self.assertEqual(input.validate(), None)
+
+        exp_fp = ['Human-Armpit_S2_L001_R1_001.fastq.gz',
+                  'Human-Kneecap_S1_L001_R1_001.fastq.gz']
         obs_fp = [str(fp) for fp, _ in obs.sequences.iter_views(FastqGzFormat)]
 
         self.assertEqual(obs_fp, exp_fp)
 
     def test_slpspefdf_to_casava_one_eight_single_lane_per_sample_dirfmt(self):
         filenames = ('Human-Kneecap_S1_L001_R1_001.fastq.gz',
-                     'paired_end_data/Human-Kneecap_S1_L001_R2_001.fastq.gz')
-        _, obs = self.transform_format(
+                     'paired_end_data/Human-Kneecap_S1_L001_R2_001.fastq.gz',
+                     'paired_end_data/MANIFEST',
+                     'metadata.yml')
+        input, obs = self.transform_format(
             SingleLanePerSamplePairedEndFastqDirFmt,
             CasavaOneEightSingleLanePerSampleDirFmt, filenames=filenames
         )
+
+        self.assertEqual(input.validate(), None)
 
         exp_fp = ['Human-Kneecap_S1_L001_R1_001.fastq.gz',
                   'Human-Kneecap_S1_L001_R2_001.fastq.gz']
