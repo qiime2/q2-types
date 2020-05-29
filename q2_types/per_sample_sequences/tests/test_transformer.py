@@ -6,6 +6,7 @@
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
 
+import functools
 import unittest
 import os
 import shutil
@@ -25,6 +26,7 @@ from q2_types.per_sample_sequences import (
     SingleEndFastqManifestPhred64,
     PairedEndFastqManifestPhred33,
     PairedEndFastqManifestPhred64,
+    FastqAbsolutePathManifestFormat,
     FastqManifestFormat,
     SingleEndFastqManifestPhred33V2,
     SingleEndFastqManifestPhred64V2,
@@ -32,13 +34,20 @@ from q2_types.per_sample_sequences import (
     PairedEndFastqManifestPhred64V2,
     QIIME1DemuxDirFmt,
     FastqGzFormat)
-from q2_types.per_sample_sequences._transformer import (
+from q2_types.per_sample_sequences._util import (
     _validate_header,
     _validate_single_end_fastq_manifest_directions,
     _validate_paired_end_fastq_manifest_directions,
     _parse_and_validate_manifest
 )
 from qiime2.plugin.testing import TestPluginBase
+
+
+_parse_and_validate_manifest_partial = functools.partial(
+    _parse_and_validate_manifest,
+    abs_manifest_fmt=FastqAbsolutePathManifestFormat,
+    manifest_fmt=FastqManifestFormat,
+)
 
 
 class TestTransformers(TestPluginBase):
@@ -244,6 +253,43 @@ class TestTransformers(TestPluginBase):
         self.assertEqual(set(df.columns), {'forward', 'reverse'})
         self.assertTrue(os.path.exists(df['forward'].loc['Human-Kneecap']))
         self.assertTrue(os.path.exists(df['reverse'].loc['Human-Kneecap']))
+
+    def test_slpssefdf_to_casava_one_eight_single_lane_per_sample_dirfmt(self):
+        filenames = ('single-end-two-sample-data1/MANIFEST',
+                     'metadata.yml',
+                     'Human-Kneecap_S1_L001_R1_001.fastq.gz',
+                     'Human-Armpit_S2_L001_R1_001.fastq.gz')
+
+        input, obs = self.transform_format(
+            SingleLanePerSampleSingleEndFastqDirFmt,
+            CasavaOneEightSingleLanePerSampleDirFmt, filenames=filenames
+        )
+
+        self.assertEqual(input.validate(), None)
+
+        exp_fp = ['Human-Armpit_S2_L001_R1_001.fastq.gz',
+                  'Human-Kneecap_S1_L001_R1_001.fastq.gz']
+        obs_fp = [str(fp) for fp, _ in obs.sequences.iter_views(FastqGzFormat)]
+
+        self.assertEqual(obs_fp, exp_fp)
+
+    def test_slpspefdf_to_casava_one_eight_single_lane_per_sample_dirfmt(self):
+        filenames = ('Human-Kneecap_S1_L001_R1_001.fastq.gz',
+                     'paired_end_data/Human-Kneecap_S1_L001_R2_001.fastq.gz',
+                     'paired_end_data/MANIFEST',
+                     'metadata.yml')
+        input, obs = self.transform_format(
+            SingleLanePerSamplePairedEndFastqDirFmt,
+            CasavaOneEightSingleLanePerSampleDirFmt, filenames=filenames
+        )
+
+        self.assertEqual(input.validate(), None)
+
+        exp_fp = ['Human-Kneecap_S1_L001_R1_001.fastq.gz',
+                  'Human-Kneecap_S1_L001_R2_001.fastq.gz']
+        obs_fp = [str(fp) for fp, _ in obs.sequences.iter_views(FastqGzFormat)]
+
+        self.assertEqual(obs_fp, exp_fp)
 
 
 class TestFastqManifestTransformers(TestPluginBase):
@@ -795,24 +841,24 @@ class TestFastqManifestTransformers(TestPluginBase):
         with self.assertRaisesRegex(
                 ValueError, "Expected.*absolute-filepath.*found "
                             "'sample-id,absolute-filepath'.$"):
-            _parse_and_validate_manifest(manifest, single_end=True,
-                                         absolute=True)
+            _parse_and_validate_manifest_partial(
+                manifest, single_end=True, absolute=True)
 
         manifest = io.StringIO(
             'sample-id,absolute-filepath,direction\n'
             'abc,/hello/world\n'
             'abc,/hello/world,forward\n')
         with self.assertRaisesRegex(ValueError, 'Empty cells'):
-            _parse_and_validate_manifest(manifest, single_end=True,
-                                         absolute=True)
+            _parse_and_validate_manifest_partial(
+                manifest, single_end=True, absolute=True)
 
         manifest = io.StringIO(
             'sample-id,absolute-filepath,direction\n'
             'abc,/hello/world,forward\n'
             'xyz,/hello/world,forward,extra-field')
         with self.assertRaisesRegex(ValueError, 'issue parsing the manifest'):
-            _parse_and_validate_manifest(manifest, single_end=True,
-                                         absolute=True)
+            _parse_and_validate_manifest_partial(
+                manifest, single_end=True, absolute=True)
 
         manifest = io.StringIO(
             'sample-id,absolute-filepath,direction\n'
@@ -820,8 +866,8 @@ class TestFastqManifestTransformers(TestPluginBase):
             'xyz,world,forward')
         with self.assertRaisesRegex(ValueError,
                                     'absolute but found relative path'):
-            _parse_and_validate_manifest(manifest, single_end=True,
-                                         absolute=True)
+            _parse_and_validate_manifest_partial(
+                manifest, single_end=True, absolute=True)
 
         manifest = io.StringIO(
             'sample-id,absolute-filepath,direction\n'
@@ -829,8 +875,8 @@ class TestFastqManifestTransformers(TestPluginBase):
             'abc,world,reverse')
         with self.assertRaisesRegex(ValueError,
                                     'absolute but found relative path'):
-            _parse_and_validate_manifest(manifest, single_end=False,
-                                         absolute=True)
+            _parse_and_validate_manifest_partial(
+                manifest, single_end=False, absolute=True)
 
         manifest = io.StringIO(
             'sample-id,filename,direction\n'
@@ -838,8 +884,8 @@ class TestFastqManifestTransformers(TestPluginBase):
             'xyz,/snap/crackle/pop/world,forward')
         with self.assertRaisesRegex(ValueError,
                                     'relative but found absolute path'):
-            _parse_and_validate_manifest(manifest, single_end=True,
-                                         absolute=False)
+            _parse_and_validate_manifest_partial(
+                manifest, single_end=True, absolute=False)
 
         manifest = io.StringIO(
             'sample-id,filename,direction\n'
@@ -847,8 +893,8 @@ class TestFastqManifestTransformers(TestPluginBase):
             'abc,/snap/crackle/pop/world,reverse')
         with self.assertRaisesRegex(ValueError,
                                     'relative but found absolute path'):
-            _parse_and_validate_manifest(manifest, single_end=False,
-                                         absolute=False)
+            _parse_and_validate_manifest_partial(
+                manifest, single_end=False, absolute=False)
 
     def test_parse_and_validate_manifest_expand_vars(self):
         expected_fp = os.path.join(self.temp_dir.name, 'manifest.txt')
@@ -858,8 +904,8 @@ class TestFastqManifestTransformers(TestPluginBase):
         manifest = io.StringIO(
             'sample-id,absolute-filepath,direction\n'
             'abc,$TESTENVGWAR/manifest.txt,forward')
-        manifest = _parse_and_validate_manifest(manifest, single_end=True,
-                                                absolute=True)
+        manifest = _parse_and_validate_manifest_partial(
+            manifest, single_end=True, absolute=True)
         del os.environ['TESTENVGWAR']
 
         self.assertEqual(manifest.iloc[0]['absolute-filepath'], expected_fp)
