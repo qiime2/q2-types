@@ -515,6 +515,21 @@ class TestFormats(TestPluginBase):
                                     'paired'):
             format.validate()
 
+    def test_slanepsample_paired_end_fastq_dir_fmt_incorrect_filenames(self):
+        filenames = ('single_end_data/MANIFEST.txt', 'metadata.yml.txt',
+                     'Human-Kneecap_S1_L001_R1_001.fastq.gz',
+                     'paired_end_data/Human-Kneecap_S1_L001_R2_001.fastq.gz')
+        for filename in filenames:
+            filepath = self.get_data_path(filename)
+            shutil.copy(filepath, self.temp_dir.name)
+
+        format = SingleLanePerSamplePairedEndFastqDirFmt(
+            self.temp_dir.name, mode='r')
+
+        with self.assertRaisesRegex(ValidationError,
+                                    'Missing one or more files.*MANIFEST'):
+            format.validate()
+
 
 class TestQIIME1DemuxFormat(TestPluginBase):
     package = 'q2_types.per_sample_sequences.tests'
