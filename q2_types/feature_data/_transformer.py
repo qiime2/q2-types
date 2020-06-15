@@ -364,6 +364,21 @@ def _33(ff: AlignedDNAFASTAFormat) -> qiime2.Metadata:
     return _dnafastaformats_to_metadata(ff)
 
 
+@plugin.register_transformer
+def _34(ff: AlignedDNAFASTAFormat) -> pd.Series:
+    return _dnafastaformats_to_series(ff)
+
+
+@plugin.register_transformer
+def _35(data: pd.Series) -> AlignedDNAFASTAFormat:
+    ff = AlignedDNAFASTAFormat()
+    with ff.open() as f:
+        for id_, seq in data.iteritems():
+            sequence = skbio.DNA(seq, metadata={'id': id_})
+            skbio.io.write(sequence, format='fasta', into=f)
+    return ff
+
+
 # differential types
 @plugin.register_transformer
 def _222(ff: DifferentialFormat) -> pd.DataFrame:
