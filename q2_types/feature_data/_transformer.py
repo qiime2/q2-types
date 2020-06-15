@@ -378,6 +378,7 @@ def _35(data: pd.Series) -> AlignedDNAFASTAFormat:
             skbio.io.write(sequence, format='fasta', into=f)
     return ff
 
+
 @plugin.register_transformer
 def _36(fmt: AlignedDNAFASTAFormat) -> DNAIterator:
     generator = _read_dna_fasta(str(fmt))
