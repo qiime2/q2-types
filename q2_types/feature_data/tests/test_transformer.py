@@ -694,6 +694,55 @@ class TestDNAFASTAFormatTransformers(TestPluginBase):
 
         self.assertEqual(exp, obs)
 
+    def test_aligned_dnafasta_format_to_series(self):
+        _, obs = self.transform_format(AlignedDNAFASTAFormat, pd.Series,
+                                       'aligned-dna-sequences.fasta')
+
+        obs = obs.astype(str)
+
+        index = pd.Index(['SEQUENCE1', 'SEQUENCE2'])
+        exp = pd.Series(['------------------------ACGTACGTACGTACGTACGTAC'
+                         'GTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGT',
+                         'ACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTAC'
+                         'GTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGT'],
+                        index=index, dtype=object)
+
+        assert_series_equal(exp, obs)
+
+    def test_series_to_aligned_dnafasta_format(self):
+        transformer = self.get_transformer(pd.Series, AlignedDNAFASTAFormat)
+
+        index = pd.Index(['SEQUENCE1', 'SEQUENCE2'])
+        input = pd.Series(['------------------------ACGTACGTACGTACGTACGTAC'
+                           'GTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGT',
+                           'ACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTAC'
+                           'GTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGT'],
+                          index=index, dtype=object)
+
+        obs = transformer(input)
+
+        self.assertIsInstance(obs, AlignedDNAFASTAFormat)
+
+        obs_lines = list(open(str(obs)))
+        self.assertEqual(obs_lines[0], '>SEQUENCE1\n')
+        self.assertEqual(obs_lines[1],
+                         '------------------------ACGTACGTACGTACGTACGTAC'
+                         'GTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGT\n')
+        self.assertEqual(obs_lines[2], '>SEQUENCE2\n')
+        self.assertEqual(obs_lines[3],
+                         'ACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTAC'
+                         'GTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGT\n')
+
+    def test_aligned_dna_fasta_format_to_dna_iterator(self):
+        input, obs = self.transform_format(
+            AlignedDNAFASTAFormat, DNAIterator,
+            filename='aligned-dna-sequences.fasta')
+
+        exp = skbio.read(str(input), format='fasta', constructor=skbio.DNA)
+
+        for observed, expected in zip(obs, exp):
+            self.assertEqual(observed, expected)
+
 
 class TestDifferentialTransformer(TestPluginBase):
     package = 'q2_types.feature_data.tests'
