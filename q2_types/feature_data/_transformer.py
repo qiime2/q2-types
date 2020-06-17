@@ -262,6 +262,13 @@ def _dnafastaformats_to_metadata(ff):
     return qiime2.Metadata(df)
 
 
+def _series_to_fasta_format(ff, data):
+    with ff.open() as f:
+        for id_, seq in data.iteritems():
+            sequence = skbio.DNA(seq, metadata={'id': id_})
+            skbio.io.write(sequence, format='fasta', into=f)
+
+
 @plugin.register_transformer
 def _9(ff: DNAFASTAFormat) -> DNAIterator:
     generator = _read_dna_fasta(str(ff))
@@ -339,10 +346,7 @@ def _31(ff: DNAFASTAFormat) -> qiime2.Metadata:
 @plugin.register_transformer
 def _16(data: pd.Series) -> DNAFASTAFormat:
     ff = DNAFASTAFormat()
-    with ff.open() as f:
-        for id_, seq in data.iteritems():
-            sequence = skbio.DNA(seq, metadata={'id': id_})
-            skbio.io.write(sequence, format='fasta', into=f)
+    _series_to_fasta_format(ff, data)
     return ff
 
 
@@ -362,6 +366,24 @@ def _19(data: AlignedDNAIterator) -> AlignedDNAFASTAFormat:
 @plugin.register_transformer
 def _33(ff: AlignedDNAFASTAFormat) -> qiime2.Metadata:
     return _dnafastaformats_to_metadata(ff)
+
+
+@plugin.register_transformer
+def _34(ff: AlignedDNAFASTAFormat) -> pd.Series:
+    return _dnafastaformats_to_series(ff)
+
+
+@plugin.register_transformer
+def _35(data: pd.Series) -> AlignedDNAFASTAFormat:
+    ff = AlignedDNAFASTAFormat()
+    _series_to_fasta_format(ff, data)
+    return ff
+
+
+@plugin.register_transformer
+def _36(fmt: AlignedDNAFASTAFormat) -> DNAIterator:
+    generator = _read_dna_fasta(str(fmt))
+    return DNAIterator(generator)
 
 
 # differential types
