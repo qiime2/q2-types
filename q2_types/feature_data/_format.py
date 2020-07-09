@@ -296,7 +296,7 @@ class AlignedDNAFASTAFormat(model.TextFileFormat):
 
                     elif re.fullmatch(FASTADNAValidator, line):
                         if prev_seq_start_line == 0:
-                            prev_seq_start_line = line
+                            prev_seq_start_line = line_number
 
                         prev_seq_len += len(line)
                         last_line_was_ID = False
