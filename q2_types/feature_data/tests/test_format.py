@@ -271,6 +271,14 @@ class TestDNAFASTAFormats(TestPluginBase):
         with self.assertRaisesRegex(ValidationError, 'AlignedDNAFASTA'):
             format.validate()
 
+    def test_aligned_dna_fasta_format_unaligned(self):
+        filepath = self.get_data_path('dna-sequences.fasta')
+        format = AlignedDNAFASTAFormat(filepath, mode='r')
+
+        with self.assertRaisesRegex(ValidationError,
+                                    'line 4.*length 90.*length 65'):
+            format.validate()
+
     def test_aligned_dna_sequences_directory_format(self):
         filepath = self.get_data_path('aligned-dna-sequences.fasta')
         temp_dir = self.temp_dir.name
