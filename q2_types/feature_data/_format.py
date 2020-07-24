@@ -143,17 +143,15 @@ TSVTaxonomyDirectoryFormat = model.SingleFileDirectoryFormat(
 
 
 class DNAFASTAFormat(model.TextFileFormat):
-    def _validate_lines(self, max_lines):
+    def _validate_(self, max_lines):
+        level_map = {'min': 100, 'max': float('inf')}
+
         FASTADNAValidator = re.compile(r'[ACGTURYKMSWBDHVN]+\r?\n?')
         ValidationSet = frozenset(('A', 'C', 'G', 'T', 'U', 'R', 'Y', 'K', 'M',
                                    'S', 'W', 'B', 'D', 'H', 'V', 'N'))
 
         _validate_DNAFASTAFormats(self, FASTADNAValidator, ValidationSet,
-                                  max_lines)
-
-    def _validate_(self, max_lines):
-        level_map = {'min': 100, 'max': float('inf')}
-        self._validate_lines(level_map[max_lines])
+                                  level_map[max_lines])
 
 
 DNASequencesDirectoryFormat = model.SingleFileDirectoryFormat(
@@ -168,18 +166,16 @@ class PairedDNASequencesDirectoryFormat(model.DirectoryFormat):
 
 
 class AlignedDNAFASTAFormat(model.TextFileFormat):
-    def _validate_lines(self, max_lines):
+    def _validate_(self, max_lines):
+        level_map = {'min': 100, 'max': float('inf')}
+
         FASTADNAValidator = re.compile(r'[ACGTURYKMSWBDHVN.-]+\r?\n?')
         ValidationSet = frozenset(('A', 'C', 'G', 'T', 'U', 'R', 'Y', 'K', 'M',
                                    'S', 'W', 'B', 'D', 'H', 'V', 'N', '.',
                                    '-'))
 
         _validate_DNAFASTAFormats(self, FASTADNAValidator, ValidationSet,
-                                  max_lines, True)
-
-    def _validate_(self, max_lines):
-        level_map = {'min': 100, 'max': float('inf')}
-        self._validate_lines(level_map[max_lines])
+                                  level_map[max_lines], True)
 
 
 AlignedDNASequencesDirectoryFormat = model.SingleFileDirectoryFormat(
@@ -187,7 +183,7 @@ AlignedDNASequencesDirectoryFormat = model.SingleFileDirectoryFormat(
     AlignedDNAFASTAFormat)
 
 
-def _validate_DNAFASTAFormats(file, FASTADNAValidator, ValidationSet,
+def _validate_DNAFASTAFormats(fmt, FASTADNAValidator, ValidationSet,
                               max_lines, aligned=False):
     last_line_was_ID = False
     ids = {}
@@ -196,7 +192,7 @@ def _validate_DNAFASTAFormats(file, FASTADNAValidator, ValidationSet,
     prev_seq_len = 0
     prev_seq_start_line = 0
 
-    with open(str(file), 'rb') as fh:
+    with open(str(fmt), 'rb') as fh:
         try:
             first = fh.read(6)
             if first[:3] == b'\xEF\xBB\xBF':
