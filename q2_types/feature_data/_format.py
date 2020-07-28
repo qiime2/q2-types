@@ -143,15 +143,13 @@ TSVTaxonomyDirectoryFormat = model.SingleFileDirectoryFormat(
 
 
 class DNAFASTAFormat(model.TextFileFormat):
-    def _validate_(self, max_lines):
-        level_map = {'min': 100, 'max': float('inf')}
-
+    def _validate_(self, level):
         FASTADNAValidator = re.compile(r'[ACGTURYKMSWBDHVN]+\r?\n?')
         ValidationSet = frozenset(('A', 'C', 'G', 'T', 'U', 'R', 'Y', 'K', 'M',
                                    'S', 'W', 'B', 'D', 'H', 'V', 'N'))
 
         _validate_DNAFASTAFormats(self, FASTADNAValidator, ValidationSet,
-                                  level_map[max_lines])
+                                  level)
 
 
 DNASequencesDirectoryFormat = model.SingleFileDirectoryFormat(
@@ -166,16 +164,14 @@ class PairedDNASequencesDirectoryFormat(model.DirectoryFormat):
 
 
 class AlignedDNAFASTAFormat(model.TextFileFormat):
-    def _validate_(self, max_lines):
-        level_map = {'min': 100, 'max': float('inf')}
-
+    def _validate_(self, level):
         FASTADNAValidator = re.compile(r'[ACGTURYKMSWBDHVN.-]+\r?\n?')
         ValidationSet = frozenset(('A', 'C', 'G', 'T', 'U', 'R', 'Y', 'K', 'M',
                                    'S', 'W', 'B', 'D', 'H', 'V', 'N', '.',
                                    '-'))
 
         _validate_DNAFASTAFormats(self, FASTADNAValidator, ValidationSet,
-                                  level_map[max_lines], True)
+                                  level, True)
 
 
 AlignedDNASequencesDirectoryFormat = model.SingleFileDirectoryFormat(
@@ -183,8 +179,8 @@ AlignedDNASequencesDirectoryFormat = model.SingleFileDirectoryFormat(
     AlignedDNAFASTAFormat)
 
 
-def _validate_DNAFASTAFormats(fmt, FASTADNAValidator, ValidationSet,
-                              max_lines, aligned=False):
+def _validate_DNAFASTAFormats(fmt, FASTADNAValidator, ValidationSet, level,
+                              aligned=False):
     last_line_was_ID = False
     ids = {}
 
@@ -192,7 +188,10 @@ def _validate_DNAFASTAFormats(fmt, FASTADNAValidator, ValidationSet,
     prev_seq_len = 0
     prev_seq_start_line = 0
 
-    with open(str(fmt), 'rb') as fh:
+    level_map = {'min': 100, 'max': float('inf')}
+    max_lines = level_map[level]
+
+    with fmt.path.open('rb') as fh:
         try:
             first = fh.read(6)
             if first[:3] == b'\xEF\xBB\xBF':
