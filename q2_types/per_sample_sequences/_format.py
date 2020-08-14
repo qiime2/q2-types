@@ -315,6 +315,9 @@ class CasavaOneEightSingleLanePerSampleDirFmt(model.DirectoryFormat):
         if 'reverse' not in df:
             df['reverse'] = None
 
+        if 'forward' not in df:
+            df['forward'] = None
+
         def munge_fn_closure(val):
             if val is not None:
                 return str(self.path / pathlib.Path(val).name)
