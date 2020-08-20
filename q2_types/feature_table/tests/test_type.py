@@ -11,7 +11,7 @@ import unittest
 from q2_types.feature_table import (FeatureTable, Frequency,
                                     RelativeFrequency, PercentileNormalized,
                                     Composition, Balance,
-                                    PresenceAbsence, BIOMV210DirFmt)
+                                    PresenceAbsence, BIOMV210DirFmt, Design)
 from qiime2.plugin.testing import TestPluginBase
 
 
@@ -39,7 +39,8 @@ class TestTypes(TestPluginBase):
     def test_feature_table_semantic_type_to_v210_format_registration(self):
         self.assertSemanticTypeRegisteredToFormat(
             FeatureTable[Frequency | RelativeFrequency | PresenceAbsence |
-                         Composition | Balance | PercentileNormalized],
+                         Composition | Balance | PercentileNormalized |
+                         Design],
             BIOMV210DirFmt)
 
 
