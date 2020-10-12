@@ -352,6 +352,7 @@ class TestProteinFASTAFormats(TestPluginBase):
         format = ProteinFASTAFormat(filepath, mode='r')
 
         format.validate()
+        format.validate('min')
 
     def test_protein_fasta_format_invalid_characters(self):
         filepath = self.get_data_path('not-dna-sequences.fasta')
@@ -383,6 +384,7 @@ class TestProteinFASTAFormats(TestPluginBase):
         format = AlignedProteinFASTAFormat(filepath, mode='r')
 
         format.validate()
+        format.validate('min')
 
     def test_aligned_protein_fasta_format_unaligned(self):
         filepath = self.get_data_path('protein-sequences.fasta')
