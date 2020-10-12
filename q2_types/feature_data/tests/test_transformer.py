@@ -21,10 +21,12 @@ from q2_types.feature_data import (
     TaxonomyFormat, HeaderlessTSVTaxonomyFormat, TSVTaxonomyFormat,
     DNAFASTAFormat, DNAIterator, PairedDNAIterator,
     PairedDNASequencesDirectoryFormat, AlignedDNAFASTAFormat,
-    DifferentialFormat, AlignedDNAIterator
+    DifferentialFormat, AlignedDNAIterator, ProteinFASTAFormat,
+    AlignedProteinFASTAFormat
 )
 from q2_types.feature_data._transformer import (
-    _taxonomy_formats_to_dataframe, _dataframe_to_tsv_taxonomy_format)
+    _taxonomy_formats_to_dataframe, _dataframe_to_tsv_taxonomy_format,
+    ProteinIterator, AlignedProteinIterator)
 from qiime2.plugin.testing import TestPluginBase
 
 
@@ -779,6 +781,205 @@ class TestDifferentialTransformer(TestPluginBase):
         obs = transformer(input)
 
         self.assertIsInstance(obs, DifferentialFormat)
+
+
+class TestProteinFASTAFormatTransformers(TestPluginBase):
+    package = 'q2_types.feature_data.tests'
+
+    def test_protein_fasta_format_to_protein_iterator(self):
+        input, obs = self.transform_format(ProteinFASTAFormat, ProteinIterator,
+                                           filename='protein-sequences.fasta')
+
+        exp = skbio.read(str(input), format='fasta', constructor=skbio.Protein)
+
+        for observed, expected in zip(obs, exp):
+            self.assertEqual(observed, expected)
+
+    def test_protein_iterator_to_protein_fasta_format(self):
+        transformer = self.get_transformer(
+            ProteinIterator, ProteinFASTAFormat)
+        filepath = self.get_data_path('protein-sequences.fasta')
+        generator = skbio.read(
+            filepath, format='fasta', constructor=skbio.Protein)
+        input = ProteinIterator(generator)
+
+        obs = transformer(input)
+        self.assertIsInstance(obs, ProteinFASTAFormat)
+        obs = skbio.read(str(obs), format='fasta', constructor=skbio.Protein)
+
+        for act, exp in zip(obs, input):
+            self.assertEqual(act, exp)
+
+    def test_aln_protein_fasta_format_to_aln_protein_iterator(self):
+        filename = 'aligned-protein-sequences.fasta'
+        input, obs = self.transform_format(AlignedProteinFASTAFormat,
+                                           AlignedProteinIterator,
+                                           filename=filename)
+
+        exp = skbio.read(str(input), format='fasta', constructor=skbio.Protein)
+
+        for observed, expected in zip(obs, exp):
+            self.assertEqual(observed, expected)
+
+    def test_aln_protein_iterator_to_aln_protein_fasta_format(self):
+        transformer = self.get_transformer(AlignedProteinIterator,
+                                           AlignedProteinFASTAFormat)
+        filepath = self.get_data_path('aligned-protein-sequences.fasta')
+        generator = skbio.read(
+            filepath, format='fasta', constructor=skbio.Protein)
+        input = AlignedProteinIterator(generator)
+
+        obs = transformer(input)
+        self.assertIsInstance(obs, AlignedProteinFASTAFormat)
+        obs = skbio.read(str(obs), format='fasta', constructor=skbio.Protein)
+
+        for act, exp in zip(obs, input):
+            self.assertEqual(act, exp)
+
+    def test_aligned_protein_fasta_format_to_skbio_tabular_msa(self):
+        filename = 'aligned-protein-sequences.fasta'
+        input, obs = self.transform_format(AlignedProteinFASTAFormat,
+                                           skbio.TabularMSA, filename=filename)
+        exp = skbio.TabularMSA.read(str(input), constructor=skbio.Protein,
+                                    format='fasta')
+
+        for act, exp in zip(obs, exp):
+            self.assertEqual(act, exp)
+
+    def test_skbio_tabular_msa_to_aligned_protein_fasta_format(self):
+        filepath = self.get_data_path('aligned-protein-sequences.fasta')
+        transformer = self.get_transformer(skbio.TabularMSA,
+                                           AlignedProteinFASTAFormat)
+        input = skbio.TabularMSA.read(filepath, constructor=skbio.Protein,
+                                      format='fasta')
+        obs = transformer(input)
+        obs = skbio.TabularMSA.read(str(obs), constructor=skbio.Protein,
+                                    format='fasta')
+
+        for act, exp in zip(obs, input):
+            self.assertEqual(act, exp)
+
+    def test_proteinfasta_format_to_series(self):
+        _, obs = self.transform_format(ProteinFASTAFormat, pd.Series,
+                                       'protein-sequences.fasta')
+
+        obs = obs.astype(str)
+
+        index = pd.Index(['sequence1', 'sequence2'])
+        exp = pd.Series(['MTTRDLTAAQFNETIQSSDMVLVDYWASWCGPCRAFAPTFAESSEK'
+                         'HPDVVHAKVDTEAERELAAAAQIR',
+                         'MVKQIESKTAFQEALDAAGDKLVVVDFSATWCGPCKMIKPFFHSLS'
+                         'EKYSNVIFLEVDVDDCQDVASECEVKCMPTFQFFKKGQKVGEFSGAN'],
+                        index=index, dtype=object)
+
+        assert_series_equal(exp, obs)
+
+    def test_series_to_proteinfasta_format(self):
+        transformer = self.get_transformer(pd.Series, ProteinFASTAFormat)
+
+        index = pd.Index(['sequence1', 'sequence2'])
+        input = pd.Series(['MTTRDLTAAQFNETIQSSDMVLVDYWASWCGPCRAFAPTFAESSEK'
+                           'HPDVVHAKVDTEAERELAAAAQIR',
+                           'MVKQIESKTAFQEALDAAGDKLVVVDFSATWCGPCKMIKPFFHSLS'
+                           'EKYSNVIFLEVDVDDCQDVASECEVKCMPTFQFFKKGQKVGEFSGAN'],
+                          index=index, dtype=object)
+
+        obs = transformer(input)
+
+        self.assertIsInstance(obs, ProteinFASTAFormat)
+
+    def test_proteinfasta_format_with_duplicate_ids_to_series(self):
+        with self.assertRaisesRegex(ValueError, 'unique.*sequence1'):
+            self.transform_format(
+                ProteinFASTAFormat,
+                pd.Series,
+                'protein-sequences-duplicate-ids.fasta')
+
+    def test_proteinfasta_format_to_metadata(self):
+        _, obs = self.transform_format(ProteinFASTAFormat, qiime2.Metadata,
+                                       'protein-sequences.fasta')
+        index = pd.Index(['sequence1', 'sequence2'], name='Feature ID')
+        exp_df = pd.DataFrame(['MTTRDLTAAQFNETIQSSDMVLVDYWASWCGPCRA'
+                               'FAPTFAESSEKHPDVVHAKVDTEAERELAAAAQIR',
+                               'MVKQIESKTAFQEALDAAGDKLVVVDFSATWCGPC'
+                               'KMIKPFFHSLSEKYSNVIFLEVDVDDCQDVASECE'
+                               'VKCMPTFQFFKKGQKVGEFSGAN'],
+                              index=index, columns=['Sequence'], dtype=object)
+        exp = qiime2.Metadata(exp_df)
+
+        self.assertEqual(exp, obs)
+
+    def test_aligned_proteinfasta_format_to_metadata(self):
+        _, obs = self.transform_format(AlignedProteinFASTAFormat,
+                                       qiime2.Metadata,
+                                       'aligned-protein-sequences.fasta')
+        index = pd.Index(['sequence1', 'sequence2'], name='Feature ID')
+        exp_df = pd.DataFrame(['------------------------VDFSATWCGPC'
+                               'KMIKPFFHSLSEKYSNVIFLEVDVDDCQDVASECE'
+                               'VKCMPTFQFFKKGQKVGEFSGAN',
+                               'MVKQIESKTAFQEALDAAGDKLVVVDFSATWCGPC'
+                               'KMIKPFFHSLSEKYSNVIFLEVDVDDCQDVASECE'
+                               'VKCMPTFQ-------VGEFSGAN'],
+                              index=index, columns=['Sequence'], dtype=object)
+        exp = qiime2.Metadata(exp_df)
+
+        self.assertEqual(exp, obs)
+
+    def test_aligned_proteinfasta_format_to_series(self):
+        _, obs = self.transform_format(AlignedProteinFASTAFormat, pd.Series,
+                                       'aligned-protein-sequences.fasta')
+
+        obs = obs.astype(str)
+
+        index = pd.Index(['sequence1', 'sequence2'])
+        exp = pd.Series(['------------------------VDFSATWCGPC'
+                         'KMIKPFFHSLSEKYSNVIFLEVDVDDCQDVASECE'
+                         'VKCMPTFQFFKKGQKVGEFSGAN',
+                         'MVKQIESKTAFQEALDAAGDKLVVVDFSATWCGPC'
+                         'KMIKPFFHSLSEKYSNVIFLEVDVDDCQDVASECE'
+                         'VKCMPTFQ-------VGEFSGAN'],
+                        index=index, dtype=object)
+
+        assert_series_equal(exp, obs)
+
+    def test_series_to_aligned_proteinfasta_format(self):
+        transformer = self.get_transformer(
+            pd.Series, AlignedProteinFASTAFormat)
+
+        index = pd.Index(['sequence1', 'sequence2'])
+        input = pd.Series(['------------------------VDFSATWCGPC'
+                           'KMIKPFFHSLSEKYSNVIFLEVDVDDCQDVASECE'
+                           'VKCMPTFQFFKKGQKVGEFSGAN',
+                           'MVKQIESKTAFQEALDAAGDKLVVVDFSATWCGPC'
+                           'KMIKPFFHSLSEKYSNVIFLEVDVDDCQDVASECE'
+                           'VKCMPTFQ-------VGEFSGAN'],
+                          index=index, dtype=object)
+
+        obs = transformer(input)
+
+        self.assertIsInstance(obs, AlignedProteinFASTAFormat)
+
+        obs_lines = list(open(str(obs)))
+        self.assertEqual(obs_lines[0], '>sequence1\n')
+        self.assertEqual(obs_lines[1],
+                         '------------------------VDFSATWCGPC'
+                         'KMIKPFFHSLSEKYSNVIFLEVDVDDCQDVASECE'
+                         'VKCMPTFQFFKKGQKVGEFSGAN\n')
+        self.assertEqual(obs_lines[2], '>sequence2\n')
+        self.assertEqual(obs_lines[3],
+                         'MVKQIESKTAFQEALDAAGDKLVVVDFSATWCGPC'
+                         'KMIKPFFHSLSEKYSNVIFLEVDVDDCQDVASECE'
+                         'VKCMPTFQ-------VGEFSGAN\n')
+
+    def test_aligned_protein_fasta_format_to_protein_iterator(self):
+        input, obs = self.transform_format(
+            AlignedProteinFASTAFormat, ProteinIterator,
+            filename='aligned-protein-sequences.fasta')
+
+        exp = skbio.read(str(input), format='fasta', constructor=skbio.Protein)
+
+        for observed, expected in zip(obs, exp):
+            self.assertEqual(observed, expected)
 
 
 if __name__ == '__main__':

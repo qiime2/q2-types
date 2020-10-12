@@ -5,10 +5,11 @@
 #
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
-
+import itertools
 import re
 
 import qiime2.plugin.model as model
+import skbio
 from qiime2.plugin import ValidationError
 import qiime2
 
@@ -299,11 +300,60 @@ DifferentialDirectoryFormat = model.SingleFileDirectoryFormat(
     'DifferentialDirectoryFormat', 'differentials.tsv', DifferentialFormat)
 
 
+class ProteinFASTAFormat(model.TextFileFormat):
+    def _validate_(self, level):
+        record_count_map = {'min': 5, 'max': None}
+        self._validate(record_count_map[level])
+
+    def _validate(self, n_records=None):
+        # read in using skbio and iterate over the contents -
+        # ValueErrors will be raised for wrong records
+        generator = self._read_protein_fasta(str(self))
+        if n_records is not None:
+            generator = itertools.islice(generator, n_records)
+        [x for x in generator]
+
+    def _read_protein_fasta(self, path):
+        return skbio.read(path, format='fasta', constructor=skbio.Protein)
+
+
+ProteinSequencesDirectoryFormat = model.SingleFileDirectoryFormat(
+    'ProteinSequencesDirectoryFormat',
+    'protein-sequences.fasta',
+    ProteinFASTAFormat)
+
+
+class AlignedProteinFASTAFormat(model.TextFileFormat):
+    def _validate_(self, level):
+        record_count_map = {'min': 5, 'max': None}
+        self._validate(record_count_map[level])
+
+    def _validate(self, n_records=None):
+        # read in using skbio and iterate over the contents -
+        # ValueErrors will be raised for wrong records
+        generator = self._read_protein_alignment_fasta(str(self))
+        if n_records is not None:
+            generator = itertools.islice(generator, n_records)
+        [x for x in generator]
+
+    def _read_protein_alignment_fasta(self, path):
+        return skbio.read(path, format='fasta',
+                          constructor=skbio.Protein, into=skbio.TabularMSA)
+
+
+AlignedProteinSequencesDirectoryFormat = model.SingleFileDirectoryFormat(
+    'AlignedProteinSequencesDirectoryFormat',
+    'aligned-protein-sequences.fasta',
+    AlignedProteinFASTAFormat)
+
+
 plugin.register_formats(
     TSVTaxonomyFormat, TSVTaxonomyDirectoryFormat,
     HeaderlessTSVTaxonomyFormat, HeaderlessTSVTaxonomyDirectoryFormat,
     TaxonomyFormat, TaxonomyDirectoryFormat, DNAFASTAFormat,
     DNASequencesDirectoryFormat, PairedDNASequencesDirectoryFormat,
     AlignedDNAFASTAFormat, AlignedDNASequencesDirectoryFormat,
-    DifferentialFormat, DifferentialDirectoryFormat
+    DifferentialFormat, DifferentialDirectoryFormat, ProteinFASTAFormat,
+    AlignedProteinFASTAFormat, ProteinSequencesDirectoryFormat,
+    AlignedProteinSequencesDirectoryFormat,
 )
