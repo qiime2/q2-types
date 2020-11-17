@@ -10,7 +10,7 @@ import os.path
 import unittest
 
 import pandas as pd
-import pandas.io.common
+import pandas.errors
 import biom
 import skbio
 import qiime2
@@ -315,13 +315,13 @@ class TestTaxonomyFormatsToDataFrame(TestPluginBase):
                 self.get_data_path(os.path.join('taxonomy', '1-column.tsv')))
 
     def test_blanks(self):
-        with self.assertRaises(pandas.io.common.EmptyDataError):
+        with self.assertRaises(pandas.errors.EmptyDataError):
             _taxonomy_formats_to_dataframe(
                 self.get_data_path(os.path.join('taxonomy',
                                                 'blanks')))
 
     def test_empty(self):
-        with self.assertRaises(pandas.io.common.EmptyDataError):
+        with self.assertRaises(pandas.errors.EmptyDataError):
             _taxonomy_formats_to_dataframe(
                 self.get_data_path(os.path.join('taxonomy', 'empty')))
 
@@ -338,7 +338,7 @@ class TestTaxonomyFormatsToDataFrame(TestPluginBase):
                 has_header=True)
 
     def test_jagged(self):
-        with self.assertRaises(pandas.io.common.ParserError):
+        with self.assertRaises(pandas.errors.ParserError):
             _taxonomy_formats_to_dataframe(
                 self.get_data_path(os.path.join('taxonomy', 'jagged.tsv')))
 
