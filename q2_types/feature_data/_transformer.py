@@ -266,11 +266,10 @@ def _dnafastaformats_to_metadata(ff):
 def _series_to_fasta_format(ff, data, sequence_type="DNA"):
     with ff.open() as f:
         for id_, seq in data.iteritems():
-            sequence = skbio.Protein(
-                seq, metadata={
-                    'id': id_}) if sequence_type == "protein" else skbio.DNA(
-                seq, metadata={
-                    'id': id_})
+            if sequence_type == "protein":
+                sequence = skbio.Protein(seq, metadata={'id': id_})
+            else:
+                sequence = skbio.DNA(seq, metadata={'id': id_})
             skbio.io.write(sequence, format='fasta', into=f)
 
 
@@ -423,13 +422,13 @@ class AlignedProteinIterator(ProteinIterator):
     pass
 
 
-def _read_protein_fasta(path):
-    return skbio.read(path, format='fasta', constructor=skbio.Protein)
+# def _read_protein_fasta(path):
+#     return skbio.read(path, format='fasta', constructor=skbio.Protein)
 
 
 def _proteinfastaformats_to_series(ff):
     data = {}
-    for sequence in _read_protein_fasta(str(ff)):
+    for sequence in ff._read_protein_fasta(str(ff)):
         id_ = sequence.metadata['id']
         if id_ in data:
             raise ValueError("FASTA format sequence IDs must be unique. The "
@@ -448,7 +447,7 @@ def _proteinfastaformats_to_metadata(ff):
 
 @plugin.register_transformer
 def _37(ff: ProteinFASTAFormat) -> ProteinIterator:
-    generator = _read_protein_fasta(str(ff))
+    generator = ff._read_protein_fasta(str(ff))
     return ProteinIterator(generator)
 
 
@@ -491,7 +490,7 @@ def _43(data: pd.Series) -> ProteinFASTAFormat:
 
 @plugin.register_transformer
 def _44(ff: AlignedProteinFASTAFormat) -> AlignedProteinIterator:
-    generator = _read_protein_fasta(str(ff))
+    generator = ff._read_protein_fasta(str(ff))
     return AlignedProteinIterator(generator)
 
 
@@ -521,5 +520,5 @@ def _48(data: pd.Series) -> AlignedProteinFASTAFormat:
 
 @plugin.register_transformer
 def _49(fmt: AlignedProteinFASTAFormat) -> ProteinIterator:
-    generator = _read_protein_fasta(str(fmt))
+    generator = fmt._read_protein_fasta(str(fmt))
     return ProteinIterator(generator)

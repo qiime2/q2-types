@@ -336,7 +336,7 @@ class AlignedProteinFASTAFormat(model.TextFileFormat):
             generator = itertools.islice(generator, n_records)
         [x for x in generator]
 
-    def _read_protein_alignment_fasta(self, path):
+    def _read_protein_fasta(self, path):
         return skbio.read(path, format='fasta',
                           constructor=skbio.Protein, into=skbio.TabularMSA)
 
