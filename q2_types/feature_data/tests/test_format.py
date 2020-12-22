@@ -365,9 +365,9 @@ class TestProteinFASTAFormats(TestPluginBase):
         filepath = self.get_data_path('not-dna-sequences.fasta')
         format = ProteinFASTAFormat(filepath, mode='r')
 
-        # with self.assertRaisesRegex(
-        #         ValueError, "Invalid characters in sequence"):
-        format.validate()
+        with self.assertRaisesRegex(
+                ValidationError, "Invalid character '1' .*0 on line 2"):
+            format.validate()
 
     def test_protein_fasta_format_empty_file(self):
         filepath = os.path.join(self.temp_dir.name, 'empty')
@@ -397,8 +397,8 @@ class TestProteinFASTAFormats(TestPluginBase):
         filepath = self.get_data_path('protein-sequences.fasta')
         format = AlignedProteinFASTAFormat(filepath, mode='r')
 
-        with self.assertRaisesRegex(ValueError,
-                                    'length must match.* 93.* 70'):
+        with self.assertRaisesRegex(
+                ValidationError, 'line 5 was length 93.* previous .* 70'):
             format.validate()
 
     def test_aligned_protein_sequences_directory_format(self):

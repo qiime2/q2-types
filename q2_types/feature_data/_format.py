@@ -324,21 +324,15 @@ DifferentialDirectoryFormat = model.SingleFileDirectoryFormat(
     'DifferentialDirectoryFormat', 'differentials.tsv', DifferentialFormat)
 
 
-class ProteinFASTAFormat(model.TextFileFormat):
+class ProteinFASTAFormat(FASTAFormat):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.alphabet = "ABCDEFGHIKLMNPQRSTVWXYZ"
+
     def _validate_(self, level):
-        record_count_map = {'min': 5, 'max': None}
-        self._validate(record_count_map[level])
-
-    def _validate(self, n_records=None):
-        # read in using skbio and iterate over the contents -
-        # ValueErrors will be raised for wrong records
-        generator = self._read_protein_fasta(str(self))
-        if n_records is not None:
-            generator = itertools.islice(generator, n_records)
-        [x for x in generator]
-
-    def _read_protein_fasta(self, path):
-        return skbio.read(path, format='fasta', constructor=skbio.Protein)
+        FASTAValidator, ValidationSet = _construct_validator_from_alphabet(
+            self.alphabet)
+        self._validate_FASTA(level, FASTAValidator, ValidationSet)
 
 
 ProteinSequencesDirectoryFormat = model.SingleFileDirectoryFormat(
@@ -347,22 +341,10 @@ ProteinSequencesDirectoryFormat = model.SingleFileDirectoryFormat(
     ProteinFASTAFormat)
 
 
-class AlignedProteinFASTAFormat(model.TextFileFormat):
-    def _validate_(self, level):
-        record_count_map = {'min': 5, 'max': None}
-        self._validate(record_count_map[level])
-
-    def _validate(self, n_records=None):
-        # read in using skbio and iterate over the contents -
-        # ValueErrors will be raised for wrong records
-        generator = self._read_protein_alignment_fasta(str(self))
-        if n_records is not None:
-            generator = itertools.islice(generator, n_records)
-        [x for x in generator]
-
-    def _read_protein_fasta(self, path):
-        return skbio.read(path, format='fasta',
-                          constructor=skbio.Protein, into=skbio.TabularMSA)
+class AlignedProteinFASTAFormat(AlignedFASTAFormatMixin, ProteinFASTAFormat):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        super()._turn_into_alignment()
 
 
 AlignedProteinSequencesDirectoryFormat = model.SingleFileDirectoryFormat(

@@ -221,8 +221,43 @@ def _27(ff: BIOMV210Format) -> TSVTaxonomyFormat:
         table = biom.Table.from_hdf5(fh)
     return _biom_to_tsv_taxonomy_format(table)
 
+# common to all FASTA transformers
+
+
+def _read_from_fasta(path, constructor=skbio.DNA):
+    return skbio.read(path, format='fasta', constructor=constructor)
+
+
+def _fastaformats_to_series(ff, constructor=skbio.DNA):
+    data = {}
+    for sequence in _read_from_fasta(str(ff), constructor):
+        id_ = sequence.metadata['id']
+        if id_ in data:
+            raise ValueError("FASTA format sequence IDs must be unique. The "
+                             "following ID was found more than once: %s."
+                             % id_)
+        data[id_] = sequence
+    return pd.Series(data)
+
+
+def _fastaformats_to_metadata(ff, constructor=skbio.DNA):
+    df = _fastaformats_to_series(ff, constructor).to_frame()
+    df = df.astype(str)
+    df.index.name, df.columns = 'Feature ID', ['Sequence']
+    return qiime2.Metadata(df)
+
+
+def _series_to_fasta_format(ff, data, sequence_type="DNA"):
+    with ff.open() as f:
+        for id_, seq in data.iteritems():
+            if sequence_type == "protein":
+                sequence = skbio.Protein(seq, metadata={'id': id_})
+            else:
+                sequence = skbio.DNA(seq, metadata={'id': id_})
+            skbio.io.write(sequence, format='fasta', into=f)
 
 # DNA FASTA transformers
+
 
 class DNAIterator(collections.abc.Iterable):
     def __init__(self, generator):
@@ -240,42 +275,9 @@ class AlignedDNAIterator(DNAIterator):
     pass
 
 
-def _read_dna_fasta(path):
-    return skbio.read(path, format='fasta', constructor=skbio.DNA)
-
-
-def _dnafastaformats_to_series(ff):
-    data = {}
-    for sequence in _read_dna_fasta(str(ff)):
-        id_ = sequence.metadata['id']
-        if id_ in data:
-            raise ValueError("FASTA format sequence IDs must be unique. The "
-                             "following ID was found more than once: %s."
-                             % id_)
-        data[id_] = sequence
-    return pd.Series(data)
-
-
-def _dnafastaformats_to_metadata(ff):
-    df = _dnafastaformats_to_series(ff).to_frame()
-    df = df.astype(str)
-    df.index.name, df.columns = 'Feature ID', ['Sequence']
-    return qiime2.Metadata(df)
-
-
-def _series_to_fasta_format(ff, data, sequence_type="DNA"):
-    with ff.open() as f:
-        for id_, seq in data.iteritems():
-            if sequence_type == "protein":
-                sequence = skbio.Protein(seq, metadata={'id': id_})
-            else:
-                sequence = skbio.DNA(seq, metadata={'id': id_})
-            skbio.io.write(sequence, format='fasta', into=f)
-
-
 @plugin.register_transformer
 def _9(ff: DNAFASTAFormat) -> DNAIterator:
-    generator = _read_dna_fasta(str(ff))
+    generator = _read_from_fasta(str(ff), skbio.DNA)
     return DNAIterator(generator)
 
 
@@ -339,12 +341,12 @@ def _14(data: skbio.TabularMSA) -> AlignedDNAFASTAFormat:
 
 @plugin.register_transformer
 def _15(ff: DNAFASTAFormat) -> pd.Series:
-    return _dnafastaformats_to_series(ff)
+    return _fastaformats_to_series(ff, skbio.DNA)
 
 
 @plugin.register_transformer
 def _31(ff: DNAFASTAFormat) -> qiime2.Metadata:
-    return _dnafastaformats_to_metadata(ff)
+    return _fastaformats_to_metadata(ff, skbio.DNA)
 
 
 @plugin.register_transformer
@@ -356,7 +358,7 @@ def _16(data: pd.Series) -> DNAFASTAFormat:
 
 @plugin.register_transformer
 def _18(ff: AlignedDNAFASTAFormat) -> AlignedDNAIterator:
-    generator = _read_dna_fasta(str(ff))
+    generator = _read_from_fasta(str(ff), skbio.DNA)
     return AlignedDNAIterator(generator)
 
 
@@ -369,12 +371,12 @@ def _19(data: AlignedDNAIterator) -> AlignedDNAFASTAFormat:
 
 @plugin.register_transformer
 def _33(ff: AlignedDNAFASTAFormat) -> qiime2.Metadata:
-    return _dnafastaformats_to_metadata(ff)
+    return _fastaformats_to_metadata(ff, skbio.DNA)
 
 
 @plugin.register_transformer
 def _34(ff: AlignedDNAFASTAFormat) -> pd.Series:
-    return _dnafastaformats_to_series(ff)
+    return _fastaformats_to_series(ff, skbio.DNA)
 
 
 @plugin.register_transformer
@@ -386,7 +388,7 @@ def _35(data: pd.Series) -> AlignedDNAFASTAFormat:
 
 @plugin.register_transformer
 def _36(fmt: AlignedDNAFASTAFormat) -> DNAIterator:
-    generator = _read_dna_fasta(str(fmt))
+    generator = _read_from_fasta(str(fmt), skbio.DNA)
     return DNAIterator(generator)
 
 
@@ -422,32 +424,9 @@ class AlignedProteinIterator(ProteinIterator):
     pass
 
 
-# def _read_protein_fasta(path):
-#     return skbio.read(path, format='fasta', constructor=skbio.Protein)
-
-
-def _proteinfastaformats_to_series(ff):
-    data = {}
-    for sequence in ff._read_protein_fasta(str(ff)):
-        id_ = sequence.metadata['id']
-        if id_ in data:
-            raise ValueError("FASTA format sequence IDs must be unique. The "
-                             "following ID was found more than once: %s."
-                             % id_)
-        data[id_] = sequence
-    return pd.Series(data)
-
-
-def _proteinfastaformats_to_metadata(ff):
-    df = _proteinfastaformats_to_series(ff).to_frame()
-    df = df.astype(str)
-    df.index.name, df.columns = 'Feature ID', ['Sequence']
-    return qiime2.Metadata(df)
-
-
 @plugin.register_transformer
 def _37(ff: ProteinFASTAFormat) -> ProteinIterator:
-    generator = ff._read_protein_fasta(str(ff))
+    generator = _read_from_fasta(str(ff), skbio.Protein)
     return ProteinIterator(generator)
 
 
@@ -473,12 +452,12 @@ def _40(data: skbio.TabularMSA) -> AlignedProteinFASTAFormat:
 
 @plugin.register_transformer
 def _41(ff: ProteinFASTAFormat) -> pd.Series:
-    return _proteinfastaformats_to_series(ff)
+    return _fastaformats_to_series(ff, skbio.Protein)
 
 
 @plugin.register_transformer
 def _42(ff: ProteinFASTAFormat) -> qiime2.Metadata:
-    return _proteinfastaformats_to_metadata(ff)
+    return _fastaformats_to_metadata(ff, skbio.Protein)
 
 
 @plugin.register_transformer
@@ -490,7 +469,7 @@ def _43(data: pd.Series) -> ProteinFASTAFormat:
 
 @plugin.register_transformer
 def _44(ff: AlignedProteinFASTAFormat) -> AlignedProteinIterator:
-    generator = ff._read_protein_fasta(str(ff))
+    generator = _read_from_fasta(str(ff), skbio.Protein)
     return AlignedProteinIterator(generator)
 
 
@@ -503,12 +482,12 @@ def _45(data: AlignedProteinIterator) -> AlignedProteinFASTAFormat:
 
 @plugin.register_transformer
 def _46(ff: AlignedProteinFASTAFormat) -> qiime2.Metadata:
-    return _proteinfastaformats_to_metadata(ff)
+    return _fastaformats_to_metadata(ff, skbio.Protein)
 
 
 @plugin.register_transformer
 def _47(ff: AlignedProteinFASTAFormat) -> pd.Series:
-    return _proteinfastaformats_to_series(ff)
+    return _fastaformats_to_series(ff, skbio.Protein)
 
 
 @plugin.register_transformer
@@ -520,5 +499,5 @@ def _48(data: pd.Series) -> AlignedProteinFASTAFormat:
 
 @plugin.register_transformer
 def _49(fmt: AlignedProteinFASTAFormat) -> ProteinIterator:
-    generator = fmt._read_protein_fasta(str(fmt))
+    generator = _read_from_fasta(str(fmt), skbio.Protein)
     return ProteinIterator(generator)
