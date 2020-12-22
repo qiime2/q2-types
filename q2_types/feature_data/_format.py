@@ -144,12 +144,15 @@ TSVTaxonomyDirectoryFormat = model.SingleFileDirectoryFormat(
 
 
 class FASTAFormat(model.TextFileFormat):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.aligned = False
+        self.alphabet = ""
+
     def _validate_(self, level):
         self._validate_FASTA(level)
 
-    def _validate_FASTA(
-            self, level, FASTAValidator=None,
-            ValidationSet=None, aligned=False):
+    def _validate_FASTA(self, level, FASTAValidator=None, ValidationSet=None):
         last_line_was_ID = False
         ids = {}
 
@@ -187,9 +190,9 @@ class FASTAFormat(model.TextFileFormat):
                             if seq_len == 0:
                                 seq_len = prev_seq_len
 
-                            if aligned:
-                                _validate_line_lengths(seq_len, prev_seq_len,
-                                                       prev_seq_start_line)
+                            if self.aligned:
+                                self._validate_line_lengths(
+                                    seq_len, prev_seq_len, prev_seq_start_line)
 
                             prev_seq_len = 0
                             prev_seq_start_line = 0
@@ -243,12 +246,30 @@ class FASTAFormat(model.TextFileFormat):
                 raise ValidationError(f'utf-8 cannot decode byte on line '
                                       f'{line_number}') from e
 
-        if aligned:
-            _validate_line_lengths(seq_len, prev_seq_len, prev_seq_start_line)
+        if self.aligned:
+            self._validate_line_lengths(
+                seq_len, prev_seq_len, prev_seq_start_line)
+
+
+class AlignedFASTAFormatMixin:
+    def _turn_into_alignment(self):
+        self.aligned = True
+        self.alphabet = self.alphabet + ".-"
+
+    def _validate_line_lengths(
+            self, seq_len, prev_seq_len, prev_seq_start_line):
+        if prev_seq_len != seq_len:
+            raise ValidationError('The sequence starting on line '
+                                  f'{prev_seq_start_line} was length '
+                                  f'{prev_seq_len}. All previous sequences '
+                                  f'were length {seq_len}. All sequences must '
+                                  'be the same length for AlignedFASTAFormat.')
 
 
 class DNAFASTAFormat(FASTAFormat):
-    alphabet = "ACGTURYKMSWBDHVN"
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.alphabet = "ACGTURYKMSWBDHVN"
 
     def _validate_(self, level):
         FASTADNAValidator, ValidationSet = _construct_validator_from_alphabet(
@@ -267,13 +288,10 @@ class PairedDNASequencesDirectoryFormat(model.DirectoryFormat):
                                      format=DNAFASTAFormat)
 
 
-class AlignedDNAFASTAFormat(FASTAFormat):
-    alphabet = "ACGTURYKMSWBDHVN.-"
-
-    def _validate_(self, level):
-        FASTADNAValidator, ValidationSet = _construct_validator_from_alphabet(
-            self.alphabet)
-        self._validate_FASTA(level, FASTADNAValidator, ValidationSet, True)
+class AlignedDNAFASTAFormat(AlignedFASTAFormatMixin, DNAFASTAFormat):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        super()._turn_into_alignment()
 
 
 AlignedDNASequencesDirectoryFormat = model.SingleFileDirectoryFormat(
@@ -285,15 +303,6 @@ def _construct_validator_from_alphabet(alphabet_str):
     Validator = re.compile(fr'[{alphabet_str}]+\r?\n?')
     ValidationSet = frozenset(alphabet_str)
     return Validator, ValidationSet
-
-
-def _validate_line_lengths(seq_len, prev_seq_len, prev_seq_start_line):
-    if prev_seq_len != seq_len:
-        raise ValidationError('The sequence starting on line '
-                              f'{prev_seq_start_line} was length '
-                              f'{prev_seq_len}. All previous sequences were '
-                              f'length {seq_len}. All sequences must be the '
-                              'same length for AlignedDNAFASTAFormat.')
 
 
 class DifferentialFormat(model.TextFileFormat):
