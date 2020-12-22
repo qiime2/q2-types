@@ -16,7 +16,8 @@ from q2_types.feature_data import (
     HeaderlessTSVTaxonomyDirectoryFormat, TSVTaxonomyFormat,
     TSVTaxonomyDirectoryFormat, DNAFASTAFormat, DNASequencesDirectoryFormat,
     PairedDNASequencesDirectoryFormat, AlignedDNAFASTAFormat,
-    AlignedDNASequencesDirectoryFormat, DifferentialDirectoryFormat
+    AlignedDNASequencesDirectoryFormat, DifferentialDirectoryFormat,
+    FASTAFormat
 )
 from qiime2.plugin.testing import TestPluginBase
 from qiime2.plugin import ValidationError
@@ -151,6 +152,12 @@ class TestTaxonomyFormats(TestPluginBase):
 class TestDNAFASTAFormats(TestPluginBase):
     package = 'q2_types.feature_data.tests'
 
+    def test_permissive_fasta_format(self):
+        filepath = self.get_data_path('dna-sequences-gisaid.fasta')
+        format = FASTAFormat(filepath, mode='r')
+
+        format.validate()
+
     def test_dna_fasta_format_validate_positive(self):
         filepath = self.get_data_path('dna-sequences.fasta')
         format = DNAFASTAFormat(filepath, mode='r')
@@ -276,7 +283,7 @@ class TestDNAFASTAFormats(TestPluginBase):
         format = AlignedDNAFASTAFormat(filepath, mode='r')
 
         with self.assertRaisesRegex(ValidationError,
-                                    'line 4.*length 90.*length 65'):
+                                    'line 4.*length 88.*length 64'):
             format.validate()
 
     def test_aligned_dna_sequences_directory_format(self):
