@@ -15,8 +15,9 @@ from ._format import (
     PairedDNASequencesDirectoryFormat, AlignedDNAFASTAFormat,
     AlignedDNASequencesDirectoryFormat, DifferentialFormat,
     DifferentialDirectoryFormat, AlignedProteinSequencesDirectoryFormat,
-    ProteinSequencesDirectoryFormat, ProteinFASTAFormat,
+    ProteinSequencesDirectoryFormat, ProteinFASTAFormat, FASTAFormat,
     AlignedProteinFASTAFormat)
+
 from ._type import (
     FeatureData, Taxonomy, Sequence, PairedEndSequence, AlignedSequence,
     Differential, ProteinSequence, AlignedProteinSequence)
@@ -33,7 +34,7 @@ __all__ = [
     'DNASequencesDirectoryFormat', 'PairedDNASequencesDirectoryFormat',
     'AlignedDNAFASTAFormat', 'AlignedDNASequencesDirectoryFormat',
     'FeatureData', 'Taxonomy', 'Sequence', 'PairedEndSequence',
-    'AlignedSequence', 'DNAIterator', 'PairedDNAIterator',
+    'AlignedSequence', 'DNAIterator', 'PairedDNAIterator', 'FASTAFormat',
     'AlignedDNAIterator', 'Differential', 'DifferentialDirectoryFormat',
     'ProteinFASTAFormat', 'AlignedProteinFASTAFormat',
     'ProteinSequence', 'ProteinSequencesDirectoryFormat',
