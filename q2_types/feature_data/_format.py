@@ -5,7 +5,6 @@
 #
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
-import itertools
 import re
 import skbio
 
@@ -330,11 +329,6 @@ class ProteinFASTAFormat(FASTAFormat):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.alphabet = "ABCDEFGHIKLMNPQRSTVWXYZ"
-
-    def _validate_(self, level):
-        FASTAValidator, ValidationSet = _construct_validator_from_alphabet(
-            self.alphabet)
-        self._validate_FASTA(level, FASTAValidator, ValidationSet)
 
 
 ProteinSequencesDirectoryFormat = model.SingleFileDirectoryFormat(
