@@ -239,7 +239,9 @@ class FASTAFormat(model.TextFileFormat):
                                         f"Invalid character '{character}' at "
                                         f"position {position} on line "
                                         f"{line_number} (does not match IUPAC "
-                                        "characters for a DNA sequence).")
+                                        "characters for this sequence type). "
+                                        "Allowed characters are "
+                                        f"{self.alphabet}.")
 
                     else:
                         last_line_was_ID = False
