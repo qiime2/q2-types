@@ -147,10 +147,12 @@ class FASTAFormat(model.TextFileFormat):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.aligned = False
-        self.alphabet = ""
+        self.alphabet = None
 
     def _validate_(self, level):
-        self._validate_FASTA(level)
+        FASTAValidator, ValidationSet = _construct_validator_from_alphabet(
+            self.alphabet)
+        self._validate_FASTA(level, FASTAValidator, ValidationSet)
 
     def _validate_FASTA(self, level, FASTAValidator=None, ValidationSet=None):
         last_line_was_ID = False
@@ -271,11 +273,6 @@ class DNAFASTAFormat(FASTAFormat):
         super().__init__(*args, **kwargs)
         self.alphabet = "ACGTURYKMSWBDHVN"
 
-    def _validate_(self, level):
-        FASTADNAValidator, ValidationSet = _construct_validator_from_alphabet(
-            self.alphabet)
-        self._validate_FASTA(level, FASTADNAValidator, ValidationSet)
-
 
 DNASequencesDirectoryFormat = model.SingleFileDirectoryFormat(
     'DNASequencesDirectoryFormat', 'dna-sequences.fasta', DNAFASTAFormat)
@@ -300,8 +297,11 @@ AlignedDNASequencesDirectoryFormat = model.SingleFileDirectoryFormat(
 
 
 def _construct_validator_from_alphabet(alphabet_str):
-    Validator = re.compile(fr'[{alphabet_str}]+\r?\n?')
-    ValidationSet = frozenset(alphabet_str)
+    if alphabet_str:
+        Validator = re.compile(fr'[{alphabet_str}]+\r?\n?')
+        ValidationSet = frozenset(alphabet_str)
+    else:
+        Validator, ValidationSet = None, None
     return Validator, ValidationSet
 
 
