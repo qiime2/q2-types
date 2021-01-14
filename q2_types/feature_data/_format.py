@@ -7,7 +7,6 @@
 # ----------------------------------------------------------------------------
 
 import re
-import skbio
 
 import qiime2.plugin.model as model
 from qiime2.plugin import ValidationError
@@ -165,7 +164,7 @@ class FASTAFormat(model.TextFileFormat):
         level_map = {'min': 100, 'max': float('inf')}
         max_lines = level_map[level]
 
-        with skbio.io.util.open(str(self), encoding='binary') as fh:
+        with self.path.open('rb') as fh:
             try:
                 first = fh.read(6)
                 if first[:3] == b'\xEF\xBB\xBF':
