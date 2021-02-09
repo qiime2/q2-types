@@ -142,14 +142,137 @@ TSVTaxonomyDirectoryFormat = model.SingleFileDirectoryFormat(
     'TSVTaxonomyDirectoryFormat', 'taxonomy.tsv', TSVTaxonomyFormat)
 
 
-class DNAFASTAFormat(model.TextFileFormat):
-    def _validate_(self, level):
-        FASTADNAValidator = re.compile(r'[ACGTURYKMSWBDHVN]+\r?\n?')
-        ValidationSet = frozenset(('A', 'C', 'G', 'T', 'U', 'R', 'Y', 'K', 'M',
-                                   'S', 'W', 'B', 'D', 'H', 'V', 'N'))
+class FASTAFormat(model.TextFileFormat):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.aligned = False
+        self.alphabet = None
 
-        _validate_DNAFASTAFormats(self, FASTADNAValidator, ValidationSet,
-                                  level)
+    def _validate_(self, level):
+        FASTAValidator, ValidationSet = _construct_validator_from_alphabet(
+            self.alphabet)
+        self._validate_FASTA(level, FASTAValidator, ValidationSet)
+
+    def _validate_FASTA(self, level, FASTAValidator=None, ValidationSet=None):
+        last_line_was_ID = False
+        ids = {}
+
+        seq_len = 0
+        prev_seq_len = 0
+        prev_seq_start_line = 0
+
+        level_map = {'min': 100, 'max': float('inf')}
+        max_lines = level_map[level]
+
+        with self.path.open('rb') as fh:
+            try:
+                first = fh.read(6)
+                if first[:3] == b'\xEF\xBB\xBF':
+                    first = first[3:]
+
+                # Empty files should validate
+                if first.strip() == b'':
+                    return
+
+                if first[0] != ord(b'>'):
+                    raise ValidationError("First line of file is not a valid "
+                                          "description. Descriptions must "
+                                          "start with '>'")
+                fh.seek(0)
+
+                for line_number, line in enumerate(fh, 1):
+                    line = line.strip()
+                    if line_number >= max_lines:
+                        return
+                    line = line.decode('utf-8-sig')
+
+                    if line.startswith('>'):
+                        if FASTAValidator and ValidationSet:
+                            if seq_len == 0:
+                                seq_len = prev_seq_len
+
+                            if self.aligned:
+                                self._validate_line_lengths(
+                                    seq_len, prev_seq_len, prev_seq_start_line)
+
+                            prev_seq_len = 0
+                            prev_seq_start_line = 0
+
+                        if last_line_was_ID:
+                            raise ValidationError('Multiple consecutive '
+                                                  'descriptions starting on '
+                                                  f'line {line_number-1!r}')
+
+                        line = line.split()
+
+                        if line[0] == '>':
+                            if len(line) == 1:
+                                raise ValidationError(
+                                    f'Description on line {line_number} is '
+                                    'missing an ID.')
+                            else:
+                                raise ValidationError(
+                                    f'ID on line {line_number} starts with a '
+                                    'space. IDs may not start with spaces')
+
+                        if line[0] in ids:
+                            raise ValidationError(
+                                f'ID on line {line_number} is a duplicate of '
+                                f'another ID on line {ids[line[0]]}.')
+
+                        ids[line[0]] = line_number
+                        last_line_was_ID = True
+
+                    elif FASTAValidator and ValidationSet:
+                        if re.fullmatch(FASTAValidator, line):
+                            if prev_seq_start_line == 0:
+                                prev_seq_start_line = line_number
+
+                            prev_seq_len += len(line)
+                            last_line_was_ID = False
+
+                        else:
+                            for position, character in enumerate(line):
+                                if character not in ValidationSet:
+                                    raise ValidationError(
+                                        f"Invalid character '{character}' at "
+                                        f"position {position} on line "
+                                        f"{line_number} (does not match IUPAC "
+                                        "characters for this sequence type). "
+                                        "Allowed characters are "
+                                        f"{self.alphabet}.")
+
+                    else:
+                        last_line_was_ID = False
+
+            except UnicodeDecodeError as e:
+                raise ValidationError(f'utf-8 cannot decode byte on line '
+                                      f'{line_number}') from e
+
+        if self.aligned:
+            self._validate_line_lengths(
+                seq_len, prev_seq_len, prev_seq_start_line)
+
+
+class AlignedFASTAFormatMixin:
+    def _turn_into_alignment(self):
+        self.aligned = True
+        self.alphabet = self.alphabet + ".-"
+
+    def _validate_line_lengths(
+            self, seq_len, prev_seq_len, prev_seq_start_line):
+        if prev_seq_len != seq_len:
+            raise ValidationError('The sequence starting on line '
+                                  f'{prev_seq_start_line} was length '
+                                  f'{prev_seq_len}. All previous sequences '
+                                  f'were length {seq_len}. All sequences must '
+                                  'be the same length for AlignedFASTAFormat.')
+
+
+class DNAFASTAFormat(FASTAFormat):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.alphabet = "ACGTURYKMSWBDHVN"
 
 
 DNASequencesDirectoryFormat = model.SingleFileDirectoryFormat(
@@ -163,15 +286,10 @@ class PairedDNASequencesDirectoryFormat(model.DirectoryFormat):
                                      format=DNAFASTAFormat)
 
 
-class AlignedDNAFASTAFormat(model.TextFileFormat):
-    def _validate_(self, level):
-        FASTADNAValidator = re.compile(r'[ACGTURYKMSWBDHVN.-]+\r?\n?')
-        ValidationSet = frozenset(('A', 'C', 'G', 'T', 'U', 'R', 'Y', 'K', 'M',
-                                   'S', 'W', 'B', 'D', 'H', 'V', 'N', '.',
-                                   '-'))
-
-        _validate_DNAFASTAFormats(self, FASTADNAValidator, ValidationSet,
-                                  level, True)
+class AlignedDNAFASTAFormat(AlignedFASTAFormatMixin, DNAFASTAFormat):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        super()._turn_into_alignment()
 
 
 AlignedDNASequencesDirectoryFormat = model.SingleFileDirectoryFormat(
@@ -179,105 +297,13 @@ AlignedDNASequencesDirectoryFormat = model.SingleFileDirectoryFormat(
     AlignedDNAFASTAFormat)
 
 
-def _validate_DNAFASTAFormats(fmt, FASTADNAValidator, ValidationSet, level,
-                              aligned=False):
-    last_line_was_ID = False
-    ids = {}
-
-    seq_len = 0
-    prev_seq_len = 0
-    prev_seq_start_line = 0
-
-    level_map = {'min': 100, 'max': float('inf')}
-    max_lines = level_map[level]
-
-    with fmt.path.open('rb') as fh:
-        try:
-            first = fh.read(6)
-            if first[:3] == b'\xEF\xBB\xBF':
-                first = first[3:]
-
-            # Empty files should validate
-            if first.strip() == b'':
-                return
-
-            if first[0] != ord(b'>'):
-                raise ValidationError("First line of file is not a valid "
-                                      "description. Descriptions must "
-                                      "start with '>'")
-            fh.seek(0)
-
-            for line_number, line in enumerate(fh, 1):
-                if line_number >= max_lines:
-                    return
-                line = line.decode('utf-8-sig')
-
-                if line.startswith('>'):
-                    if seq_len == 0:
-                        seq_len = prev_seq_len
-
-                    if aligned:
-                        _validate_line_lengths(seq_len, prev_seq_len,
-                                               prev_seq_start_line)
-
-                    prev_seq_len = 0
-                    prev_seq_start_line = 0
-
-                    if last_line_was_ID:
-                        raise ValidationError('Multiple consecutive '
-                                              'descriptions starting on '
-                                              f'line {line_number-1!r}')
-
-                    line = line.split()
-
-                    if line[0] == '>':
-                        if len(line) == 1:
-                            raise ValidationError(
-                                f'Description on line {line_number} is '
-                                'missing an ID.')
-                        else:
-                            raise ValidationError(
-                                f'ID on line {line_number} starts with a '
-                                'space. IDs may not start with spaces')
-
-                    if line[0] in ids:
-                        raise ValidationError(
-                            f'ID on line {line_number} is a duplicate of '
-                            f'another ID on line {ids[line[0]]}.')
-
-                    ids[line[0]] = line_number
-                    last_line_was_ID = True
-
-                elif re.fullmatch(FASTADNAValidator, line):
-                    if prev_seq_start_line == 0:
-                        prev_seq_start_line = line_number
-
-                    prev_seq_len += len(line)
-                    last_line_was_ID = False
-                else:
-                    for position, character in enumerate(line):
-                        if character not in ValidationSet:
-                            raise ValidationError(
-                                f"Invalid character '{character}' at "
-                                f"position {position} on line "
-                                f"{line_number} (does not match IUPAC "
-                                "characters for a DNA sequence).")
-
-        except UnicodeDecodeError as e:
-            raise ValidationError(f'utf-8 cannot decode byte on line '
-                                  f'{line_number}') from e
-
-    if aligned:
-        _validate_line_lengths(seq_len, prev_seq_len, prev_seq_start_line)
-
-
-def _validate_line_lengths(seq_len, prev_seq_len, prev_seq_start_line):
-    if prev_seq_len != seq_len:
-        raise ValidationError('The sequence starting on line '
-                              f'{prev_seq_start_line} was length '
-                              f'{prev_seq_len}. All previous sequences were '
-                              f'length {seq_len}. All sequences must be the '
-                              'same length for AlignedDNAFASTAFormat.')
+def _construct_validator_from_alphabet(alphabet_str):
+    if alphabet_str:
+        Validator = re.compile(fr'[{alphabet_str}]+\r?\n?')
+        ValidationSet = frozenset(alphabet_str)
+    else:
+        Validator, ValidationSet = None, None
+    return Validator, ValidationSet
 
 
 class DifferentialFormat(model.TextFileFormat):
@@ -305,5 +331,5 @@ plugin.register_formats(
     TaxonomyFormat, TaxonomyDirectoryFormat, DNAFASTAFormat,
     DNASequencesDirectoryFormat, PairedDNASequencesDirectoryFormat,
     AlignedDNAFASTAFormat, AlignedDNASequencesDirectoryFormat,
-    DifferentialFormat, DifferentialDirectoryFormat
+    DifferentialFormat, DifferentialDirectoryFormat, FASTAFormat
 )
