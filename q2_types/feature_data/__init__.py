@@ -29,7 +29,7 @@ __all__ = [
     'DNASequencesDirectoryFormat', 'PairedDNASequencesDirectoryFormat',
     'AlignedDNAFASTAFormat', 'AlignedDNASequencesDirectoryFormat',
     'FeatureData', 'Taxonomy', 'Sequence', 'PairedEndSequence',
-    'AlignedSequence', 'DNAIterator', 'PairedDNAIterator', 'FASTAFormat'
+    'AlignedSequence', 'DNAIterator', 'PairedDNAIterator', 'FASTAFormat',
     'AlignedDNAIterator', 'Differential', 'DifferentialDirectoryFormat']
 
 importlib.import_module('q2_types.feature_data._transformer')
