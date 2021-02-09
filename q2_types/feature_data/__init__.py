@@ -14,7 +14,7 @@ from ._format import (
     TSVTaxonomyDirectoryFormat, DNAFASTAFormat, DNASequencesDirectoryFormat,
     PairedDNASequencesDirectoryFormat, AlignedDNAFASTAFormat,
     AlignedDNASequencesDirectoryFormat, DifferentialFormat,
-    DifferentialDirectoryFormat, FASTAFormat)
+    DifferentialDirectoryFormat, FASTAFormat, AlignedFASTAFormatMixin)
 from ._type import (
     FeatureData, Taxonomy, Sequence, PairedEndSequence, AlignedSequence,
     Differential)
@@ -30,6 +30,7 @@ __all__ = [
     'AlignedDNAFASTAFormat', 'AlignedDNASequencesDirectoryFormat',
     'FeatureData', 'Taxonomy', 'Sequence', 'PairedEndSequence',
     'AlignedSequence', 'DNAIterator', 'PairedDNAIterator', 'FASTAFormat',
-    'AlignedDNAIterator', 'Differential', 'DifferentialDirectoryFormat']
+    'AlignedDNAIterator', 'Differential', 'DifferentialDirectoryFormat',
+    'AlignedFASTAFormatMixin']
 
 importlib.import_module('q2_types.feature_data._transformer')
