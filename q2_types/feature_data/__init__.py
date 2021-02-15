@@ -1,5 +1,5 @@
 # ----------------------------------------------------------------------------
-# Copyright (c) 2016-2020, QIIME 2 development team.
+# Copyright (c) 2016-2021, QIIME 2 development team.
 #
 # Distributed under the terms of the Modified BSD License.
 #
@@ -14,10 +14,9 @@ from ._format import (
     TSVTaxonomyDirectoryFormat, DNAFASTAFormat, DNASequencesDirectoryFormat,
     PairedDNASequencesDirectoryFormat, AlignedDNAFASTAFormat,
     AlignedDNASequencesDirectoryFormat, DifferentialFormat,
-    DifferentialDirectoryFormat, AlignedProteinSequencesDirectoryFormat,
-    ProteinSequencesDirectoryFormat, ProteinFASTAFormat, FASTAFormat,
-    AlignedProteinFASTAFormat)
-
+    DifferentialDirectoryFormat, FASTAFormat, AlignedFASTAFormatMixin,
+    AlignedProteinSequencesDirectoryFormat, ProteinSequencesDirectoryFormat, 
+    ProteinFASTAFormat, AlignedProteinFASTAFormat)
 from ._type import (
     FeatureData, Taxonomy, Sequence, PairedEndSequence, AlignedSequence,
     Differential, ProteinSequence, AlignedProteinSequence)
@@ -36,8 +35,8 @@ __all__ = [
     'FeatureData', 'Taxonomy', 'Sequence', 'PairedEndSequence',
     'AlignedSequence', 'DNAIterator', 'PairedDNAIterator', 'FASTAFormat',
     'AlignedDNAIterator', 'Differential', 'DifferentialDirectoryFormat',
-    'ProteinFASTAFormat', 'AlignedProteinFASTAFormat',
-    'ProteinSequence', 'ProteinSequencesDirectoryFormat',
+    'AlignedFASTAFormatMixin', 'ProteinFASTAFormat', 'ProteinSequence',
+    'AlignedProteinFASTAFormat', 'ProteinSequencesDirectoryFormat',
     'AlignedProteinSequence', 'AlignedProteinSequencesDirectoryFormat',
     'ProteinIterator', 'AlignedProteinIterator']
 

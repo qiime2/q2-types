@@ -1,5 +1,5 @@
 # ----------------------------------------------------------------------------
-# Copyright (c) 2016-2020, QIIME 2 development team.
+# Copyright (c) 2016-2021, QIIME 2 development team.
 #
 # Distributed under the terms of the Modified BSD License.
 #
@@ -164,7 +164,7 @@ class FASTAFormat(model.TextFileFormat):
         level_map = {'min': 100, 'max': float('inf')}
         max_lines = level_map[level]
 
-        with skbio.io.util.open(str(self), encoding='binary') as fh:
+        with self.path.open('rb') as fh:
             try:
                 first = fh.read(6)
                 if first[:3] == b'\xEF\xBB\xBF':
@@ -357,5 +357,5 @@ plugin.register_formats(
     AlignedDNAFASTAFormat, AlignedDNASequencesDirectoryFormat,
     DifferentialFormat, DifferentialDirectoryFormat, ProteinFASTAFormat,
     AlignedProteinFASTAFormat, ProteinSequencesDirectoryFormat,
-    AlignedProteinSequencesDirectoryFormat, FASTAFormat
+    AlignedProteinSequencesDirectoryFormat,
 )
