@@ -331,5 +331,5 @@ plugin.register_formats(
     TaxonomyFormat, TaxonomyDirectoryFormat, DNAFASTAFormat,
     DNASequencesDirectoryFormat, PairedDNASequencesDirectoryFormat,
     AlignedDNAFASTAFormat, AlignedDNASequencesDirectoryFormat,
-    DifferentialFormat, DifferentialDirectoryFormat, FASTAFormat
+    DifferentialFormat, DifferentialDirectoryFormat,
 )
