@@ -252,8 +252,12 @@ def _series_to_fasta_format(ff, data, sequence_type="DNA"):
         for id_, seq in data.iteritems():
             if sequence_type == "protein":
                 sequence = skbio.Protein(seq, metadata={'id': id_})
-            else:
+            elif sequence_type == "DNA":
                 sequence = skbio.DNA(seq, metadata={'id': id_})
+            else:
+                raise NotImplementedError(
+                    "pd.Series can only be converted to DNA or "
+                    "protein FASTA format.")
             skbio.io.write(sequence, format='fasta', into=f)
 
 # DNA FASTA transformers
