@@ -15,7 +15,7 @@ from ._format import (
     PairedDNASequencesDirectoryFormat, AlignedDNAFASTAFormat,
     AlignedDNASequencesDirectoryFormat, DifferentialFormat,
     DifferentialDirectoryFormat, FASTAFormat, AlignedFASTAFormatMixin,
-    AlignedProteinSequencesDirectoryFormat, ProteinSequencesDirectoryFormat, 
+    AlignedProteinSequencesDirectoryFormat, ProteinSequencesDirectoryFormat,
     ProteinFASTAFormat, AlignedProteinFASTAFormat)
 from ._type import (
     FeatureData, Taxonomy, Sequence, PairedEndSequence, AlignedSequence,
