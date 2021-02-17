@@ -51,4 +51,4 @@ jobs:
       with:
         package-name: q2-types
         build-target: staging
-        additional-tests: py.test --pyargs q2_types --capture=tee-sys
+        additional-tests: py.test --pyargs q2_types
