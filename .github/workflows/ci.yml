@@ -47,4 +47,4 @@ jobs:
       with:
         package-name: q2-types
         build-target: staging
-        additional-tests: ${ADDITIONAL_TESTS}
+        additional-tests: py.test --pyargs q2_types
