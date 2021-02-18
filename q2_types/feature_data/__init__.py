@@ -14,13 +14,17 @@ from ._format import (
     TSVTaxonomyDirectoryFormat, DNAFASTAFormat, DNASequencesDirectoryFormat,
     PairedDNASequencesDirectoryFormat, AlignedDNAFASTAFormat,
     AlignedDNASequencesDirectoryFormat, DifferentialFormat,
-    DifferentialDirectoryFormat, FASTAFormat, AlignedFASTAFormatMixin)
+    DifferentialDirectoryFormat, FASTAFormat, AlignedFASTAFormatMixin,
+    AlignedProteinSequencesDirectoryFormat, ProteinSequencesDirectoryFormat,
+    ProteinFASTAFormat, AlignedProteinFASTAFormat)
 from ._type import (
     FeatureData, Taxonomy, Sequence, PairedEndSequence, AlignedSequence,
-    Differential)
+    Differential, ProteinSequence, AlignedProteinSequence)
 
 # TODO remove these imports when tests are rewritten. Remove from __all__ too
-from ._transformer import DNAIterator, PairedDNAIterator, AlignedDNAIterator
+from ._transformer import (
+    DNAIterator, PairedDNAIterator, AlignedDNAIterator,
+    ProteinIterator, AlignedProteinIterator)
 
 __all__ = [
     'TaxonomyFormat', 'TaxonomyDirectoryFormat', 'HeaderlessTSVTaxonomyFormat',
@@ -31,6 +35,9 @@ __all__ = [
     'FeatureData', 'Taxonomy', 'Sequence', 'PairedEndSequence',
     'AlignedSequence', 'DNAIterator', 'PairedDNAIterator', 'FASTAFormat',
     'AlignedDNAIterator', 'Differential', 'DifferentialDirectoryFormat',
-    'AlignedFASTAFormatMixin']
+    'AlignedFASTAFormatMixin', 'ProteinFASTAFormat', 'ProteinSequence',
+    'AlignedProteinFASTAFormat', 'ProteinSequencesDirectoryFormat',
+    'AlignedProteinSequence', 'AlignedProteinSequencesDirectoryFormat',
+    'ProteinIterator', 'AlignedProteinIterator']
 
 importlib.import_module('q2_types.feature_data._transformer')

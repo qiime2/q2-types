@@ -12,7 +12,8 @@ from ..plugin_setup import plugin
 from . import (TSVTaxonomyDirectoryFormat, DNASequencesDirectoryFormat,
                PairedDNASequencesDirectoryFormat,
                AlignedDNASequencesDirectoryFormat,
-               DifferentialDirectoryFormat)
+               DifferentialDirectoryFormat, ProteinSequencesDirectoryFormat,
+               AlignedProteinSequencesDirectoryFormat)
 
 
 FeatureData = SemanticType('FeatureData', field_names='type')
@@ -30,9 +31,16 @@ AlignedSequence = SemanticType('AlignedSequence',
 Differential = SemanticType('Differential',
                             variant_of=FeatureData.field['type'])
 
+ProteinSequence = SemanticType('ProteinSequence',
+                               variant_of=FeatureData.field['type'])
+
+AlignedProteinSequence = SemanticType('AlignedProteinSequence',
+                                      variant_of=FeatureData.field['type'])
+
 plugin.register_semantic_types(FeatureData, Taxonomy, Sequence,
                                PairedEndSequence, AlignedSequence,
-                               Differential)
+                               Differential, ProteinSequence,
+                               AlignedProteinSequence)
 
 
 plugin.register_semantic_type_to_format(
@@ -49,3 +57,9 @@ plugin.register_semantic_type_to_format(
     artifact_format=AlignedDNASequencesDirectoryFormat)
 plugin.register_semantic_type_to_format(
     FeatureData[Differential], DifferentialDirectoryFormat)
+plugin.register_semantic_type_to_format(
+    FeatureData[ProteinSequence],
+    artifact_format=ProteinSequencesDirectoryFormat)
+plugin.register_semantic_type_to_format(
+    FeatureData[AlignedProteinSequence],
+    artifact_format=AlignedProteinSequencesDirectoryFormat)

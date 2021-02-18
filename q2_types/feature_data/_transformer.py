@@ -18,7 +18,8 @@ from ..plugin_setup import plugin
 from ..feature_table import BIOMV210Format
 from . import (TaxonomyFormat, HeaderlessTSVTaxonomyFormat, TSVTaxonomyFormat,
                DNAFASTAFormat, PairedDNASequencesDirectoryFormat,
-               AlignedDNAFASTAFormat, DifferentialFormat)
+               AlignedDNAFASTAFormat, DifferentialFormat, ProteinFASTAFormat,
+               AlignedProteinFASTAFormat)
 
 
 # Taxonomy format transformers
@@ -249,12 +250,15 @@ def _fastaformats_to_metadata(ff, constructor=skbio.DNA):
 def _series_to_fasta_format(ff, data, sequence_type="DNA"):
     with ff.open() as f:
         for id_, seq in data.iteritems():
-            if sequence_type == "DNA":
+            if sequence_type == "protein":
+                sequence = skbio.Protein(seq, metadata={'id': id_})
+            elif sequence_type == "DNA":
                 sequence = skbio.DNA(seq, metadata={'id': id_})
-                skbio.io.write(sequence, format='fasta', into=f)
             else:
                 raise NotImplementedError(
-                    "pd.Series can only be converted to DNA FASTA format.")
+                    "pd.Series can only be converted to DNA or "
+                    "protein FASTA format.")
+            skbio.io.write(sequence, format='fasta', into=f)
 
 # DNA FASTA transformers
 
@@ -408,3 +412,96 @@ def _224(data: pd.DataFrame) -> DifferentialFormat:
     ff = DifferentialFormat()
     qiime2.Metadata(data).save(str(ff))
     return ff
+
+
+# Protein FASTA transformers
+
+class ProteinIterator(collections.abc.Iterable):
+    def __init__(self, generator):
+        self.generator = generator
+
+    def __iter__(self):
+        yield from self.generator
+
+
+class AlignedProteinIterator(ProteinIterator):
+    pass
+
+
+@plugin.register_transformer
+def _37(ff: ProteinFASTAFormat) -> ProteinIterator:
+    generator = _read_from_fasta(str(ff), skbio.Protein)
+    return ProteinIterator(generator)
+
+
+@plugin.register_transformer
+def _38(data: ProteinIterator) -> ProteinFASTAFormat:
+    ff = ProteinFASTAFormat()
+    skbio.io.write(iter(data), format='fasta', into=str(ff))
+    return ff
+
+
+@plugin.register_transformer
+def _39(ff: AlignedProteinFASTAFormat) -> skbio.TabularMSA:
+    return skbio.TabularMSA.read(str(ff), constructor=skbio.Protein,
+                                 format='fasta')
+
+
+@plugin.register_transformer
+def _40(data: skbio.TabularMSA) -> AlignedProteinFASTAFormat:
+    ff = AlignedProteinFASTAFormat()
+    data.write(str(ff), format='fasta')
+    return ff
+
+
+@plugin.register_transformer
+def _41(ff: ProteinFASTAFormat) -> pd.Series:
+    return _fastaformats_to_series(ff, skbio.Protein)
+
+
+@plugin.register_transformer
+def _42(ff: ProteinFASTAFormat) -> qiime2.Metadata:
+    return _fastaformats_to_metadata(ff, skbio.Protein)
+
+
+@plugin.register_transformer
+def _43(data: pd.Series) -> ProteinFASTAFormat:
+    ff = ProteinFASTAFormat()
+    _series_to_fasta_format(ff, data, "protein")
+    return ff
+
+
+@plugin.register_transformer
+def _44(ff: AlignedProteinFASTAFormat) -> AlignedProteinIterator:
+    generator = _read_from_fasta(str(ff), skbio.Protein)
+    return AlignedProteinIterator(generator)
+
+
+@plugin.register_transformer
+def _45(data: AlignedProteinIterator) -> AlignedProteinFASTAFormat:
+    ff = AlignedProteinFASTAFormat()
+    skbio.io.write(iter(data), format='fasta', into=str(ff))
+    return ff
+
+
+@plugin.register_transformer
+def _46(ff: AlignedProteinFASTAFormat) -> qiime2.Metadata:
+    return _fastaformats_to_metadata(ff, skbio.Protein)
+
+
+@plugin.register_transformer
+def _47(ff: AlignedProteinFASTAFormat) -> pd.Series:
+    return _fastaformats_to_series(ff, skbio.Protein)
+
+
+@plugin.register_transformer
+def _48(data: pd.Series) -> AlignedProteinFASTAFormat:
+    ff = AlignedProteinFASTAFormat()
+    _series_to_fasta_format(ff, data, "protein")
+    return ff
+
+
+@plugin.register_transformer
+def _49(fmt: AlignedProteinFASTAFormat) -> ProteinIterator:
+    generator = _read_from_fasta(str(fmt), skbio.Protein)
+    return ProteinIterator(generator)

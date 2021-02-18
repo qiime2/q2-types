@@ -5,7 +5,6 @@
 #
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
-
 import re
 
 import qiime2.plugin.model as model
@@ -325,11 +324,37 @@ DifferentialDirectoryFormat = model.SingleFileDirectoryFormat(
     'DifferentialDirectoryFormat', 'differentials.tsv', DifferentialFormat)
 
 
+class ProteinFASTAFormat(FASTAFormat):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.alphabet = "ABCDEFGHIKLMNPQRSTVWXYZ"
+
+
+ProteinSequencesDirectoryFormat = model.SingleFileDirectoryFormat(
+    'ProteinSequencesDirectoryFormat',
+    'protein-sequences.fasta',
+    ProteinFASTAFormat)
+
+
+class AlignedProteinFASTAFormat(AlignedFASTAFormatMixin, ProteinFASTAFormat):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        super()._turn_into_alignment()
+
+
+AlignedProteinSequencesDirectoryFormat = model.SingleFileDirectoryFormat(
+    'AlignedProteinSequencesDirectoryFormat',
+    'aligned-protein-sequences.fasta',
+    AlignedProteinFASTAFormat)
+
+
 plugin.register_formats(
     TSVTaxonomyFormat, TSVTaxonomyDirectoryFormat,
     HeaderlessTSVTaxonomyFormat, HeaderlessTSVTaxonomyDirectoryFormat,
     TaxonomyFormat, TaxonomyDirectoryFormat, DNAFASTAFormat,
     DNASequencesDirectoryFormat, PairedDNASequencesDirectoryFormat,
     AlignedDNAFASTAFormat, AlignedDNASequencesDirectoryFormat,
-    DifferentialFormat, DifferentialDirectoryFormat,
+    DifferentialFormat, DifferentialDirectoryFormat, ProteinFASTAFormat,
+    AlignedProteinFASTAFormat, ProteinSequencesDirectoryFormat,
+    AlignedProteinSequencesDirectoryFormat,
 )

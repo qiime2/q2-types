@@ -17,7 +17,9 @@ from q2_types.feature_data import (
     TSVTaxonomyDirectoryFormat, DNAFASTAFormat, DNASequencesDirectoryFormat,
     PairedDNASequencesDirectoryFormat, AlignedDNAFASTAFormat,
     AlignedDNASequencesDirectoryFormat, DifferentialDirectoryFormat,
-    FASTAFormat
+    ProteinFASTAFormat, AlignedProteinFASTAFormat, FASTAFormat,
+    AlignedProteinSequencesDirectoryFormat, ProteinSequencesDirectoryFormat
+
 )
 from qiime2.plugin.testing import TestPluginBase
 from qiime2.plugin import ValidationError
@@ -347,6 +349,66 @@ class TestDifferentialFormat(TestPluginBase):
         with self.assertRaisesRegex(ValidationError, 'numeric'):
             format = DifferentialDirectoryFormat(temp_dir, mode='r')
             format.validate()
+
+
+class TestProteinFASTAFormats(TestPluginBase):
+    package = 'q2_types.feature_data.tests'
+
+    def test_protein_fasta_format_validate_positive(self):
+        filepath = self.get_data_path('protein-sequences.fasta')
+        format = ProteinFASTAFormat(filepath, mode='r')
+
+        format.validate()
+        format.validate('min')
+
+    def test_protein_fasta_format_invalid_characters(self):
+        filepath = self.get_data_path('not-dna-sequences.fasta')
+        format = ProteinFASTAFormat(filepath, mode='r')
+
+        with self.assertRaisesRegex(
+                ValidationError, "Invalid character '1' .*0 on line 2"):
+            format.validate()
+
+    def test_protein_fasta_format_empty_file(self):
+        filepath = os.path.join(self.temp_dir.name, 'empty')
+        with open(filepath, 'w') as fh:
+            fh.write('\n')
+        format = ProteinFASTAFormat(filepath, mode='r')
+
+        format.validate()
+
+    def test_protein_sequences_directory_format(self):
+        filepath = self.get_data_path('protein-sequences.fasta')
+        shutil.copy(filepath,
+                    os.path.join(
+                        self.temp_dir.name, 'protein-sequences.fasta'))
+        format = ProteinSequencesDirectoryFormat(self.temp_dir.name, mode='r')
+
+        format.validate()
+
+    def test_aligned_protein_fasta_format_validate_positive(self):
+        filepath = self.get_data_path('aligned-protein-sequences.fasta')
+        format = AlignedProteinFASTAFormat(filepath, mode='r')
+
+        format.validate()
+        format.validate('min')
+
+    def test_aligned_protein_fasta_format_unaligned(self):
+        filepath = self.get_data_path('protein-sequences.fasta')
+        format = AlignedProteinFASTAFormat(filepath, mode='r')
+
+        with self.assertRaisesRegex(
+                ValidationError, 'line 5 was length 93.* previous .* 70'):
+            format.validate()
+
+    def test_aligned_protein_sequences_directory_format(self):
+        filepath = self.get_data_path('aligned-protein-sequences.fasta')
+        temp_dir = self.temp_dir.name
+        shutil.copy(filepath,
+                    os.path.join(temp_dir, 'aligned-protein-sequences.fasta'))
+        format = AlignedProteinSequencesDirectoryFormat(temp_dir, mode='r')
+
+        format.validate()
 
 
 if __name__ == '__main__':
