@@ -52,3 +52,4 @@ jobs:
         package-name: q2-types
         build-target: staging
         additional-tests: py.test --pyargs q2_types
+        library-token: ${{ secrets.LIBRARY_TOKEN }}
