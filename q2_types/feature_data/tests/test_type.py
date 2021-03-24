@@ -14,7 +14,8 @@ from q2_types.feature_data import (
     DifferentialDirectoryFormat, PairedDNASequencesDirectoryFormat,
     AlignedDNASequencesDirectoryFormat, ProteinSequencesDirectoryFormat,
     AlignedProteinSequencesDirectoryFormat, ProteinSequence,
-    AlignedProteinSequence
+    AlignedProteinSequence, RNASequence, RNASequencesDirectoryFormat,
+    AlignedRNASequencesDirectoryFormat, AlignedRNASequence
 )
 from qiime2.plugin.testing import TestPluginBase
 
@@ -80,6 +81,22 @@ class TestTypes(TestPluginBase):
         self.assertSemanticTypeRegisteredToFormat(
                 FeatureData[AlignedProteinSequence],
                 AlignedProteinSequencesDirectoryFormat
+        )
+
+    def test_rna_sequence_semantic_type_registration(self):
+        self.assertRegisteredSemanticType(RNASequence)
+
+    def test_aligned_rna_sequence_semantic_type_registration(self):
+        self.assertRegisteredSemanticType(AlignedRNASequence)
+
+    def test_rna_sequence_semantic_type_to_format_registration(self):
+        self.assertSemanticTypeRegisteredToFormat(
+                FeatureData[RNASequence], RNASequencesDirectoryFormat)
+
+    def test_aligned_rna_sequence_semantic_type_to_format_registration(self):
+        self.assertSemanticTypeRegisteredToFormat(
+                FeatureData[AlignedRNASequence],
+                AlignedRNASequencesDirectoryFormat
         )
 
 

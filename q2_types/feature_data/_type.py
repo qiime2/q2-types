@@ -46,7 +46,8 @@ AlignedProteinSequence = SemanticType('AlignedProteinSequence',
 plugin.register_semantic_types(FeatureData, Taxonomy, Sequence,
                                PairedEndSequence, AlignedSequence,
                                Differential, ProteinSequence,
-                               AlignedProteinSequence)
+                               AlignedProteinSequence, RNASequence,
+                               AlignedRNASequence)
 
 
 plugin.register_semantic_type_to_format(
