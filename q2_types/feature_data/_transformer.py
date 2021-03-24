@@ -255,6 +255,8 @@ def _series_to_fasta_format(ff, data, sequence_type="DNA"):
                 sequence = skbio.Protein(seq, metadata={'id': id_})
             elif sequence_type == "DNA":
                 sequence = skbio.DNA(seq, metadata={'id': id_})
+            elif sequence_type == "RNA":
+                sequence = skbio.RNA(seq, metadata={'id': id_})
             else:
                 raise NotImplementedError(
                     "pd.Series can only be converted to DNA or "
@@ -543,7 +545,7 @@ def _55(ff: RNAFASTAFormat) -> qiime2.Metadata:
 @plugin.register_transformer
 def _56(data: pd.Series) -> RNAFASTAFormat:
     ff = RNAFASTAFormat()
-    _series_to_fasta_format(ff, data, constructor=skbio.RNA)
+    _series_to_fasta_format(ff, data, sequence_type="RNA")
     return ff
 
 
@@ -573,7 +575,7 @@ def _60(ff: AlignedRNAFASTAFormat) -> pd.Series:
 @plugin.register_transformer
 def _61(data: pd.Series) -> AlignedRNAFASTAFormat:
     ff = AlignedRNAFASTAFormat()
-    _series_to_fasta_format(ff, data, constructor=skbio.RNA)
+    _series_to_fasta_format(ff, data, sequence_type="RNA")
     return ff
 
 
