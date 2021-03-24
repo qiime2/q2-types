@@ -271,11 +271,21 @@ class AlignedFASTAFormatMixin:
 class DNAFASTAFormat(FASTAFormat):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.alphabet = "ACGTURYKMSWBDHVN"
+        self.alphabet = "ACGTRYKMSWBDHVN"
 
 
 DNASequencesDirectoryFormat = model.SingleFileDirectoryFormat(
     'DNASequencesDirectoryFormat', 'dna-sequences.fasta', DNAFASTAFormat)
+
+
+class RNAFASTAFormat(FASTAFormat):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.alphabet = "ACGURYKMSWBDHVN"
+
+
+RNASequencesDirectoryFormat = model.SingleFileDirectoryFormat(
+    'RNASequencesDirectoryFormat', 'rna-sequences.fasta', RNAFASTAFormat)
 
 
 class PairedDNASequencesDirectoryFormat(model.DirectoryFormat):
@@ -294,6 +304,17 @@ class AlignedDNAFASTAFormat(AlignedFASTAFormatMixin, DNAFASTAFormat):
 AlignedDNASequencesDirectoryFormat = model.SingleFileDirectoryFormat(
     'AlignedDNASequencesDirectoryFormat', 'aligned-dna-sequences.fasta',
     AlignedDNAFASTAFormat)
+
+
+class AlignedRNAFASTAFormat(AlignedFASTAFormatMixin, RNAFASTAFormat):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        super()._turn_into_alignment()
+
+
+AlignedRNASequencesDirectoryFormat = model.SingleFileDirectoryFormat(
+    'AlignedRNASequencesDirectoryFormat', 'aligned-rna-sequences.fasta',
+    AlignedRNAFASTAFormat)
 
 
 def _construct_validator_from_alphabet(alphabet_str):
@@ -356,5 +377,7 @@ plugin.register_formats(
     AlignedDNAFASTAFormat, AlignedDNASequencesDirectoryFormat,
     DifferentialFormat, DifferentialDirectoryFormat, ProteinFASTAFormat,
     AlignedProteinFASTAFormat, ProteinSequencesDirectoryFormat,
-    AlignedProteinSequencesDirectoryFormat,
+    AlignedProteinSequencesDirectoryFormat, RNAFASTAFormat,
+    RNASequencesDirectoryFormat, AlignedRNAFASTAFormat,
+    AlignedRNASequencesDirectoryFormat
 )
