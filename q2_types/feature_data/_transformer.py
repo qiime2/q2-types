@@ -19,7 +19,8 @@ from ..feature_table import BIOMV210Format
 from . import (TaxonomyFormat, HeaderlessTSVTaxonomyFormat, TSVTaxonomyFormat,
                DNAFASTAFormat, PairedDNASequencesDirectoryFormat,
                AlignedDNAFASTAFormat, DifferentialFormat, ProteinFASTAFormat,
-               AlignedProteinFASTAFormat, RNAFASTAFormat, AlignedRNAFASTAFormat
+               AlignedProteinFASTAFormat, RNAFASTAFormat,
+               AlignedRNAFASTAFormat, PairedRNASequencesDirectoryFormat
                )
 
 
@@ -287,6 +288,10 @@ class AlignedDNAIterator(NucleicAcidIterator):
 
 
 class RNAIterator(NucleicAcidIterator):
+    pass
+
+
+class PairedRNAIterator(NucleicAcidIterator):
     pass
 
 
@@ -583,6 +588,44 @@ def _61(data: pd.Series) -> AlignedRNAFASTAFormat:
 def _62(fmt: AlignedRNAFASTAFormat) -> RNAIterator:
     generator = _read_from_fasta(str(fmt), constructor=skbio.RNA)
     return RNAIterator(generator)
+
+
+@plugin.register_transformer
+def _63(df: PairedRNASequencesDirectoryFormat) -> PairedRNAIterator:
+    left = df.left_rna_sequences.view(RNAIterator)
+    right = df.right_rna_sequences.view(RNAIterator)
+
+    def read_seqs():
+        for lseq, rseq in zip_longest(left, right):
+            if rseq is None:
+                raise ValueError('more left sequences than right sequences')
+            if lseq is None:
+                raise ValueError('more right sequences than left sequences')
+            if rseq.metadata['id'] != lseq.metadata['id']:
+                raise ValueError(lseq.metadata['id'] + ' and ' +
+                                 rseq.metadata['id'] + ' differ')
+            yield lseq, rseq
+
+    return PairedRNAIterator(read_seqs())
+
+
+@plugin.register_transformer
+def _64(data: PairedRNAIterator) -> PairedRNASequencesDirectoryFormat:
+    df = PairedRNASequencesDirectoryFormat()
+    ff_left = RNAFASTAFormat()
+    ff_right = RNAFASTAFormat()
+
+    with ff_left.open() as lfile, ff_right.open() as rfile:
+        for lseq, rseq in data:
+            if rseq.metadata['id'] != lseq.metadata['id']:
+                raise ValueError(lseq.metadata['id'] + ' and ' +
+                                 rseq.metadata['id'] + ' differ')
+            skbio.io.write(lseq, format='fasta', into=lfile)
+            skbio.io.write(rseq, format='fasta', into=rfile)
+
+    df.left_rna_sequences.write_data(ff_left, RNAFASTAFormat)
+    df.right_rna_sequences.write_data(ff_right, RNAFASTAFormat)
+    return df
 
 
 # differential types

@@ -14,7 +14,8 @@ from . import (TSVTaxonomyDirectoryFormat, DNASequencesDirectoryFormat,
                AlignedDNASequencesDirectoryFormat,
                DifferentialDirectoryFormat, ProteinSequencesDirectoryFormat,
                AlignedProteinSequencesDirectoryFormat,
-               RNASequencesDirectoryFormat, AlignedRNASequencesDirectoryFormat)
+               RNASequencesDirectoryFormat, AlignedRNASequencesDirectoryFormat,
+               PairedRNASequencesDirectoryFormat)
 
 
 FeatureData = SemanticType('FeatureData', field_names='type')
@@ -27,6 +28,9 @@ RNASequence = SemanticType('RNASequence', variant_of=FeatureData.field['type'])
 
 PairedEndSequence = SemanticType('PairedEndSequence',
                                  variant_of=FeatureData.field['type'])
+
+PairedEndRNASequence = SemanticType('PairedEndRNASequence',
+                                    variant_of=FeatureData.field['type'])
 
 AlignedSequence = SemanticType('AlignedSequence',
                                variant_of=FeatureData.field['type'])
@@ -47,7 +51,7 @@ plugin.register_semantic_types(FeatureData, Taxonomy, Sequence,
                                PairedEndSequence, AlignedSequence,
                                Differential, ProteinSequence,
                                AlignedProteinSequence, RNASequence,
-                               AlignedRNASequence)
+                               AlignedRNASequence, PairedEndRNASequence)
 
 
 plugin.register_semantic_type_to_format(
@@ -62,6 +66,9 @@ plugin.register_semantic_type_to_format(
 plugin.register_semantic_type_to_format(
     FeatureData[PairedEndSequence],
     artifact_format=PairedDNASequencesDirectoryFormat)
+plugin.register_semantic_type_to_format(
+    FeatureData[PairedEndRNASequence],
+    artifact_format=PairedRNASequencesDirectoryFormat)
 plugin.register_semantic_type_to_format(
     FeatureData[AlignedSequence],
     artifact_format=AlignedDNASequencesDirectoryFormat)

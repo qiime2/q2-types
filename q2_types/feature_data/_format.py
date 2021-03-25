@@ -295,6 +295,13 @@ class PairedDNASequencesDirectoryFormat(model.DirectoryFormat):
                                      format=DNAFASTAFormat)
 
 
+class PairedRNASequencesDirectoryFormat(model.DirectoryFormat):
+    left_rna_sequences = model.File('left-rna-sequences.fasta',
+                                    format=RNAFASTAFormat)
+    right_rna_sequences = model.File('right-rna-sequences.fasta',
+                                     format=RNAFASTAFormat)
+
+
 class AlignedDNAFASTAFormat(AlignedFASTAFormatMixin, DNAFASTAFormat):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -379,5 +386,5 @@ plugin.register_formats(
     AlignedProteinFASTAFormat, ProteinSequencesDirectoryFormat,
     AlignedProteinSequencesDirectoryFormat, RNAFASTAFormat,
     RNASequencesDirectoryFormat, AlignedRNAFASTAFormat,
-    AlignedRNASequencesDirectoryFormat
+    AlignedRNASequencesDirectoryFormat, PairedRNASequencesDirectoryFormat
 )
