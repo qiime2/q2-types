@@ -322,7 +322,7 @@ class TestNucleicAcidFASTAFormats(TestPluginBase):
 
     def test_rna_fasta_format_invalid_characters(self):
         filepath = self.get_data_path('not-rna-sequences.fasta')
-        format = DNAFASTAFormat(filepath, mode='r')
+        format = RNAFASTAFormat(filepath, mode='r')
 
         with self.assertRaisesRegex(ValidationError, "Invalid character '1' "
                                                      ".*0 on line 2"):
