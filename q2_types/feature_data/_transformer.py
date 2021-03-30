@@ -19,7 +19,9 @@ from ..feature_table import BIOMV210Format
 from . import (TaxonomyFormat, HeaderlessTSVTaxonomyFormat, TSVTaxonomyFormat,
                DNAFASTAFormat, PairedDNASequencesDirectoryFormat,
                AlignedDNAFASTAFormat, DifferentialFormat, ProteinFASTAFormat,
-               AlignedProteinFASTAFormat)
+               AlignedProteinFASTAFormat, RNAFASTAFormat,
+               AlignedRNAFASTAFormat, PairedRNASequencesDirectoryFormat
+               )
 
 
 # Taxonomy format transformers
@@ -254,6 +256,8 @@ def _series_to_fasta_format(ff, data, sequence_type="DNA"):
                 sequence = skbio.Protein(seq, metadata={'id': id_})
             elif sequence_type == "DNA":
                 sequence = skbio.DNA(seq, metadata={'id': id_})
+            elif sequence_type == "RNA":
+                sequence = skbio.RNA(seq, metadata={'id': id_})
             else:
                 raise NotImplementedError(
                     "pd.Series can only be converted to DNA or "
@@ -263,7 +267,7 @@ def _series_to_fasta_format(ff, data, sequence_type="DNA"):
 # DNA FASTA transformers
 
 
-class DNAIterator(collections.abc.Iterable):
+class NucleicAcidIterator(collections.abc.Iterable):
     def __init__(self, generator):
         self.generator = generator
 
@@ -271,14 +275,31 @@ class DNAIterator(collections.abc.Iterable):
         yield from self.generator
 
 
-class PairedDNAIterator(DNAIterator):
+class DNAIterator(NucleicAcidIterator):
     pass
 
 
-class AlignedDNAIterator(DNAIterator):
+class PairedDNAIterator(NucleicAcidIterator):
     pass
 
 
+class AlignedDNAIterator(NucleicAcidIterator):
+    pass
+
+
+class RNAIterator(NucleicAcidIterator):
+    pass
+
+
+class PairedRNAIterator(NucleicAcidIterator):
+    pass
+
+
+class AlignedRNAIterator(NucleicAcidIterator):
+    pass
+
+
+# DNA Transformers
 @plugin.register_transformer
 def _9(ff: DNAFASTAFormat) -> DNAIterator:
     generator = _read_from_fasta(str(ff), skbio.DNA)
@@ -396,24 +417,6 @@ def _36(fmt: AlignedDNAFASTAFormat) -> DNAIterator:
     return DNAIterator(generator)
 
 
-# differential types
-@plugin.register_transformer
-def _222(ff: DifferentialFormat) -> pd.DataFrame:
-    return qiime2.Metadata.load(str(ff)).to_dataframe()
-
-
-@plugin.register_transformer
-def _223(ff: DifferentialFormat) -> qiime2.Metadata:
-    return qiime2.Metadata.load(str(ff))
-
-
-@plugin.register_transformer
-def _224(data: pd.DataFrame) -> DifferentialFormat:
-    ff = DifferentialFormat()
-    qiime2.Metadata(data).save(str(ff))
-    return ff
-
-
 # Protein FASTA transformers
 
 class ProteinIterator(collections.abc.Iterable):
@@ -505,3 +508,139 @@ def _48(data: pd.Series) -> AlignedProteinFASTAFormat:
 def _49(fmt: AlignedProteinFASTAFormat) -> ProteinIterator:
     generator = _read_from_fasta(str(fmt), skbio.Protein)
     return ProteinIterator(generator)
+
+
+# RNA Transformers
+@plugin.register_transformer
+def _50(ff: RNAFASTAFormat) -> RNAIterator:
+    generator = _read_from_fasta(str(ff), constructor=skbio.RNA)
+    return RNAIterator(generator)
+
+
+@plugin.register_transformer
+def _51(data: RNAIterator) -> RNAFASTAFormat:
+    ff = RNAFASTAFormat()
+    skbio.io.write(iter(data), format='fasta', into=str(ff))
+    return ff
+
+
+@plugin.register_transformer
+def _52(ff: AlignedRNAFASTAFormat) -> skbio.TabularMSA:
+    return skbio.TabularMSA.read(str(ff), constructor=skbio.RNA,
+                                 format='fasta')
+
+
+@plugin.register_transformer
+def _53(data: skbio.TabularMSA) -> AlignedRNAFASTAFormat:
+    ff = AlignedRNAFASTAFormat()
+    data.write(str(ff), format='fasta')
+    return ff
+
+
+@plugin.register_transformer
+def _54(ff: RNAFASTAFormat) -> pd.Series:
+    return _fastaformats_to_series(ff, constructor=skbio.RNA)
+
+
+@plugin.register_transformer
+def _55(ff: RNAFASTAFormat) -> qiime2.Metadata:
+    return _fastaformats_to_metadata(ff, constructor=skbio.RNA)
+
+
+@plugin.register_transformer
+def _56(data: pd.Series) -> RNAFASTAFormat:
+    ff = RNAFASTAFormat()
+    _series_to_fasta_format(ff, data, sequence_type="RNA")
+    return ff
+
+
+@plugin.register_transformer
+def _57(ff: AlignedRNAFASTAFormat) -> AlignedRNAIterator:
+    generator = _read_from_fasta(str(ff), constructor=skbio.RNA)
+    return AlignedRNAIterator(generator)
+
+
+@plugin.register_transformer
+def _58(data: AlignedRNAIterator) -> AlignedRNAFASTAFormat:
+    ff = AlignedRNAFASTAFormat()
+    skbio.io.write(iter(data), format='fasta', into=str(ff))
+    return ff
+
+
+@plugin.register_transformer
+def _59(ff: AlignedRNAFASTAFormat) -> qiime2.Metadata:
+    return _fastaformats_to_metadata(ff, constructor=skbio.RNA)
+
+
+@plugin.register_transformer
+def _60(ff: AlignedRNAFASTAFormat) -> pd.Series:
+    return _fastaformats_to_series(ff, constructor=skbio.RNA)
+
+
+@plugin.register_transformer
+def _61(data: pd.Series) -> AlignedRNAFASTAFormat:
+    ff = AlignedRNAFASTAFormat()
+    _series_to_fasta_format(ff, data, sequence_type="RNA")
+    return ff
+
+
+@plugin.register_transformer
+def _62(fmt: AlignedRNAFASTAFormat) -> RNAIterator:
+    generator = _read_from_fasta(str(fmt), constructor=skbio.RNA)
+    return RNAIterator(generator)
+
+
+@plugin.register_transformer
+def _63(df: PairedRNASequencesDirectoryFormat) -> PairedRNAIterator:
+    left = df.left_rna_sequences.view(RNAIterator)
+    right = df.right_rna_sequences.view(RNAIterator)
+
+    def read_seqs():
+        for lseq, rseq in zip_longest(left, right):
+            if rseq is None:
+                raise ValueError('more left sequences than right sequences')
+            if lseq is None:
+                raise ValueError('more right sequences than left sequences')
+            if rseq.metadata['id'] != lseq.metadata['id']:
+                raise ValueError(lseq.metadata['id'] + ' and ' +
+                                 rseq.metadata['id'] + ' differ')
+            yield lseq, rseq
+
+    return PairedRNAIterator(read_seqs())
+
+
+@plugin.register_transformer
+def _64(data: PairedRNAIterator) -> PairedRNASequencesDirectoryFormat:
+    df = PairedRNASequencesDirectoryFormat()
+    ff_left = RNAFASTAFormat()
+    ff_right = RNAFASTAFormat()
+
+    with ff_left.open() as lfile, ff_right.open() as rfile:
+        for lseq, rseq in data:
+            if rseq.metadata['id'] != lseq.metadata['id']:
+                raise ValueError(lseq.metadata['id'] + ' and ' +
+                                 rseq.metadata['id'] + ' differ')
+            skbio.io.write(lseq, format='fasta', into=lfile)
+            skbio.io.write(rseq, format='fasta', into=rfile)
+
+    df.left_rna_sequences.write_data(ff_left, RNAFASTAFormat)
+    df.right_rna_sequences.write_data(ff_right, RNAFASTAFormat)
+    return df
+
+
+# differential types
+@plugin.register_transformer
+def _222(ff: DifferentialFormat) -> pd.DataFrame:
+    return qiime2.Metadata.load(str(ff)).to_dataframe()
+
+
+@plugin.register_transformer
+def _223(ff: DifferentialFormat) -> qiime2.Metadata:
+    return qiime2.Metadata.load(str(ff))
+
+
+@plugin.register_transformer
+def _224(data: pd.DataFrame) -> DifferentialFormat:
+    ff = DifferentialFormat()
+    qiime2.Metadata(data).save(str(ff))
+    return ff

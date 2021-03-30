@@ -16,15 +16,19 @@ from ._format import (
     AlignedDNASequencesDirectoryFormat, DifferentialFormat,
     DifferentialDirectoryFormat, FASTAFormat, AlignedFASTAFormatMixin,
     AlignedProteinSequencesDirectoryFormat, ProteinSequencesDirectoryFormat,
-    ProteinFASTAFormat, AlignedProteinFASTAFormat)
+    ProteinFASTAFormat, AlignedProteinFASTAFormat, RNASequencesDirectoryFormat,
+    RNAFASTAFormat, AlignedRNAFASTAFormat, AlignedRNASequencesDirectoryFormat,
+    PairedRNASequencesDirectoryFormat)
 from ._type import (
     FeatureData, Taxonomy, Sequence, PairedEndSequence, AlignedSequence,
-    Differential, ProteinSequence, AlignedProteinSequence)
+    Differential, ProteinSequence, AlignedProteinSequence, RNASequence,
+    AlignedRNASequence, PairedEndRNASequence)
 
 # TODO remove these imports when tests are rewritten. Remove from __all__ too
 from ._transformer import (
-    DNAIterator, PairedDNAIterator, AlignedDNAIterator,
-    ProteinIterator, AlignedProteinIterator)
+    NucleicAcidIterator, DNAIterator, PairedDNAIterator, AlignedDNAIterator,
+    ProteinIterator, AlignedProteinIterator, RNAIterator, AlignedRNAIterator,
+    PairedRNAIterator)
 
 __all__ = [
     'TaxonomyFormat', 'TaxonomyDirectoryFormat', 'HeaderlessTSVTaxonomyFormat',
@@ -33,11 +37,16 @@ __all__ = [
     'DNASequencesDirectoryFormat', 'PairedDNASequencesDirectoryFormat',
     'AlignedDNAFASTAFormat', 'AlignedDNASequencesDirectoryFormat',
     'FeatureData', 'Taxonomy', 'Sequence', 'PairedEndSequence',
-    'AlignedSequence', 'DNAIterator', 'PairedDNAIterator', 'FASTAFormat',
-    'AlignedDNAIterator', 'Differential', 'DifferentialDirectoryFormat',
-    'AlignedFASTAFormatMixin', 'ProteinFASTAFormat', 'ProteinSequence',
-    'AlignedProteinFASTAFormat', 'ProteinSequencesDirectoryFormat',
-    'AlignedProteinSequence', 'AlignedProteinSequencesDirectoryFormat',
-    'ProteinIterator', 'AlignedProteinIterator']
+    'AlignedSequence', 'NucleicAcidIterator', 'DNAIterator',
+    'PairedDNAIterator', 'FASTAFormat', 'AlignedDNAIterator', 'Differential',
+    'DifferentialDirectoryFormat', 'AlignedFASTAFormatMixin',
+    'ProteinFASTAFormat', 'ProteinSequence', 'AlignedProteinFASTAFormat',
+    'ProteinSequencesDirectoryFormat', 'AlignedProteinSequence',
+    'AlignedProteinSequencesDirectoryFormat', 'ProteinIterator',
+    'AlignedProteinIterator', 'RNAIterator', 'AlignedRNAIterator',
+    'RNAFASTAFormat', 'AlignedRNAFASTAFormat', 'RNASequencesDirectoryFormat',
+    'AlignedRNASequencesDirectoryFormat', 'RNASequence', 'AlignedRNASequence',
+    'PairedRNAIterator', 'PairedRNASequencesDirectoryFormat',
+    'PairedEndRNASequence']
 
 importlib.import_module('q2_types.feature_data._transformer')
