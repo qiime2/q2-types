@@ -336,9 +336,9 @@ class TestFastqManifestTransformers(TestPluginBase):
             for o, e in zip(obs_fh, exp_fh):
                 self.assertEqual(o, e)
 
-        obs_metadata = yaml.load(open('%s/metadata.yml' % str(obs)), 
+        obs_metadata = yaml.load(open('%s/metadata.yml' % str(obs)),
                                  Loader=yaml.SafeLoader)
-        exp_metadata = yaml.load("{'phred-offset': 33}", 
+        exp_metadata = yaml.load("{'phred-offset': 33}",
                                  Loader=yaml.SafeLoader)
         self.assertEqual(obs_metadata, exp_metadata)
 
@@ -704,7 +704,7 @@ class TestFastqManifestTransformers(TestPluginBase):
 
         obs_metadata = yaml.load(open('%s/metadata.yml' % str(obs)),
                                  Loader=yaml.SafeLoader)
-        exp_metadata = yaml.load("{'phred-offset': 33}", 
+        exp_metadata = yaml.load("{'phred-offset': 33}",
                                  Loader=yaml.SafeLoader)
         self.assertEqual(obs_metadata, exp_metadata)
 
