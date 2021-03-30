@@ -11,7 +11,7 @@ import unittest
 import pandas as pd
 
 import qiime2
-from pandas.util.testing import assert_series_equal
+from pandas.testing import assert_series_equal
 from q2_types.sample_data import AlphaDiversityFormat
 from qiime2.plugin.testing import TestPluginBase
 
