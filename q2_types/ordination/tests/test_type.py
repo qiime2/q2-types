@@ -10,7 +10,7 @@ import unittest
 
 from q2_types.ordination import (
     PCoAResults, OrdinationDirectoryFormat,
-    ProcrustesM2Statistic, ProcrustesM2StatDFmt,
+    ProcrustesStatistics, ProcrustesStatisticsDirFmt,
 )
 
 
@@ -28,11 +28,11 @@ class TestTypes(TestPluginBase):
                                                   OrdinationDirectoryFormat)
 
     def test_procrustes_m2_semantic_type_registration(self):
-        self.assertRegisteredSemanticType(ProcrustesM2Statistic)
+        self.assertRegisteredSemanticType(ProcrustesStatistics)
 
     def test_procrustes_m2_semantic_type_to_m2_fmt_registration(self):
-        self.assertSemanticTypeRegisteredToFormat(ProcrustesM2Statistic,
-                                                  ProcrustesM2StatDFmt)
+        self.assertSemanticTypeRegisteredToFormat(ProcrustesStatistics,
+                                                  ProcrustesStatisticsDirFmt)
 
 
 if __name__ == "__main__":

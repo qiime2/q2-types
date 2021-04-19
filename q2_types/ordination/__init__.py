@@ -10,14 +10,14 @@ import importlib
 
 from ._format import (
     OrdinationFormat, OrdinationDirectoryFormat,
-    ProcrustesM2StatisticFmt, ProcrustesM2StatDFmt,
+    ProcrustesStatisticsFmt, ProcrustesStatisticsDirFmt,
 )
-from ._type import PCoAResults, ProcrustesM2Statistic
+from ._type import PCoAResults, ProcrustesStatistics
 
 
 __all__ = ['OrdinationFormat', 'OrdinationDirectoryFormat',
-           'ProcrustesM2StatisticFmt', 'ProcrustesM2StatDFmt',
-           'PCoAResults', 'ProcrustesM2Statistic']
+           'ProcrustesStatisticsFmt', 'ProcrustesStatisticsDirFmt',
+           'PCoAResults', 'ProcrustesStatistics']
 
 
 importlib.import_module('q2_types.ordination._transformer')

@@ -24,7 +24,7 @@ OrdinationDirectoryFormat = model.SingleFileDirectoryFormat(
     'OrdinationDirectoryFormat', 'ordination.txt', OrdinationFormat)
 
 
-class ProcrustesM2StatisticFmt(model.TextFileFormat):
+class ProcrustesStatisticsFmt(model.TextFileFormat):
     METADATA_COLUMNS = {
         'true M^2 value',
         'p-value for true M^2 value',
@@ -44,10 +44,10 @@ class ProcrustesM2StatisticFmt(model.TextFileFormat):
                 raise ValidationError(md_exc) from md_exc
 
 
-ProcrustesM2StatDFmt = model.SingleFileDirectoryFormat(
-    'ProcrustesM2StatDFmt', 'ProcrustesM2Statistic.tsv',
-    ProcrustesM2StatisticFmt)
+ProcrustesStatisticsDirFmt = model.SingleFileDirectoryFormat(
+    'ProcrustesStatisticsDirFmt', 'ProcrustesStatistics.tsv',
+    ProcrustesStatisticsFmt)
 
 
 plugin.register_formats(OrdinationFormat, OrdinationDirectoryFormat,
-                        ProcrustesM2StatisticFmt, ProcrustesM2StatDFmt)
+                        ProcrustesStatisticsFmt, ProcrustesStatisticsDirFmt)

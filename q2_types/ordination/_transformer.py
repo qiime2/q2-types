@@ -11,7 +11,7 @@ import skbio
 import qiime2
 
 from ..plugin_setup import plugin
-from . import OrdinationFormat, ProcrustesM2StatisticFmt
+from . import OrdinationFormat, ProcrustesStatisticsFmt
 
 
 def _ordination_format_to_ordination_results(ff):
@@ -46,14 +46,14 @@ def _3(ff: OrdinationFormat) -> qiime2.Metadata:
 
 
 @plugin.register_transformer
-def _4(data: pd.DataFrame) -> ProcrustesM2StatisticFmt:
-    ff = ProcrustesM2StatisticFmt()
+def _4(data: pd.DataFrame) -> ProcrustesStatisticsFmt:
+    ff = ProcrustesStatisticsFmt()
     qiime2.Metadata(data).save(str(ff))
     return ff
 
 
 @plugin.register_transformer
-def _5(ff: ProcrustesM2StatisticFmt) -> pd.DataFrame:
+def _5(ff: ProcrustesStatisticsFmt) -> pd.DataFrame:
     df = qiime2.Metadata.load(str(ff)).to_dataframe()
     return df.astype({
         'true M^2 value': float,
@@ -63,5 +63,5 @@ def _5(ff: ProcrustesM2StatisticFmt) -> pd.DataFrame:
 
 
 @plugin.register_transformer
-def _6(ff: ProcrustesM2StatisticFmt) -> qiime2.Metadata:
+def _6(ff: ProcrustesStatisticsFmt) -> qiime2.Metadata:
     return qiime2.Metadata.load(str(ff))

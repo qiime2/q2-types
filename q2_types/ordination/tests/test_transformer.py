@@ -13,7 +13,7 @@ import pandas as pd
 import pandas.testing as pdt
 
 import qiime2
-from q2_types.ordination import OrdinationFormat, ProcrustesM2StatisticFmt
+from q2_types.ordination import OrdinationFormat, ProcrustesStatisticsFmt
 from qiime2.plugin.testing import TestPluginBase
 
 
@@ -91,7 +91,7 @@ class TestTransformers(TestPluginBase):
                'results\t1\t0.2\t300\n']
 
         transformer = self.get_transformer(pd.DataFrame,
-                                           ProcrustesM2StatisticFmt)
+                                           ProcrustesStatisticsFmt)
         fmt = transformer(input_df)
         with open(str(fmt), 'r') as fh:
             obs = fh.readlines()
@@ -100,13 +100,13 @@ class TestTransformers(TestPluginBase):
 
     def test_procrustes_m2_stats_fmt_to_df(self):
         filepath = self.get_data_path('m2stats-999-permus.tsv')
-        input_fmt = ProcrustesM2StatisticFmt(filepath, mode='r')
+        input_fmt = ProcrustesStatisticsFmt(filepath, mode='r')
         exp = pd.DataFrame({'true M^2 value': [0.0789623748362618],
                             'p-value for true M^2 value': [0.001],
                             'number of Monte Carlo permutations': [999]},
                            index=pd.Index(['results'], name='id'))
 
-        transformer = self.get_transformer(ProcrustesM2StatisticFmt,
+        transformer = self.get_transformer(ProcrustesStatisticsFmt,
                                            pd.DataFrame)
         obs = transformer(input_fmt)
 
@@ -114,14 +114,14 @@ class TestTransformers(TestPluginBase):
 
     def test_procrustes_m2_stats_fmt_to_md(self):
         filepath = self.get_data_path('m2stats-999-permus.tsv')
-        input_fmt = ProcrustesM2StatisticFmt(filepath, mode='r')
+        input_fmt = ProcrustesStatisticsFmt(filepath, mode='r')
         df = pd.DataFrame({'true M^2 value': [0.0789623748362618],
                            'p-value for true M^2 value': [0.001],
                            'number of Monte Carlo permutations': [999]},
                           index=pd.Index(['results'], name='id'))
         exp = qiime2.Metadata(df)
 
-        transformer = self.get_transformer(ProcrustesM2StatisticFmt,
+        transformer = self.get_transformer(ProcrustesStatisticsFmt,
                                            qiime2.Metadata)
         obs = transformer(input_fmt)
 
