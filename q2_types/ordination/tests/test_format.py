@@ -10,7 +10,9 @@ import os
 import shutil
 import unittest
 
-from q2_types.ordination import OrdinationFormat, OrdinationDirectoryFormat
+from q2_types.ordination import (
+    OrdinationFormat, OrdinationDirectoryFormat,
+    ProcrustesM2StatisticFmt, ProcrustesM2StatDFmt)
 from qiime2.plugin.testing import TestPluginBase
 from qiime2.plugin import ValidationError
 
@@ -38,6 +40,27 @@ class TestFormats(TestPluginBase):
         format = OrdinationDirectoryFormat(self.temp_dir.name, mode='r')
 
         format.validate()
+
+    def test_m2_stats_fmt_positive(self):
+        filepath = self.get_data_path('m2stats-999-permus.tsv')
+        format = ProcrustesM2StatisticFmt(filepath, mode='r')
+
+        format.validate(level='max')
+
+        # If we made it this far, congrats!
+        self.assertTrue(True)
+
+    def test_m2_stats_dir_fmt_positive(self):
+        filepath = self.get_data_path('m2stats-999-permus.tsv')
+        shutil.copy(filepath,
+                    os.path.join(self.temp_dir.name,
+                                 'ProcrustesM2Statistic.tsv'))
+        format = ProcrustesM2StatDFmt(self.temp_dir.name, mode='r')
+
+        format.validate(level='max')
+
+        # If we made it this far, congrats!
+        self.assertTrue(True)
 
 
 if __name__ == "__main__":

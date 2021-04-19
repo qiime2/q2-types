@@ -8,12 +8,16 @@
 
 import importlib
 
-from ._format import OrdinationFormat, OrdinationDirectoryFormat
-from ._type import PCoAResults
+from ._format import (
+    OrdinationFormat, OrdinationDirectoryFormat,
+    ProcrustesM2StatisticFmt, ProcrustesM2StatDFmt,
+)
+from ._type import PCoAResults, ProcrustesM2Statistic
 
 
 __all__ = ['OrdinationFormat', 'OrdinationDirectoryFormat',
-           'PCoAResults']
+           'ProcrustesM2StatisticFmt', 'ProcrustesM2StatDFmt',
+           'PCoAResults', 'ProcrustesM2Statistic']
 
 
 importlib.import_module('q2_types.ordination._transformer')

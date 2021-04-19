@@ -1,0 +1,3 @@
+id	true M^2 value	p-value for true M^2 value	number of Monte Carlo permutations
+#q2:types	numeric	numeric	numeric
+results	0.0789623748362618	0.001	999

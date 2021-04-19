@@ -54,7 +54,12 @@ def _4(data: pd.DataFrame) -> ProcrustesM2StatisticFmt:
 
 @plugin.register_transformer
 def _5(ff: ProcrustesM2StatisticFmt) -> pd.DataFrame:
-    return qiime2.Metadata.load(str(ff)).to_dataframe()
+    df = qiime2.Metadata.load(str(ff)).to_dataframe()
+    return df.astype({
+        'true M^2 value': float,
+        'p-value for true M^2 value': float,
+        'number of Monte Carlo permutations': int,
+    }, copy=True, errors='raise')
 
 
 @plugin.register_transformer

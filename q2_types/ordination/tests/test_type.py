@@ -8,7 +8,12 @@
 
 import unittest
 
-from q2_types.ordination import PCoAResults, OrdinationDirectoryFormat
+from q2_types.ordination import (
+    PCoAResults, OrdinationDirectoryFormat,
+    ProcrustesM2Statistic, ProcrustesM2StatDFmt,
+)
+
+
 from qiime2.plugin.testing import TestPluginBase
 
 
@@ -21,6 +26,13 @@ class TestTypes(TestPluginBase):
     def test_pcoa_results_semantic_type_to_ordination_fmt_registration(self):
         self.assertSemanticTypeRegisteredToFormat(PCoAResults,
                                                   OrdinationDirectoryFormat)
+
+    def test_procrustes_m2_semantic_type_registration(self):
+        self.assertRegisteredSemanticType(ProcrustesM2Statistic)
+
+    def test_procrustes_m2_semantic_type_to_m2_fmt_registration(self):
+        self.assertSemanticTypeRegisteredToFormat(ProcrustesM2Statistic,
+                                                  ProcrustesM2StatDFmt)
 
 
 if __name__ == "__main__":
