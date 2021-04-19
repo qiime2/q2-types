@@ -9,13 +9,21 @@
 from qiime2.plugin import SemanticType
 
 from ..plugin_setup import plugin
-from . import OrdinationDirectoryFormat
+from . import OrdinationDirectoryFormat, ProcrustesStatisticsDirFmt
 
 
 PCoAResults = SemanticType('PCoAResults')
 
-plugin.register_semantic_types(PCoAResults)
+ProcrustesStatistics = SemanticType('ProcrustesStatistics')
+
+plugin.register_semantic_types(PCoAResults, ProcrustesStatistics)
 plugin.register_semantic_type_to_format(
     PCoAResults,
     artifact_format=OrdinationDirectoryFormat
+)
+
+plugin.register_semantic_type_to_format(
+    ProcrustesStatistics,
+
+    artifact_format=ProcrustesStatisticsDirFmt
 )

@@ -6,8 +6,10 @@
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
 
+import qiime2
 import skbio.io
 import qiime2.plugin.model as model
+from qiime2.plugin import ValidationError
 
 from ..plugin_setup import plugin
 
@@ -22,4 +24,30 @@ OrdinationDirectoryFormat = model.SingleFileDirectoryFormat(
     'OrdinationDirectoryFormat', 'ordination.txt', OrdinationFormat)
 
 
-plugin.register_formats(OrdinationFormat, OrdinationDirectoryFormat)
+class ProcrustesStatisticsFmt(model.TextFileFormat):
+    METADATA_COLUMNS = {
+        'true M^2 value',
+        'p-value for true M^2 value',
+        'number of Monte Carlo permutations',
+    }
+
+    def validate(self, level):
+        try:
+            md = qiime2.Metadata.load(str(self))
+        except qiime2.metadata.MetadataFileError as md_exc:
+            raise ValidationError(md_exc) from md_exc
+
+        for column in sorted(self.METADATA_COLUMNS):
+            try:
+                md.get_column(column)
+            except ValueError as md_exc:
+                raise ValidationError(md_exc) from md_exc
+
+
+ProcrustesStatisticsDirFmt = model.SingleFileDirectoryFormat(
+    'ProcrustesStatisticsDirFmt', 'ProcrustesStatistics.tsv',
+    ProcrustesStatisticsFmt)
+
+
+plugin.register_formats(OrdinationFormat, OrdinationDirectoryFormat,
+                        ProcrustesStatisticsFmt, ProcrustesStatisticsDirFmt)
