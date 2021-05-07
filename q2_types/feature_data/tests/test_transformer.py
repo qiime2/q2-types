@@ -23,7 +23,7 @@ from q2_types.feature_data import (
     PairedDNASequencesDirectoryFormat, AlignedDNAFASTAFormat,
     DifferentialFormat, AlignedDNAIterator, ProteinFASTAFormat,
     AlignedProteinFASTAFormat, RNAFASTAFormat, AlignedRNAFASTAFormat,
-    RNAIterator, AlignedRNAIterator
+    RNAIterator, AlignedRNAIterator, BLAST6Format
 )
 from q2_types.feature_data._transformer import (
     _taxonomy_formats_to_dataframe, _dataframe_to_tsv_taxonomy_format,
@@ -1162,6 +1162,37 @@ class TestProteinFASTAFormatTransformers(TestPluginBase):
 
         for observed, expected in zip(obs, exp):
             self.assertEqual(observed, expected)
+
+
+class TestBLAST6Transformer(TestPluginBase):
+    package = 'q2_types.feature_data.tests'
+
+    def test_blast6_to_df(self):
+
+        _, obs = self.transform_format(BLAST6Format, pd.DataFrame,
+                                       filename='blast6.tsv')
+        self.assertEqual(obs.shape[0], 2)
+        self.assertListEqual(obs.columns.tolist(), [
+            'qseqid', 'sseqid', 'pident', 'length', 'mismatch', 'gapopen',
+            'qstart', 'qend', 'sstart', 'send', 'evalue', 'bitscore'])
+        self.assertListEqual(obs['pident'].tolist(), [100.0, 99.38])
+        self.assertListEqual(obs['mismatch'].tolist(), [0.0, 1.0])
+        self.assertListEqual(obs['bitscore'].tolist(), [330.0, 329.0])
+
+    def test_df_to_blast6(self):
+        transformer = self.get_transformer(pd.DataFrame, BLAST6Format)
+
+        columns = [
+            'qseqid', 'sseqid', 'pident', 'length', 'mismatch', 'gapopen',
+            'qstart', 'qend', 'sstart', 'send', 'evalue', 'bitscore']
+        data = [
+            ['moaC', 'gi|15800534|ref|NP_286546.1|', 100.0, 161.0, 0.0, 0.0,
+                1.0, 161.0, 1.0, 161.0, 2e-114, 330.0],
+            ['moaC', 'gi|170768970|ref|ZP_02903423.1|', 99.38, 161.0, 1.0,
+                0.0, 1.0, 161.0, 1.0, 161.0, 8e-114, 329.0]]
+        input = pd.DataFrame(data=data, columns=columns)
+        obs = transformer(input)
+        self.assertIsInstance(obs, BLAST6Format)
 
 
 if __name__ == '__main__':

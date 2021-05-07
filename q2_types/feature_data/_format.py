@@ -7,6 +7,9 @@
 # ----------------------------------------------------------------------------
 import re
 
+import pandas as pd
+import skbio
+
 import qiime2.plugin.model as model
 from qiime2.plugin import ValidationError
 import qiime2
@@ -376,6 +379,21 @@ AlignedProteinSequencesDirectoryFormat = model.SingleFileDirectoryFormat(
     AlignedProteinFASTAFormat)
 
 
+class BLAST6Format(model.TextFileFormat):
+    def validate(self, *args):
+        try:
+            _ = skbio.read(str(self), format='blast+6', into=pd.DataFrame,
+                           default_columns=True)
+        except pd.errors.EmptyDataError:
+            raise ValidationError('BLAST6 file is empty.')
+        except ValueError:
+            raise ValidationError('Invalid BLAST6 format.')
+
+
+BLAST6DirectoryFormat = model.SingleFileDirectoryFormat(
+    'BLAST6DirectoryFormat', 'blast6.tsv', BLAST6Format)
+
+
 plugin.register_formats(
     TSVTaxonomyFormat, TSVTaxonomyDirectoryFormat,
     HeaderlessTSVTaxonomyFormat, HeaderlessTSVTaxonomyDirectoryFormat,
@@ -386,5 +404,6 @@ plugin.register_formats(
     AlignedProteinFASTAFormat, ProteinSequencesDirectoryFormat,
     AlignedProteinSequencesDirectoryFormat, RNAFASTAFormat,
     RNASequencesDirectoryFormat, AlignedRNAFASTAFormat,
-    AlignedRNASequencesDirectoryFormat, PairedRNASequencesDirectoryFormat
+    AlignedRNASequencesDirectoryFormat, PairedRNASequencesDirectoryFormat,
+    BLAST6Format, BLAST6DirectoryFormat
 )

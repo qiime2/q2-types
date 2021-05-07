@@ -16,7 +16,8 @@ from q2_types.feature_data import (
     AlignedProteinSequencesDirectoryFormat, ProteinSequence,
     AlignedProteinSequence, RNASequence, RNASequencesDirectoryFormat,
     AlignedRNASequencesDirectoryFormat, AlignedRNASequence,
-    PairedRNASequencesDirectoryFormat, PairedEndRNASequence
+    PairedRNASequencesDirectoryFormat, PairedEndRNASequence,
+    BLAST6, BLAST6DirectoryFormat
 )
 from qiime2.plugin.testing import TestPluginBase
 
@@ -109,6 +110,13 @@ class TestTypes(TestPluginBase):
                 FeatureData[AlignedRNASequence],
                 AlignedRNASequencesDirectoryFormat
         )
+
+    def test_blast6_semantic_type_registration(self):
+        self.assertRegisteredSemanticType(BLAST6)
+
+    def test_blast6_semantic_type_to_format_registration(self):
+        self.assertSemanticTypeRegisteredToFormat(
+                FeatureData[BLAST6], BLAST6DirectoryFormat)
 
 
 if __name__ == "__main__":

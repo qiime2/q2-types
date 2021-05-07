@@ -20,7 +20,7 @@ from q2_types.feature_data import (
     ProteinFASTAFormat, AlignedProteinFASTAFormat, FASTAFormat,
     AlignedProteinSequencesDirectoryFormat, ProteinSequencesDirectoryFormat,
     RNAFASTAFormat, RNASequencesDirectoryFormat, AlignedRNAFASTAFormat,
-    AlignedRNASequencesDirectoryFormat
+    AlignedRNASequencesDirectoryFormat, BLAST6DirectoryFormat
 )
 from qiime2.plugin.testing import TestPluginBase
 from qiime2.plugin import ValidationError
@@ -536,6 +536,31 @@ class TestProteinFASTAFormats(TestPluginBase):
         format = AlignedProteinSequencesDirectoryFormat(temp_dir, mode='r')
 
         format.validate()
+
+
+class TestBLAST6Format(TestPluginBase):
+    package = 'q2_types.feature_data.tests'
+
+    def test_blast6_format(self):
+        filepath = self.get_data_path('blast6.tsv')
+        temp_dir = self.temp_dir.name
+        shutil.copy(filepath, os.path.join(temp_dir, 'blast6.tsv'))
+        format = BLAST6DirectoryFormat(temp_dir, mode='r')
+        format.validate()
+        self.assertTrue(True)
+
+    def test_blast6_format_empty(self):
+        temp_dir = self.temp_dir.name
+        open(os.path.join(temp_dir, 'blast6.tsv'), 'w').close()
+        with self.assertRaisesRegex(ValidationError, 'BLAST6 file is empty.'):
+            BLAST6DirectoryFormat(temp_dir, mode='r').validate()
+
+    def test_blast6_format_invalid(self):
+        filepath = self.get_data_path('blast6_invalid.tsv')
+        temp_dir = self.temp_dir.name
+        shutil.copy(filepath, os.path.join(temp_dir, 'blast6.tsv'))
+        with self.assertRaisesRegex(ValidationError, 'Invalid BLAST6 format.'):
+            BLAST6DirectoryFormat(temp_dir, mode='r').validate()
 
 
 if __name__ == '__main__':
