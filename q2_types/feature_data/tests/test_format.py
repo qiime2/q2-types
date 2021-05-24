@@ -40,6 +40,7 @@ class TestTaxonomyFormats(TestPluginBase):
 
         for filepath in filepaths:
             format = TaxonomyFormat(filepath, mode='r')
+
             format.validate()
 
     def test_taxonomy_format_validate_negative(self):
@@ -137,6 +138,7 @@ class TestTaxonomyFormats(TestPluginBase):
                     os.path.join(self.temp_dir.name, 'taxonomy.tsv'))
 
         format = TSVTaxonomyDirectoryFormat(self.temp_dir.name, mode='r')
+
         format.validate()
 
     def test_tsv_taxonomy_format_column_header_lengths(self):

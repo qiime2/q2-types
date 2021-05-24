@@ -10,8 +10,10 @@ import unittest
 
 from q2_types.feature_data import (
     FeatureData, Taxonomy, Sequence, PairedEndSequence, AlignedSequence,
-    Differential, TSVTaxonomyDirectoryFormat, DNASequencesDirectoryFormat,
-    DifferentialDirectoryFormat, PairedDNASequencesDirectoryFormat,
+    Differential, MonteCarloTensor,
+    TSVTaxonomyDirectoryFormat, DNASequencesDirectoryFormat,
+    DifferentialDirectoryFormat, MonteCarloTensorDirectoryFormat,
+    PairedDNASequencesDirectoryFormat,
     AlignedDNASequencesDirectoryFormat, ProteinSequencesDirectoryFormat,
     AlignedProteinSequencesDirectoryFormat, ProteinSequence,
     AlignedProteinSequence, RNASequence, RNASequencesDirectoryFormat,
@@ -40,7 +42,10 @@ class TestTypes(TestPluginBase):
         self.assertRegisteredSemanticType(AlignedSequence)
 
     def test_differential_semantic_type_registration(self):
-        self.assertRegisteredSemanticType(AlignedSequence)
+        self.assertRegisteredSemanticType(Differential)
+
+    def test_monte_carlo_tensor_semantic_type_registration(self):
+        self.assertRegisteredSemanticType(MonteCarloTensor)
 
     def test_protein_sequence_semantic_type_registration(self):
         self.assertRegisteredSemanticType(ProteinSequence)
@@ -51,6 +56,10 @@ class TestTypes(TestPluginBase):
     def test_differential_semantic_type_to_format_registration(self):
         self.assertSemanticTypeRegisteredToFormat(
                 FeatureData[Differential], DifferentialDirectoryFormat)
+
+    def test_monte_carlo_tensor_semantic_type_to_format_registration(self):
+        self.assertSemanticTypeRegisteredToFormat(
+                MonteCarloTensor, MonteCarloTensorDirectoryFormat)
 
     def test_taxonomy_semantic_type_to_format_registration(self):
         self.assertSemanticTypeRegisteredToFormat(

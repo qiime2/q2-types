@@ -14,14 +14,16 @@ import pandas.errors
 import biom
 import skbio
 import qiime2
-
+import arviz as az
+import numpy as np
 from pandas.testing import assert_frame_equal, assert_series_equal
 from q2_types.feature_table import BIOMV210Format
 from q2_types.feature_data import (
     TaxonomyFormat, HeaderlessTSVTaxonomyFormat, TSVTaxonomyFormat,
     DNAFASTAFormat, DNAIterator, PairedDNAIterator,
     PairedDNASequencesDirectoryFormat, AlignedDNAFASTAFormat,
-    DifferentialFormat, AlignedDNAIterator, ProteinFASTAFormat,
+    DifferentialFormat, MonteCarloTensorFormat,
+    AlignedDNAIterator, ProteinFASTAFormat,
     AlignedProteinFASTAFormat, RNAFASTAFormat, AlignedRNAFASTAFormat,
     RNAIterator, AlignedRNAIterator
 )
@@ -963,6 +965,26 @@ class TestDifferentialTransformer(TestPluginBase):
         obs = transformer(input)
 
         self.assertIsInstance(obs, DifferentialFormat)
+
+
+class TestMonteCarloTensorTransformer(TestPluginBase):
+    package = 'q2_types.feature_data.tests'
+
+    def test_monte_carlo_tensor_to_infdata(self):
+        # check if object can be loaded
+        input, obs = self.transform_format(
+            MonteCarloTensorFormat, az.InferenceData,
+            filename='monte-carlo-samples.az')
+        exp = az.InferenceData.from_netcdf(str(input))
+        self.assertEqual(exp.to_dataframe().shape,
+                         obs.to_dataframe().shape)
+
+    def test_infdata_to_monte_carlo_tensor(self):
+        transformer = self.get_transformer(
+            az.InferenceData, MonteCarloTensorFormat)
+        input = az.convert_to_inference_data(np.random.randn(100))
+        obs = transformer(input)
+        self.assertIsInstance(obs, MonteCarloTensorFormat)
 
 
 class TestProteinFASTAFormatTransformers(TestPluginBase):
