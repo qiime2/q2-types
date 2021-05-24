@@ -21,7 +21,7 @@ from q2_types.feature_data import (
     AlignedProteinSequencesDirectoryFormat, ProteinSequencesDirectoryFormat,
     RNAFASTAFormat, RNASequencesDirectoryFormat, AlignedRNAFASTAFormat,
     AlignedRNASequencesDirectoryFormat,
-    MonteCarloTensor, MonteCarloTensorDirectoryFormat
+    MonteCarloTensorDirectoryFormat
 )
 from qiime2.plugin.testing import TestPluginBase
 from qiime2.plugin import ValidationError
@@ -539,59 +539,6 @@ class TestProteinFASTAFormats(TestPluginBase):
         format.validate()
 
 
-class TestDifferentialFormat(TestPluginBase):
-    package = 'q2_types.feature_data.tests'
-
-    def test_differential_format(self):
-        filepath = self.get_data_path('differentials.tsv')
-        temp_dir = self.temp_dir.name
-        shutil.copy(filepath,
-                    os.path.join(temp_dir, 'differentials.tsv'))
-        format = DifferentialDirectoryFormat(temp_dir, mode='r')
-
-        format.validate()
-
-    def test_differential_format_empty(self):
-        filepath = self.get_data_path('empty_differential.tsv')
-        temp_dir = self.temp_dir.name
-        shutil.copy(filepath,
-                    os.path.join(temp_dir, 'empty_differential.tsv'))
-        format = DifferentialDirectoryFormat(temp_dir, mode='r')
-
-        with self.assertRaisesRegex(ValidationError, 'Differential'):
-            format.validate()
-
-    def test_differential_format_bad(self):
-        filepath = self.get_data_path('bad_differential.tsv')
-        temp_dir = self.temp_dir.name
-        shutil.copy(filepath,
-                    os.path.join(temp_dir, 'bad_differential.tsv'))
-        format = DifferentialDirectoryFormat(temp_dir, mode='r')
-
-        with self.assertRaisesRegex(ValidationError, 'Differential'):
-            format.validate()
-
-    def test_differential_format_inf(self):
-        filepath = self.get_data_path('inf_differential.tsv')
-        temp_dir = self.temp_dir.name
-        shutil.copy(filepath,
-                    os.path.join(temp_dir, 'inf_differential.tsv'))
-        format = DifferentialDirectoryFormat(temp_dir, mode='r')
-
-        with self.assertRaisesRegex(ValidationError, 'Differential'):
-            format.validate()
-
-    def test_differential_format_nan(self):
-        filepath = self.get_data_path('nan_differential.tsv')
-        temp_dir = self.temp_dir.name
-        shutil.copy(filepath,
-                    os.path.join(temp_dir, 'nan_differential.tsv'))
-        format = DifferentialDirectoryFormat(temp_dir, mode='r')
-
-        with self.assertRaisesRegex(ValidationError, 'Differential'):
-            format.validate()
-
-
 class TestMonteCarloTensorFormat(TestPluginBase):
 
     package = 'q2_types.feature_data.tests'
@@ -610,7 +557,6 @@ class TestMonteCarloTensorFormat(TestPluginBase):
                     os.path.join(temp_dir, 'monte-carlo-samples.az'))
         format = MonteCarloTensorDirectoryFormat(temp_dir, mode='r')
         format.validate()
-
 
     def test_monte_carlo_format_bad(self):
         filepath = self.get_data_path('nan_differential.tsv')

@@ -12,7 +12,7 @@ from ..plugin_setup import plugin
 from . import (TSVTaxonomyDirectoryFormat, DNASequencesDirectoryFormat,
                PairedDNASequencesDirectoryFormat,
                AlignedDNASequencesDirectoryFormat,
-               MonteCarloTensorFormat, MonteCarloTensorDirectoryFormat,
+               MonteCarloTensorDirectoryFormat,
                DifferentialDirectoryFormat, ProteinSequencesDirectoryFormat,
                AlignedProteinSequencesDirectoryFormat,
                RNASequencesDirectoryFormat, AlignedRNASequencesDirectoryFormat,
@@ -36,17 +36,9 @@ PairedEndRNASequence = SemanticType('PairedEndRNASequence',
 AlignedSequence = SemanticType('AlignedSequence',
                                variant_of=FeatureData.field['type'])
 
-<<<<<<< HEAD
-Differential = SemanticType('Differential',
-                            variant_of=FeatureData.field['type'])
-
 MonteCarloTensor = SemanticType('MonteCarloTensor')
 
 
-plugin.register_semantic_types(FeatureData, Taxonomy, Sequence,
-                               PairedEndSequence, AlignedSequence,
-                               Differential, MonteCarloTensor)
-=======
 AlignedRNASequence = SemanticType('AlignedRNASequence',
                                   variant_of=FeatureData.field['type'])
 
@@ -61,10 +53,10 @@ AlignedProteinSequence = SemanticType('AlignedProteinSequence',
 
 plugin.register_semantic_types(FeatureData, Taxonomy, Sequence,
                                PairedEndSequence, AlignedSequence,
-                               Differential, ProteinSequence,
+                               Differential, MonteCarloTensor,
+                               ProteinSequence,
                                AlignedProteinSequence, RNASequence,
                                AlignedRNASequence, PairedEndRNASequence)
->>>>>>> 623c9aad86e777c1029ff286697e7d532a101258
 
 
 plugin.register_semantic_type_to_format(
@@ -89,6 +81,7 @@ plugin.register_semantic_type_to_format(
     FeatureData[Differential], DifferentialDirectoryFormat)
 plugin.register_semantic_type_to_format(
     MonteCarloTensor, MonteCarloTensorDirectoryFormat)
+plugin.register_semantic_type_to_format(
     FeatureData[AlignedRNASequence],
     artifact_format=AlignedRNASequencesDirectoryFormat)
 plugin.register_semantic_type_to_format(
@@ -99,4 +92,3 @@ plugin.register_semantic_type_to_format(
 plugin.register_semantic_type_to_format(
     FeatureData[AlignedProteinSequence],
     artifact_format=AlignedProteinSequencesDirectoryFormat)
->>>>>>> 623c9aad86e777c1029ff286697e7d532a101258

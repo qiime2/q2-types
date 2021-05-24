@@ -18,7 +18,7 @@ from ..plugin_setup import plugin
 from ..feature_table import BIOMV210Format
 from . import (TaxonomyFormat, HeaderlessTSVTaxonomyFormat, TSVTaxonomyFormat,
                DNAFASTAFormat, PairedDNASequencesDirectoryFormat,
-               MonteCarloTensorFormat, MonteCarloTensorDirectoryFormat
+               MonteCarloTensorFormat,
                AlignedDNAFASTAFormat, DifferentialFormat, ProteinFASTAFormat,
                AlignedProteinFASTAFormat, RNAFASTAFormat,
                AlignedRNAFASTAFormat, PairedRNASequencesDirectoryFormat
@@ -634,9 +634,11 @@ def _64(data: PairedRNAIterator) -> PairedRNASequencesDirectoryFormat:
 def _222(ff: DifferentialFormat) -> pd.DataFrame:
     return qiime2.Metadata.load(str(ff)).to_dataframe()
 
+
 @plugin.register_transformer
 def _223(ff: DifferentialFormat) -> qiime2.Metadata:
     return qiime2.Metadata.load(str(ff))
+
 
 @plugin.register_transformer
 def _224(data: pd.DataFrame) -> DifferentialFormat:
@@ -644,9 +646,11 @@ def _224(data: pd.DataFrame) -> DifferentialFormat:
     qiime2.Metadata(data).save(str(ff))
     return ff
 
+
 @plugin.register_transformer
 def _225(ff: MonteCarloTensorFormat) -> az.InferenceData:
     return az.InferenceData.from_netcdf(str(ff))
+
 
 @plugin.register_transformer
 def _226(obj: az.InferenceData) -> MonteCarloTensorFormat:

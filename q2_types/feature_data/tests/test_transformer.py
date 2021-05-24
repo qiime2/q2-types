@@ -928,43 +928,6 @@ class TestRNAFASTAFormatTransformers(TestPluginBase):
             self.assertEqual(observed, expected)
 
 
-class TestDifferentialTransformer(TestPluginBase):
-    package = 'q2_types.feature_data.tests'
-
-    def test_differential_to_df(self):
-
-        _, obs = self.transform_format(DifferentialFormat, pd.DataFrame,
-                                       filename='differentials.tsv')
-
-        # sniff to see if the first 4 feature ids are the same
-        exp = ['F0', 'F1', 'F2', 'F3']
-        obs = list(obs.index[:4])
-        self.assertListEqual(exp, obs)
-
-    def test_differential_to_md(self):
-
-        _, obs = self.transform_format(DifferentialFormat, qiime2.Metadata,
-                                       filename='differentials.tsv')
-        obs = obs.to_dataframe()
-        # sniff to see if the first 4 feature ids are the same
-        exp = ['F0', 'F1', 'F2', 'F3']
-        obs = list(obs.index[:4])
-        self.assertListEqual(exp, obs)
-
-    def test_df_to_differential(self):
-        transformer = self.get_transformer(pd.DataFrame, DifferentialFormat)
-
-        index = pd.Index(['SEQUENCE1', 'SEQUENCE2', 'SEQUENCE3'])
-        index.name = 'featureid'
-        input = pd.DataFrame(
-            [-1.3, 0.1, 1.2], index=index, columns=['differential'],
-            dtype=float)
-
-        obs = transformer(input)
-
-        self.assertIsInstance(obs, DifferentialFormat)
-
-
 class TestProteinFASTAFormatTransformers(TestPluginBase):
     package = 'q2_types.feature_data.tests'
 
