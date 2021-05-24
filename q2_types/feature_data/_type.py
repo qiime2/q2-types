@@ -78,8 +78,6 @@ plugin.register_semantic_type_to_format(
     FeatureData[AlignedSequence],
     artifact_format=AlignedDNASequencesDirectoryFormat)
 plugin.register_semantic_type_to_format(
-    FeatureData[Differential], DifferentialDirectoryFormat)
-plugin.register_semantic_type_to_format(
     MonteCarloTensor, MonteCarloTensorDirectoryFormat)
 plugin.register_semantic_type_to_format(
     FeatureData[AlignedRNASequence],
