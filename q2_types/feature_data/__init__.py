@@ -13,11 +13,13 @@ from ._format import (
     HeaderlessTSVTaxonomyDirectoryFormat, TSVTaxonomyFormat,
     TSVTaxonomyDirectoryFormat, DNAFASTAFormat, DNASequencesDirectoryFormat,
     PairedDNASequencesDirectoryFormat, AlignedDNAFASTAFormat,
-    AlignedDNASequencesDirectoryFormat, DifferentialFormat,
-    DifferentialDirectoryFormat)
+    AlignedDNASequencesDirectoryFormat,
+    DifferentialFormat, DifferentialDirectoryFormat,
+    MonteCarloTensorFormat, MonteCarloTensorDirectoryFormat
+)
 from ._type import (
     FeatureData, Taxonomy, Sequence, PairedEndSequence, AlignedSequence,
-    Differential)
+    Differential, MonteCarloTensor)
 
 # TODO remove these imports when tests are rewritten. Remove from __all__ too
 from ._transformer import DNAIterator, PairedDNAIterator, AlignedDNAIterator
@@ -30,6 +32,8 @@ __all__ = [
     'AlignedDNAFASTAFormat', 'AlignedDNASequencesDirectoryFormat',
     'FeatureData', 'Taxonomy', 'Sequence', 'PairedEndSequence',
     'AlignedSequence', 'DNAIterator', 'PairedDNAIterator',
-    'AlignedDNAIterator', 'Differential', 'DifferentialDirectoryFormat']
+    'AlignedDNAIterator', 'Differential', 'DifferentialDirectoryFormat',
+    'MonteCarloTensor', 'MonteCarloTensorDirectoryFormat'
+]
 
 importlib.import_module('q2_types.feature_data._transformer')

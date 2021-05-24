@@ -16,10 +16,13 @@ from q2_types.feature_data import (
     HeaderlessTSVTaxonomyDirectoryFormat, TSVTaxonomyFormat,
     TSVTaxonomyDirectoryFormat, DNAFASTAFormat, DNASequencesDirectoryFormat,
     PairedDNASequencesDirectoryFormat, AlignedDNAFASTAFormat,
-    AlignedDNASequencesDirectoryFormat, DifferentialDirectoryFormat
+    AlignedDNASequencesDirectoryFormat, DifferentialDirectoryFormat,
+    MonteCarloTensorDirectoryFormat
 )
 from qiime2.plugin.testing import TestPluginBase
 from qiime2.plugin import ValidationError
+import arviz as az
+import numpy as np
 
 
 class TestTaxonomyFormats(TestPluginBase):
@@ -33,7 +36,6 @@ class TestTaxonomyFormats(TestPluginBase):
 
         for filepath in filepaths:
             format = TaxonomyFormat(filepath, mode='r')
-
             format.validate()
 
     def test_taxonomy_format_validate_negative(self):
@@ -252,6 +254,36 @@ class TestDifferentialFormat(TestPluginBase):
         format = DifferentialDirectoryFormat(temp_dir, mode='r')
 
         with self.assertRaisesRegex(ValidationError, 'Differential'):
+            format.validate()
+
+
+class TestMonteCarloTensorFormat(TestPluginBase):
+
+    package = 'q2_types.feature_data.tests'
+
+    def test_monte_carlo_format(self):
+        # Note that this file is empty, we are using it as a
+        # placeholder to place the az Inference object
+        filepath = self.get_data_path('monte-carlo-samples.az')
+
+        size = 100
+        dataset = az.convert_to_inference_data(np.random.randn(size))
+        dataset.to_netcdf(filepath)
+
+        temp_dir = self.temp_dir.name
+        shutil.copy(filepath,
+                    os.path.join(temp_dir, 'monte-carlo-samples.az'))
+        format = MonteCarloTensorDirectoryFormat(temp_dir, mode='r')
+        format.validate()
+
+
+    def test_monte_carlo_format_bad(self):
+        filepath = self.get_data_path('nan_differential.tsv')
+        temp_dir = self.temp_dir.name
+        shutil.copy(filepath,
+                    os.path.join(temp_dir, 'nan_differential.tsv'))
+        format = MonteCarloTensorDirectoryFormat(temp_dir, mode='r')
+        with self.assertRaisesRegex(ValidationError, 'MonteCarloTensor'):
             format.validate()
 
 

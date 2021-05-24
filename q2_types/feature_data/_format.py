@@ -11,7 +11,7 @@ import skbio.io
 import qiime2
 import qiime2.plugin.model as model
 from qiime2.plugin import ValidationError
-
+import arviz as az
 from ..plugin_setup import plugin
 
 
@@ -203,7 +203,7 @@ class DifferentialFormat(model.TextFileFormat):
                          'at least 1 column')
                 )
 
- 
+
         types = md.dtypes
         for t in types:
             if not np.issubdtype(t, np.number):
@@ -212,17 +212,33 @@ class DifferentialFormat(model.TextFileFormat):
                          'continuously valued quantities')
                 )
 
-            
+
         for c in md.columns:
             if (np.isinf(md[c].values).sum() > 0 or
                 pd.isnull(md[c]).sum() > 0):
                 raise ValueError(
                         ('Differential contains infs or nans.')
                 )
-            
-        
+
+
 DifferentialDirectoryFormat = model.SingleFileDirectoryFormat(
     'DifferentialDirectoryFormat', 'differentials.tsv', DifferentialFormat)
+
+
+class MonteCarloTensorFormat(model.BinaryFileFormat):
+
+    def sniff(self):
+        try:
+            az.InferenceData.from_netcdf(str(self))
+            return True
+        except Exception:
+            return False
+
+
+MonteCarloTensorDirectoryFormat = model.SingleFileDirectoryFormat(
+    'MonteCarloTensorDirectoryFormat', 'monte-carlo-samples.az',
+    MonteCarloTensorFormat)
+
 
 plugin.register_formats(
     TSVTaxonomyFormat, TSVTaxonomyDirectoryFormat,
@@ -230,5 +246,6 @@ plugin.register_formats(
     TaxonomyFormat, TaxonomyDirectoryFormat, DNAFASTAFormat,
     DNASequencesDirectoryFormat, PairedDNASequencesDirectoryFormat,
     AlignedDNAFASTAFormat, AlignedDNASequencesDirectoryFormat,
-    DifferentialFormat, DifferentialDirectoryFormat
+    DifferentialFormat, DifferentialDirectoryFormat,
+    MonteCarloTensorFormat, MonteCarloTensorDirectoryFormat
 )

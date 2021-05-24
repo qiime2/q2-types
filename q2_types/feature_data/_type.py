@@ -12,7 +12,8 @@ from ..plugin_setup import plugin
 from . import (TSVTaxonomyDirectoryFormat, DNASequencesDirectoryFormat,
                PairedDNASequencesDirectoryFormat,
                AlignedDNASequencesDirectoryFormat,
-               DifferentialDirectoryFormat)
+               DifferentialDirectoryFormat,
+               MonteCarloTensorDirectoryFormat)
 
 
 FeatureData = SemanticType('FeatureData', field_names='type')
@@ -30,9 +31,12 @@ AlignedSequence = SemanticType('AlignedSequence',
 Differential = SemanticType('Differential',
                             variant_of=FeatureData.field['type'])
 
+MonteCarloTensor = SemanticType('MonteCarloTensor')
+
+
 plugin.register_semantic_types(FeatureData, Taxonomy, Sequence,
                                PairedEndSequence, AlignedSequence,
-                               Differential)
+                               Differential, MonteCarloTensor)
 
 
 plugin.register_semantic_type_to_format(
@@ -49,3 +53,5 @@ plugin.register_semantic_type_to_format(
     artifact_format=AlignedDNASequencesDirectoryFormat)
 plugin.register_semantic_type_to_format(
     FeatureData[Differential], DifferentialDirectoryFormat)
+plugin.register_semantic_type_to_format(
+    MonteCarloTensor, MonteCarloTensorDirectoryFormat)

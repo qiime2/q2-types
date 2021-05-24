@@ -13,12 +13,13 @@ import pandas as pd
 import biom
 import skbio
 import qiime2
-
+import arviz as az
 from ..plugin_setup import plugin
 from ..feature_table import BIOMV210Format
 from . import (TaxonomyFormat, HeaderlessTSVTaxonomyFormat, TSVTaxonomyFormat,
                DNAFASTAFormat, PairedDNASequencesDirectoryFormat,
-               AlignedDNAFASTAFormat, DifferentialFormat)
+               AlignedDNAFASTAFormat, DifferentialFormat,
+               MonteCarloTensorFormat)
 
 
 # Taxonomy format transformers
@@ -374,4 +375,14 @@ def _223(ff: DifferentialFormat) -> qiime2.Metadata:
 def _224(df: pd.DataFrame) -> DifferentialFormat:
     ff = DifferentialFormat()
     qiime2.Metadata(data).save(str(ff))
+    return ff
+
+@plugin.register_transformer
+def _225(ff: MonteCarloTensorFormat) -> az.InferenceData:
+    return az.InferenceData.from_netcdf(str(ff))
+
+@plugin.register_transformer
+def _226(obj: az.InferenceData) -> MonteCarloTensorFormat:
+    ff = MonteCarloTensorFormat()
+    obj.to_netcdf(str(ff))
     return ff
