@@ -25,6 +25,7 @@ requirements:
     - biom-format >=2.1.5,<2.2.0
     - ijson
     - h5py
+    - arviz
     - qiime2 {{ release }}.*
 
 test:
