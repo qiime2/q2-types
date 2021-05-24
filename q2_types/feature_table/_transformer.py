@@ -1,5 +1,5 @@
 # ----------------------------------------------------------------------------
-# Copyright (c) 2016-2019, QIIME 2 development team.
+# Copyright (c) 2016-2021, QIIME 2 development team.
 #
 # Distributed under the terms of the Modified BSD License.
 #
@@ -73,28 +73,11 @@ def _table_to_v210(data):
     return ff
 
 
-def _table_to_v100(data):
-    ff = BIOMV100Format()
-    with ff.open() as fh:
-        data.to_json(generated_by=_get_generated_by(), direct_io=fh)
-    return ff
-
-
 def _dataframe_to_table(df):
     if df.index.inferred_type != 'string':
         raise TypeError("Please provide a DataFrame with a string-based Index")
     return biom.Table(df.T.values, observation_ids=df.columns,
                       sample_ids=df.index)
-
-
-@plugin.register_transformer
-def _1(data: biom.Table) -> BIOMV100Format:
-    data = _drop_axis_metadata(data)
-
-    ff = BIOMV100Format()
-    with ff.open() as fh:
-        fh.write(data.to_json(generated_by=_get_generated_by()))
-    return ff
 
 
 @plugin.register_transformer
@@ -150,12 +133,6 @@ def _9(df: pd.DataFrame) -> biom.Table:
 @plugin.register_transformer
 def _10(df: pd.DataFrame) -> BIOMV210Format:
     return _table_to_v210(_dataframe_to_table(df))
-
-
-@plugin.register_transformer
-def _11(ff: BIOMV210Format) -> BIOMV100Format:
-    data = _parse_biom_table_v210(ff)
-    return _table_to_v100(data)
 
 
 @plugin.register_transformer

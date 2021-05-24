@@ -1,16 +1,17 @@
 # ----------------------------------------------------------------------------
-# Copyright (c) 2016-2019, QIIME 2 development team.
+# Copyright (c) 2016-2021, QIIME 2 development team.
 #
 # Distributed under the terms of the Modified BSD License.
 #
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
 
+import pandas as pd
 import skbio
 import qiime2
 
 from ..plugin_setup import plugin
-from . import OrdinationFormat
+from . import OrdinationFormat, ProcrustesStatisticsFmt
 
 
 def _ordination_format_to_ordination_results(ff):
@@ -42,3 +43,25 @@ def _2(ff: OrdinationFormat) -> skbio.OrdinationResults:
 def _3(ff: OrdinationFormat) -> qiime2.Metadata:
     df = _ordination_format_to_dataframe(ff)
     return qiime2.Metadata(df)
+
+
+@plugin.register_transformer
+def _4(data: pd.DataFrame) -> ProcrustesStatisticsFmt:
+    ff = ProcrustesStatisticsFmt()
+    qiime2.Metadata(data).save(str(ff))
+    return ff
+
+
+@plugin.register_transformer
+def _5(ff: ProcrustesStatisticsFmt) -> pd.DataFrame:
+    df = qiime2.Metadata.load(str(ff)).to_dataframe()
+    return df.astype({
+        'true M^2 value': float,
+        'p-value for true M^2 value': float,
+        'number of Monte Carlo permutations': int,
+    }, copy=True, errors='raise')
+
+
+@plugin.register_transformer
+def _6(ff: ProcrustesStatisticsFmt) -> qiime2.Metadata:
+    return qiime2.Metadata.load(str(ff))

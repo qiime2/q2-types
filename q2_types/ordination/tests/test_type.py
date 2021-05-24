@@ -1,5 +1,5 @@
 # ----------------------------------------------------------------------------
-# Copyright (c) 2016-2019, QIIME 2 development team.
+# Copyright (c) 2016-2021, QIIME 2 development team.
 #
 # Distributed under the terms of the Modified BSD License.
 #
@@ -8,7 +8,12 @@
 
 import unittest
 
-from q2_types.ordination import PCoAResults, OrdinationDirectoryFormat
+from q2_types.ordination import (
+    PCoAResults, OrdinationDirectoryFormat,
+    ProcrustesStatistics, ProcrustesStatisticsDirFmt,
+)
+
+
 from qiime2.plugin.testing import TestPluginBase
 
 
@@ -21,6 +26,13 @@ class TestTypes(TestPluginBase):
     def test_pcoa_results_semantic_type_to_ordination_fmt_registration(self):
         self.assertSemanticTypeRegisteredToFormat(PCoAResults,
                                                   OrdinationDirectoryFormat)
+
+    def test_procrustes_m2_semantic_type_registration(self):
+        self.assertRegisteredSemanticType(ProcrustesStatistics)
+
+    def test_procrustes_m2_semantic_type_to_m2_fmt_registration(self):
+        self.assertSemanticTypeRegisteredToFormat(ProcrustesStatistics,
+                                                  ProcrustesStatisticsDirFmt)
 
 
 if __name__ == "__main__":

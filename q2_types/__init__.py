@@ -1,5 +1,5 @@
 # ----------------------------------------------------------------------------
-# Copyright (c) 2016-2019, QIIME 2 development team.
+# Copyright (c) 2016-2021, QIIME 2 development team.
 #
 # Distributed under the terms of the Modified BSD License.
 #
@@ -22,3 +22,4 @@ importlib.import_module('q2_types.tree')
 importlib.import_module('q2_types.ordination')
 importlib.import_module('q2_types.sample_data')
 importlib.import_module('q2_types.per_sample_sequences')
+importlib.import_module('q2_types.bowtie2')

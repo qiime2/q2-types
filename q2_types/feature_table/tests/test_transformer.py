@@ -1,5 +1,5 @@
 # ----------------------------------------------------------------------------
-# Copyright (c) 2016-2019, QIIME 2 development team.
+# Copyright (c) 2016-2021, QIIME 2 development team.
 #
 # Distributed under the terms of the Modified BSD License.
 #
@@ -12,7 +12,7 @@ import biom
 import pandas as pd
 import qiime2
 
-from pandas.util.testing import assert_frame_equal
+from pandas.testing import assert_frame_equal
 from q2_types.feature_table import BIOMV100Format, BIOMV210Format
 from qiime2.plugin.testing import TestPluginBase
 from q2_types.feature_table._transformer import (_parse_biom_table_v100,
@@ -23,20 +23,6 @@ from q2_types.feature_table._transformer import (_parse_biom_table_v100,
 
 class TestTransformers(TestPluginBase):
     package = 'q2_types.feature_table.tests'
-
-    def test_biom_table_to_biom_v100_format(self):
-        filepath = self.get_data_path('feature-table_v100.biom')
-        transformer = self.get_transformer(biom.Table, BIOMV100Format)
-        input = biom.load_table(filepath)
-
-        obs = transformer(input)
-        obs = biom.load_table(str(obs))
-
-        exp = input
-        self.assertEqual(obs.ids(axis='observation').all(),
-                         exp.ids(axis='observation').all())
-        self.assertEqual(obs.ids(axis='sample').all(),
-                         exp.ids(axis='sample').all())
 
     def test_biom_v100_format_to_biom_table(self):
         input, obs = self.transform_format(BIOMV100Format, biom.Table,
@@ -103,17 +89,6 @@ class TestTransformers(TestPluginBase):
     def test_biom_v100_format_to_biom_v210_format(self):
         input, obs = self.transform_format(BIOMV100Format, BIOMV210Format,
                                            filename='feature-table_v100.biom')
-        exp = biom.load_table(str(input))
-        obs = biom.load_table(str(obs))
-
-        self.assertEqual(obs.ids(axis='observation').all(),
-                         exp.ids(axis='observation').all())
-        self.assertEqual(obs.ids(axis='sample').all(),
-                         exp.ids(axis='sample').all())
-
-    def test_biom_v210_format_to_biom_v100_format(self):
-        input, obs = self.transform_format(BIOMV210Format, BIOMV100Format,
-                                           filename='feature-table_v210.biom')
         exp = biom.load_table(str(input))
         obs = biom.load_table(str(obs))
 

@@ -1,5 +1,5 @@
 # ----------------------------------------------------------------------------
-# Copyright (c) 2016-2019, QIIME 2 development team.
+# Copyright (c) 2016-2021, QIIME 2 development team.
 #
 # Distributed under the terms of the Modified BSD License.
 #
@@ -12,7 +12,11 @@ from q2_types.feature_data import (
     FeatureData, Taxonomy, Sequence, PairedEndSequence, AlignedSequence,
     Differential, TSVTaxonomyDirectoryFormat, DNASequencesDirectoryFormat,
     DifferentialDirectoryFormat, PairedDNASequencesDirectoryFormat,
-    AlignedDNASequencesDirectoryFormat
+    AlignedDNASequencesDirectoryFormat, ProteinSequencesDirectoryFormat,
+    AlignedProteinSequencesDirectoryFormat, ProteinSequence,
+    AlignedProteinSequence, RNASequence, RNASequencesDirectoryFormat,
+    AlignedRNASequencesDirectoryFormat, AlignedRNASequence,
+    PairedRNASequencesDirectoryFormat, PairedEndRNASequence
 )
 from qiime2.plugin.testing import TestPluginBase
 
@@ -38,6 +42,12 @@ class TestTypes(TestPluginBase):
     def test_differential_semantic_type_registration(self):
         self.assertRegisteredSemanticType(AlignedSequence)
 
+    def test_protein_sequence_semantic_type_registration(self):
+        self.assertRegisteredSemanticType(ProteinSequence)
+
+    def test_aligned_protein_sequence_semantic_type_registration(self):
+        self.assertRegisteredSemanticType(AlignedProteinSequence)
+
     def test_differential_semantic_type_to_format_registration(self):
         self.assertSemanticTypeRegisteredToFormat(
                 FeatureData[Differential], DifferentialDirectoryFormat)
@@ -60,6 +70,44 @@ class TestTypes(TestPluginBase):
         self.assertSemanticTypeRegisteredToFormat(
                 FeatureData[AlignedSequence],
                 AlignedDNASequencesDirectoryFormat
+        )
+
+    def test_protein_sequence_semantic_type_to_format_registration(self):
+        self.assertSemanticTypeRegisteredToFormat(
+                FeatureData[ProteinSequence],
+                ProteinSequencesDirectoryFormat
+        )
+
+    def test_aln_protein_sequence_semantic_type_to_format_registration(self):
+        self.assertSemanticTypeRegisteredToFormat(
+                FeatureData[AlignedProteinSequence],
+                AlignedProteinSequencesDirectoryFormat
+        )
+
+    def test_rna_sequence_semantic_type_registration(self):
+        self.assertRegisteredSemanticType(RNASequence)
+
+    def test_aligned_rna_sequence_semantic_type_registration(self):
+        self.assertRegisteredSemanticType(AlignedRNASequence)
+
+    def test_paired_end_rna_sequence_semantic_type_registration(self):
+        self.assertRegisteredSemanticType(PairedEndRNASequence)
+
+    def test_rna_sequence_semantic_type_to_format_registration(self):
+        self.assertSemanticTypeRegisteredToFormat(
+                FeatureData[RNASequence], RNASequencesDirectoryFormat)
+
+    def test_paired_end_rna_sequence_semantic_type_to_format_registration(
+            self):
+        self.assertSemanticTypeRegisteredToFormat(
+                FeatureData[PairedEndRNASequence],
+                PairedRNASequencesDirectoryFormat
+        )
+
+    def test_aligned_rna_sequence_semantic_type_to_format_registration(self):
+        self.assertSemanticTypeRegisteredToFormat(
+                FeatureData[AlignedRNASequence],
+                AlignedRNASequencesDirectoryFormat
         )
 
 

@@ -1,11 +1,11 @@
 
 
-# There's some important whitespace in this file for testing, take care not to
-# remove :)
 
-# hello
 
-# world #
+
+
+
+
 
 
 
@@ -15,20 +15,20 @@
               
 
     
-# comment
+
 
 Feature ID	Taxon	Extra Column
 
-# hello, peanut
-#
 
-#  
+
+
+
 
 
 SEQUENCE1	k__Bar; p__Baz	foo
 
-# GWAR
+
 seq2	some; taxonomy; for; ya	bar baz
 
 
-# FOOTER
+

@@ -1,5 +1,5 @@
 # ----------------------------------------------------------------------------
-# Copyright (c) 2016-2019, QIIME 2 development team.
+# Copyright (c) 2016-2021, QIIME 2 development team.
 #
 # Distributed under the terms of the Modified BSD License.
 #
@@ -22,7 +22,8 @@ class BIOMV100Format(model.TextFileFormat):
     }
 
     def sniff(self):
-        with self.open() as fh:
+        # Can't self.open(mode='rb'), so we defer to the backing pathlib object
+        with self.path.open(mode='rb') as fh:
             try:
                 parser = ijson.parse(fh)
                 for prefix, event, value in parser:

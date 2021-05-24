@@ -1,5 +1,5 @@
 # ----------------------------------------------------------------------------
-# Copyright (c) 2016-2019, QIIME 2 development team.
+# Copyright (c) 2016-2021, QIIME 2 development team.
 #
 # Distributed under the terms of the Modified BSD License.
 #
@@ -10,6 +10,7 @@ import os
 import gzip
 import itertools
 import collections
+import pathlib
 
 import pandas as pd
 import skbio
@@ -20,6 +21,10 @@ import qiime2.plugin.model as model
 from qiime2.plugin import ValidationError
 
 from ..plugin_setup import plugin
+from ._util import (
+    _parse_casava_filename,
+    _manifest_to_df,
+)
 
 
 class FastqAbsolutePathManifestFormatV2(model.TextFileFormat):
@@ -295,6 +300,33 @@ class CasavaOneEightSingleLanePerSampleDirFmt(model.DirectoryFormat):
 
     def _find_duplicates(self, ids):
         return {x for x, c in collections.Counter(ids).items() if c > 1}
+
+    @property
+    def manifest(self):
+        tmp_manifest = FastqManifestFormat()
+        with tmp_manifest.open() as fh:
+            fh.write('sample-id,filename,direction\n')
+            for fp, _ in self.sequences.iter_views(FastqGzFormat):
+                sample_id, _, _, _, direction = _parse_casava_filename(fp)
+                fh.write('%s,%s,%s\n' % (sample_id, fp.name, direction))
+
+        df = _manifest_to_df(tmp_manifest, self.path.parent)
+
+        if 'reverse' not in df:
+            df['reverse'] = None
+
+        if 'forward' not in df:
+            df['forward'] = None
+
+        def munge_fn_closure(val):
+            if val is not None:
+                return str(self.path / pathlib.Path(val).name)
+            return val
+
+        for column in {'forward', 'reverse'}:
+            df[column] = df[column].apply(munge_fn_closure)
+
+        return df
 
     def _validate_(self, level):
         forwards = []

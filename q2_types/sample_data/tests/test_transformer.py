@@ -1,5 +1,5 @@
 # ----------------------------------------------------------------------------
-# Copyright (c) 2016-2019, QIIME 2 development team.
+# Copyright (c) 2016-2021, QIIME 2 development team.
 #
 # Distributed under the terms of the Modified BSD License.
 #
@@ -11,7 +11,7 @@ import unittest
 import pandas as pd
 
 import qiime2
-from pandas.util.testing import assert_series_equal
+from pandas.testing import assert_series_equal
 from q2_types.sample_data import AlphaDiversityFormat
 from qiime2.plugin.testing import TestPluginBase
 
@@ -26,7 +26,10 @@ class TestTransformers(TestPluginBase):
                         name='shannon', index=exp_index)
 
         obs = transformer(exp)
-        obs = pd.Series.from_csv(str(obs), sep='\t', header=0)
+
+        # Squeeze equals true to return series instead of dataframe
+        obs = pd.read_csv(str(obs), sep='\t', header=0, index_col=0,
+                          squeeze=True)
 
         assert_series_equal(exp, obs)
 

@@ -1,5 +1,5 @@
 # ----------------------------------------------------------------------------
-# Copyright (c) 2016-2019, QIIME 2 development team.
+# Copyright (c) 2016-2021, QIIME 2 development team.
 #
 # Distributed under the terms of the Modified BSD License.
 #
@@ -11,6 +11,7 @@ import shutil
 import unittest
 import string
 
+import pandas as pd
 from q2_types.per_sample_sequences import (
     CasavaOneEightSingleLanePerSampleDirFmt,
     CasavaOneEightLanelessPerSampleDirFmt,
@@ -328,6 +329,17 @@ class TestFormats(TestPluginBase):
 
         format.validate()
 
+    def test_casava_one_eight_slanepsample_dir_fmt_manifest_property(self):
+        filepath = self.get_data_path('Human-Kneecap_S1_L001_R1_001.fastq.gz')
+        shutil.copy(filepath, self.temp_dir.name)
+
+        format = CasavaOneEightSingleLanePerSampleDirFmt(
+            self.temp_dir.name, mode='r')
+
+        format.validate()
+        self.assertTrue(True)
+        self.assertIsInstance(format.manifest, pd.DataFrame)
+
     def test_casava_one_eight_slanepsample_dir_fmt_validate_negative(self):
         filepath = self.get_data_path('not-fastq.fastq.gz')
         shutil.copy(filepath, self.temp_dir.name)
@@ -501,6 +513,21 @@ class TestFormats(TestPluginBase):
 
         with self.assertRaisesRegex(ValidationError,
                                     'paired'):
+            format.validate()
+
+    def test_slanepsample_paired_end_fastq_dir_fmt_incorrect_filenames(self):
+        filenames = ('single_end_data/MANIFEST.txt', 'metadata.yml.txt',
+                     'Human-Kneecap_S1_L001_R1_001.fastq.gz',
+                     'paired_end_data/Human-Kneecap_S1_L001_R2_001.fastq.gz')
+        for filename in filenames:
+            filepath = self.get_data_path(filename)
+            shutil.copy(filepath, self.temp_dir.name)
+
+        format = SingleLanePerSamplePairedEndFastqDirFmt(
+            self.temp_dir.name, mode='r')
+
+        with self.assertRaisesRegex(ValidationError,
+                                    'Missing one or more files.*MANIFEST'):
             format.validate()
 
 

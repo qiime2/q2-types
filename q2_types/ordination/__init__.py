@@ -1,5 +1,5 @@
 # ----------------------------------------------------------------------------
-# Copyright (c) 2016-2019, QIIME 2 development team.
+# Copyright (c) 2016-2021, QIIME 2 development team.
 #
 # Distributed under the terms of the Modified BSD License.
 #
@@ -8,12 +8,16 @@
 
 import importlib
 
-from ._format import OrdinationFormat, OrdinationDirectoryFormat
-from ._type import PCoAResults
+from ._format import (
+    OrdinationFormat, OrdinationDirectoryFormat,
+    ProcrustesStatisticsFmt, ProcrustesStatisticsDirFmt,
+)
+from ._type import PCoAResults, ProcrustesStatistics
 
 
 __all__ = ['OrdinationFormat', 'OrdinationDirectoryFormat',
-           'PCoAResults']
+           'ProcrustesStatisticsFmt', 'ProcrustesStatisticsDirFmt',
+           'PCoAResults', 'ProcrustesStatistics']
 
 
 importlib.import_module('q2_types.ordination._transformer')

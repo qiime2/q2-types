@@ -1,5 +1,5 @@
 # ----------------------------------------------------------------------------
-# Copyright (c) 2016-2019, QIIME 2 development team.
+# Copyright (c) 2016-2021, QIIME 2 development team.
 #
 # Distributed under the terms of the Modified BSD License.
 #
@@ -17,7 +17,11 @@ from q2_types.feature_data import (
     TSVTaxonomyDirectoryFormat, DNAFASTAFormat, DNASequencesDirectoryFormat,
     PairedDNASequencesDirectoryFormat, AlignedDNAFASTAFormat,
     AlignedDNASequencesDirectoryFormat, DifferentialDirectoryFormat,
-    MonteCarloTensorDirectoryFormat
+    ProteinFASTAFormat, AlignedProteinFASTAFormat, FASTAFormat,
+    AlignedProteinSequencesDirectoryFormat, ProteinSequencesDirectoryFormat,
+    RNAFASTAFormat, RNASequencesDirectoryFormat, AlignedRNAFASTAFormat,
+    AlignedRNASequencesDirectoryFormat,
+    MonteCarloTensor, MonteCarloTensorDirectoryFormat
 )
 from qiime2.plugin.testing import TestPluginBase
 from qiime2.plugin import ValidationError
@@ -39,7 +43,7 @@ class TestTaxonomyFormats(TestPluginBase):
             format.validate()
 
     def test_taxonomy_format_validate_negative(self):
-        filenames = ['empty', 'blanks-and-comments', '1-column.tsv']
+        filenames = ['empty', 'blanks', '1-column.tsv']
         filepaths = [self.get_data_path(os.path.join('taxonomy', filename))
                      for filename in filenames]
 
@@ -80,7 +84,7 @@ class TestTaxonomyFormats(TestPluginBase):
             format.validate()
 
     def test_headerless_tsv_taxonomy_format_validate_negative(self):
-        filenames = ['empty', 'blanks-and-comments', '1-column.tsv']
+        filenames = ['empty', 'blanks', '1-column.tsv']
         filepaths = [self.get_data_path(os.path.join('taxonomy', filename))
                      for filename in filenames]
 
@@ -115,7 +119,7 @@ class TestTaxonomyFormats(TestPluginBase):
             format.validate()
 
     def test_tsv_taxonomy_format_validate_negative(self):
-        filenames = ['empty', 'blanks-and-comments', '1-column.tsv',
+        filenames = ['empty', 'blanks', '1-column.tsv',
                      'headerless.tsv', 'header-only.tsv', 'jagged.tsv']
         filepaths = [self.get_data_path(os.path.join('taxonomy', filename))
                      for filename in filenames]
@@ -135,9 +139,29 @@ class TestTaxonomyFormats(TestPluginBase):
         format = TSVTaxonomyDirectoryFormat(self.temp_dir.name, mode='r')
         format.validate()
 
+    def test_tsv_taxonomy_format_column_header_lengths(self):
+        filenames = ['greater-column-length.tsv', 'greater-header-length.tsv']
 
-class TestDNAFASTAFormats(TestPluginBase):
+        filepaths = [self.get_data_path(os.path.join('taxonomy', filename))
+                     for filename in filenames]
+
+        for filepath in filepaths:
+            format = TSVTaxonomyFormat(filepath, mode='r')
+
+            with self.assertRaisesRegex(ValidationError,
+                                        'line 2.*3 values.*expected 2'):
+                format.validate()
+
+
+class TestNucleicAcidFASTAFormats(TestPluginBase):
     package = 'q2_types.feature_data.tests'
+
+    # DNA Format Tests
+    def test_permissive_fasta_format(self):
+        filepath = self.get_data_path('dna-sequences-gisaid.fasta')
+        format = FASTAFormat(filepath, mode='r')
+
+        format.validate()
 
     def test_dna_fasta_format_validate_positive(self):
         filepath = self.get_data_path('dna-sequences.fasta')
@@ -145,12 +169,11 @@ class TestDNAFASTAFormats(TestPluginBase):
 
         format.validate()
 
-    def test_dna_fasta_format_validate_negative(self):
-        filepath = self.get_data_path('not-dna-sequences')
+    def test_dna_fasta_format_bom_passes(self):
+        filepath = self.get_data_path('dna-with-bom-passes.fasta')
         format = DNAFASTAFormat(filepath, mode='r')
 
-        with self.assertRaisesRegex(ValidationError, 'DNAFASTA'):
-            format.validate()
+        format.validate()
 
     def test_dna_fasta_format_empty_file(self):
         filepath = os.path.join(self.temp_dir.name, 'empty')
@@ -160,6 +183,50 @@ class TestDNAFASTAFormats(TestPluginBase):
 
         format.validate()
 
+    def test_dna_fasta_format_invalid_characters(self):
+        filepath = self.get_data_path('not-dna-sequences.fasta')
+        format = DNAFASTAFormat(filepath, mode='r')
+
+        with self.assertRaisesRegex(ValidationError, "Invalid character '1' "
+                                                     ".*0 on line 2"):
+            format.validate()
+
+    def test_dna_fasta_format_validate_negative(self):
+        filepath = self.get_data_path('not-dna-sequences')
+        format = DNAFASTAFormat(filepath, mode='r')
+
+        with self.assertRaisesRegex(ValidationError, 'DNAFASTA'):
+            format.validate()
+
+    def test_dna_fasta_format_consecutive_IDs(self):
+        filepath = self.get_data_path('dna-sequences-consecutive-ids.fasta')
+        format = DNAFASTAFormat(filepath, mode='r')
+
+        with self.assertRaisesRegex(
+                ValidationError, 'consecutive descriptions.*1'):
+            format.validate()
+
+    def test_dna_fasta_format_missing_initial_ID(self):
+        filepath = self.get_data_path('dna-sequences-first-line-not-id.fasta')
+        format = DNAFASTAFormat(filepath, mode='r')
+
+        with self.assertRaisesRegex(ValidationError, 'First line'):
+            format.validate()
+
+    def test_dna_fasta_format_corrupt_characters(self):
+        filepath = self.get_data_path('dna-sequences-corrupt-characters.fasta')
+        format = DNAFASTAFormat(filepath, mode='r')
+
+        with self.assertRaisesRegex(ValidationError, 'utf-8.*2'):
+            format.validate()
+
+    def test_dna_fasta_format_bom_fails(self):
+        filepath = self.get_data_path('dna-with-bom-fails.fasta')
+        format = DNAFASTAFormat(filepath, mode='r')
+
+        with self.assertRaisesRegex(ValidationError, 'First line'):
+            format.validate()
+
     def test_dna_sequences_directory_format(self):
         filepath = self.get_data_path('dna-sequences.fasta')
         shutil.copy(filepath,
@@ -167,6 +234,28 @@ class TestDNAFASTAFormats(TestPluginBase):
         format = DNASequencesDirectoryFormat(self.temp_dir.name, mode='r')
 
         format.validate()
+
+    def test_dna_fasta_format_duplicate_ids(self):
+        filepath = self.get_data_path('dna-sequences-duplicate-id.fasta')
+        format = DNAFASTAFormat(filepath, mode='r')
+
+        with self.assertRaisesRegex(ValidationError, '3.*duplicate.*1'):
+            format.validate()
+
+    def test_dna_fasta_format_no_id(self):
+        filepath = self.get_data_path('dna-sequences-no-id.fasta')
+        format = DNAFASTAFormat(filepath, mode='r')
+
+        with self.assertRaisesRegex(ValidationError, '1.*missing an ID'):
+            format.validate()
+
+    def test_dna_fasta_format_id_starts_with_space(self):
+        filepath = self.get_data_path(
+            'dna-sequences-id-starts-with-space.fasta')
+        format = DNAFASTAFormat(filepath, mode='r')
+
+        with self.assertRaisesRegex(ValidationError, '1 starts with a space'):
+            format.validate()
 
     def test_paired_dna_sequences_directory_format(self):
         filepath = self.get_data_path('dna-sequences.fasta')
@@ -194,12 +283,258 @@ class TestDNAFASTAFormats(TestPluginBase):
         with self.assertRaisesRegex(ValidationError, 'AlignedDNAFASTA'):
             format.validate()
 
+    def test_aligned_dna_fasta_format_unaligned(self):
+        filepath = self.get_data_path('dna-sequences.fasta')
+        format = AlignedDNAFASTAFormat(filepath, mode='r')
+
+        with self.assertRaisesRegex(ValidationError,
+                                    'line 4.*length 88.*length 64'):
+            format.validate()
+
     def test_aligned_dna_sequences_directory_format(self):
         filepath = self.get_data_path('aligned-dna-sequences.fasta')
         temp_dir = self.temp_dir.name
         shutil.copy(filepath,
                     os.path.join(temp_dir, 'aligned-dna-sequences.fasta'))
         format = AlignedDNASequencesDirectoryFormat(temp_dir, mode='r')
+
+        format.validate()
+
+    # RNA Format Tests
+    def test_rna_fasta_format_validate_positive(self):
+        filepath = self.get_data_path('rna-sequences.fasta')
+        format = RNAFASTAFormat(filepath, mode='r')
+
+        format.validate()
+
+    def test_rna_fasta_format_bom_passes(self):
+        filepath = self.get_data_path('rna-with-bom-passes.fasta')
+        format = RNAFASTAFormat(filepath, mode='r')
+
+        format.validate()
+
+    def test_rna_fasta_format_empty_file(self):
+        filepath = os.path.join(self.temp_dir.name, 'empty')
+        with open(filepath, 'w') as fh:
+            fh.write('\n')
+        format = RNAFASTAFormat(filepath, mode='r')
+
+        format.validate()
+
+    def test_rna_fasta_format_invalid_characters(self):
+        filepath = self.get_data_path('not-rna-sequences.fasta')
+        format = RNAFASTAFormat(filepath, mode='r')
+
+        with self.assertRaisesRegex(ValidationError, "Invalid character '1' "
+                                                     ".*0 on line 2"):
+            format.validate()
+
+    def test_rna_fasta_format_validate_negative(self):
+        filepath = self.get_data_path('not-rna-sequences')
+        format = RNAFASTAFormat(filepath, mode='r')
+
+        with self.assertRaisesRegex(ValidationError, 'RNAFASTA'):
+            format.validate()
+
+    def test_rna_fasta_format_consecutive_IDs(self):
+        filepath = self.get_data_path('dna-sequences-consecutive-ids.fasta')
+        format = RNAFASTAFormat(filepath, mode='r')
+
+        with self.assertRaisesRegex(
+                ValidationError, 'consecutive descriptions.*1'):
+            format.validate()
+
+    def test_rna_fasta_format_missing_initial_ID(self):
+        filepath = self.get_data_path('dna-sequences-first-line-not-id.fasta')
+        format = RNAFASTAFormat(filepath, mode='r')
+
+        with self.assertRaisesRegex(ValidationError, 'First line'):
+            format.validate()
+
+    def test_rna_fasta_format_corrupt_characters(self):
+        filepath = self.get_data_path('dna-sequences-corrupt-characters.fasta')
+        format = RNAFASTAFormat(filepath, mode='r')
+
+        with self.assertRaisesRegex(ValidationError, 'utf-8.*2'):
+            format.validate()
+
+    def test_rna_fasta_format_bom_fails(self):
+        filepath = self.get_data_path('dna-with-bom-fails.fasta')
+        format = RNAFASTAFormat(filepath, mode='r')
+
+        with self.assertRaisesRegex(ValidationError, 'First line'):
+            format.validate()
+
+    def test_rna_sequences_directory_format(self):
+        filepath = self.get_data_path('rna-sequences.fasta')
+        shutil.copy(filepath,
+                    os.path.join(self.temp_dir.name, 'rna-sequences.fasta'))
+        format = RNASequencesDirectoryFormat(self.temp_dir.name, mode='r')
+
+        format.validate()
+
+    def test_rna_fasta_format_duplicate_ids(self):
+        filepath = self.get_data_path('rna-sequences-with-duplicate-ids.fasta')
+        format = RNAFASTAFormat(filepath, mode='r')
+
+        with self.assertRaisesRegex(ValidationError, '6.*duplicate.*1'):
+            format.validate()
+
+    def test_rna_fasta_format_no_id(self):
+        filepath = self.get_data_path('dna-sequences-no-id.fasta')
+        format = RNAFASTAFormat(filepath, mode='r')
+
+        with self.assertRaisesRegex(ValidationError, '1.*missing an ID'):
+            format.validate()
+
+    def test_rna_fasta_format_id_starts_with_space(self):
+        filepath = self.get_data_path(
+            'dna-sequences-id-starts-with-space.fasta')
+        format = RNAFASTAFormat(filepath, mode='r')
+
+        with self.assertRaisesRegex(ValidationError, '1 starts with a space'):
+            format.validate()
+
+    def test_aligned_rna_fasta_format_validate_positive(self):
+        filepath = self.get_data_path('aligned-rna-sequences.fasta')
+        format = AlignedRNAFASTAFormat(filepath, mode='r')
+
+        format.validate()
+
+    def test_aligned_rna_fasta_format_validate_negative(self):
+        filepath = self.get_data_path('not-rna-sequences')
+        format = AlignedRNAFASTAFormat(filepath, mode='r')
+
+        with self.assertRaisesRegex(ValidationError, 'AlignedRNAFASTA'):
+            format.validate()
+
+    def test_aligned_rna_fasta_format_unaligned(self):
+        filepath = self.get_data_path('rna-sequences.fasta')
+        format = AlignedRNAFASTAFormat(filepath, mode='r')
+
+        with self.assertRaisesRegex(ValidationError,
+                                    'line 4.*length 88.*length 64'):
+            format.validate()
+
+    def test_aligned_rna_sequences_directory_format(self):
+        filepath = self.get_data_path('aligned-rna-sequences.fasta')
+        temp_dir = self.temp_dir.name
+        shutil.copy(filepath,
+                    os.path.join(temp_dir, 'aligned-rna-sequences.fasta'))
+        format = AlignedRNASequencesDirectoryFormat(temp_dir, mode='r')
+
+        format.validate()
+
+
+class TestDifferentialFormat(TestPluginBase):
+    package = 'q2_types.feature_data.tests'
+
+    def test_differential_format(self):
+        filepath = self.get_data_path('differentials.tsv')
+        temp_dir = self.temp_dir.name
+        shutil.copy(filepath,
+                    os.path.join(temp_dir, 'differentials.tsv'))
+        format = DifferentialDirectoryFormat(temp_dir, mode='r')
+        format.validate()
+        self.assertTrue(True)
+
+    def test_differential_format_empty(self):
+        filepath = self.get_data_path('empty_differential.tsv')
+        temp_dir = self.temp_dir.name
+        shutil.copy(filepath,
+                    os.path.join(temp_dir, 'differentials.tsv'))
+
+        with self.assertRaisesRegex(ValidationError, 'least 1 column'):
+            format = DifferentialDirectoryFormat(temp_dir, mode='r')
+            format.validate()
+
+    def test_differential_format_not(self):
+        filepath = self.get_data_path('not_differential.tsv')
+        temp_dir = self.temp_dir.name
+        shutil.copy(filepath,
+                    os.path.join(temp_dir, 'differentials.tsv'))
+
+        with self.assertRaises(ValidationError):
+            format = DifferentialDirectoryFormat(temp_dir, mode='r')
+            format.validate()
+
+    def test_differential_format_inf(self):
+        filepath = self.get_data_path('inf_differential.tsv')
+        temp_dir = self.temp_dir.name
+        shutil.copy(filepath,
+                    os.path.join(temp_dir, 'differentials.tsv'))
+
+        with self.assertRaisesRegex(ValidationError, 'numeric'):
+            format = DifferentialDirectoryFormat(temp_dir, mode='r')
+            format.validate()
+
+    def test_differential_format_bad_type(self):
+        filepath = self.get_data_path('bad_differential.tsv')
+        temp_dir = self.temp_dir.name
+        shutil.copy(filepath,
+                    os.path.join(temp_dir, 'differentials.tsv'))
+
+        with self.assertRaisesRegex(ValidationError, 'numeric'):
+            format = DifferentialDirectoryFormat(temp_dir, mode='r')
+            format.validate()
+
+
+class TestProteinFASTAFormats(TestPluginBase):
+    package = 'q2_types.feature_data.tests'
+
+    def test_protein_fasta_format_validate_positive(self):
+        filepath = self.get_data_path('protein-sequences.fasta')
+        format = ProteinFASTAFormat(filepath, mode='r')
+
+        format.validate()
+        format.validate('min')
+
+    def test_protein_fasta_format_invalid_characters(self):
+        filepath = self.get_data_path('not-dna-sequences.fasta')
+        format = ProteinFASTAFormat(filepath, mode='r')
+
+        with self.assertRaisesRegex(
+                ValidationError, "Invalid character '1' .*0 on line 2"):
+            format.validate()
+
+    def test_protein_fasta_format_empty_file(self):
+        filepath = os.path.join(self.temp_dir.name, 'empty')
+        with open(filepath, 'w') as fh:
+            fh.write('\n')
+        format = ProteinFASTAFormat(filepath, mode='r')
+
+        format.validate()
+
+    def test_protein_sequences_directory_format(self):
+        filepath = self.get_data_path('protein-sequences.fasta')
+        shutil.copy(filepath,
+                    os.path.join(
+                        self.temp_dir.name, 'protein-sequences.fasta'))
+        format = ProteinSequencesDirectoryFormat(self.temp_dir.name, mode='r')
+
+        format.validate()
+
+    def test_aligned_protein_fasta_format_validate_positive(self):
+        filepath = self.get_data_path('aligned-protein-sequences.fasta')
+        format = AlignedProteinFASTAFormat(filepath, mode='r')
+
+        format.validate()
+        format.validate('min')
+
+    def test_aligned_protein_fasta_format_unaligned(self):
+        filepath = self.get_data_path('protein-sequences.fasta')
+        format = AlignedProteinFASTAFormat(filepath, mode='r')
+
+        with self.assertRaisesRegex(
+                ValidationError, 'line 5 was length 93.* previous .* 70'):
+            format.validate()
+
+    def test_aligned_protein_sequences_directory_format(self):
+        filepath = self.get_data_path('aligned-protein-sequences.fasta')
+        temp_dir = self.temp_dir.name
+        shutil.copy(filepath,
+                    os.path.join(temp_dir, 'aligned-protein-sequences.fasta'))
+        format = AlignedProteinSequencesDirectoryFormat(temp_dir, mode='r')
 
         format.validate()
 

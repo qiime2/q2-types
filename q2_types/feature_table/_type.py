@@ -1,5 +1,5 @@
 # ----------------------------------------------------------------------------
-# Copyright (c) 2016-2019, QIIME 2 development team.
+# Copyright (c) 2016-2021, QIIME 2 development team.
 #
 # Distributed under the terms of the Modified BSD License.
 #
@@ -31,13 +31,17 @@ Balance = SemanticType('Balance',
 PercentileNormalized = SemanticType('PercentileNormalized',
                                     variant_of=FeatureTable.field['content'])
 
+# Design is the type of design matrices for linear regressions that have
+# been transformed/coded.
+Design = SemanticType('Design', variant_of=FeatureTable.field['content'])
+
 plugin.register_semantic_types(FeatureTable, Frequency, RelativeFrequency,
                                PresenceAbsence, Balance, Composition,
-                               PercentileNormalized)
+                               PercentileNormalized, Design)
 
 plugin.register_semantic_type_to_format(
     FeatureTable[Frequency | RelativeFrequency |
                  PresenceAbsence | Balance | Composition |
-                 PercentileNormalized],
+                 PercentileNormalized | Design],
     artifact_format=BIOMV210DirFmt
 )
