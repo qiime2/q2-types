@@ -355,7 +355,7 @@ DifferentialDirectoryFormat = model.SingleFileDirectoryFormat(
 class ProteinFASTAFormat(FASTAFormat):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.alphabet = "ABCDEFGHIKLMNPQRSTVWXYZ"
+        self.alphabet = "ABCDEFGHIKLMNPQRSTVWXYZ*"
 
 
 ProteinSequencesDirectoryFormat = model.SingleFileDirectoryFormat(

@@ -1051,7 +1051,7 @@ class TestProteinFASTAFormatTransformers(TestPluginBase):
         exp = pd.Series(['MTTRDLTAAQFNETIQSSDMVLVDYWASWCGPCRAFAPTFAESSEK'
                          'HPDVVHAKVDTEAERELAAAAQIR',
                          'MVKQIESKTAFQEALDAAGDKLVVVDFSATWCGPCKMIKPFFHSLS'
-                         'EKYSNVIFLEVDVDDCQDVASECEVKCMPTFQFFKKGQKVGEFSGAN'],
+                         'EKYSNVIFLEVDVDDCQDVASECEVKCMPTFQFFKKGQKVGEFSGAN*'],
                         index=index, dtype=object)
 
         assert_series_equal(exp, obs)
@@ -1085,7 +1085,7 @@ class TestProteinFASTAFormatTransformers(TestPluginBase):
                                'FAPTFAESSEKHPDVVHAKVDTEAERELAAAAQIR',
                                'MVKQIESKTAFQEALDAAGDKLVVVDFSATWCGPC'
                                'KMIKPFFHSLSEKYSNVIFLEVDVDDCQDVASECE'
-                               'VKCMPTFQFFKKGQKVGEFSGAN'],
+                               'VKCMPTFQFFKKGQKVGEFSGAN*'],
                               index=index, columns=['Sequence'], dtype=object)
         exp = qiime2.Metadata(exp_df)
 

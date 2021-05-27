@@ -525,7 +525,7 @@ class TestProteinFASTAFormats(TestPluginBase):
         format = AlignedProteinFASTAFormat(filepath, mode='r')
 
         with self.assertRaisesRegex(
-                ValidationError, 'line 5 was length 93.* previous .* 70'):
+                ValidationError, 'line 5 was length 94.* previous .* 70'):
             format.validate()
 
     def test_aligned_protein_sequences_directory_format(self):
