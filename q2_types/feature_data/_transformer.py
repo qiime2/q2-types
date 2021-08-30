@@ -20,8 +20,8 @@ from . import (TaxonomyFormat, HeaderlessTSVTaxonomyFormat, TSVTaxonomyFormat,
                DNAFASTAFormat, PairedDNASequencesDirectoryFormat,
                AlignedDNAFASTAFormat, DifferentialFormat, ProteinFASTAFormat,
                AlignedProteinFASTAFormat, RNAFASTAFormat,
-               AlignedRNAFASTAFormat, PairedRNASequencesDirectoryFormat
-               )
+               AlignedRNAFASTAFormat, PairedRNASequencesDirectoryFormat,
+               BLAST6Format)
 
 
 # Taxonomy format transformers
@@ -643,4 +643,18 @@ def _223(ff: DifferentialFormat) -> qiime2.Metadata:
 def _224(data: pd.DataFrame) -> DifferentialFormat:
     ff = DifferentialFormat()
     qiime2.Metadata(data).save(str(ff))
+    return ff
+
+
+# blast types
+@plugin.register_transformer
+def _225(ff: BLAST6Format) -> pd.DataFrame:
+    return skbio.read(str(ff), format='blast+6', into=pd.DataFrame,
+                      default_columns=True)
+
+
+@plugin.register_transformer
+def _226(data: pd.DataFrame) -> BLAST6Format:
+    ff = BLAST6Format()
+    data.to_csv(str(ff), sep='\t', header=False, index=False)
     return ff
