@@ -20,7 +20,6 @@ requirements:
     - python {{ python }}
     - scikit-bio >=0.5.5
     - numpy
-    - blas=*=openblas
     - pandas >=1
     - biom-format >=2.1.5,<2.2.0
     - ijson
