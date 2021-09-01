@@ -1,6 +1,5 @@
 {% set data = load_setup_py_data() %}
 {% set version = data.get('version') or 'placehold' %}
-{% set release = '.'.join(version.split('.')[:2]) %}
 
 package:
   name: q2-types
@@ -25,11 +24,12 @@ requirements:
     - ijson
     - h5py
     - hdf5 {{ hdf5 }}
-    - qiime2 {{ qiime2 }}
+    - qiime2 {{ qiime2_epoch }}.*
 
 test:
   requires:
     - pytest
+    - qiime2 >={{ qiime2 }}
 
   imports:
     - q2_types
