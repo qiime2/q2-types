@@ -71,7 +71,10 @@ class BIOMV210Format(model.BinaryFileFormat):
 
     def sniff(self):
         try:
-            with self.open() as fh:
+            # Always sniff in read-only mode. If opened in 'w' mode,
+            # h5py will truncate the file, effectively destroying
+            # the table's contents
+            with h5py.File(str(self), mode='r') as fh:
                 for grp in self.groups:
                     if grp not in fh:
                         return False
