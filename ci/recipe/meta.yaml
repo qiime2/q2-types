@@ -23,7 +23,6 @@ requirements:
     - biom-format >=2.1.5,<2.2.0
     - ijson
     - h5py
-    - hdf5 {{ hdf5 }}
     - qiime2 {{ qiime2_epoch }}.*
 
 test:
