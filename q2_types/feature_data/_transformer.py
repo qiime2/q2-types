@@ -637,6 +637,7 @@ def _64(data: PairedRNAIterator) -> PairedRNASequencesDirectoryFormat:
 
 # Mixed Case Transformers
 
+
 @plugin.register_transformer
 def _65(fmt: MixedCaseDNAFASTAFormat) -> DNAIterator:
     generator = _read_from_fasta(str(fmt), constructor=skbio.DNA,
@@ -645,21 +646,15 @@ def _65(fmt: MixedCaseDNAFASTAFormat) -> DNAIterator:
 
 
 @plugin.register_transformer
-def _67(ff: MixedCaseDNAFASTAFormat) -> pd.Series:
+def _66(ff: MixedCaseDNAFASTAFormat) -> pd.Series:
     return _fastaformats_to_series(ff, constructor=skbio.DNA,
                                    lowercase=True)
 
 
 @plugin.register_transformer
-def _68(ff: MixedCaseDNAFASTAFormat) -> qiime2.Metadata:
+def _67(ff: MixedCaseDNAFASTAFormat) -> qiime2.Metadata:
     return _fastaformats_to_metadata(ff, constructor=skbio.DNA,
                                      lowercase=True)
-
-@plugin.register_transformer
-def _69(data: MixedCaseDNAIterator) -> DNAFASTAFormat:
-    ff = DNAFASTAFormat()
-    skbio.io.write(iter(data), format='fasta', into=str(ff))
-    return ff
 
 
 # differential types

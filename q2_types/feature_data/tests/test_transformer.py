@@ -942,22 +942,6 @@ class TestMixedCaseDNAFASTAFormatTransformers(TestPluginBase):
             self.assertEqual(observed, expected)
 
 
-    def test_mixed_case_dna_iterator_to_dna_fasta_format(self):
-        transformer = self.get_transformer(MixedCaseDNAIterator, DNAFASTAFormat)
-        filepath = self.get_data_path('dna-sequences-mixed-case.fasta')
-        generator = skbio.read(filepath, format='fasta', constructor=skbio.DNA,
-                               lowercase=True)
-        input = DNAIterator(generator)
-
-        obs = transformer(input)
-        self.assertIsInstance(obs, DNAFASTAFormat)
-        obs = skbio.read(str(obs), format='fasta', constructor=skbio.DNA,
-                         lowercase=True)
-
-        for act, exp in zip(obs, input):
-            self.assertEqual(act, exp)
-
-
     def test_mixed_case_dna_fasta_format_to_series(self):
         _, obs = self.transform_format(MixedCaseDNAFASTAFormat, pd.Series,
                                        'dna-sequences-mixed-case.fasta')
