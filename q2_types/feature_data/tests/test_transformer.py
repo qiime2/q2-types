@@ -23,11 +23,11 @@ from q2_types.feature_data import (
     PairedDNASequencesDirectoryFormat, AlignedDNAFASTAFormat,
     DifferentialFormat, AlignedDNAIterator, ProteinFASTAFormat,
     AlignedProteinFASTAFormat, RNAFASTAFormat, AlignedRNAFASTAFormat,
-    RNAIterator, AlignedRNAIterator, BLAST6Format
+    RNAIterator, AlignedRNAIterator, BLAST6Format, MixedCaseDNAFASTAFormat
 )
 from q2_types.feature_data._transformer import (
     _taxonomy_formats_to_dataframe, _dataframe_to_tsv_taxonomy_format,
-    ProteinIterator, AlignedProteinIterator)
+    ProteinIterator, AlignedProteinIterator, MixedCaseDNAIterator)
 from qiime2.plugin.testing import TestPluginBase
 
 
@@ -923,6 +923,20 @@ class TestRNAFASTAFormatTransformers(TestPluginBase):
             filename='aligned-rna-sequences.fasta')
 
         exp = skbio.read(str(input), format='fasta', constructor=skbio.RNA)
+
+        for observed, expected in zip(obs, exp):
+            self.assertEqual(observed, expected)
+
+
+class TestMixedCaseDNAFASTAFormatTransformers(TestPluginBase):
+    package = 'q2_types.feature_data.tests'
+
+    def test_mixed_case_dna_fasta_format_to_dna_iterator(self):
+        input, obs = self.transform_format(MixedCaseDNAFASTAFormat, DNAIterator,
+                                      filename='dna-sequences-mixed-case.fasta')
+
+        exp = skbio.read(str(input), format='fasta', constructor=skbio.DNA,
+                         lowercase=True)
 
         for observed, expected in zip(obs, exp):
             self.assertEqual(observed, expected)

@@ -20,7 +20,8 @@ from q2_types.feature_data import (
     ProteinFASTAFormat, AlignedProteinFASTAFormat, FASTAFormat,
     AlignedProteinSequencesDirectoryFormat, ProteinSequencesDirectoryFormat,
     RNAFASTAFormat, RNASequencesDirectoryFormat, AlignedRNAFASTAFormat,
-    AlignedRNASequencesDirectoryFormat, BLAST6DirectoryFormat
+    AlignedRNASequencesDirectoryFormat, BLAST6DirectoryFormat,
+    MixedCaseDNAFASTAFormat, MixedCaseDNASequencesDirectoryFormat
 )
 from qiime2.plugin.testing import TestPluginBase
 from qiime2.plugin import ValidationError
@@ -423,6 +424,98 @@ class TestNucleicAcidFASTAFormats(TestPluginBase):
         format = AlignedRNASequencesDirectoryFormat(temp_dir, mode='r')
 
         format.validate()
+
+    # Mixed Case
+    def test_mixed_case_dna_fasta_format_validate_positive(self):
+        filepath = self.get_data_path('dna-sequences-mixed-case.fasta')
+        format = MixedCaseDNAFASTAFormat(filepath, mode='r')
+
+        format.validate()
+
+    def test_mixed_case_dna_format_bom_passes(self):
+        filepath = self.get_data_path('dna-mixed-case-with-bom-passes.fasta')
+        format = MixedCaseDNAFASTAFormat(filepath, mode='r')
+
+        format.validate()
+
+    def test_mixed_case_dna_fasta_format_bom_fails(self):
+        filepath = self.get_data_path('dna-with-bom-fails.fasta')
+        format = MixedCaseDNAFASTAFormat(filepath, mode='r')
+
+        with self.assertRaisesRegex(ValidationError, 'First line'):
+            format.validate()
+
+    def test_mixed_case_dna_fasta_format_empty_file(self):
+        filepath = os.path.join(self.temp_dir.name, 'empty')
+        with open(filepath, 'w') as fh:
+            fh.write('\n')
+        format = MixedCaseDNAFASTAFormat(filepath, mode='r')
+
+        format.validate()
+
+    def test_mixed_case_dna_fasta_format_invalid_characters(self):
+        filepath = self.get_data_path('not-dna-sequences.fasta')
+        format = MixedCaseDNAFASTAFormat(filepath, mode='r')
+
+        with self.assertRaisesRegex(ValidationError, "Invalid character '1' "
+                                    ".*0 on line 2"):
+            format.validate()
+
+    def test_mixed_case_dna_format_validate_negative(self):
+        filepath = self.get_data_path('not-dna-sequences')
+        format = MixedCaseDNAFASTAFormat(filepath, mode='r')
+
+        with self.assertRaisesRegex(ValidationError, 'DNAFASTA'):
+            format.validate()
+
+    def test_mixed_case_dna_fasta_format_consecutive_IDs(self):
+        filepath = self.get_data_path('dna-sequences-consecutive-ids.fasta')
+        format = MixedCaseDNAFASTAFormat(filepath, mode='r')
+
+        with self.assertRaisesRegex(
+                ValidationError, 'consecutive descriptions.*1'):
+            format.validate()
+
+    def test_mixed_case_dna_fasta_format_missing_initial_ID(self):
+        filepath = self.get_data_path('dna-sequences-first-line-not-id.fasta')
+        format = MixedCaseDNAFASTAFormat(filepath, mode='r')
+
+        with self.assertRaisesRegex(ValidationError, 'First line'):
+            format.validate()
+
+    def test_mixed_case_dna_fasta_format_corrupt_characters(self):
+        filepath = self.get_data_path('dna-sequences-corrupt-characters.fasta')
+        format = MixedCaseDNAFASTAFormat(filepath, mode='r')
+
+        with self.assertRaisesRegex(ValidationError, 'utf-8.*2'):
+            format.validate()
+
+    def test_mixed_case_dna_sequences_directory_format(self):
+        filepath = self.get_data_path('dna-sequences-mixed-case.fasta')
+        shutil.copy(filepath,
+                    os.path.join(self.temp_dir.name,
+                                 'dna-sequences.fasta'))
+        format = MixedCaseDNASequencesDirectoryFormat(self.temp_dir.name,
+                                                      mode='r')
+
+        format.validate()
+
+    def test_mixed_case_dna_fasta_format_duplicate_ids(self):
+        filepath = self.get_data_path(
+                          'dna-sequences-mixed-case-with-duplicate-ids.fasta')
+        format = MixedCaseDNAFASTAFormat(filepath, mode='r')
+
+        with self.assertRaisesRegex(ValidationError, '6.*duplicate.*1'):
+            format.validate()
+
+    def test_mixed_case_dna_fasta_format_no_id(self):
+        filepath = self.get_data_path('dna-sequences-no-id.fasta')
+        format = MixedCaseDNAFASTAFormat(filepath, mode='r')
+
+        with self.assertRaisesRegex(ValidationError, '1.*missing an ID'):
+            format.validate()
+
+
 
 
 class TestDifferentialFormat(TestPluginBase):
