@@ -49,6 +49,7 @@ __all__ = [
     'AlignedRNASequencesDirectoryFormat', 'RNASequence', 'AlignedRNASequence',
     'PairedRNAIterator', 'PairedRNASequencesDirectoryFormat',
     'PairedEndRNASequence', 'BLAST6Format', 'BLAST6DirectoryFormat', 'BLAST6',
-    'MixedCaseDNAFASTAFormat', 'MixedCaseDNASequencesDirectoryFormat']
+    'MixedCaseDNAFASTAFormat', 'MixedCaseDNASequencesDirectoryFormat',
+    'MixedCaseDNAIterator']
 
 importlib.import_module('q2_types.feature_data._transformer')
