@@ -515,6 +515,13 @@ class TestNucleicAcidFASTAFormats(TestPluginBase):
         with self.assertRaisesRegex(ValidationError, '1.*missing an ID'):
             format.validate()
 
+    def test_mixed_case_dna_fasta_format_id_starts_with_space(self):
+        filepath = self.get_data_path(
+            'dna-sequences-id-starts-with-space.fasta')
+        format = MixedCaseDNAFASTAFormat(filepath, mode='r')
+
+        with self.assertRaisesRegex(ValidationError, '1 starts with a space'):
+            format.validate()
 
 
 

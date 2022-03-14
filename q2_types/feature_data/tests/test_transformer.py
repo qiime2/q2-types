@@ -942,6 +942,58 @@ class TestMixedCaseDNAFASTAFormatTransformers(TestPluginBase):
             self.assertEqual(observed, expected)
 
 
+    def test_mixed_case_dna_iterator_to_dna_fasta_format(self):
+        transformer = self.get_transformer(MixedCaseDNAIterator, DNAFASTAFormat)
+        filepath = self.get_data_path('dna-sequences-mixed-case.fasta')
+        generator = skbio.read(filepath, format='fasta', constructor=skbio.DNA,
+                               lowercase=True)
+        input = DNAIterator(generator)
+
+        obs = transformer(input)
+        self.assertIsInstance(obs, DNAFASTAFormat)
+        obs = skbio.read(str(obs), format='fasta', constructor=skbio.DNA,
+                         lowercase=True)
+
+        for act, exp in zip(obs, input):
+            self.assertEqual(act, exp)
+
+
+    def test_mixed_case_dna_fasta_format_to_series(self):
+        _, obs = self.transform_format(MixedCaseDNAFASTAFormat, pd.Series,
+                                       'dna-sequences-mixed-case.fasta')
+
+        obs = obs.astype(str)
+
+        index = pd.Index(['SEQUENCE1', 'SEQUENCE2'])
+        exp = pd.Series(['ACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTAC'
+                         'GTACGTACGTACGT', 'ACGTACGTACGTACGTACGTACGTACGTACGT'
+                         'ACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTAC'
+                         'GTACGT'], index=index, dtype=object)
+
+        assert_series_equal(exp, obs)
+
+
+    def test_mixed_case_dna_fasta_format_with_duplicate_ids_to_series(self):
+        with self.assertRaisesRegex(ValueError, 'unique.*SEQUENCE1'):
+            self.transform_format(MixedCaseDNAFASTAFormat, pd.Series,
+                            'dna-sequences-mixed-case-with-duplicate-ids.fasta')
+
+
+    def test_mixed_case_dna_fasta_format_to_metadata(self):
+        _, obs = self.transform_format(MixedCaseDNAFASTAFormat, qiime2.Metadata,
+                                       'dna-sequences-mixed-case.fasta')
+        index = pd.Index(['SEQUENCE1', 'SEQUENCE2'], name='Feature ID')
+        exp_df = pd.DataFrame(['ACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTA'
+                               'CGTACGTACGTACGTACGT', 'ACGTACGTACGTACGTACGTAC'
+                               'GTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACG'
+                               'TACGTACGTACGTACGTACGT'], index=index,
+                              columns=['Sequence'], dtype=object)
+        exp = qiime2.Metadata(exp_df)
+
+        self.assertEqual(exp, obs)
+
+
+
 class TestDifferentialTransformer(TestPluginBase):
     package = 'q2_types.feature_data.tests'
 
