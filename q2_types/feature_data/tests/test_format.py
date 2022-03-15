@@ -524,7 +524,6 @@ class TestNucleicAcidFASTAFormats(TestPluginBase):
             format.validate()
 
 
-
 class TestDifferentialFormat(TestPluginBase):
     package = 'q2_types.feature_data.tests'
 

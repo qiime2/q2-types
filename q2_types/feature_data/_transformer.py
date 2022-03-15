@@ -233,7 +233,8 @@ def _read_from_fasta(path, constructor=skbio.DNA, lowercase=False):
 
 def _fastaformats_to_series(ff, constructor=skbio.DNA, lowercase=False):
     data = {}
-    for sequence in _read_from_fasta(str(ff), constructor, lowercase=lowercase):
+    for sequence in _read_from_fasta(str(ff), constructor,
+                                     lowercase=lowercase):
         id_ = sequence.metadata['id']
         if id_ in data:
             raise ValueError("FASTA format sequence IDs must be unique. The "
@@ -279,10 +280,6 @@ class NucleicAcidIterator(collections.abc.Iterable):
 
 
 class DNAIterator(NucleicAcidIterator):
-    pass
-
-
-class MixedCaseDNAIterator(NucleicAcidIterator):
     pass
 
 
@@ -636,7 +633,12 @@ def _64(data: PairedRNAIterator) -> PairedRNASequencesDirectoryFormat:
 
 
 # Mixed Case Transformers
-
+# NOTE:
+# These are mainly for reading in mixed case data and converting to another
+# format (i.e. `MixedCaseDNAFASTAFormat` to `DNAIterator` or `DNAFASTAFormat`).
+# We'd have to make a new `skbio.sequence.GrammaredSequence` class to enable
+# proper iterator, reader, writer functionality for mixed case types. That is
+# skbio.DNA|RNA|Protein enforce IUPAC characters (i.e. capital letters).
 
 @plugin.register_transformer
 def _65(fmt: MixedCaseDNAFASTAFormat) -> DNAIterator:
@@ -665,8 +667,6 @@ def _69(ff: MixedCaseDNAFASTAFormat) -> DNAFASTAFormat:
     dff = DNAFASTAFormat()
     skbio.io.write(iter(data), format='fasta', into=str(dff))
     return dff
-
-
 
 
 # differential types

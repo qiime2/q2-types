@@ -29,7 +29,7 @@ from ._type import (
 from ._transformer import (
     NucleicAcidIterator, DNAIterator, PairedDNAIterator, AlignedDNAIterator,
     ProteinIterator, AlignedProteinIterator, RNAIterator, AlignedRNAIterator,
-    PairedRNAIterator, MixedCaseDNAIterator)
+    PairedRNAIterator)
 
 __all__ = [
     'TaxonomyFormat', 'TaxonomyDirectoryFormat', 'HeaderlessTSVTaxonomyFormat',
@@ -49,7 +49,6 @@ __all__ = [
     'AlignedRNASequencesDirectoryFormat', 'RNASequence', 'AlignedRNASequence',
     'PairedRNAIterator', 'PairedRNASequencesDirectoryFormat',
     'PairedEndRNASequence', 'BLAST6Format', 'BLAST6DirectoryFormat', 'BLAST6',
-    'MixedCaseDNAFASTAFormat', 'MixedCaseDNASequencesDirectoryFormat',
-    'MixedCaseDNAIterator']
+    'MixedCaseDNAFASTAFormat', 'MixedCaseDNASequencesDirectoryFormat']
 
 importlib.import_module('q2_types.feature_data._transformer')
