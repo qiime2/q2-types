@@ -657,6 +657,18 @@ def _67(ff: MixedCaseDNAFASTAFormat) -> qiime2.Metadata:
                                      lowercase=True)
 
 
+@plugin.register_transformer
+def _69(ff: MixedCaseDNAFASTAFormat) -> DNAFASTAFormat:
+    generator = _read_from_fasta(str(ff), constructor=skbio.DNA,
+                                 lowercase=True)
+    data = DNAIterator(generator)
+    dff = DNAFASTAFormat()
+    skbio.io.write(iter(data), format='fasta', into=str(dff))
+    return dff
+
+
+
+
 # differential types
 @plugin.register_transformer
 def _222(ff: DifferentialFormat) -> pd.DataFrame:
