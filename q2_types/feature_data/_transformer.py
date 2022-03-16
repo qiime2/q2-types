@@ -22,7 +22,7 @@ from . import (TaxonomyFormat, HeaderlessTSVTaxonomyFormat, TSVTaxonomyFormat,
                AlignedProteinFASTAFormat, RNAFASTAFormat,
                AlignedRNAFASTAFormat, PairedRNASequencesDirectoryFormat,
                BLAST6Format, MixedCaseDNAFASTAFormat, MixedCaseRNAFASTAFormat,
-               MixedCaseAlignedDNAFASTAFormat)
+               MixedCaseAlignedDNAFASTAFormat, MixedCaseAlignedRNAFASTAFormat)
 
 
 # Taxonomy format transformers

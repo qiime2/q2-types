@@ -22,7 +22,9 @@ from ._format import (
     MixedCaseDNAFASTAFormat, MixedCaseDNASequencesDirectoryFormat,
     MixedCaseRNAFASTAFormat, MixedCaseRNASequencesDirectoryFormat,
     MixedCaseAlignedDNAFASTAFormat,
-    MixedCaseAlignedDNASequencesDirectoryFormat)
+    MixedCaseAlignedDNASequencesDirectoryFormat,
+    MixedCaseAlignedRNAFASTAFormat,
+    MixedCaseAlignedRNASequencesDirectoryFormat)
 from ._type import (
     FeatureData, Taxonomy, Sequence, PairedEndSequence, AlignedSequence,
     Differential, ProteinSequence, AlignedProteinSequence, RNASequence,
@@ -55,6 +57,8 @@ __all__ = [
     'MixedCaseDNAFASTAFormat', 'MixedCaseDNASequencesDirectoryFormat'
     'MixedCaseRNAFASTAFormat', 'MixedCaseRNASequencesDirectoryFormat',
     'MixedCaseAlignedDNAFASTAFormat',
-    'MixedCaseAlignedDNASequencesDirectoryFormat']
+    'MixedCaseAlignedDNASequencesDirectoryFormat',
+    'MixedCaseAlignedRNAFASTAFormat',
+    'MixedCaseAlignedRNASequencesDirectoryFormat']
 
 importlib.import_module('q2_types.feature_data._transformer')

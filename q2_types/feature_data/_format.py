@@ -361,6 +361,18 @@ AlignedRNASequencesDirectoryFormat = model.SingleFileDirectoryFormat(
     AlignedRNAFASTAFormat)
 
 
+class MixedCaseAlignedRNAFASTAFormat(AlignedFASTAFormatMixin,
+                                     MixedCaseRNAFASTAFormat):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        super()._turn_into_alignment()
+
+
+MixedCaseAlignedRNASequencesDirectoryFormat = model.SingleFileDirectoryFormat(
+    'MixedCaseAlignedRNASequencesDirectoryFormat',
+    'aligned-rna-sequences.fasta', MixedCaseAlignedRNAFASTAFormat)
+
+
 def _construct_validator_from_alphabet(alphabet_str):
     if alphabet_str:
         Validator = re.compile(fr'[{alphabet_str}]+\r?\n?')
@@ -442,5 +454,7 @@ plugin.register_formats(
     BLAST6Format, BLAST6DirectoryFormat, MixedCaseDNAFASTAFormat,
     MixedCaseDNASequencesDirectoryFormat, MixedCaseRNAFASTAFormat,
     MixedCaseRNASequencesDirectoryFormat, MixedCaseAlignedDNAFASTAFormat,
-    MixedCaseAlignedDNASequencesDirectoryFormat
+    MixedCaseAlignedDNASequencesDirectoryFormat,
+    MixedCaseAlignedRNAFASTAFormat,
+    MixedCaseAlignedRNASequencesDirectoryFormat
 )
