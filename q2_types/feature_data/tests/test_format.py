@@ -22,7 +22,8 @@ from q2_types.feature_data import (
     RNAFASTAFormat, RNASequencesDirectoryFormat, AlignedRNAFASTAFormat,
     AlignedRNASequencesDirectoryFormat, BLAST6DirectoryFormat,
     MixedCaseDNAFASTAFormat, MixedCaseDNASequencesDirectoryFormat,
-    MixedCaseRNAFASTAFormat, MixedCaseRNASequencesDirectoryFormat
+    MixedCaseRNAFASTAFormat, MixedCaseRNASequencesDirectoryFormat,
+    MixedCaseAlignedDNAFASTAFormat, MixedCaseAlignedDNASequencesDirectoryFormat
 )
 from qiime2.plugin.testing import TestPluginBase
 from qiime2.plugin import ValidationError
@@ -426,8 +427,7 @@ class TestNucleicAcidFASTAFormats(TestPluginBase):
 
         format.validate()
 
-    # Mixed Case
-    ## DNA
+    # Mixed Case DNA
     def test_mixed_case_dna_fasta_format_validate_positive(self):
         filepath = self.get_data_path('dna-sequences-mixed-case.fasta')
         format = MixedCaseDNAFASTAFormat(filepath, mode='r')
@@ -525,9 +525,42 @@ class TestNucleicAcidFASTAFormats(TestPluginBase):
         with self.assertRaisesRegex(ValidationError, '1 starts with a space'):
             format.validate()
 
+    # Mixed case AlignedDNA
 
-    # Mixed Case
-    ## RNA
+    def test_mixed_case_aligned_dna_fasta_format_validate_positive(self):
+        filepath = self.get_data_path('aligned-dna-sequences-mixed-case.fasta')
+        format = MixedCaseAlignedDNAFASTAFormat(filepath, mode='r')
+
+        format.validate()
+
+    def test_mixed_case_aligned_dna_fasta_format_validate_negative(self):
+        filepath = self.get_data_path('not-dna-sequences')
+        format = MixedCaseAlignedDNAFASTAFormat(filepath, mode='r')
+
+        with self.assertRaisesRegex(ValidationError,
+                                    'MixedCaseAlignedDNAFASTA'):
+            format.validate()
+
+    def test_mixed_case_aligned_dna_fasta_format_unaligned(self):
+        filepath = self.get_data_path('dna-sequences-mixed-case.fasta')
+        format = MixedCaseAlignedDNAFASTAFormat(filepath, mode='r')
+
+        with self.assertRaisesRegex(ValidationError,
+                                    'line 4.*length 88.*length 64'):
+            format.validate()
+
+    def test_mixed_case_aligned_dna_sequences_directory_format(self):
+        filepath = self.get_data_path('aligned-dna-sequences-mixed-case.fasta')
+        temp_dir = self.temp_dir.name
+        shutil.copy(filepath,
+                    os.path.join(temp_dir,
+                                 'aligned-dna-sequences.fasta'))
+        format = MixedCaseAlignedDNASequencesDirectoryFormat(
+                                          temp_dir, mode='r')
+
+        format.validate()
+
+    # Mixed Case RNA
     def test_mixed_case_rna_fasta_format_validate_positive(self):
         filepath = self.get_data_path('rna-sequences-mixed-case.fasta')
         format = MixedCaseRNAFASTAFormat(filepath, mode='r')
@@ -624,7 +657,6 @@ class TestNucleicAcidFASTAFormats(TestPluginBase):
 
         with self.assertRaisesRegex(ValidationError, '1 starts with a space'):
             format.validate()
-
 
 
 class TestDifferentialFormat(TestPluginBase):

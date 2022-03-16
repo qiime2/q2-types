@@ -338,6 +338,18 @@ AlignedDNASequencesDirectoryFormat = model.SingleFileDirectoryFormat(
     AlignedDNAFASTAFormat)
 
 
+class MixedCaseAlignedDNAFASTAFormat(AlignedFASTAFormatMixin,
+                                     MixedCaseDNAFASTAFormat):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        super()._turn_into_alignment()
+
+
+MixedCaseAlignedDNASequencesDirectoryFormat = model.SingleFileDirectoryFormat(
+    'MixedCaseAlignedDNASequencesDirectoryFormat',
+    'aligned-dna-sequences.fasta', MixedCaseAlignedDNAFASTAFormat)
+
+
 class AlignedRNAFASTAFormat(AlignedFASTAFormatMixin, RNAFASTAFormat):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -429,5 +441,6 @@ plugin.register_formats(
     AlignedRNASequencesDirectoryFormat, PairedRNASequencesDirectoryFormat,
     BLAST6Format, BLAST6DirectoryFormat, MixedCaseDNAFASTAFormat,
     MixedCaseDNASequencesDirectoryFormat, MixedCaseRNAFASTAFormat,
-    MixedCaseRNASequencesDirectoryFormat
+    MixedCaseRNASequencesDirectoryFormat, MixedCaseAlignedDNAFASTAFormat,
+    MixedCaseAlignedDNASequencesDirectoryFormat
 )

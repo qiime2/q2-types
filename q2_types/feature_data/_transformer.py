@@ -21,7 +21,8 @@ from . import (TaxonomyFormat, HeaderlessTSVTaxonomyFormat, TSVTaxonomyFormat,
                AlignedDNAFASTAFormat, DifferentialFormat, ProteinFASTAFormat,
                AlignedProteinFASTAFormat, RNAFASTAFormat,
                AlignedRNAFASTAFormat, PairedRNASequencesDirectoryFormat,
-               BLAST6Format, MixedCaseDNAFASTAFormat, MixedCaseRNAFASTAFormat)
+               BLAST6Format, MixedCaseDNAFASTAFormat, MixedCaseRNAFASTAFormat,
+               MixedCaseAlignedDNAFASTAFormat)
 
 
 # Taxonomy format transformers

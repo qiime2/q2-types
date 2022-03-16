@@ -24,7 +24,7 @@ from q2_types.feature_data import (
     DifferentialFormat, AlignedDNAIterator, ProteinFASTAFormat,
     AlignedProteinFASTAFormat, RNAFASTAFormat, AlignedRNAFASTAFormat,
     RNAIterator, AlignedRNAIterator, BLAST6Format, MixedCaseDNAFASTAFormat,
-    MixedCaseDNAFASTAFormat
+    MixedCaseRNAFASTAFormat, MixedCaseAlignedDNAFASTAFormat
 )
 from q2_types.feature_data._transformer import (
     _taxonomy_formats_to_dataframe, _dataframe_to_tsv_taxonomy_format,
