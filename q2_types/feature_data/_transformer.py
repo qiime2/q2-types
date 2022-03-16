@@ -670,6 +670,93 @@ def _69(ff: MixedCaseDNAFASTAFormat) -> DNAFASTAFormat:
     return dff
 
 
+@plugin.register_transformer
+def _70(fmt: MixedCaseRNAFASTAFormat) -> RNAIterator:
+    generator = _read_from_fasta(str(fmt), constructor=skbio.RNA,
+                                 lowercase=True)
+    return RNAIterator(generator)
+
+
+@plugin.register_transformer
+def _71(ff: MixedCaseRNAFASTAFormat) -> pd.Series:
+    return _fastaformats_to_series(ff, constructor=skbio.RNA,
+                                   lowercase=True)
+
+
+@plugin.register_transformer
+def _72(ff: MixedCaseRNAFASTAFormat) -> qiime2.Metadata:
+    return _fastaformats_to_metadata(ff, constructor=skbio.RNA,
+                                     lowercase=True)
+
+
+@plugin.register_transformer
+def _73(ff: MixedCaseRNAFASTAFormat) -> RNAFASTAFormat:
+    generator = _read_from_fasta(str(ff), constructor=skbio.RNA,
+                                 lowercase=True)
+    data = RNAIterator(generator)
+    dff = RNAFASTAFormat()
+    skbio.io.write(iter(data), format='fasta', into=str(dff))
+    return dff
+
+
+@plugin.register_transformer
+def _74(fmt: MixedCaseAlignedDNAFASTAFormat) -> AlignedDNAIterator:
+    generator = _read_from_fasta(str(fmt), constructor=skbio.DNA,
+                                 lowercase=True)
+    return AlignedDNAIterator(generator)
+
+
+@plugin.register_transformer
+def _75(ff: MixedCaseAlignedDNAFASTAFormat) -> pd.Series:
+    return _fastaformats_to_series(ff, constructor=skbio.DNA,
+                                   lowercase=True)
+
+
+@plugin.register_transformer
+def _76(ff: MixedCaseAlignedDNAFASTAFormat) -> qiime2.Metadata:
+    return _fastaformats_to_metadata(ff, constructor=skbio.DNA,
+                                     lowercase=True)
+
+
+@plugin.register_transformer
+def _77(ff: MixedCaseAlignedDNAFASTAFormat) -> AlignedDNAFASTAFormat:
+    generator = _read_from_fasta(str(ff), constructor=skbio.DNA,
+                                 lowercase=True)
+    data = AlignedDNAIterator(generator)
+    dff = AlignedDNAFASTAFormat()
+    skbio.io.write(iter(data), format='fasta', into=str(dff))
+    return dff
+
+
+@plugin.register_transformer
+def _78(fmt: MixedCaseAlignedRNAFASTAFormat) -> AlignedRNAIterator:
+    generator = _read_from_fasta(str(fmt), constructor=skbio.RNA,
+                                 lowercase=True)
+    return AlignedRNAIterator(generator)
+
+
+@plugin.register_transformer
+def _79(ff: MixedCaseAlignedRNAFASTAFormat) -> pd.Series:
+    return _fastaformats_to_series(ff, constructor=skbio.RNA,
+                                   lowercase=True)
+
+
+@plugin.register_transformer
+def _80(ff: MixedCaseAlignedRNAFASTAFormat) -> qiime2.Metadata:
+    return _fastaformats_to_metadata(ff, constructor=skbio.RNA,
+                                     lowercase=True)
+
+
+@plugin.register_transformer
+def _81(ff: MixedCaseAlignedRNAFASTAFormat) -> AlignedRNAFASTAFormat:
+    generator = _read_from_fasta(str(ff), constructor=skbio.RNA,
+                                 lowercase=True)
+    data = AlignedRNAIterator(generator)
+    dff = AlignedRNAFASTAFormat()
+    skbio.io.write(iter(data), format='fasta', into=str(dff))
+    return dff
+
+
 # differential types
 @plugin.register_transformer
 def _222(ff: DifferentialFormat) -> pd.DataFrame:
