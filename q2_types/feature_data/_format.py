@@ -281,11 +281,10 @@ DNASequencesDirectoryFormat = model.SingleFileDirectoryFormat(
     'DNASequencesDirectoryFormat', 'dna-sequences.fasta', DNAFASTAFormat)
 
 
-class MixedCaseDNAFASTAFormat(FASTAFormat):
+class MixedCaseDNAFASTAFormat(DNAFASTAFormat):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        alph = "ACGTRYKMSWBDHVN"
-        self.alphabet = alph + alph.lower()
+        self.alphabet = self.alphabet + self.alphabet.lower()
 
 
 MixedCaseDNASequencesDirectoryFormat = model.SingleFileDirectoryFormat(
@@ -301,6 +300,17 @@ class RNAFASTAFormat(FASTAFormat):
 
 RNASequencesDirectoryFormat = model.SingleFileDirectoryFormat(
     'RNASequencesDirectoryFormat', 'rna-sequences.fasta', RNAFASTAFormat)
+
+
+class MixedCaseRNAFASTAFormat(RNAFASTAFormat):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.alphabet = self.alphabet + self.alphabet.lower()
+
+
+MixedCaseRNASequencesDirectoryFormat = model.SingleFileDirectoryFormat(
+    'MixedCaseRNASequencesDirectoryFormat', 'rna-sequences.fasta',
+    MixedCaseRNAFASTAFormat)
 
 
 class PairedDNASequencesDirectoryFormat(model.DirectoryFormat):
@@ -418,5 +428,6 @@ plugin.register_formats(
     RNASequencesDirectoryFormat, AlignedRNAFASTAFormat,
     AlignedRNASequencesDirectoryFormat, PairedRNASequencesDirectoryFormat,
     BLAST6Format, BLAST6DirectoryFormat, MixedCaseDNAFASTAFormat,
-    MixedCaseDNASequencesDirectoryFormat
+    MixedCaseDNASequencesDirectoryFormat, MixedCaseRNAFASTAFormat,
+    MixedCaseRNASequencesDirectoryFormat
 )
