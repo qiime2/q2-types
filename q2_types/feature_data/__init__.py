@@ -54,7 +54,7 @@ __all__ = [
     'AlignedRNASequencesDirectoryFormat', 'RNASequence', 'AlignedRNASequence',
     'PairedRNAIterator', 'PairedRNASequencesDirectoryFormat',
     'PairedEndRNASequence', 'BLAST6Format', 'BLAST6DirectoryFormat', 'BLAST6',
-    'MixedCaseDNAFASTAFormat', 'MixedCaseDNASequencesDirectoryFormat'
+    'MixedCaseDNAFASTAFormat', 'MixedCaseDNASequencesDirectoryFormat',
     'MixedCaseRNAFASTAFormat', 'MixedCaseRNASequencesDirectoryFormat',
     'MixedCaseAlignedDNAFASTAFormat',
     'MixedCaseAlignedDNASequencesDirectoryFormat',
