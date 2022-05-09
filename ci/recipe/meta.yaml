@@ -19,7 +19,7 @@ requirements:
     - python {{ python }}
     - scikit-bio {{ scikit_bio }}
     - numpy
-    - pandas >=1
+    - pandas {{ pandas }}
     - biom-format >=2.1.5,<2.2.0
     - ijson
     - h5py
