@@ -17,10 +17,10 @@ requirements:
 
   run:
     - python {{ python }}
-    - scikit-bio >=0.5.5
+    - scikit-bio {{ scikit_bio }}
     - numpy
-    - pandas >=1
-    - biom-format >=2.1.5,<2.2.0
+    - pandas {{ pandas }}
+    - biom-format {{ biom_format }}
     - ijson
     - h5py
     - qiime2 {{ qiime2_epoch }}.*
