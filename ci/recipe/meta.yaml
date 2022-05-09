@@ -20,7 +20,7 @@ requirements:
     - scikit-bio {{ scikit_bio }}
     - numpy
     - pandas {{ pandas }}
-    - biom-format >=2.1.5,<2.2.0
+    - biom-format {{ biom_format }}
     - ijson
     - h5py
     - qiime2 {{ qiime2_epoch }}.*
