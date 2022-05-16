@@ -1205,5 +1205,6 @@ class TestBLAST6Transformer(TestPluginBase):
         exp.index = pd.Index(exp.index.astype(str), name='id')
         assert_frame_equal(obs.to_dataframe(), exp)
 
+
 if __name__ == '__main__':
     unittest.main()

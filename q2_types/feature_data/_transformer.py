@@ -659,6 +659,7 @@ def _226(data: pd.DataFrame) -> BLAST6Format:
     data.to_csv(str(ff), sep='\t', header=False, index=False)
     return ff
 
+
 @plugin.register_transformer
 def _227(ff: BLAST6Format) -> qiime2.Metadata:
     data = skbio.read(
