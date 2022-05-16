@@ -658,3 +658,12 @@ def _226(data: pd.DataFrame) -> BLAST6Format:
     ff = BLAST6Format()
     data.to_csv(str(ff), sep='\t', header=False, index=False)
     return ff
+
+@plugin.register_transformer
+def _227(ff: BLAST6Format) -> qiime2.Metadata:
+    data = skbio.read(
+        str(ff), format='blast+6', into=pd.DataFrame, default_columns=True)
+    # Metadata cannot have repeat index names, nor a multiindex, so we use the
+    # default int index but cast to a str and give it a name.
+    data.index = pd.Index(data.index.astype(str), name='id')
+    return qiime2.Metadata(data)
