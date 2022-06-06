@@ -1194,6 +1194,17 @@ class TestBLAST6Transformer(TestPluginBase):
         obs = transformer(input)
         self.assertIsInstance(obs, BLAST6Format)
 
+    def test_blast6_to_metadata(self):
+
+        _, obs = self.transform_format(BLAST6Format, qiime2.Metadata,
+                                       filename='blast6.tsv')
+        # we already validated the DataFrame transformer above, so just use
+        # that as a reference point for this test, but re-cast the index as str
+        _, exp = self.transform_format(BLAST6Format, pd.DataFrame,
+                                       filename='blast6.tsv')
+        exp.index = pd.Index(exp.index.astype(str), name='id')
+        assert_frame_equal(obs.to_dataframe(), exp)
+
 
 if __name__ == '__main__':
     unittest.main()
