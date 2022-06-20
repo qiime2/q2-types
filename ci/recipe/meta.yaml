@@ -19,7 +19,9 @@ requirements:
     - python {{ python }}
     - scikit-bio {{ scikit_bio }}
     - numpy
-    - pandas {{ pandas }}
+    # TODO: revert
+    # - pandas {{ pandas }}
+    - pandas
     - biom-format {{ biom_format }}
     - ijson
     - h5py >=3.6.0
