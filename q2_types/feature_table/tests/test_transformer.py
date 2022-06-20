@@ -12,6 +12,7 @@ import biom
 import pandas as pd
 import qiime2
 
+from numpy.testing import assert_array_equal
 from pandas.testing import assert_frame_equal
 from q2_types.feature_table import BIOMV100Format, BIOMV210Format
 from qiime2.plugin.testing import TestPluginBase
@@ -29,10 +30,9 @@ class TestTransformers(TestPluginBase):
                                            filename='feature-table_v100.biom')
 
         exp = biom.load_table(str(input))
-        self.assertEqual(obs.ids(axis='observation').all(),
-                         exp.ids(axis='observation').all())
-        self.assertEqual(obs.ids(axis='sample').all(),
-                         exp.ids(axis='sample').all())
+        assert_array_equal(obs.ids(axis='observation'),
+                           exp.ids(axis='observation'))
+        assert_array_equal(obs.ids(axis='sample'), exp.ids(axis='sample'))
 
     def test_biom_v100_format_to_pandas_data_frame(self):
         input, obs = self.transform_format(BIOMV100Format, pd.DataFrame,
@@ -58,10 +58,9 @@ class TestTransformers(TestPluginBase):
 
         exp = biom.load_table(str(input))
 
-        self.assertEqual(obs.ids(axis='observation').all(),
-                         exp.ids(axis='observation').all())
-        self.assertEqual(obs.ids(axis='sample').all(),
-                         exp.ids(axis='sample').all())
+        assert_array_equal(obs.ids(axis='observation'),
+                           exp.ids(axis='observation'))
+        assert_array_equal(obs.ids(axis='sample'), exp.ids(axis='sample'))
 
     def test_biom_table_to_biom_v210_format(self):
         filepath = self.get_data_path('feature-table_v210.biom')
@@ -72,10 +71,9 @@ class TestTransformers(TestPluginBase):
         obs = biom.load_table(str(obs))
 
         exp = input
-        self.assertEqual(obs.ids(axis='observation').all(),
-                         exp.ids(axis='observation').all())
-        self.assertEqual(obs.ids(axis='sample').all(),
-                         exp.ids(axis='sample').all())
+        assert_array_equal(obs.ids(axis='observation'),
+                           exp.ids(axis='observation'))
+        assert_array_equal(obs.ids(axis='sample'), exp.ids(axis='sample'))
 
     def test_biom_table_to_pandas_data_frame(self):
         filepath = self.get_data_path('feature-table_v100.biom')
@@ -92,10 +90,9 @@ class TestTransformers(TestPluginBase):
         exp = biom.load_table(str(input))
         obs = biom.load_table(str(obs))
 
-        self.assertEqual(obs.ids(axis='observation').all(),
-                         exp.ids(axis='observation').all())
-        self.assertEqual(obs.ids(axis='sample').all(),
-                         exp.ids(axis='sample').all())
+        assert_array_equal(obs.ids(axis='observation'),
+                           exp.ids(axis='observation'))
+        assert_array_equal(obs.ids(axis='sample'), exp.ids(axis='sample'))
 
     def test_to_pandas_data_frame_to_biom_v210_format(self):
         filepath = self.get_data_path('feature-table_v100.biom')
