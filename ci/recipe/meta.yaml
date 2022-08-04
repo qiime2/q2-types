@@ -18,6 +18,7 @@ requirements:
   run:
     - python {{ python }}
     - scikit-bio {{ scikit_bio }}
+    - scipy {{ scipy }}
     - numpy
     - pandas {{ pandas }}
     - biom-format {{ biom_format }}
