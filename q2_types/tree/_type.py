@@ -22,8 +22,13 @@ Hierarchy = SemanticType('Hierarchy')
 
 plugin.register_semantic_types(Phylogeny, Rooted, Unrooted, Hierarchy)
 
-plugin.register_semantic_type_to_format(Phylogeny[Rooted | Unrooted],
-                                        artifact_format=NewickDirectoryFormat)
+plugin.register_artifact_class(
+    Phylogeny[Rooted], NewickDirectoryFormat,
+    "A phylogenetic tree containing a defined root.")
+
+plugin.register_artifact_class(
+    Phylogeny[Unrooted], NewickDirectoryFormat,
+    "A phylogenetic tree not containing a defined root.")
 
 plugin.register_semantic_type_to_format(Hierarchy,
                                         artifact_format=NewickDirectoryFormat)
