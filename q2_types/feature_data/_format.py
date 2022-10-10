@@ -394,6 +394,29 @@ BLAST6DirectoryFormat = model.SingleFileDirectoryFormat(
     'BLAST6DirectoryFormat', 'blast6.tsv', BLAST6Format)
 
 
+class NewlineListFileFormat(model.TextFileFormat):
+    """
+    Format for newline-delimited list.
+
+    More on this later.
+    """
+    def _validate_(self, level):
+        pass
+
+
+class InclusionExclusionDirectoryFormat(model.DirectoryFormat):
+    included = model.File('included.csv', format=NewlineListFileFormat)
+    excluded = model.File('excluded.csv', format=NewlineListFileFormat)
+
+    def validate(self, level='min'):
+        with open('included.csv') as included:
+            with open('excluded.csv') as excluded:
+                if set(included).intersection(excluded):
+                    raise model.ValidationError(
+                        'Overlapping IDs found in both included and excluded'
+                        ' lists.'
+                    )
+
 plugin.register_formats(
     TSVTaxonomyFormat, TSVTaxonomyDirectoryFormat,
     HeaderlessTSVTaxonomyFormat, HeaderlessTSVTaxonomyDirectoryFormat,
@@ -405,5 +428,6 @@ plugin.register_formats(
     AlignedProteinSequencesDirectoryFormat, RNAFASTAFormat,
     RNASequencesDirectoryFormat, AlignedRNAFASTAFormat,
     AlignedRNASequencesDirectoryFormat, PairedRNASequencesDirectoryFormat,
-    BLAST6Format, BLAST6DirectoryFormat
+    BLAST6Format, BLAST6DirectoryFormat, NewlineListFileFormat,
+    InclusionExclusionDirectoryFormat
 )

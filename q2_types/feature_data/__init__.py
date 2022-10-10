@@ -18,11 +18,12 @@ from ._format import (
     AlignedProteinSequencesDirectoryFormat, ProteinSequencesDirectoryFormat,
     ProteinFASTAFormat, AlignedProteinFASTAFormat, RNASequencesDirectoryFormat,
     RNAFASTAFormat, AlignedRNAFASTAFormat, AlignedRNASequencesDirectoryFormat,
-    PairedRNASequencesDirectoryFormat, BLAST6Format, BLAST6DirectoryFormat)
+    PairedRNASequencesDirectoryFormat, BLAST6Format, BLAST6DirectoryFormat,
+    NewlineListFileFormat, InclusionExclusionDirectoryFormat)
 from ._type import (
     FeatureData, Taxonomy, Sequence, PairedEndSequence, AlignedSequence,
     Differential, ProteinSequence, AlignedProteinSequence, RNASequence,
-    AlignedRNASequence, PairedEndRNASequence, BLAST6)
+    AlignedRNASequence, PairedEndRNASequence, BLAST6, Selection)
 
 # TODO remove these imports when tests are rewritten. Remove from __all__ too
 from ._transformer import (
@@ -47,6 +48,7 @@ __all__ = [
     'RNAFASTAFormat', 'AlignedRNAFASTAFormat', 'RNASequencesDirectoryFormat',
     'AlignedRNASequencesDirectoryFormat', 'RNASequence', 'AlignedRNASequence',
     'PairedRNAIterator', 'PairedRNASequencesDirectoryFormat',
-    'PairedEndRNASequence', 'BLAST6Format', 'BLAST6DirectoryFormat', 'BLAST6']
+    'PairedEndRNASequence', 'BLAST6Format', 'BLAST6DirectoryFormat', 'BLAST6',
+    'NewlineListFileFormat', 'InclusionExclusionDirectoryFormat', 'Selection']
 
 importlib.import_module('q2_types.feature_data._transformer')
