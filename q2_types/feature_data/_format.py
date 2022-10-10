@@ -401,12 +401,12 @@ class NewlineListFileFormat(model.TextFileFormat):
     More on this later.
     """
     def _validate_(self, level):
-        pass
+        return True
 
 
 class InclusionExclusionDirectoryFormat(model.DirectoryFormat):
-    included = model.File('included.csv', format=NewlineListFileFormat)
-    excluded = model.File('excluded.csv', format=NewlineListFileFormat)
+    included = model.File('included.txt', format=NewlineListFileFormat)
+    excluded = model.File('excluded.txt', format=NewlineListFileFormat)
 
     def validate(self, level='min'):
         with open('included.csv') as included:
