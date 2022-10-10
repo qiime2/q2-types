@@ -409,8 +409,8 @@ class InclusionExclusionDirectoryFormat(model.DirectoryFormat):
     excluded = model.File('excluded.txt', format=NewlineListFileFormat)
 
     def validate(self, level='min'):
-        with open('included.csv') as included:
-            with open('excluded.csv') as excluded:
+        with open('included.txt') as included:
+            with open('excluded.txt') as excluded:
                 if set(included).intersection(excluded):
                     raise model.ValidationError(
                         'Overlapping IDs found in both included and excluded'
