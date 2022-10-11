@@ -19,7 +19,7 @@ from ._format import (
     ProteinFASTAFormat, AlignedProteinFASTAFormat, RNASequencesDirectoryFormat,
     RNAFASTAFormat, AlignedRNAFASTAFormat, AlignedRNASequencesDirectoryFormat,
     PairedRNASequencesDirectoryFormat, BLAST6Format, BLAST6DirectoryFormat,
-    NewlineListFileFormat, InclusionExclusionDirectoryFormat)
+    UNIXListFormat, IDSelectionDirectoryFormat)
 from ._type import (
     FeatureData, Taxonomy, Sequence, PairedEndSequence, AlignedSequence,
     Differential, ProteinSequence, AlignedProteinSequence, RNASequence,
@@ -49,6 +49,6 @@ __all__ = [
     'AlignedRNASequencesDirectoryFormat', 'RNASequence', 'AlignedRNASequence',
     'PairedRNAIterator', 'PairedRNASequencesDirectoryFormat',
     'PairedEndRNASequence', 'BLAST6Format', 'BLAST6DirectoryFormat', 'BLAST6',
-    'NewlineListFileFormat', 'InclusionExclusionDirectoryFormat', 'Selection']
+    'UNIXListFormat', 'IDSelectionDirectoryFormat', 'Selection']
 
 importlib.import_module('q2_types.feature_data._transformer')
