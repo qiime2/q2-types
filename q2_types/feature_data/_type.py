@@ -52,8 +52,6 @@ BLAST6 = SemanticType('BLAST6', variant_of=FeatureData.field['type'])
 
 Selection = SemanticType('Selection', variant_of=FeatureData.field['type'])
 
-Selection = SemanticType('Selection', variant_of=FeatureData.field['type'])
-
 plugin.register_semantic_types(FeatureData, Taxonomy, Sequence,
                                PairedEndSequence, AlignedSequence,
                                Differential, ProteinSequence,
