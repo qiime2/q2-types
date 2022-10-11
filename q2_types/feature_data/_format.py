@@ -418,8 +418,9 @@ class IDMetadataFormat(model.TextFileFormat):
 class IDSelectionDirectoryFormat(model.DirectoryFormat):
     included = model.File('included.txt', format=UNIXListFormat)
     excluded = model.File('excluded.txt', format=UNIXListFormat)
-    metadata = model.File('metadata.tsv', format=IDMetadataFormat)
-    label = model.File('label.txt', format=UNIXListFormat)
+    metadata = model.File('metadata.tsv', format=IDMetadataFormat,
+                          optional=True)
+    label = model.File('label.txt', format=UNIXListFormat, optional=True)
 
     def validate(self, level='min'):
         with open('included.txt') as included:
