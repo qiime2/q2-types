@@ -21,7 +21,8 @@ from . import (TaxonomyFormat, HeaderlessTSVTaxonomyFormat, TSVTaxonomyFormat,
                AlignedDNAFASTAFormat, DifferentialFormat, ProteinFASTAFormat,
                AlignedProteinFASTAFormat, RNAFASTAFormat,
                AlignedRNAFASTAFormat, PairedRNASequencesDirectoryFormat,
-               BLAST6Format)
+               BLAST6Format, UNIXListFormat, IDSelectionDirectoryFormat,
+               IDMetadataFormat, IDSelection)
 
 
 # Taxonomy format transformers
@@ -668,3 +669,42 @@ def _227(ff: BLAST6Format) -> qiime2.Metadata:
     # default int index but cast to a str and give it a name.
     data.index = pd.Index(data.index.astype(str), name='id')
     return qiime2.Metadata(data)
+
+
+@plugin.register_transformer
+def _228(obj: IDSelection) -> IDSelectionDirectoryFormat:
+    result = IDSelectionDirectoryFormat()
+
+    inclusion = obj.inclusion
+    assert not inclusion.index.has_duplicates
+
+    include = inclusion.index[inclusion]
+    exclude = inclusion.index[~inclusion]
+    with open(result.included.path_maker(), 'w') as fh:
+        fh.write('\n'.join(include))
+    with open(result.excluded.path_maker(), 'w') as fh:
+        fh.write('\n'.join(exclude))
+
+    obj.metadata.save(result.metadata.path_maker())
+
+    with open(result.label.path_maker(), 'w') as fh:
+        fh.write(obj.label)
+
+    return result
+
+
+@plugin.register_transformer
+def _229(fmt: IDSelectionDirectoryFormat) -> qiime2.Metadata:
+    md = fmt.metadata.view(IDMetadataFormat).to_metadata()
+    return md.filter_ids(fmt.included.view(UNIXListFormat).to_list())
+
+
+@plugin.register_transformer
+def _230(fmt: IDSelectionDirectoryFormat) -> IDSelection:
+    md = fmt.metadata.view(IDMetadataFormat).to_metadata()
+    inclusion = pd.Series(False, index=md.to_dataframe().index)
+    included = fmt.included.view(UNIXListFormat).to_list()
+    inclusion[included] = True
+    with fmt.label.view(UNIXListFormat).open() as fh:
+        label = fh.read().strip()
+    return IDSelection(inclusion, md, label)
