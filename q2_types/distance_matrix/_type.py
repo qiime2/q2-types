@@ -17,5 +17,5 @@ DistanceMatrix = SemanticType('DistanceMatrix')
 plugin.register_semantic_types(DistanceMatrix)
 plugin.register_semantic_type_to_format(
     DistanceMatrix,
-    artifact_format=DistanceMatrixDirectoryFormat
+    directory_format=DistanceMatrixDirectoryFormat
 )

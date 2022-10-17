@@ -28,26 +28,26 @@ plugin.register_semantic_types(Sequences, SequencesWithQuality,
 
 plugin.register_artifact_class(
     SampleData[Sequences],
-    artifact_format=QIIME1DemuxDirFmt,
+    directory_format=QIIME1DemuxDirFmt,
     description=("Collections of sequences associated with specified samples "
                  "(i.e., demultiplexed sequences).")
 )
 plugin.register_artifact_class(
     SampleData[SequencesWithQuality],
-    artifact_format=SingleLanePerSampleSingleEndFastqDirFmt,
+    directory_format=SingleLanePerSampleSingleEndFastqDirFmt,
     description=("Collections of sequences with quality scores associated "
                  "with specified samples (i.e., demultiplexed sequences).")
 )
 plugin.register_artifact_class(
     SampleData[JoinedSequencesWithQuality],
-    artifact_format=SingleLanePerSampleSingleEndFastqDirFmt,
+    directory_format=SingleLanePerSampleSingleEndFastqDirFmt,
     description=("Collections of joined paired-end sequences with quality "
                  "scores associated with specified samples (i.e., "
                  "demultiplexed sequences).")
 )
 plugin.register_artifact_class(
     SampleData[PairedEndSequencesWithQuality],
-    artifact_format=SingleLanePerSamplePairedEndFastqDirFmt,
+    directory_format=SingleLanePerSamplePairedEndFastqDirFmt,
     description=("Collections of unjoined paired-end sequences with quality "
                  "scores associated with specified samples (i.e., "
                  "demultiplexed sequences).")

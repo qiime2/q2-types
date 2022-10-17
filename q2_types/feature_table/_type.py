@@ -43,5 +43,5 @@ plugin.register_semantic_type_to_format(
     FeatureTable[Frequency | RelativeFrequency |
                  PresenceAbsence | Balance | Composition |
                  PercentileNormalized | Design],
-    artifact_format=BIOMV210DirFmt
+    directory_format=BIOMV210DirFmt
 )

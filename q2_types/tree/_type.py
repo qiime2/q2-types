@@ -31,4 +31,4 @@ plugin.register_artifact_class(
     "A phylogenetic tree not containing a defined root.")
 
 plugin.register_semantic_type_to_format(Hierarchy,
-                                        artifact_format=NewickDirectoryFormat)
+                                        directory_format=NewickDirectoryFormat)

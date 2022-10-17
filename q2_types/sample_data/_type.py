@@ -21,5 +21,5 @@ plugin.register_semantic_types(SampleData, AlphaDiversity)
 
 plugin.register_semantic_type_to_format(
     SampleData[AlphaDiversity],
-    artifact_format=AlphaDiversityDirectoryFormat
+    directory_format=AlphaDiversityDirectoryFormat
 )
