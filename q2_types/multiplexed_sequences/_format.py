@@ -8,8 +8,10 @@
 
 import qiime2.plugin.model as model
 
+from ..per_sample_sequences import FastqGzFormat
+from ..feature_data import FASTAFormat, DNAFASTAFormat
+
 from ..plugin_setup import plugin
-from q2_types.per_sample_sequences import FastqGzFormat
 
 
 # MultiplexedSingleEndBarcodeInSequenceDirFmt &
@@ -27,7 +29,15 @@ class MultiplexedPairedEndBarcodeInSequenceDirFmt(model.DirectoryFormat):
     reverse_sequences = model.File('reverse.fastq.gz', format=FastqGzFormat)
 
 
+class MultiplexedFastaQualDirFmt(model.DirectoryFormat):
+    sequences = model.File('seqs.fna', format=DNAFASTAFormat)
+    # should probably have a QualFormat for validation purposes
+    # how to do cross-file validation (i.e., at the level of the DirFormat)
+    quality = model.File('seqs.qual', format=FASTAFormat)
+
+
 plugin.register_formats(
     MultiplexedSingleEndBarcodeInSequenceDirFmt,
     MultiplexedPairedEndBarcodeInSequenceDirFmt,
+    MultiplexedFastaQualDirFmt
 )

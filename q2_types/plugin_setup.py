@@ -35,5 +35,7 @@ importlib.import_module('q2_types.ordination')
 importlib.import_module('q2_types.sample_data')
 importlib.import_module('q2_types.feature_data')
 importlib.import_module('q2_types.per_sample_sequences')
-importlib.import_module('q2_types.multiplexed_sequences')
+# the following line triggers a circular import related
+# to FASTAFormat and DNAFASTAFormat
+#importlib.import_module('q2_types.multiplexed_sequences')
 importlib.import_module('q2_types.bowtie2')
