@@ -31,7 +31,7 @@ class MultiplexedPairedEndBarcodeInSequenceDirFmt(model.DirectoryFormat):
 
 class MultiplexedFastaQualDirFmt(model.DirectoryFormat):
     sequences = model.File('seqs.fna', format=DNAFASTAFormat)
-    # should probably have a QualFormat for validation purposes
+    # TODO: should probably have a QualFormat for validation purposes
     # how to do cross-file validation (i.e., at the level of the DirFormat)
     quality = model.File('seqs.qual', format=FASTAFormat)
 
