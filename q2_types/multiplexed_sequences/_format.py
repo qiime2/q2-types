@@ -18,7 +18,6 @@ from ..plugin_setup import plugin
 # MultiplexedPairedEndBarcodeInSequenceDirFmt represent multiplexed sequences
 # that contain inline barcode information:
 # AGGACTAGGTAGATC => barcode: AGGA ; biological sequence: CTAGGTAGATC
-
 MultiplexedSingleEndBarcodeInSequenceDirFmt = model.SingleFileDirectoryFormat(
     'MultiplexedSingleEndBarcodeInSequenceDirFmt', 'forward.fastq.gz',
     FastqGzFormat)
@@ -29,11 +28,18 @@ class MultiplexedPairedEndBarcodeInSequenceDirFmt(model.DirectoryFormat):
     reverse_sequences = model.File('reverse.fastq.gz', format=FastqGzFormat)
 
 
+class QualFormat(FASTAFormat):
+    # qual files (as in the 454 fasta/qual format) look like fasta files
+    # except that instead of sequence data they have space separated PHRED
+    # scores.
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.alphabet = "0123456789 "
+
+
 class MultiplexedFastaQualDirFmt(model.DirectoryFormat):
     sequences = model.File('seqs.fna', format=DNAFASTAFormat)
-    # TODO: should probably have a QualFormat for validation purposes
-    # how to do cross-file validation (i.e., at the level of the DirFormat)
-    quality = model.File('seqs.qual', format=FASTAFormat)
+    quality = model.File('seqs.qual', format=QualFormat)
 
 
 plugin.register_formats(
