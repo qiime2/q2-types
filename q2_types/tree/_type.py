@@ -14,7 +14,7 @@ from qiime2.plugin import SemanticType
 from qiime2.plugin.util import transform
 
 from ..plugin_setup import plugin
-from . import NewickFormat, NewickDirectoryFormat
+from . import NewickDirectoryFormat
 
 Phylogeny = SemanticType('Phylogeny', field_names=['type'])
 
@@ -30,7 +30,8 @@ plugin.register_artifact_class(
     Phylogeny[Unrooted], NewickDirectoryFormat,
     "A phylogenetic tree not containing a defined root.")
 
-## Phylogeny[Rooted] import usage example
+
+# Phylogeny[Rooted] import usage example
 def phylogeny_rooted_usage(use):
     def factory():
         from q2_types.tree import NewickFormat
@@ -43,10 +44,11 @@ def phylogeny_rooted_usage(use):
 
     to_import = use.init_format('my-tree', factory, ext='.tre')
 
-    ints = use.import_from_format('tree',
-                                  semantic_type='Phylogeny[Rooted]',
-                                  variable=to_import,
-                                  view_type='NewickFormat')
+    use.import_from_format('tree',
+                           semantic_type='Phylogeny[Rooted]',
+                           variable=to_import,
+                           view_type='NewickFormat')
+
 
 plugin.register_artifact_class(
     Phylogeny[Rooted], NewickDirectoryFormat,
