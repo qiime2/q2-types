@@ -27,11 +27,11 @@ Hierarchy = SemanticType('Hierarchy')
 plugin.register_semantic_types(Phylogeny, Rooted, Unrooted, Hierarchy)
 
 plugin.register_artifact_class(
-    Phylogeny[Rooted], NewickDirectoryFormat,
-    "A phylogenetic tree containing a defined root.")
+    Phylogeny[Unrooted], NewickDirectoryFormat,
+    "A phylogenetic tree not containing a defined root.")
 
-## Phylogeny[Unrooted] import usage example
-def phylogeny_unrooted_usage(use):
+## Phylogeny[Rooted] import usage example
+def phylogeny_rooted_usage(use):
     def factory():
         from q2_types.tree import NewickFormat
 
@@ -44,14 +44,14 @@ def phylogeny_unrooted_usage(use):
     to_import = use.init_format('my-tree', factory, ext='.tre')
 
     ints = use.import_from_format('tree',
-                                  semantic_type='Phylogeny[Unrooted]',
+                                  semantic_type='Phylogeny[Rooted]',
                                   variable=to_import,
                                   view_type='NewickFormat')
 
 plugin.register_artifact_class(
-    Phylogeny[Unrooted], NewickDirectoryFormat,
-    "A phylogenetic tree not containing a defined root.",
-    examples={'Import unrooted phylogenetic tree': phylogeny_unrooted_usage})
+    Phylogeny[Rooted], NewickDirectoryFormat,
+    "A phylogenetic tree containing a defined root.",
+    examples={'Import rooted phylogenetic tree': phylogeny_rooted_usage})
 
 plugin.register_semantic_type_to_format(Hierarchy,
                                         directory_format=NewickDirectoryFormat)
