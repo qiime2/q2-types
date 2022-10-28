@@ -38,8 +38,8 @@ class QualFormat(FASTAFormat):
 
 
 class MultiplexedFastaQualDirFmt(model.DirectoryFormat):
-    sequences = model.File('seqs.fna', format=DNAFASTAFormat)
-    quality = model.File('seqs.qual', format=QualFormat)
+    sequences = model.File('reads.fasta', format=DNAFASTAFormat)
+    quality = model.File('reads.qual', format=QualFormat)
 
 
 plugin.register_formats(

@@ -58,9 +58,8 @@ class TestMultiplexedFastaQualDirFmt(TestPluginBase):
 
     def test_format(self):
         # This test exists mainly to assert that the directory format is
-        # defined and functional. More extensive testing is performed
-        # on its underlying formats (FastqGzFormat).
-        for fn in ['seqs.fna', 'seqs.qual']:
+        # defined and functional.
+        for fn in ['reads.fasta', 'reads.qual']:
             filepath = self.get_data_path(fn)
             shutil.copy(filepath,
                         os.path.join(self.temp_dir.name, fn))

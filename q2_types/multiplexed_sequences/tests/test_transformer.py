@@ -23,7 +23,7 @@ class TestMultiplexedSequencesTransformers(TestPluginBase):
         _, obs = self.transform_format(
             MultiplexedFastaQualDirFmt,
             target=MultiplexedSingleEndBarcodeInSequenceDirFmt,
-            filenames=('seqs.fna', 'seqs.qual'))
+            filenames=('reads.fasta', 'reads.qual'))
 
         # TODO: can I access the file name (forward.fastq.gz) from result
         # so I'm not duplicating that here?
