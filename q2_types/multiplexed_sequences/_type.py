@@ -23,9 +23,9 @@ plugin.register_semantic_types(MultiplexedSingleEndBarcodeInSequence,
 
 plugin.register_semantic_type_to_format(
     MultiplexedSingleEndBarcodeInSequence,
-    artifact_format=MultiplexedSingleEndBarcodeInSequenceDirFmt
+    directory_format=MultiplexedSingleEndBarcodeInSequenceDirFmt
 )
 plugin.register_semantic_type_to_format(
     MultiplexedPairedEndBarcodeInSequence,
-    artifact_format=MultiplexedPairedEndBarcodeInSequenceDirFmt,
+    directory_format=MultiplexedPairedEndBarcodeInSequenceDirFmt,
 )

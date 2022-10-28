@@ -59,33 +59,33 @@ plugin.register_semantic_types(FeatureData, Taxonomy, Sequence,
 
 plugin.register_semantic_type_to_format(
     FeatureData[Taxonomy],
-    artifact_format=TSVTaxonomyDirectoryFormat)
+    directory_format=TSVTaxonomyDirectoryFormat)
 plugin.register_semantic_type_to_format(
     FeatureData[Sequence],
-    artifact_format=DNASequencesDirectoryFormat)
+    directory_format=DNASequencesDirectoryFormat)
 plugin.register_semantic_type_to_format(
     FeatureData[RNASequence],
-    artifact_format=RNASequencesDirectoryFormat)
+    directory_format=RNASequencesDirectoryFormat)
 plugin.register_semantic_type_to_format(
     FeatureData[PairedEndSequence],
-    artifact_format=PairedDNASequencesDirectoryFormat)
+    directory_format=PairedDNASequencesDirectoryFormat)
 plugin.register_semantic_type_to_format(
     FeatureData[PairedEndRNASequence],
-    artifact_format=PairedRNASequencesDirectoryFormat)
+    directory_format=PairedRNASequencesDirectoryFormat)
 plugin.register_semantic_type_to_format(
     FeatureData[AlignedSequence],
-    artifact_format=AlignedDNASequencesDirectoryFormat)
+    directory_format=AlignedDNASequencesDirectoryFormat)
 plugin.register_semantic_type_to_format(
     FeatureData[AlignedRNASequence],
-    artifact_format=AlignedRNASequencesDirectoryFormat)
+    directory_format=AlignedRNASequencesDirectoryFormat)
 plugin.register_semantic_type_to_format(
     FeatureData[Differential], DifferentialDirectoryFormat)
 plugin.register_semantic_type_to_format(
     FeatureData[ProteinSequence],
-    artifact_format=ProteinSequencesDirectoryFormat)
+    directory_format=ProteinSequencesDirectoryFormat)
 plugin.register_semantic_type_to_format(
     FeatureData[AlignedProteinSequence],
-    artifact_format=AlignedProteinSequencesDirectoryFormat)
+    directory_format=AlignedProteinSequencesDirectoryFormat)
 plugin.register_semantic_type_to_format(
     FeatureData[BLAST6],
-    artifact_format=BLAST6DirectoryFormat)
+    directory_format=BLAST6DirectoryFormat)

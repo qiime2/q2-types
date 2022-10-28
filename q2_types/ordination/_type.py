@@ -19,11 +19,11 @@ ProcrustesStatistics = SemanticType('ProcrustesStatistics')
 plugin.register_semantic_types(PCoAResults, ProcrustesStatistics)
 plugin.register_semantic_type_to_format(
     PCoAResults,
-    artifact_format=OrdinationDirectoryFormat
+    directory_format=OrdinationDirectoryFormat
 )
 
 plugin.register_semantic_type_to_format(
     ProcrustesStatistics,
 
-    artifact_format=ProcrustesStatisticsDirFmt
+    directory_format=ProcrustesStatisticsDirFmt
 )
