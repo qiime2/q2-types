@@ -22,8 +22,6 @@ def _1(df: MultiplexedFastaQualDirFmt) -> \
 
     result = MultiplexedSingleEndBarcodeInSequenceDirFmt()
 
-    # TODO: can I access the file name (forward.fastq.gz) from result
-    # so I'm not duplicating that here?
     with open(result.path / 'forward.fastq.gz', 'wb') as fh:
         for seq in skbio.io.read(seqs, qual=qual, format='fasta',
                                  verify=False):

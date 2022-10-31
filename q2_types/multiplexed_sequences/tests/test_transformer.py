@@ -25,8 +25,6 @@ class TestMultiplexedSequencesTransformers(TestPluginBase):
             target=MultiplexedSingleEndBarcodeInSequenceDirFmt,
             filenames=('reads.fasta', 'reads.qual'))
 
-        # TODO: can I access the file name (forward.fastq.gz) from result
-        # so I'm not duplicating that here?
         sequences = skbio.io.read('%s/forward.fastq.gz' % str(obs),
                                   format='fastq',
                                   variant='illumina1.8')
