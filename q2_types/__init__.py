@@ -15,6 +15,7 @@ del get_versions
 
 # feature_data needs to be imported before feature_table to avoid circular
 # import.
+importlib.import_module('q2_types.multiplexed_sequences')
 importlib.import_module('q2_types.feature_data')
 importlib.import_module('q2_types.feature_table')
 importlib.import_module('q2_types.distance_matrix')
