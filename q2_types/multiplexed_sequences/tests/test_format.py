@@ -13,6 +13,7 @@ import unittest
 from q2_types.multiplexed_sequences import (
     MultiplexedSingleEndBarcodeInSequenceDirFmt,
     MultiplexedPairedEndBarcodeInSequenceDirFmt,
+    MultiplexedFastaQualDirFmt
 )
 from qiime2.plugin.testing import TestPluginBase
 
@@ -47,6 +48,22 @@ class TestMultiplexedPairedEndBarcodeInSequenceDirFmt(TestPluginBase):
                         os.path.join(self.temp_dir.name, '%s.fastq.gz' % read))
         format = MultiplexedPairedEndBarcodeInSequenceDirFmt(
             self.temp_dir.name, mode='r')
+
+        # Should not error.
+        format.validate()
+
+
+class TestMultiplexedFastaQualDirFmt(TestPluginBase):
+    package = 'q2_types.multiplexed_sequences.tests'
+
+    def test_format(self):
+        # This test exists mainly to assert that the directory format is
+        # defined and functional.
+        for fn in ['reads.fasta', 'reads.qual']:
+            filepath = self.get_data_path(fn)
+            shutil.copy(filepath,
+                        os.path.join(self.temp_dir.name, fn))
+        format = MultiplexedFastaQualDirFmt(self.temp_dir.name, mode='r')
 
         # Should not error.
         format.validate()

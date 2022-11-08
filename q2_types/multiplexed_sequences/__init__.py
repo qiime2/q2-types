@@ -6,8 +6,11 @@
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
 
+import importlib
+
 from ._format import (MultiplexedSingleEndBarcodeInSequenceDirFmt,
-                      MultiplexedPairedEndBarcodeInSequenceDirFmt)
+                      MultiplexedPairedEndBarcodeInSequenceDirFmt,
+                      MultiplexedFastaQualDirFmt)
 from ._type import (MultiplexedSingleEndBarcodeInSequence,
                     MultiplexedPairedEndBarcodeInSequence)
 
@@ -16,4 +19,7 @@ __all__ = [
     'MultiplexedPairedEndBarcodeInSequence',
     'MultiplexedSingleEndBarcodeInSequenceDirFmt',
     'MultiplexedPairedEndBarcodeInSequenceDirFmt',
+    'MultiplexedFastaQualDirFmt'
 ]
+
+importlib.import_module('q2_types.multiplexed_sequences._transformer')
