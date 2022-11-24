@@ -19,11 +19,12 @@ ProcrustesStatistics = SemanticType('ProcrustesStatistics')
 plugin.register_semantic_types(PCoAResults, ProcrustesStatistics)
 plugin.register_artifact_class(
     PCoAResults,
-    directory_format=OrdinationDirectoryFormat
+    directory_format=OrdinationDirectoryFormat,
+    description="The results of running principal coordinate analysis (PCoA)."
 )
 
 plugin.register_artifact_class(
     ProcrustesStatistics,
-
-    directory_format=ProcrustesStatisticsDirFmt
+    directory_format=ProcrustesStatisticsDirFmt,
+    description="The results of running Procrustes analysis."
 )

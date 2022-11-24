@@ -36,3 +36,4 @@ plugin.register_artifact_class(
                  "difference samples), which are paired-end reads, and which "
                  "contain the barcode (i.e., index) indicating the source "
                  "sample as part of the sequence read.")
+)
