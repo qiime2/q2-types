@@ -21,5 +21,7 @@ plugin.register_semantic_types(SampleData, AlphaDiversity)
 
 plugin.register_artifact_class(
     SampleData[AlphaDiversity],
-    directory_format=AlphaDiversityDirectoryFormat
+    directory_format=AlphaDiversityDirectoryFormat,
+    description=("Alpha diversity values, each associated with a single "
+                 "sample identifier.")
 )
