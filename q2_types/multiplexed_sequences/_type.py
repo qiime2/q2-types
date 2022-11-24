@@ -23,9 +23,16 @@ plugin.register_semantic_types(MultiplexedSingleEndBarcodeInSequence,
 
 plugin.register_artifact_class(
     MultiplexedSingleEndBarcodeInSequence,
-    directory_format=MultiplexedSingleEndBarcodeInSequenceDirFmt
+    directory_format=MultiplexedSingleEndBarcodeInSequenceDirFmt,
+    description=("Multiplexed sequences (i.e., representing multiple "
+                 "difference samples), which are single-end reads, and which "
+                 "contain the barcode (i.e., index) indicating the source "
+                 "sample as part of the sequence read.")
 )
 plugin.register_artifact_class(
     MultiplexedPairedEndBarcodeInSequence,
     directory_format=MultiplexedPairedEndBarcodeInSequenceDirFmt,
-)
+    description=("Multiplexed sequences (i.e., representing multiple "
+                 "difference samples), which are paired-end reads, and which "
+                 "contain the barcode (i.e., index) indicating the source "
+                 "sample as part of the sequence read.")
