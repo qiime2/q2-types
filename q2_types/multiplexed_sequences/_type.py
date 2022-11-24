@@ -21,11 +21,11 @@ MultiplexedPairedEndBarcodeInSequence = \
 plugin.register_semantic_types(MultiplexedSingleEndBarcodeInSequence,
                                MultiplexedPairedEndBarcodeInSequence)
 
-plugin.register_semantic_type_to_format(
+plugin.register_artifact_class(
     MultiplexedSingleEndBarcodeInSequence,
     directory_format=MultiplexedSingleEndBarcodeInSequenceDirFmt
 )
-plugin.register_semantic_type_to_format(
+plugin.register_artifact_class(
     MultiplexedPairedEndBarcodeInSequence,
     directory_format=MultiplexedPairedEndBarcodeInSequenceDirFmt,
 )

@@ -55,5 +55,5 @@ plugin.register_artifact_class(
     "A phylogenetic tree containing a defined root.",
     examples={'Import rooted phylogenetic tree': phylogeny_rooted_usage})
 
-plugin.register_semantic_type_to_format(Hierarchy,
-                                        directory_format=NewickDirectoryFormat)
+plugin.register_artifact_class(Hierarchy,
+                               directory_format=NewickDirectoryFormat)

@@ -39,7 +39,7 @@ plugin.register_semantic_types(FeatureTable, Frequency, RelativeFrequency,
                                PresenceAbsence, Balance, Composition,
                                PercentileNormalized, Design)
 
-plugin.register_semantic_type_to_format(
+plugin.register_artifact_class(
     FeatureTable[Frequency | RelativeFrequency |
                  PresenceAbsence | Balance | Composition |
                  PercentileNormalized | Design],
