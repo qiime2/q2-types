@@ -391,6 +391,15 @@ class CasavaOneEightLanelessPerSampleDirFmt(model.DirectoryFormat):
         return '%s_%s_R%d_001.fastq.gz' % (sample_id, barcode_id, read_number)
 
 
+class SampleIdIndexedSingleEndPerSampleDirFmt(model.DirectoryFormat):
+    sequences = model.FileCollection(r'.+\.fastq\.gz',
+                                     format=FastqGzFormat)
+
+    @sequences.set_path_maker
+    def sequences_path_maker(self, sample_id, barcode_id, read_number):
+        return '%s_%s_R%d_001.fastq.gz' % (sample_id, barcode_id, read_number)
+
+
 class QIIME1DemuxFormat(model.TextFileFormat):
     """QIIME 1 demultiplexed FASTA format.
 
@@ -499,5 +508,6 @@ plugin.register_formats(
     SingleEndFastqManifestPhred64, PairedEndFastqManifestPhred33,
     PairedEndFastqManifestPhred64, SingleEndFastqManifestPhred33V2,
     SingleEndFastqManifestPhred64V2, PairedEndFastqManifestPhred33V2,
-    PairedEndFastqManifestPhred64V2, QIIME1DemuxFormat, QIIME1DemuxDirFmt
+    PairedEndFastqManifestPhred64V2, QIIME1DemuxFormat, QIIME1DemuxDirFmt,
+    SampleIdIndexedSingleEndPerSampleDirFmt
 )
