@@ -392,6 +392,14 @@ class CasavaOneEightLanelessPerSampleDirFmt(model.DirectoryFormat):
 
 
 class SampleIdIndexedSingleEndPerSampleDirFmt(model.DirectoryFormat):
+    """Single-end reads in fastq.gz files where base filename is the sample id
+
+        The full file name, minus the extension (`.fastq.gz`) is the sample id.
+        For example, the sample id for the file:
+         * `sample-1.fastq.gz` is `sample-1`
+         * `xyz.fastq.gz` is `xyz`
+         * `sample-42_S1_L001_R1_001.fastq.gz` is `sample-42_S1_L001_R1_001`
+    """
     sequences = model.FileCollection(r'.+\.fastq\.gz',
                                      format=FastqGzFormat)
 
