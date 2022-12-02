@@ -21,7 +21,9 @@ import yaml
 # up in circular import mayhem. That is all.
 
 
-def _parse_sequence_filename(path, parse_lane=True, parse_sample_id_only=False):
+def _parse_sequence_filename(path,
+                             parse_lane=True,
+                             parse_sample_id_only=False):
     filename = str(path).replace('.fastq.gz', '')
 
     if parse_sample_id_only:
