@@ -34,6 +34,7 @@ from . import (
     PairedEndFastqManifestPhred33V2,
     PairedEndFastqManifestPhred64V2,
     QIIME1DemuxDirFmt,
+    SampleIdIndexedSingleEndPerSampleDirFmt,
 )
 from ._util import (
     _single_lane_per_sample_fastq_helper,
@@ -244,3 +245,11 @@ def _26(fmt: PairedEndFastqManifestPhred64V2) \
     old_fmt = _manifest_v2_to_v1(fmt, FastqManifestFormat)
     return _fastq_manifest_helper_partial(old_fmt, _write_phred64_to_phred33,
                                           single_end=False)
+
+
+@plugin.register_transformer
+def _27(dirfmt: SampleIdIndexedSingleEndPerSampleDirFmt) \
+        -> SingleLanePerSampleSingleEndFastqDirFmt:
+    return _single_lane_per_sample_fastq_helper_partial(
+        dirfmt, SingleLanePerSampleSingleEndFastqDirFmt,
+        parse_sample_id_only=True)
