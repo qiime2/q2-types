@@ -57,35 +57,63 @@ plugin.register_semantic_types(FeatureData, Taxonomy, Sequence,
                                BLAST6)
 
 
-plugin.register_semantic_type_to_format(
+plugin.register_artifact_class(
     FeatureData[Taxonomy],
-    directory_format=TSVTaxonomyDirectoryFormat)
-plugin.register_semantic_type_to_format(
+    directory_format=TSVTaxonomyDirectoryFormat,
+    description=("Hierarchical metadata or annotations associated with a set "
+                 "of features. This can contain one or more hierarchical "
+                 "levels, and annotations can be anything (e.g., taxonomy of "
+                 "organisms, functional categorization of gene families, ...) "
+                 "as long as it is strictly hierarchical."))
+plugin.register_artifact_class(
     FeatureData[Sequence],
-    directory_format=DNASequencesDirectoryFormat)
-plugin.register_semantic_type_to_format(
+    directory_format=DNASequencesDirectoryFormat,
+    description=("Unaligned DNA sequences associated with a set of feature "
+                 "identifiers (e.g., ASV sequences or OTU representative "
+                 "sequence). Exactly one sequence is associated with each "
+                 "feature identfiier."))
+plugin.register_artifact_class(
     FeatureData[RNASequence],
-    directory_format=RNASequencesDirectoryFormat)
-plugin.register_semantic_type_to_format(
+    directory_format=RNASequencesDirectoryFormat,
+    description=("Unaligned RNA sequences associated with a set of feature "
+                 "identifiers. Exactly one sequence is associated with each "
+                 "feature identfiier."))
+plugin.register_artifact_class(
     FeatureData[PairedEndSequence],
     directory_format=PairedDNASequencesDirectoryFormat)
-plugin.register_semantic_type_to_format(
+plugin.register_artifact_class(
     FeatureData[PairedEndRNASequence],
     directory_format=PairedRNASequencesDirectoryFormat)
-plugin.register_semantic_type_to_format(
+plugin.register_artifact_class(
     FeatureData[AlignedSequence],
-    directory_format=AlignedDNASequencesDirectoryFormat)
-plugin.register_semantic_type_to_format(
+    directory_format=AlignedDNASequencesDirectoryFormat,
+    description=("Aligned DNA sequences associated with a set of feature "
+                 "identifiers (e.g., aligned ASV sequences or OTU "
+                 "representative sequence). Exactly one sequence is "
+                 "associated with each feature identfiier."))
+plugin.register_artifact_class(
     FeatureData[AlignedRNASequence],
-    directory_format=AlignedRNASequencesDirectoryFormat)
-plugin.register_semantic_type_to_format(
+    directory_format=AlignedRNASequencesDirectoryFormat,
+    description=("Aligned RNA sequences associated with a set of feature "
+                 "identifiers. Exactly one sequence is associated with each "
+                 "feature identfiier."))
+plugin.register_artifact_class(
     FeatureData[Differential], DifferentialDirectoryFormat)
-plugin.register_semantic_type_to_format(
+plugin.register_artifact_class(
     FeatureData[ProteinSequence],
-    directory_format=ProteinSequencesDirectoryFormat)
-plugin.register_semantic_type_to_format(
+    directory_format=ProteinSequencesDirectoryFormat,
+    description=("Unaligned protein sequences associated with a set of "
+                 "feature identifiers. Exactly one sequence is associated "
+                 "with each feature identfiier."))
+plugin.register_artifact_class(
     FeatureData[AlignedProteinSequence],
-    directory_format=AlignedProteinSequencesDirectoryFormat)
-plugin.register_semantic_type_to_format(
+    directory_format=AlignedProteinSequencesDirectoryFormat,
+    description=("Aligned protein sequences associated with a set of "
+                 "feature identifiers. Exactly one sequence is associated "
+                 "with each feature identfiier."))
+# FeatureData[BLAST6] seems to fix file type with semantic type.
+plugin.register_artifact_class(
     FeatureData[BLAST6],
-    directory_format=BLAST6DirectoryFormat)
+    directory_format=BLAST6DirectoryFormat,
+    description=("BLAST results associated with a set of feature "
+                 "identifiers."))

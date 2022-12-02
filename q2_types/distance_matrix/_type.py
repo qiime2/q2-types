@@ -15,7 +15,8 @@ from . import DistanceMatrixDirectoryFormat
 DistanceMatrix = SemanticType('DistanceMatrix')
 
 plugin.register_semantic_types(DistanceMatrix)
-plugin.register_semantic_type_to_format(
+plugin.register_artifact_class(
     DistanceMatrix,
-    directory_format=DistanceMatrixDirectoryFormat
+    directory_format=DistanceMatrixDirectoryFormat,
+    description="A symmetric matrix representing distances between entities."
 )
