@@ -306,7 +306,6 @@ class TestTransformers(TestPluginBase):
         )
 
         input.validate()
-        obs.validate()
 
         exp_fp = ['Human-Armpit_na_L001_R1_001.fastq.gz',
                   'Human-Kneecap_S1_L001_R1_001_na_L001_R1_001.fastq.gz']
