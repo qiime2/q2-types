@@ -22,7 +22,7 @@ from qiime2.plugin import ValidationError
 
 from ..plugin_setup import plugin
 from ._util import (
-    _parse_casava_filename,
+    _parse_sequence_filename,
     _manifest_to_df,
 )
 
@@ -307,7 +307,7 @@ class CasavaOneEightSingleLanePerSampleDirFmt(model.DirectoryFormat):
         with tmp_manifest.open() as fh:
             fh.write('sample-id,filename,direction\n')
             for fp, _ in self.sequences.iter_views(FastqGzFormat):
-                sample_id, _, _, _, direction = _parse_casava_filename(fp)
+                sample_id, _, _, _, direction = _parse_sequence_filename(fp)
                 fh.write('%s,%s,%s\n' % (sample_id, fp.name, direction))
 
         df = _manifest_to_df(tmp_manifest, self.path.parent)
@@ -404,8 +404,8 @@ class SampleIdIndexedSingleEndPerSampleDirFmt(model.DirectoryFormat):
                                      format=FastqGzFormat)
 
     @sequences.set_path_maker
-    def sequences_path_maker(self, sample_id, barcode_id, read_number):
-        return '%s_%s_R%d_001.fastq.gz' % (sample_id, barcode_id, read_number)
+    def sequences_path_maker(self, sample_id):
+        return '%s_%s_R%d_001.fastq.gz' % (sample_id)
 
 
 class QIIME1DemuxFormat(model.TextFileFormat):

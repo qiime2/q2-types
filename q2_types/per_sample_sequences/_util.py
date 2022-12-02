@@ -21,13 +21,11 @@ import yaml
 # up in circular import mayhem. That is all.
 
 
-def _parse_casava_filename(path, parse_lane=True, parse_sample_id_only=False):
+def _parse_sequence_filename(path, parse_lane=True, parse_sample_id_only=False):
     filename = str(path).replace('.fastq.gz', '')
 
     if parse_sample_id_only:
         # all text before the extension should be treated as the sample id.
-        # in this case, _parse_casava_filename is a misnomer, so it may be
-        # worth renaming to generalize this.
         return filename, 'na', 1, 1, 'forward'
 
     directions = ['forward', 'reverse']
@@ -52,7 +50,7 @@ def _single_lane_per_sample_fastq_helper(
     manifest_fh = manifest.open()
     manifest_fh.write('sample-id,filename,direction\n')
     for path, view in dirfmt.sequences.iter_views(fastq_fmt):
-        parsed = _parse_casava_filename(
+        parsed = _parse_sequence_filename(
             path, parse_lane=parse_lane,
             parse_sample_id_only=parse_sample_id_only)
         sample_id, barcode_id, lane_number, read_number, direction = parsed
