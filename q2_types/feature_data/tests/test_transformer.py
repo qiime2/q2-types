@@ -23,7 +23,9 @@ from q2_types.feature_data import (
     PairedDNASequencesDirectoryFormat, AlignedDNAFASTAFormat,
     DifferentialFormat, AlignedDNAIterator, ProteinFASTAFormat,
     AlignedProteinFASTAFormat, RNAFASTAFormat, AlignedRNAFASTAFormat,
-    RNAIterator, AlignedRNAIterator, BLAST6Format
+    RNAIterator, AlignedRNAIterator, BLAST6Format, MixedCaseDNAFASTAFormat,
+    MixedCaseRNAFASTAFormat, MixedCaseAlignedDNAFASTAFormat,
+    MixedCaseAlignedRNAFASTAFormat
 )
 from q2_types.feature_data._transformer import (
     _taxonomy_formats_to_dataframe, _dataframe_to_tsv_taxonomy_format,
@@ -926,6 +928,278 @@ class TestRNAFASTAFormatTransformers(TestPluginBase):
 
         for observed, expected in zip(obs, exp):
             self.assertEqual(observed, expected)
+
+
+class TestMixedCaseDNAFASTAFormatTransformers(TestPluginBase):
+    package = 'q2_types.feature_data.tests'
+
+    def test_mixed_case_dna_fasta_format_to_dna_iterator(self):
+        input, obs = self.transform_format(
+                                    MixedCaseDNAFASTAFormat,
+                                    DNAIterator,
+                                    filename='dna-sequences-mixed-case.fasta')
+
+        exp = skbio.read(str(input), format='fasta', constructor=skbio.DNA,
+                         lowercase=True)
+
+        for observed, expected in zip(obs, exp):
+            self.assertEqual(observed, expected)
+
+    def test_mixed_case_dna_fasta_format_to_series(self):
+        _, obs = self.transform_format(MixedCaseDNAFASTAFormat, pd.Series,
+                                       'dna-sequences-mixed-case.fasta')
+
+        obs = obs.astype(str)
+
+        index = pd.Index(['SEQUENCE1', 'SEQUENCE2'])
+        exp = pd.Series(['ACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTAC'
+                         'GTACGTACGTACGT', 'ACGTACGTACGTACGTACGTACGTACGTACGT'
+                         'ACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTAC'
+                         'GTACGT'], index=index, dtype=object)
+
+        assert_series_equal(exp, obs)
+
+    def test_mixed_case_dna_fasta_format_with_duplicate_ids_to_series(self):
+        with self.assertRaisesRegex(ValueError, 'unique.*SEQUENCE1'):
+            self.transform_format(
+                        MixedCaseDNAFASTAFormat, pd.Series,
+                        'dna-sequences-mixed-case-with-duplicate-ids.fasta')
+
+    def test_mixed_case_dna_fasta_format_to_metadata(self):
+        _, obs = self.transform_format(MixedCaseDNAFASTAFormat,
+                                       qiime2.Metadata,
+                                       'dna-sequences-mixed-case.fasta')
+        index = pd.Index(['SEQUENCE1', 'SEQUENCE2'], name='Feature ID')
+        exp_df = pd.DataFrame(['ACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTA'
+                               'CGTACGTACGTACGTACGT', 'ACGTACGTACGTACGTACGTAC'
+                               'GTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACG'
+                               'TACGTACGTACGTACGTACGT'], index=index,
+                              columns=['Sequence'], dtype=object)
+        exp = qiime2.Metadata(exp_df)
+
+        self.assertEqual(exp, obs)
+
+    def test_mixed_case_dna_format_to_dna_format(self):
+        input, obs = self.transform_format(
+                                    MixedCaseDNAFASTAFormat,
+                                    DNAFASTAFormat,
+                                    filename='dna-sequences-mixed-case.fasta')
+
+        exp = skbio.read(str(input), format='fasta', constructor=skbio.DNA,
+                         lowercase=True)
+        transformer = self.get_transformer(DNAIterator, DNAFASTAFormat)
+        exp = transformer(exp)
+
+        self.assertIsInstance(obs, DNAFASTAFormat)
+        self.assertEqual(
+            obs.path.read_text(),
+            exp.path.read_text())
+
+
+class TestMixedCaseRNAFASTAFormatTransformers(TestPluginBase):
+    package = 'q2_types.feature_data.tests'
+
+    def test_mixed_case_rna_fasta_format_to_rna_iterator(self):
+        input, obs = self.transform_format(
+                                    MixedCaseRNAFASTAFormat,
+                                    RNAIterator,
+                                    filename='rna-sequences-mixed-case.fasta')
+
+        exp = skbio.read(str(input), format='fasta', constructor=skbio.RNA,
+                         lowercase=True)
+
+        for observed, expected in zip(obs, exp):
+            self.assertEqual(observed, expected)
+
+    def test_mixed_case_rna_fasta_format_to_series(self):
+        _, obs = self.transform_format(MixedCaseRNAFASTAFormat, pd.Series,
+                                       'rna-sequences-mixed-case.fasta')
+
+        obs = obs.astype(str)
+
+        index = pd.Index(['SEQUENCE1', 'SEQUENCE2'])
+        exp = pd.Series(['ACGUACGUACGUACGUACGUACGUACGUACGUACGUACGUACGUACGUAC'
+                         'GUACGUACGUACGU', 'ACGUACGUACGUACGUACGUACGUACGUACGU'
+                         'ACGUACGUACGUACGUACGUACGUACGUACGUACGUACGUACGUACGUAC'
+                         'GUACGU'], index=index, dtype=object)
+
+        assert_series_equal(exp, obs)
+
+    def test_mixed_case_rna_fasta_format_with_duplicate_ids_to_series(self):
+        with self.assertRaisesRegex(ValueError, 'unique.*SEQUENCE1'):
+            self.transform_format(
+                        MixedCaseRNAFASTAFormat, pd.Series,
+                        'rna-sequences-mixed-case-with-duplicate-ids.fasta')
+
+    def test_mixed_case_rna_fasta_format_to_metadata(self):
+        _, obs = self.transform_format(MixedCaseRNAFASTAFormat,
+                                       qiime2.Metadata,
+                                       'rna-sequences-mixed-case.fasta')
+        index = pd.Index(['SEQUENCE1', 'SEQUENCE2'], name='Feature ID')
+        exp_df = pd.DataFrame(['ACGUACGUACGUACGUACGUACGUACGUACGUACGUACGUACGUA'
+                               'CGUACGUACGUACGUACGU', 'ACGUACGUACGUACGUACGUAC'
+                               'GUACGUACGUACGUACGUACGUACGUACGUACGUACGUACGUACG'
+                               'UACGUACGUACGUACGUACGU'], index=index,
+                              columns=['Sequence'], dtype=object)
+        exp = qiime2.Metadata(exp_df)
+
+        self.assertEqual(exp, obs)
+
+    def test_mixed_case_rna_format_to_rna_format(self):
+        input, obs = self.transform_format(
+                                    MixedCaseRNAFASTAFormat,
+                                    RNAFASTAFormat,
+                                    filename='rna-sequences-mixed-case.fasta')
+
+        exp = skbio.read(str(input), format='fasta', constructor=skbio.RNA,
+                         lowercase=True)
+        transformer = self.get_transformer(RNAIterator, RNAFASTAFormat)
+        exp = transformer(exp)
+
+        self.assertIsInstance(obs, RNAFASTAFormat)
+        self.assertEqual(
+            obs.path.read_text(),
+            exp.path.read_text())
+
+
+class TestMixedCaseAlignedDNAFASTAFormatTransformers(TestPluginBase):
+    package = 'q2_types.feature_data.tests'
+
+    def test_mixed_case_aln_dna_fasta_format_to_aln_dna_iterator(self):
+        input, obs = self.transform_format(
+                            MixedCaseAlignedDNAFASTAFormat,
+                            AlignedDNAIterator,
+                            filename='aligned-dna-sequences-mixed-case.fasta')
+
+        exp = skbio.read(str(input), format='fasta', constructor=skbio.DNA,
+                         lowercase=True)
+
+        for observed, expected in zip(obs, exp):
+            self.assertEqual(observed, expected)
+
+    def test_mixed_case_aln_dna_fasta_format_to_series(self):
+        _, obs = self.transform_format(
+                        MixedCaseAlignedDNAFASTAFormat,
+                        pd.Series, 'aligned-dna-sequences-mixed-case.fasta')
+
+        obs = obs.astype(str)
+
+        index = pd.Index(['SEQUENCE1', 'SEQUENCE2'])
+        exp = pd.Series(['------------------------ACGTACGTACGTACGTACGTACGTAC'
+                         'GTACGTACGTACGTACGTACGTACGTACGTACGTACGT', 'ACGTACGT'
+                         'ACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTAC'
+                         'GTACGTACGTACGTACGTACGTACGTACGT'], index=index,
+                        dtype=object)
+
+        assert_series_equal(exp, obs)
+
+    def test_mixed_case_aln_dna_fasta_format_w_duplicate_ids_to_series(self):
+        with self.assertRaisesRegex(ValueError, 'unique.*SEQUENCE1'):
+            self.transform_format(
+                        MixedCaseAlignedDNAFASTAFormat, pd.Series,
+                        'dna-sequences-mixed-case-with-duplicate-ids.fasta')
+
+    def test_mixed_case_aln_dna_fasta_format_to_metadata(self):
+        _, obs = self.transform_format(
+                        MixedCaseAlignedDNAFASTAFormat,
+                        qiime2.Metadata,
+                        'aligned-dna-sequences-mixed-case.fasta')
+        index = pd.Index(['SEQUENCE1', 'SEQUENCE2'], name='Feature ID')
+        exp_df = pd.DataFrame(['------------------------ACGTACGTACGTACGTACGT'
+                               'ACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGT',
+                               'ACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGT'
+                               'ACGTACGTACGTACGTACGTACGTACGTACGTACGTACGTACGT'],
+                              index=index, columns=['Sequence'], dtype=object)
+        exp = qiime2.Metadata(exp_df)
+
+        self.assertEqual(exp, obs)
+
+    def test_mixed_case_aln_dna_format_to_aln_dna_format(self):
+        input, obs = self.transform_format(
+                            MixedCaseAlignedDNAFASTAFormat,
+                            AlignedDNAFASTAFormat,
+                            filename='aligned-dna-sequences-mixed-case.fasta')
+
+        exp = skbio.read(str(input), format='fasta', constructor=skbio.DNA,
+                         lowercase=True)
+        transformer = self.get_transformer(AlignedDNAIterator,
+                                           AlignedDNAFASTAFormat)
+        exp = transformer(exp)
+
+        self.assertIsInstance(obs, AlignedDNAFASTAFormat)
+        self.assertEqual(
+            obs.path.read_text(),
+            exp.path.read_text())
+
+
+class TestMixedCaseAlignedRNAFASTAFormatTransformers(TestPluginBase):
+    package = 'q2_types.feature_data.tests'
+
+    def test_mixed_case_aln_rna_fasta_format_to_aln_rna_iterator(self):
+        input, obs = self.transform_format(
+                            MixedCaseAlignedRNAFASTAFormat,
+                            AlignedRNAIterator,
+                            filename='aligned-rna-sequences-mixed-case.fasta')
+
+        exp = skbio.read(str(input), format='fasta', constructor=skbio.RNA,
+                         lowercase=True)
+
+        for observed, expected in zip(obs, exp):
+            self.assertEqual(observed, expected)
+
+    def test_mixed_case_aln_rna_fasta_format_to_series(self):
+        _, obs = self.transform_format(
+                        MixedCaseAlignedRNAFASTAFormat,
+                        pd.Series, 'aligned-rna-sequences-mixed-case.fasta')
+
+        obs = obs.astype(str)
+
+        index = pd.Index(['SEQUENCE1', 'SEQUENCE2'])
+        exp = pd.Series(['------------------------ACGUACGUACGUACGUACGUACGUAC'
+                         'GUACGUACGUACGUACGUACGUACGUACGUACGUACGU', 'ACGUACGU'
+                         'ACGUACGUACGUACGUACGUACGUACGUACGUACGUACGUACGUACGUAC'
+                         'GUACGUACGUACGUACGUACGUACGUACGU'], index=index,
+                        dtype=object)
+
+        assert_series_equal(exp, obs)
+
+    def test_mixed_case_aln_rna_fasta_format_w_duplicate_ids_to_series(self):
+        with self.assertRaisesRegex(ValueError, 'unique.*SEQUENCE1'):
+            self.transform_format(
+                        MixedCaseAlignedRNAFASTAFormat, pd.Series,
+                        'rna-sequences-mixed-case-with-duplicate-ids.fasta')
+
+    def test_mixed_case_aln_rna_fasta_format_to_metadata(self):
+        _, obs = self.transform_format(
+                        MixedCaseAlignedRNAFASTAFormat,
+                        qiime2.Metadata,
+                        'aligned-rna-sequences-mixed-case.fasta')
+        index = pd.Index(['SEQUENCE1', 'SEQUENCE2'], name='Feature ID')
+        exp_df = pd.DataFrame(['------------------------ACGUACGUACGUACGUACGU'
+                               'ACGUACGUACGUACGUACGUACGUACGUACGUACGUACGUACGU',
+                               'ACGUACGUACGUACGUACGUACGUACGUACGUACGUACGUACGU'
+                               'ACGUACGUACGUACGUACGUACGUACGUACGUACGUACGUACGU'],
+                              index=index, columns=['Sequence'], dtype=object)
+        exp = qiime2.Metadata(exp_df)
+
+        self.assertEqual(exp, obs)
+
+    def test_mixed_case_aln_rna_format_to_aln_rna_format(self):
+        input, obs = self.transform_format(
+                            MixedCaseAlignedRNAFASTAFormat,
+                            AlignedRNAFASTAFormat,
+                            filename='aligned-rna-sequences-mixed-case.fasta')
+
+        exp = skbio.read(str(input), format='fasta', constructor=skbio.RNA,
+                         lowercase=True)
+        transformer = self.get_transformer(AlignedRNAIterator,
+                                           AlignedRNAFASTAFormat)
+        exp = transformer(exp)
+
+        self.assertIsInstance(obs, AlignedRNAFASTAFormat)
+        self.assertEqual(
+            obs.path.read_text(),
+            exp.path.read_text())
 
 
 class TestDifferentialTransformer(TestPluginBase):
