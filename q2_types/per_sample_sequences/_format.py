@@ -53,7 +53,7 @@ class FastqAbsolutePathManifestFormatV2(model.TextFileFormat):
         filepaths = dict()
         for column_name, column in md_cols.items():
             column = column.to_series()
-            for i, (id_, fp) in enumerate(column.iteritems(), start=1):
+            for i, (id_, fp) in enumerate(column.items(), start=1):
                 # QIIME 2 represents empty cells as np.nan once normalized
                 if pd.isna(fp):
                     raise ValidationError(
