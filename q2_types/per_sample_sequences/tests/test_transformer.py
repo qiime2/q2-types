@@ -240,6 +240,21 @@ class TestTransformers(TestPluginBase):
         self.assertTrue(os.path.exists(df['forward'].loc['Human-Kneecap']))
         self.assertTrue(os.path.exists(df['forward'].loc['Human-Armpit']))
 
+    def test_fastqmanifest_single_numeric(self):
+        _, dirfmt = self.transform_format(
+            CasavaOneEightSingleLanePerSampleDirFmt,
+            SingleLanePerSampleSingleEndFastqDirFmt,
+            filenames=('1_S1_L001_R1_001.fastq.gz',
+                       '0.10_S2_L001_R1_001.fastq.gz'),
+        )
+
+        df = dirfmt.manifest.view(pd.DataFrame)
+
+        self.assertEqual(set(df.index), {'1', '0.10'})
+        self.assertEqual(set(df.columns), {'forward'})
+        self.assertTrue(os.path.exists(df['forward'].loc['1']))
+        self.assertTrue(os.path.exists(df['forward'].loc['0.10']))
+
     def test_fastqmanifest_paired(self):
         _, dirfmt = self.transform_format(
             CasavaOneEightSingleLanePerSampleDirFmt,
@@ -255,6 +270,25 @@ class TestTransformers(TestPluginBase):
         self.assertEqual(set(df.columns), {'forward', 'reverse'})
         self.assertTrue(os.path.exists(df['forward'].loc['Human-Kneecap']))
         self.assertTrue(os.path.exists(df['reverse'].loc['Human-Kneecap']))
+
+    def test_fastqmanifest_paired_numeric(self):
+        _, dirfmt = self.transform_format(
+            CasavaOneEightSingleLanePerSampleDirFmt,
+            SingleLanePerSamplePairedEndFastqDirFmt,
+            filenames=(
+                '1_S1_L001_R1_001.fastq.gz', '0.10_S2_L001_R1_001.fastq.gz',
+                'paired_end_data_numeric/1_S1_L001_R2_001.fastq.gz',
+                'paired_end_data_numeric/0.10_S2_L001_R2_001.fastq.gz'),
+        )
+
+        df = dirfmt.manifest.view(pd.DataFrame)
+
+        self.assertEqual(set(df.index), {'1', '0.10'})
+        self.assertEqual(set(df.columns), {'forward', 'reverse'})
+        self.assertTrue(os.path.exists(df['forward'].loc['1']))
+        self.assertTrue(os.path.exists(df['reverse'].loc['1']))
+        self.assertTrue(os.path.exists(df['forward'].loc['0.10']))
+        self.assertTrue(os.path.exists(df['reverse'].loc['0.10']))
 
     def test_slpssefdf_to_casava_one_eight_single_lane_per_sample_dirfmt(self):
         filenames = ('single-end-two-sample-data1/MANIFEST',
