@@ -1,0 +1,10 @@
+# Produced by Super Duper Sequencing Machine
+
+sample-id,filename,direction
+1,1_S1_L001_R1_001.fastq.gz,forward
+0.10,0.10_S1_L001_R1_001.fastq.gz,forward
+
+# paired end data.
+1,1_S1_L001_R2_001.fastq.gz,reverse
+0.10,0.10_S1_L001_R2_001.fastq.gz,reverse
+

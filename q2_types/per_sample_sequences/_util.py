@@ -319,7 +319,7 @@ def _manifest_v2_to_v1(fmt, manifest_fmt):
 
 
 def _manifest_to_df(ff, base_dir):
-    manifest = pd.read_csv(str(ff), header=0, comment='#')
+    manifest = pd.read_csv(str(ff), header=0, comment='#', dtype=str)
     manifest.filename = manifest.filename.apply(
         lambda f: os.path.join(base_dir, f))
 
