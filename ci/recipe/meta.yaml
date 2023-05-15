@@ -27,6 +27,9 @@ requirements:
     - qiime2 {{ qiime2_epoch }}.*
 
 test:
+  commands:
+    - py.test --pyargs q2_types
+    
   requires:
     - pytest
     - qiime2 >={{ qiime2 }}
