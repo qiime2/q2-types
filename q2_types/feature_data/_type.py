@@ -16,6 +16,7 @@ from . import (TSVTaxonomyDirectoryFormat, DNASequencesDirectoryFormat,
                AlignedProteinSequencesDirectoryFormat,
                RNASequencesDirectoryFormat, AlignedRNASequencesDirectoryFormat,
                PairedRNASequencesDirectoryFormat, BLAST6DirectoryFormat)
+from q2_types.sample_data import SampleData
 
 
 FeatureData = SemanticType('FeatureData', field_names='type')
@@ -47,7 +48,9 @@ ProteinSequence = SemanticType('ProteinSequence',
 AlignedProteinSequence = SemanticType('AlignedProteinSequence',
                                       variant_of=FeatureData.field['type'])
 
-BLAST6 = SemanticType('BLAST6', variant_of=FeatureData.field['type'])
+BLAST6 = SemanticType('BLAST6',
+                      variant_of=[FeatureData.field['type'],
+                                  SampleData.field['type']])
 
 plugin.register_semantic_types(FeatureData, Taxonomy, Sequence,
                                PairedEndSequence, AlignedSequence,
