@@ -29,3 +29,17 @@ class TestTransformers(TestPluginBase):
                                     "column name 'bad-id-label'"):
             self.transform_format(ImmutableMetadataFormat, qiime2.Metadata,
                                   filename)
+
+    def test_metadata_to_metadata_format(self):
+        filename = 'metadata.tsv'
+        transformer = self.get_transformer(qiime2.Metadata,
+                                           ImmutableMetadataFormat)
+
+        # round-trip the file by loading as qiime2.Metadata, transforming to
+        # the file format, and then loading the result as qiime2.Metadata
+        md = qiime2.Metadata.load(self.get_data_path(filename))
+        obs = transformer(md)
+        obs_md = qiime2.Metadata.load(obs.path)
+
+        exp_md = qiime2.Metadata.load(self.get_data_path(filename))
+        self.assertEqual(obs_md, exp_md)
