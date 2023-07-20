@@ -15,3 +15,10 @@ from . import ImmutableMetadataFormat
 @plugin.register_transformer
 def _1(ff: ImmutableMetadataFormat) -> qiime2.Metadata:
     return qiime2.Metadata.load(str(ff))
+
+
+@plugin.register_transformer
+def _2(md: qiime2.Metadata) -> ImmutableMetadataFormat:
+    ff = ImmutableMetadataFormat()
+    md.save(str(ff.path))
+    return ff
