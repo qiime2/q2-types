@@ -17,6 +17,7 @@ del get_versions
 # import.
 importlib.import_module('q2_types.multiplexed_sequences')
 importlib.import_module('q2_types.feature_data')
+importlib.import_module('q2_types.feature_map')
 importlib.import_module('q2_types.feature_table')
 importlib.import_module('q2_types.distance_matrix')
 importlib.import_module('q2_types.tree')
