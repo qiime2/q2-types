@@ -29,6 +29,7 @@ setup(
         'q2_types.tests': ['data/*'],
         'q2_types.distance_matrix.tests': ['data/*'],
         'q2_types.feature_data.tests': ['data/*', 'data/taxonomy/*'],
+        'q2_types.feature_map.tests': ['data/*'],
         'q2_types.feature_table.tests': ['data/*'],
         'q2_types.metadata.tests': ['data/*'],
         'q2_types.multiplexed_sequences.tests': ['data/*'],
