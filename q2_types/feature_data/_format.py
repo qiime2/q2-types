@@ -404,7 +404,9 @@ DifferentialDirectoryFormat = model.SingleFileDirectoryFormat(
 class ProteinFASTAFormat(FASTAFormat):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.alphabet = "ABCDEFGHIKLMNPQRSTVWXYZ*"
+        upper_case = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
+        lower_case = "abcdefghijklmnopqrstuvwxy"
+        self.alphabet = upper_case + lower_case + "*"
 
 
 ProteinSequencesDirectoryFormat = model.SingleFileDirectoryFormat(
