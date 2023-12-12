@@ -1,5 +1,5 @@
 # ----------------------------------------------------------------------------
-# Copyright (c) 2016-2022, QIIME 2 development team.
+# Copyright (c) 2016-2023, QIIME 2 development team.
 #
 # Distributed under the terms of the Modified BSD License.
 #
@@ -281,6 +281,17 @@ DNASequencesDirectoryFormat = model.SingleFileDirectoryFormat(
     'DNASequencesDirectoryFormat', 'dna-sequences.fasta', DNAFASTAFormat)
 
 
+class MixedCaseDNAFASTAFormat(DNAFASTAFormat):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.alphabet = self.alphabet + self.alphabet.lower()
+
+
+MixedCaseDNASequencesDirectoryFormat = model.SingleFileDirectoryFormat(
+    'MixedCaseDNASequencesDirectoryFormat', 'dna-sequences.fasta',
+    MixedCaseDNAFASTAFormat)
+
+
 class RNAFASTAFormat(FASTAFormat):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -289,6 +300,17 @@ class RNAFASTAFormat(FASTAFormat):
 
 RNASequencesDirectoryFormat = model.SingleFileDirectoryFormat(
     'RNASequencesDirectoryFormat', 'rna-sequences.fasta', RNAFASTAFormat)
+
+
+class MixedCaseRNAFASTAFormat(RNAFASTAFormat):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.alphabet = self.alphabet + self.alphabet.lower()
+
+
+MixedCaseRNASequencesDirectoryFormat = model.SingleFileDirectoryFormat(
+    'MixedCaseRNASequencesDirectoryFormat', 'rna-sequences.fasta',
+    MixedCaseRNAFASTAFormat)
 
 
 class PairedDNASequencesDirectoryFormat(model.DirectoryFormat):
@@ -316,6 +338,18 @@ AlignedDNASequencesDirectoryFormat = model.SingleFileDirectoryFormat(
     AlignedDNAFASTAFormat)
 
 
+class MixedCaseAlignedDNAFASTAFormat(AlignedFASTAFormatMixin,
+                                     MixedCaseDNAFASTAFormat):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        super()._turn_into_alignment()
+
+
+MixedCaseAlignedDNASequencesDirectoryFormat = model.SingleFileDirectoryFormat(
+    'MixedCaseAlignedDNASequencesDirectoryFormat',
+    'aligned-dna-sequences.fasta', MixedCaseAlignedDNAFASTAFormat)
+
+
 class AlignedRNAFASTAFormat(AlignedFASTAFormatMixin, RNAFASTAFormat):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -325,6 +359,18 @@ class AlignedRNAFASTAFormat(AlignedFASTAFormatMixin, RNAFASTAFormat):
 AlignedRNASequencesDirectoryFormat = model.SingleFileDirectoryFormat(
     'AlignedRNASequencesDirectoryFormat', 'aligned-rna-sequences.fasta',
     AlignedRNAFASTAFormat)
+
+
+class MixedCaseAlignedRNAFASTAFormat(AlignedFASTAFormatMixin,
+                                     MixedCaseRNAFASTAFormat):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        super()._turn_into_alignment()
+
+
+MixedCaseAlignedRNASequencesDirectoryFormat = model.SingleFileDirectoryFormat(
+    'MixedCaseAlignedRNASequencesDirectoryFormat',
+    'aligned-rna-sequences.fasta', MixedCaseAlignedRNAFASTAFormat)
 
 
 def _construct_validator_from_alphabet(alphabet_str):
@@ -358,7 +404,7 @@ DifferentialDirectoryFormat = model.SingleFileDirectoryFormat(
 class ProteinFASTAFormat(FASTAFormat):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.alphabet = "ABCDEFGHIKLMNPQRSTVWXYZ"
+        self.alphabet = "ABCDEFGHIKLMNPQRSTVWXYZ*"
 
 
 ProteinSequencesDirectoryFormat = model.SingleFileDirectoryFormat(
@@ -452,5 +498,10 @@ plugin.register_formats(
     RNASequencesDirectoryFormat, AlignedRNAFASTAFormat,
     AlignedRNASequencesDirectoryFormat, PairedRNASequencesDirectoryFormat,
     BLAST6Format, BLAST6DirectoryFormat, UNIXListFormat,
-    IDSelectionDirectoryFormat
+    IDSelectionDirectoryFormat, MixedCaseDNAFASTAFormat,
+    MixedCaseDNASequencesDirectoryFormat, MixedCaseRNAFASTAFormat,
+    MixedCaseRNASequencesDirectoryFormat, MixedCaseAlignedDNAFASTAFormat,
+    MixedCaseAlignedDNASequencesDirectoryFormat,
+    MixedCaseAlignedRNAFASTAFormat,
+    MixedCaseAlignedRNASequencesDirectoryFormat
 )

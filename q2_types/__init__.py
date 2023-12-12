@@ -1,5 +1,5 @@
 # ----------------------------------------------------------------------------
-# Copyright (c) 2016-2022, QIIME 2 development team.
+# Copyright (c) 2016-2023, QIIME 2 development team.
 #
 # Distributed under the terms of the Modified BSD License.
 #
@@ -15,7 +15,9 @@ del get_versions
 
 # feature_data needs to be imported before feature_table to avoid circular
 # import.
+importlib.import_module('q2_types.multiplexed_sequences')
 importlib.import_module('q2_types.feature_data')
+importlib.import_module('q2_types.feature_map')
 importlib.import_module('q2_types.feature_table')
 importlib.import_module('q2_types.distance_matrix')
 importlib.import_module('q2_types.tree')
@@ -23,3 +25,4 @@ importlib.import_module('q2_types.ordination')
 importlib.import_module('q2_types.sample_data')
 importlib.import_module('q2_types.per_sample_sequences')
 importlib.import_module('q2_types.bowtie2')
+importlib.import_module('q2_types.metadata')

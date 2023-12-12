@@ -1,5 +1,5 @@
 # ----------------------------------------------------------------------------
-# Copyright (c) 2016-2022, QIIME 2 development team.
+# Copyright (c) 2016-2023, QIIME 2 development team.
 #
 # Distributed under the terms of the Modified BSD License.
 #
@@ -19,7 +19,13 @@ from ._format import (
     ProteinFASTAFormat, AlignedProteinFASTAFormat, RNASequencesDirectoryFormat,
     RNAFASTAFormat, AlignedRNAFASTAFormat, AlignedRNASequencesDirectoryFormat,
     PairedRNASequencesDirectoryFormat, BLAST6Format, BLAST6DirectoryFormat,
-    UNIXListFormat, IDSelectionDirectoryFormat, IDMetadataFormat, IDSelection)
+    UNIXListFormat, IDSelectionDirectoryFormat, IDMetadataFormat, IDSelection,
+    MixedCaseDNAFASTAFormat, MixedCaseDNASequencesDirectoryFormat,
+    MixedCaseRNAFASTAFormat, MixedCaseRNASequencesDirectoryFormat,
+    MixedCaseAlignedDNAFASTAFormat,
+    MixedCaseAlignedDNASequencesDirectoryFormat,
+    MixedCaseAlignedRNAFASTAFormat,
+    MixedCaseAlignedRNASequencesDirectoryFormat)
 from ._type import (
     FeatureData, Taxonomy, Sequence, PairedEndSequence, AlignedSequence,
     Differential, ProteinSequence, AlignedProteinSequence, RNASequence,
@@ -50,6 +56,12 @@ __all__ = [
     'PairedRNAIterator', 'PairedRNASequencesDirectoryFormat',
     'PairedEndRNASequence', 'BLAST6Format', 'BLAST6DirectoryFormat', 'BLAST6',
     'UNIXListFormat', 'IDSelectionDirectoryFormat', 'IDSelection',
-    'IDMetadataFormat', 'Selection']
+    'IDMetadataFormat', 'Selection',
+    'MixedCaseDNAFASTAFormat', 'MixedCaseDNASequencesDirectoryFormat',
+    'MixedCaseRNAFASTAFormat', 'MixedCaseRNASequencesDirectoryFormat',
+    'MixedCaseAlignedDNAFASTAFormat',
+    'MixedCaseAlignedDNASequencesDirectoryFormat',
+    'MixedCaseAlignedRNAFASTAFormat',
+    'MixedCaseAlignedRNASequencesDirectoryFormat']
 
 importlib.import_module('q2_types.feature_data._transformer')

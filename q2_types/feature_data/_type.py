@@ -1,5 +1,5 @@
 # ----------------------------------------------------------------------------
-# Copyright (c) 2016-2022, QIIME 2 development team.
+# Copyright (c) 2016-2023, QIIME 2 development team.
 #
 # Distributed under the terms of the Modified BSD License.
 #
@@ -17,6 +17,7 @@ from . import (TSVTaxonomyDirectoryFormat, DNASequencesDirectoryFormat,
                RNASequencesDirectoryFormat, AlignedRNASequencesDirectoryFormat,
                PairedRNASequencesDirectoryFormat, BLAST6DirectoryFormat,
                IDSelectionDirectoryFormat)
+from q2_types.sample_data import SampleData
 
 
 FeatureData = SemanticType('FeatureData', field_names='type')
@@ -48,7 +49,9 @@ ProteinSequence = SemanticType('ProteinSequence',
 AlignedProteinSequence = SemanticType('AlignedProteinSequence',
                                       variant_of=FeatureData.field['type'])
 
-BLAST6 = SemanticType('BLAST6', variant_of=FeatureData.field['type'])
+BLAST6 = SemanticType('BLAST6',
+                      variant_of=[FeatureData.field['type'],
+                                  SampleData.field['type']])
 
 Selection = SemanticType('Selection', variant_of=FeatureData.field['type'])
 
@@ -60,37 +63,66 @@ plugin.register_semantic_types(FeatureData, Taxonomy, Sequence,
                                BLAST6, Selection)
 
 
-plugin.register_semantic_type_to_format(
+plugin.register_artifact_class(
     FeatureData[Taxonomy],
-    artifact_format=TSVTaxonomyDirectoryFormat)
-plugin.register_semantic_type_to_format(
+    directory_format=TSVTaxonomyDirectoryFormat,
+    description=("Hierarchical metadata or annotations associated with a set "
+                 "of features. This can contain one or more hierarchical "
+                 "levels, and annotations can be anything (e.g., taxonomy of "
+                 "organisms, functional categorization of gene families, ...) "
+                 "as long as it is strictly hierarchical."))
+plugin.register_artifact_class(
     FeatureData[Sequence],
-    artifact_format=DNASequencesDirectoryFormat)
-plugin.register_semantic_type_to_format(
+    directory_format=DNASequencesDirectoryFormat,
+    description=("Unaligned DNA sequences associated with a set of feature "
+                 "identifiers (e.g., ASV sequences or OTU representative "
+                 "sequence). Exactly one sequence is associated with each "
+                 "feature identfiier."))
+plugin.register_artifact_class(
     FeatureData[RNASequence],
-    artifact_format=RNASequencesDirectoryFormat)
-plugin.register_semantic_type_to_format(
+    directory_format=RNASequencesDirectoryFormat,
+    description=("Unaligned RNA sequences associated with a set of feature "
+                 "identifiers. Exactly one sequence is associated with each "
+                 "feature identfiier."))
+plugin.register_artifact_class(
     FeatureData[PairedEndSequence],
-    artifact_format=PairedDNASequencesDirectoryFormat)
-plugin.register_semantic_type_to_format(
+    directory_format=PairedDNASequencesDirectoryFormat)
+plugin.register_artifact_class(
     FeatureData[PairedEndRNASequence],
-    artifact_format=PairedRNASequencesDirectoryFormat)
-plugin.register_semantic_type_to_format(
+    directory_format=PairedRNASequencesDirectoryFormat)
+plugin.register_artifact_class(
     FeatureData[AlignedSequence],
-    artifact_format=AlignedDNASequencesDirectoryFormat)
-plugin.register_semantic_type_to_format(
+    directory_format=AlignedDNASequencesDirectoryFormat,
+    description=("Aligned DNA sequences associated with a set of feature "
+                 "identifiers (e.g., aligned ASV sequences or OTU "
+                 "representative sequence). Exactly one sequence is "
+                 "associated with each feature identfiier."))
+plugin.register_artifact_class(
     FeatureData[AlignedRNASequence],
-    artifact_format=AlignedRNASequencesDirectoryFormat)
-plugin.register_semantic_type_to_format(
+    directory_format=AlignedRNASequencesDirectoryFormat,
+    description=("Aligned RNA sequences associated with a set of feature "
+                 "identifiers. Exactly one sequence is associated with each "
+                 "feature identfiier."))
+plugin.register_artifact_class(
     FeatureData[Differential], DifferentialDirectoryFormat)
-plugin.register_semantic_type_to_format(
+plugin.register_artifact_class(
     FeatureData[ProteinSequence],
-    artifact_format=ProteinSequencesDirectoryFormat)
-plugin.register_semantic_type_to_format(
+    directory_format=ProteinSequencesDirectoryFormat,
+    description=("Unaligned protein sequences associated with a set of "
+                 "feature identifiers. Exactly one sequence is associated "
+                 "with each feature identfiier."))
+plugin.register_artifact_class(
     FeatureData[AlignedProteinSequence],
-    artifact_format=AlignedProteinSequencesDirectoryFormat)
-plugin.register_semantic_type_to_format(
+    directory_format=AlignedProteinSequencesDirectoryFormat,
+    description=("Aligned protein sequences associated with a set of "
+                 "feature identifiers. Exactly one sequence is associated "
+                 "with each feature identfiier."))
+# FeatureData[BLAST6] seems to fix file type with semantic type.
+plugin.register_artifact_class(
     FeatureData[BLAST6],
-    artifact_format=BLAST6DirectoryFormat)
-plugin.register_semantic_type_to_format(
-    FeatureData[Selection], artifact_format=IDSelectionDirectoryFormat)
+    directory_format=BLAST6DirectoryFormat,
+    description=("BLAST results associated with a set of feature "
+                 "identifiers."))
+plugin.register_artifact_class(
+    FeatureData[Selection],
+    directory_format=IDSelectionDirectoryFormat)

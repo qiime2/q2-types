@@ -1,5 +1,5 @@
 # ----------------------------------------------------------------------------
-# Copyright (c) 2016-2022, QIIME 2 development team.
+# Copyright (c) 2016-2023, QIIME 2 development team.
 #
 # Distributed under the terms of the Modified BSD License.
 #
@@ -29,12 +29,15 @@ setup(
         'q2_types.tests': ['data/*'],
         'q2_types.distance_matrix.tests': ['data/*'],
         'q2_types.feature_data.tests': ['data/*', 'data/taxonomy/*'],
+        'q2_types.feature_map.tests': ['data/*'],
         'q2_types.feature_table.tests': ['data/*'],
+        'q2_types.metadata.tests': ['data/*'],
         'q2_types.multiplexed_sequences.tests': ['data/*'],
         'q2_types.ordination.tests': ['data/*'],
         'q2_types.per_sample_sequences.tests':
             ['data/*',
              'data/paired_end_data/*',
+             'data/paired_end_data_numeric/*',
              'data/single_end_data/*',
              'data/absolute_manifests/*',
              'data/absolute_manifests_v2/*',

@@ -1,5 +1,5 @@
 # ----------------------------------------------------------------------------
-# Copyright (c) 2016-2022, QIIME 2 development team.
+# Copyright (c) 2016-2023, QIIME 2 development team.
 #
 # Distributed under the terms of the Modified BSD License.
 #
@@ -33,13 +33,15 @@ from q2_types.per_sample_sequences import (
     PairedEndFastqManifestPhred33V2,
     PairedEndFastqManifestPhred64V2,
     QIIME1DemuxDirFmt,
-    FastqGzFormat)
+    FastqGzFormat,
+    SampleIdIndexedSingleEndPerSampleDirFmt)
 from q2_types.per_sample_sequences._util import (
     _validate_header,
     _validate_single_end_fastq_manifest_directions,
     _validate_paired_end_fastq_manifest_directions,
     _parse_and_validate_manifest
 )
+from qiime2.plugin import ValidationError
 from qiime2.plugin.testing import TestPluginBase
 
 
@@ -238,6 +240,21 @@ class TestTransformers(TestPluginBase):
         self.assertTrue(os.path.exists(df['forward'].loc['Human-Kneecap']))
         self.assertTrue(os.path.exists(df['forward'].loc['Human-Armpit']))
 
+    def test_fastqmanifest_single_numeric(self):
+        _, dirfmt = self.transform_format(
+            CasavaOneEightSingleLanePerSampleDirFmt,
+            SingleLanePerSampleSingleEndFastqDirFmt,
+            filenames=('1_S1_L001_R1_001.fastq.gz',
+                       '0.10_S2_L001_R1_001.fastq.gz'),
+        )
+
+        df = dirfmt.manifest.view(pd.DataFrame)
+
+        self.assertEqual(set(df.index), {'1', '0.10'})
+        self.assertEqual(set(df.columns), {'forward'})
+        self.assertTrue(os.path.exists(df['forward'].loc['1']))
+        self.assertTrue(os.path.exists(df['forward'].loc['0.10']))
+
     def test_fastqmanifest_paired(self):
         _, dirfmt = self.transform_format(
             CasavaOneEightSingleLanePerSampleDirFmt,
@@ -253,6 +270,25 @@ class TestTransformers(TestPluginBase):
         self.assertEqual(set(df.columns), {'forward', 'reverse'})
         self.assertTrue(os.path.exists(df['forward'].loc['Human-Kneecap']))
         self.assertTrue(os.path.exists(df['reverse'].loc['Human-Kneecap']))
+
+    def test_fastqmanifest_paired_numeric(self):
+        _, dirfmt = self.transform_format(
+            CasavaOneEightSingleLanePerSampleDirFmt,
+            SingleLanePerSamplePairedEndFastqDirFmt,
+            filenames=(
+                '1_S1_L001_R1_001.fastq.gz', '0.10_S2_L001_R1_001.fastq.gz',
+                'paired_end_data_numeric/1_S1_L001_R2_001.fastq.gz',
+                'paired_end_data_numeric/0.10_S2_L001_R2_001.fastq.gz'),
+        )
+
+        df = dirfmt.manifest.view(pd.DataFrame)
+
+        self.assertEqual(set(df.index), {'1', '0.10'})
+        self.assertEqual(set(df.columns), {'forward', 'reverse'})
+        self.assertTrue(os.path.exists(df['forward'].loc['1']))
+        self.assertTrue(os.path.exists(df['reverse'].loc['1']))
+        self.assertTrue(os.path.exists(df['forward'].loc['0.10']))
+        self.assertTrue(os.path.exists(df['reverse'].loc['0.10']))
 
     def test_slpssefdf_to_casava_one_eight_single_lane_per_sample_dirfmt(self):
         filenames = ('single-end-two-sample-data1/MANIFEST',
@@ -290,6 +326,39 @@ class TestTransformers(TestPluginBase):
         obs_fp = [str(fp) for fp, _ in obs.sequences.iter_views(FastqGzFormat)]
 
         self.assertEqual(obs_fp, exp_fp)
+
+    def test_sample_id_indexed_fastq_to_slpssefdf_fmt(self):
+        filenames = ('Human-Armpit.fastq.gz',
+                     # regardless of how much the file name looks like
+                     # Casava, everything before the .fastq.gz should be
+                     # treated as the sample id
+                     'Human-Kneecap_S1_L001_R1_001.fastq.gz')
+        input, obs = self.transform_format(
+            SampleIdIndexedSingleEndPerSampleDirFmt,
+            SingleLanePerSampleSingleEndFastqDirFmt,
+            filenames=filenames
+        )
+
+        input.validate()
+
+        exp_fp = ['Human-Armpit_na_L001_R1_001.fastq.gz',
+                  'Human-Kneecap_S1_L001_R1_001_na_L001_R1_001.fastq.gz']
+        obs_fp = [str(fp) for fp, _ in obs.sequences.iter_views(FastqGzFormat)]
+        self.assertEqual(obs_fp, exp_fp)
+
+        manifest_df = obs.manifest.view(pd.DataFrame)
+        self.assertEqual(list(manifest_df.index),
+                         ['Human-Armpit', 'Human-Kneecap_S1_L001_R1_001'])
+
+    def test_sample_id_indexed_fastq_to_slpssefdf_fmt_bad_fastq(self):
+        filenames = ('Human-Armpit.fastq.gz',
+                     'invalid-quality.fastq.gz')
+        with self.assertRaisesRegex(ValidationError, 'Quality score length'):
+            self.transform_format(
+                SampleIdIndexedSingleEndPerSampleDirFmt,
+                SingleLanePerSampleSingleEndFastqDirFmt,
+                filenames=filenames
+            )
 
 
 class TestFastqManifestTransformers(TestPluginBase):

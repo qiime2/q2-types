@@ -1,5 +1,5 @@
 # ----------------------------------------------------------------------------
-# Copyright (c) 2016-2022, QIIME 2 development team.
+# Copyright (c) 2016-2023, QIIME 2 development team.
 #
 # Distributed under the terms of the Modified BSD License.
 #
@@ -15,7 +15,8 @@ from . import DistanceMatrixDirectoryFormat
 DistanceMatrix = SemanticType('DistanceMatrix')
 
 plugin.register_semantic_types(DistanceMatrix)
-plugin.register_semantic_type_to_format(
+plugin.register_artifact_class(
     DistanceMatrix,
-    artifact_format=DistanceMatrixDirectoryFormat
+    directory_format=DistanceMatrixDirectoryFormat,
+    description="A symmetric matrix representing distances between entities."
 )

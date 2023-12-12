@@ -1,5 +1,5 @@
 # ----------------------------------------------------------------------------
-# Copyright (c) 2016-2022, QIIME 2 development team.
+# Copyright (c) 2016-2023, QIIME 2 development team.
 #
 # Distributed under the terms of the Modified BSD License.
 #
@@ -30,7 +30,9 @@ class TestTypes(TestPluginBase):
 
     def test_phylogeny_rooted_unrooted_to_newick_dir_fmt_registration(self):
         self.assertSemanticTypeRegisteredToFormat(
-            Phylogeny[Rooted | Unrooted], NewickDirectoryFormat)
+            Phylogeny[Rooted], NewickDirectoryFormat)
+        self.assertSemanticTypeRegisteredToFormat(
+            Phylogeny[Unrooted], NewickDirectoryFormat)
 
     def test_hierarchy_to_newick_dir_fmt_registration(self):
         self.assertSemanticTypeRegisteredToFormat(

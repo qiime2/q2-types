@@ -1,5 +1,5 @@
 # ----------------------------------------------------------------------------
-# Copyright (c) 2016-2022, QIIME 2 development team.
+# Copyright (c) 2016-2023, QIIME 2 development team.
 #
 # Distributed under the terms of the Modified BSD License.
 #
@@ -17,13 +17,14 @@ PCoAResults = SemanticType('PCoAResults')
 ProcrustesStatistics = SemanticType('ProcrustesStatistics')
 
 plugin.register_semantic_types(PCoAResults, ProcrustesStatistics)
-plugin.register_semantic_type_to_format(
+plugin.register_artifact_class(
     PCoAResults,
-    artifact_format=OrdinationDirectoryFormat
+    directory_format=OrdinationDirectoryFormat,
+    description="The results of running principal coordinate analysis (PCoA)."
 )
 
-plugin.register_semantic_type_to_format(
+plugin.register_artifact_class(
     ProcrustesStatistics,
-
-    artifact_format=ProcrustesStatisticsDirFmt
+    directory_format=ProcrustesStatisticsDirFmt,
+    description="The results of running Procrustes analysis."
 )

@@ -1,5 +1,5 @@
 # ----------------------------------------------------------------------------
-# Copyright (c) 2016-2022, QIIME 2 development team.
+# Copyright (c) 2016-2023, QIIME 2 development team.
 #
 # Distributed under the terms of the Modified BSD License.
 #
@@ -23,7 +23,8 @@ from q2_types.per_sample_sequences import (
     PairedEndFastqManifestPhred33V2, PairedEndFastqManifestPhred64V2,
     SingleLanePerSampleSingleEndFastqDirFmt,
     SingleLanePerSamplePairedEndFastqDirFmt,
-    QIIME1DemuxFormat, QIIME1DemuxDirFmt
+    QIIME1DemuxFormat, QIIME1DemuxDirFmt,
+    SampleIdIndexedSingleEndPerSampleDirFmt
 )
 from qiime2.plugin.testing import TestPluginBase
 from qiime2.plugin import ValidationError
@@ -433,6 +434,21 @@ class TestFormats(TestPluginBase):
         with self.assertRaisesRegex(ValidationError,
                                     'CasavaOneEightLanelessPerSampleDirFmt'):
             format.validate()
+
+    def test_sample_id_indexed_fastq_dir_fmt(self):
+        filenames = ('Human-Armpit.fastq.gz',
+                     # regardless of how much the file name looks like
+                     # Casava, everything before the .fastq.gz should be
+                     # treated as the sample id
+                     'Human-Kneecap_S1_L001_R1_001.fastq.gz')
+        for filename in filenames:
+            filepath = self.get_data_path(filename)
+            shutil.copy(filepath, self.temp_dir.name)
+
+        format = SampleIdIndexedSingleEndPerSampleDirFmt(
+            self.temp_dir.name, mode='r')
+
+        format.validate()
 
     def test_slanepsample_single_end_fastq_dir_fmt_validate_positive(self):
         filenames = ('single_end_data/MANIFEST', 'metadata.yml',

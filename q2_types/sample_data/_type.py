@@ -1,5 +1,5 @@
 # ----------------------------------------------------------------------------
-# Copyright (c) 2016-2022, QIIME 2 development team.
+# Copyright (c) 2016-2023, QIIME 2 development team.
 #
 # Distributed under the terms of the Modified BSD License.
 #
@@ -19,7 +19,9 @@ AlphaDiversity = SemanticType('AlphaDiversity',
 
 plugin.register_semantic_types(SampleData, AlphaDiversity)
 
-plugin.register_semantic_type_to_format(
+plugin.register_artifact_class(
     SampleData[AlphaDiversity],
-    artifact_format=AlphaDiversityDirectoryFormat
+    directory_format=AlphaDiversityDirectoryFormat,
+    description=("Alpha diversity values, each associated with a single "
+                 "sample identifier.")
 )

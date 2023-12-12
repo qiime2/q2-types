@@ -1,5 +1,5 @@
 # ----------------------------------------------------------------------------
-# Copyright (c) 2016-2022, QIIME 2 development team.
+# Copyright (c) 2016-2023, QIIME 2 development team.
 #
 # Distributed under the terms of the Modified BSD License.
 #
@@ -22,7 +22,7 @@ from qiime2.plugin import ValidationError
 
 from ..plugin_setup import plugin
 from ._util import (
-    _parse_casava_filename,
+    _parse_sequence_filename,
     _manifest_to_df,
 )
 
@@ -53,7 +53,7 @@ class FastqAbsolutePathManifestFormatV2(model.TextFileFormat):
         filepaths = dict()
         for column_name, column in md_cols.items():
             column = column.to_series()
-            for i, (id_, fp) in enumerate(column.iteritems(), start=1):
+            for i, (id_, fp) in enumerate(column.items(), start=1):
                 # QIIME 2 represents empty cells as np.nan once normalized
                 if pd.isna(fp):
                     raise ValidationError(
@@ -307,7 +307,7 @@ class CasavaOneEightSingleLanePerSampleDirFmt(model.DirectoryFormat):
         with tmp_manifest.open() as fh:
             fh.write('sample-id,filename,direction\n')
             for fp, _ in self.sequences.iter_views(FastqGzFormat):
-                sample_id, _, _, _, direction = _parse_casava_filename(fp)
+                sample_id, _, _, _, direction = _parse_sequence_filename(fp)
                 fh.write('%s,%s,%s\n' % (sample_id, fp.name, direction))
 
         df = _manifest_to_df(tmp_manifest, self.path.parent)
@@ -389,6 +389,23 @@ class CasavaOneEightLanelessPerSampleDirFmt(model.DirectoryFormat):
     @sequences.set_path_maker
     def sequences_path_maker(self, sample_id, barcode_id, read_number):
         return '%s_%s_R%d_001.fastq.gz' % (sample_id, barcode_id, read_number)
+
+
+class SampleIdIndexedSingleEndPerSampleDirFmt(model.DirectoryFormat):
+    """Single-end reads in fastq.gz files where base filename is the sample id
+
+        The full file name, minus the extension (`.fastq.gz`) is the sample id.
+        For example, the sample id for the file:
+         * `sample-1.fastq.gz` is `sample-1`
+         * `xyz.fastq.gz` is `xyz`
+         * `sample-42_S1_L001_R1_001.fastq.gz` is `sample-42_S1_L001_R1_001`
+    """
+    sequences = model.FileCollection(r'.+\.fastq\.gz',
+                                     format=FastqGzFormat)
+
+    @sequences.set_path_maker
+    def sequences_path_maker(self, sample_id):
+        return '%s_%s_R%d_001.fastq.gz' % (sample_id)
 
 
 class QIIME1DemuxFormat(model.TextFileFormat):
@@ -499,5 +516,6 @@ plugin.register_formats(
     SingleEndFastqManifestPhred64, PairedEndFastqManifestPhred33,
     PairedEndFastqManifestPhred64, SingleEndFastqManifestPhred33V2,
     SingleEndFastqManifestPhred64V2, PairedEndFastqManifestPhred33V2,
-    PairedEndFastqManifestPhred64V2, QIIME1DemuxFormat, QIIME1DemuxDirFmt
+    PairedEndFastqManifestPhred64V2, QIIME1DemuxFormat, QIIME1DemuxDirFmt,
+    SampleIdIndexedSingleEndPerSampleDirFmt
 )

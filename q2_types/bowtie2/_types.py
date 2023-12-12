@@ -1,5 +1,5 @@
 # ----------------------------------------------------------------------------
-# Copyright (c) 2016-2022, QIIME 2 development team.
+# Copyright (c) 2016-2023, QIIME 2 development team.
 #
 # Distributed under the terms of the Modified BSD License.
 #
@@ -17,4 +17,4 @@ from ..plugin_setup import plugin
 Bowtie2Index = SemanticType('Bowtie2Index')
 
 plugin.register_semantic_types(Bowtie2Index)
-plugin.register_semantic_type_to_format(Bowtie2Index, Bowtie2IndexDirFmt)
+plugin.register_artifact_class(Bowtie2Index, Bowtie2IndexDirFmt)

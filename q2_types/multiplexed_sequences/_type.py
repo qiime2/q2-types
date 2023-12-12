@@ -1,5 +1,5 @@
 # ----------------------------------------------------------------------------
-# Copyright (c) 2016-2022, QIIME 2 development team.
+# Copyright (c) 2016-2023, QIIME 2 development team.
 #
 # Distributed under the terms of the Modified BSD License.
 #
@@ -21,11 +21,19 @@ MultiplexedPairedEndBarcodeInSequence = \
 plugin.register_semantic_types(MultiplexedSingleEndBarcodeInSequence,
                                MultiplexedPairedEndBarcodeInSequence)
 
-plugin.register_semantic_type_to_format(
+plugin.register_artifact_class(
     MultiplexedSingleEndBarcodeInSequence,
-    artifact_format=MultiplexedSingleEndBarcodeInSequenceDirFmt
+    directory_format=MultiplexedSingleEndBarcodeInSequenceDirFmt,
+    description=("Multiplexed sequences (i.e., representing multiple "
+                 "difference samples), which are single-end reads, and which "
+                 "contain the barcode (i.e., index) indicating the source "
+                 "sample as part of the sequence read.")
 )
-plugin.register_semantic_type_to_format(
+plugin.register_artifact_class(
     MultiplexedPairedEndBarcodeInSequence,
-    artifact_format=MultiplexedPairedEndBarcodeInSequenceDirFmt,
+    directory_format=MultiplexedPairedEndBarcodeInSequenceDirFmt,
+    description=("Multiplexed sequences (i.e., representing multiple "
+                 "difference samples), which are paired-end reads, and which "
+                 "contain the barcode (i.e., index) indicating the source "
+                 "sample as part of the sequence read.")
 )

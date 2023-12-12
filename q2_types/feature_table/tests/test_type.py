@@ -1,5 +1,5 @@
 # ----------------------------------------------------------------------------
-# Copyright (c) 2016-2022, QIIME 2 development team.
+# Copyright (c) 2016-2023, QIIME 2 development team.
 #
 # Distributed under the terms of the Modified BSD License.
 #
@@ -38,9 +38,25 @@ class TestTypes(TestPluginBase):
 
     def test_feature_table_semantic_type_to_v210_format_registration(self):
         self.assertSemanticTypeRegisteredToFormat(
-            FeatureTable[Frequency | RelativeFrequency | PresenceAbsence |
-                         Composition | Balance | PercentileNormalized |
-                         Design],
+            FeatureTable[Frequency],
+            BIOMV210DirFmt)
+        self.assertSemanticTypeRegisteredToFormat(
+            FeatureTable[RelativeFrequency],
+            BIOMV210DirFmt)
+        self.assertSemanticTypeRegisteredToFormat(
+            FeatureTable[PresenceAbsence],
+            BIOMV210DirFmt)
+        self.assertSemanticTypeRegisteredToFormat(
+            FeatureTable[Composition],
+            BIOMV210DirFmt)
+        self.assertSemanticTypeRegisteredToFormat(
+            FeatureTable[Balance],
+            BIOMV210DirFmt)
+        self.assertSemanticTypeRegisteredToFormat(
+            FeatureTable[PercentileNormalized],
+            BIOMV210DirFmt)
+        self.assertSemanticTypeRegisteredToFormat(
+            FeatureTable[Design],
             BIOMV210DirFmt)
 
 
