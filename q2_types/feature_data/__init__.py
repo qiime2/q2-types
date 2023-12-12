@@ -19,6 +19,7 @@ from ._format import (
     ProteinFASTAFormat, AlignedProteinFASTAFormat, RNASequencesDirectoryFormat,
     RNAFASTAFormat, AlignedRNAFASTAFormat, AlignedRNASequencesDirectoryFormat,
     PairedRNASequencesDirectoryFormat, BLAST6Format, BLAST6DirectoryFormat,
+    UNIXListFormat, IDSelectionDirectoryFormat, IDMetadataFormat, IDSelection,
     MixedCaseDNAFASTAFormat, MixedCaseDNASequencesDirectoryFormat,
     MixedCaseRNAFASTAFormat, MixedCaseRNASequencesDirectoryFormat,
     MixedCaseAlignedDNAFASTAFormat,
@@ -28,7 +29,7 @@ from ._format import (
 from ._type import (
     FeatureData, Taxonomy, Sequence, PairedEndSequence, AlignedSequence,
     Differential, ProteinSequence, AlignedProteinSequence, RNASequence,
-    AlignedRNASequence, PairedEndRNASequence, BLAST6)
+    AlignedRNASequence, PairedEndRNASequence, BLAST6, Selection)
 
 # TODO remove these imports when tests are rewritten. Remove from __all__ too
 from ._transformer import (
@@ -54,6 +55,8 @@ __all__ = [
     'AlignedRNASequencesDirectoryFormat', 'RNASequence', 'AlignedRNASequence',
     'PairedRNAIterator', 'PairedRNASequencesDirectoryFormat',
     'PairedEndRNASequence', 'BLAST6Format', 'BLAST6DirectoryFormat', 'BLAST6',
+    'UNIXListFormat', 'IDSelectionDirectoryFormat', 'IDSelection',
+    'IDMetadataFormat', 'Selection',
     'MixedCaseDNAFASTAFormat', 'MixedCaseDNASequencesDirectoryFormat',
     'MixedCaseRNAFASTAFormat', 'MixedCaseRNASequencesDirectoryFormat',
     'MixedCaseAlignedDNAFASTAFormat',

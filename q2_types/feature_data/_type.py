@@ -15,7 +15,8 @@ from . import (TSVTaxonomyDirectoryFormat, DNASequencesDirectoryFormat,
                DifferentialDirectoryFormat, ProteinSequencesDirectoryFormat,
                AlignedProteinSequencesDirectoryFormat,
                RNASequencesDirectoryFormat, AlignedRNASequencesDirectoryFormat,
-               PairedRNASequencesDirectoryFormat, BLAST6DirectoryFormat)
+               PairedRNASequencesDirectoryFormat, BLAST6DirectoryFormat,
+               IDSelectionDirectoryFormat)
 from q2_types.sample_data import SampleData
 
 
@@ -52,12 +53,14 @@ BLAST6 = SemanticType('BLAST6',
                       variant_of=[FeatureData.field['type'],
                                   SampleData.field['type']])
 
+Selection = SemanticType('Selection', variant_of=FeatureData.field['type'])
+
 plugin.register_semantic_types(FeatureData, Taxonomy, Sequence,
                                PairedEndSequence, AlignedSequence,
                                Differential, ProteinSequence,
                                AlignedProteinSequence, RNASequence,
                                AlignedRNASequence, PairedEndRNASequence,
-                               BLAST6)
+                               BLAST6, Selection)
 
 
 plugin.register_artifact_class(
@@ -120,3 +123,6 @@ plugin.register_artifact_class(
     directory_format=BLAST6DirectoryFormat,
     description=("BLAST results associated with a set of feature "
                  "identifiers."))
+plugin.register_artifact_class(
+    FeatureData[Selection],
+    directory_format=IDSelectionDirectoryFormat)

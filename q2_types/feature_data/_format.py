@@ -440,6 +440,52 @@ BLAST6DirectoryFormat = model.SingleFileDirectoryFormat(
     'BLAST6DirectoryFormat', 'blast6.tsv', BLAST6Format)
 
 
+class UNIXListFormat(model.TextFileFormat):
+    def _validate_(self, level):
+        # any file with lines will be valid
+        return True
+
+    def to_list(self):
+        with self.open() as fh:
+            return [s.strip() for s in fh]
+
+
+class IDMetadataFormat(model.TextFileFormat):
+    def _validate_(self, level):
+        try:
+            self.to_metadata()
+        except qiime2.metadata.MetadataFileError as md_exc:
+            raise model.ValidationError(md_exc) from md_exc
+
+    def to_metadata(self):
+        return qiime2.Metadata.load(str(self))
+
+
+class IDSelectionDirectoryFormat(model.DirectoryFormat):
+    included = model.File('included.txt', format=UNIXListFormat)
+    excluded = model.File('excluded.txt', format=UNIXListFormat)
+    metadata = model.File('metadata.tsv', format=IDMetadataFormat,
+                          optional=True)
+    label = model.File('label.txt', format=UNIXListFormat, optional=True)
+
+    def validate(self, level='min'):
+        with open('included.txt') as included:
+            with open('excluded.txt') as excluded:
+                if set(included).intersection(excluded):
+                    raise model.ValidationError(
+                        'Overlapping IDs found in both included and excluded'
+                        ' lists.'
+                    )
+
+
+class IDSelection:
+    def __init__(self, inclusion: pd.Series, metadata: qiime2.Metadata,
+                 label: str):
+        self.inclusion = inclusion
+        self.metadata = metadata
+        self.label = label
+
+
 plugin.register_formats(
     TSVTaxonomyFormat, TSVTaxonomyDirectoryFormat,
     HeaderlessTSVTaxonomyFormat, HeaderlessTSVTaxonomyDirectoryFormat,
@@ -451,7 +497,8 @@ plugin.register_formats(
     AlignedProteinSequencesDirectoryFormat, RNAFASTAFormat,
     RNASequencesDirectoryFormat, AlignedRNAFASTAFormat,
     AlignedRNASequencesDirectoryFormat, PairedRNASequencesDirectoryFormat,
-    BLAST6Format, BLAST6DirectoryFormat, MixedCaseDNAFASTAFormat,
+    BLAST6Format, BLAST6DirectoryFormat, UNIXListFormat,
+    IDSelectionDirectoryFormat, MixedCaseDNAFASTAFormat,
     MixedCaseDNASequencesDirectoryFormat, MixedCaseRNAFASTAFormat,
     MixedCaseRNASequencesDirectoryFormat, MixedCaseAlignedDNAFASTAFormat,
     MixedCaseAlignedDNASequencesDirectoryFormat,
