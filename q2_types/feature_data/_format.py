@@ -404,15 +404,26 @@ DifferentialDirectoryFormat = model.SingleFileDirectoryFormat(
 class ProteinFASTAFormat(FASTAFormat):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        upper_case = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-        lower_case = "abcdefghijklmnopqrstuvwxyz"
-        self.alphabet = upper_case + lower_case + "*"
+        self.alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ*"
 
 
 ProteinSequencesDirectoryFormat = model.SingleFileDirectoryFormat(
     'ProteinSequencesDirectoryFormat',
     'protein-sequences.fasta',
     ProteinFASTAFormat)
+
+
+class MixedCaseProteinFASTAFormat(ProteinFASTAFormat):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        lower_case = "abcdefghijklmnopqrstuvwxyz"
+        self.alphabet = self.alphabet + lower_case
+
+
+MixedCaseProteinSequencesDirectoryFormat = model.SingleFileDirectoryFormat(
+    'MixedCaseProteinSequencesDirectoryFormat',
+    'protein-sequences.fasta',
+    MixedCaseProteinFASTAFormat)
 
 
 class AlignedProteinFASTAFormat(AlignedFASTAFormatMixin, ProteinFASTAFormat):
@@ -425,6 +436,23 @@ AlignedProteinSequencesDirectoryFormat = model.SingleFileDirectoryFormat(
     'AlignedProteinSequencesDirectoryFormat',
     'aligned-protein-sequences.fasta',
     AlignedProteinFASTAFormat)
+
+
+class MixedCaseAlignedProteinFASTAFormat(
+    AlignedFASTAFormatMixin, MixedCaseProteinFASTAFormat
+):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        super()._turn_into_alignment()
+
+
+MixedCaseAlignedProteinSequencesDirectoryFormat = (
+    model.SingleFileDirectoryFormat(
+        'MixedCaseAlignedProteinSequencesDirectoryFormat',
+        'aligned-protein-sequences.fasta',
+        MixedCaseAlignedProteinFASTAFormat
+    )
+)
 
 
 class BLAST6Format(model.TextFileFormat):
@@ -449,8 +477,11 @@ plugin.register_formats(
     DNASequencesDirectoryFormat, PairedDNASequencesDirectoryFormat,
     AlignedDNAFASTAFormat, AlignedDNASequencesDirectoryFormat,
     DifferentialFormat, DifferentialDirectoryFormat, ProteinFASTAFormat,
-    AlignedProteinFASTAFormat, ProteinSequencesDirectoryFormat,
-    AlignedProteinSequencesDirectoryFormat, RNAFASTAFormat,
+    AlignedProteinFASTAFormat, MixedCaseProteinFASTAFormat,
+    MixedCaseAlignedProteinFASTAFormat, ProteinSequencesDirectoryFormat,
+    AlignedProteinSequencesDirectoryFormat,
+    MixedCaseProteinSequencesDirectoryFormat,
+    MixedCaseAlignedProteinSequencesDirectoryFormat, RNAFASTAFormat,
     RNASequencesDirectoryFormat, AlignedRNAFASTAFormat,
     AlignedRNASequencesDirectoryFormat, PairedRNASequencesDirectoryFormat,
     BLAST6Format, BLAST6DirectoryFormat, MixedCaseDNAFASTAFormat,
