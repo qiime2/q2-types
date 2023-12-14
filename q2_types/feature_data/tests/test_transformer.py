@@ -1321,11 +1321,14 @@ class TestProteinFASTAFormatTransformers(TestPluginBase):
 
         obs = obs.astype(str)
 
-        index = pd.Index(['sequence1', 'sequence2'])
+        index = pd.Index(['sequence1', 'sequence2', 'sequence3'])
         exp = pd.Series(['MTTRDLTAAQFNETIQSSDMVLVDYWASWCGPCRAFAPTFAESSEK'
                          'HPDVVHAKVDTEAERELAAAAQIR',
                          'MVKQIESKTAFQEALDAAGDKLVVVDFSATWCGPCKMIKPFFHSLS'
-                         'EKYSNVIFLEVDVDDCQDVASECEVKCMPTFQFFKKGQKVGEFSGAN*'],
+                         'EKYSNVIFLEVDVDDCQDVASECEVKCMPTFQFFKKGQKVGEFSGAN*',
+                         'TEPDZNZWKRUZQYTWUYKSWUQFPUNHMDBGHFDZ'
+                         'SPIYKCZHQXLCEBYJREOAUJVDLIRPEGPOGMEJ'
+                         'ZQQRHCFQXUPZLDWDGOXTOQTCIQDD*'],
                         index=index, dtype=object)
 
         assert_series_equal(exp, obs)
@@ -1354,12 +1357,17 @@ class TestProteinFASTAFormatTransformers(TestPluginBase):
     def test_proteinfasta_format_to_metadata(self):
         _, obs = self.transform_format(ProteinFASTAFormat, qiime2.Metadata,
                                        'protein-sequences.fasta')
-        index = pd.Index(['sequence1', 'sequence2'], name='Feature ID')
+        index = pd.Index(
+            ['sequence1', 'sequence2', 'sequence3'], name='Feature ID'
+        )
         exp_df = pd.DataFrame(['MTTRDLTAAQFNETIQSSDMVLVDYWASWCGPCRA'
                                'FAPTFAESSEKHPDVVHAKVDTEAERELAAAAQIR',
                                'MVKQIESKTAFQEALDAAGDKLVVVDFSATWCGPC'
                                'KMIKPFFHSLSEKYSNVIFLEVDVDDCQDVASECE'
-                               'VKCMPTFQFFKKGQKVGEFSGAN*'],
+                               'VKCMPTFQFFKKGQKVGEFSGAN*',
+                               'TEPDZNZWKRUZQYTWUYKSWUQFPUNHMDBGHFDZ'
+                               'SPIYKCZHQXLCEBYJREOAUJVDLIRPEGPOGMEJ'
+                               'ZQQRHCFQXUPZLDWDGOXTOQTCIQDD*'],
                               index=index, columns=['Sequence'], dtype=object)
         exp = qiime2.Metadata(exp_df)
 
@@ -1369,13 +1377,18 @@ class TestProteinFASTAFormatTransformers(TestPluginBase):
         _, obs = self.transform_format(AlignedProteinFASTAFormat,
                                        qiime2.Metadata,
                                        'aligned-protein-sequences.fasta')
-        index = pd.Index(['sequence1', 'sequence2'], name='Feature ID')
+        index = pd.Index(
+            ['sequence1', 'sequence2', 'sequence3'], name='Feature ID'
+        )
         exp_df = pd.DataFrame(['------------------------VDFSATWCGPC'
                                'KMIKPFFHSLSEKYSNVIFLEVDVDDCQDVASECE'
                                'VKCMPTFQFFKKGQKVGEFSGAN',
                                'MVKQIESKTAFQEALDAAGDKLVVVDFSATWCGPC'
                                'KMIKPFFHSLSEKYSNVIFLEVDVDDCQDVASECE'
-                               'VKCMPTFQ-------VGEFSGAN'],
+                               'VKCMPTFQ-------VGEFSGAN',
+                               'MVKQIESKTAFQJALDAAGDKLVVVDFSATWCGPC'
+                               'KMIKPFFHSLSEKYSNUIFLEVDVDDCQD'
+                               'VASECEVKCMPTFO-------VGEFSGAN'],
                               index=index, columns=['Sequence'], dtype=object)
         exp = qiime2.Metadata(exp_df)
 
@@ -1387,13 +1400,16 @@ class TestProteinFASTAFormatTransformers(TestPluginBase):
 
         obs = obs.astype(str)
 
-        index = pd.Index(['sequence1', 'sequence2'])
+        index = pd.Index(['sequence1', 'sequence2', 'sequence3'])
         exp = pd.Series(['------------------------VDFSATWCGPC'
                          'KMIKPFFHSLSEKYSNVIFLEVDVDDCQDVASECE'
                          'VKCMPTFQFFKKGQKVGEFSGAN',
                          'MVKQIESKTAFQEALDAAGDKLVVVDFSATWCGPC'
                          'KMIKPFFHSLSEKYSNVIFLEVDVDDCQDVASECE'
-                         'VKCMPTFQ-------VGEFSGAN'],
+                         'VKCMPTFQ-------VGEFSGAN',
+                         'MVKQIESKTAFQJALDAAGDKLVVVDFSATWCGPC'
+                         'KMIKPFFHSLSEKYSNUIFLEVDVDDCQD'
+                         'VASECEVKCMPTFO-------VGEFSGAN'],
                         index=index, dtype=object)
 
         assert_series_equal(exp, obs)
