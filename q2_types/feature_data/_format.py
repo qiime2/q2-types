@@ -405,7 +405,7 @@ class ProteinFASTAFormat(FASTAFormat):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         upper_case = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
-        lower_case = "abcdefghijklmnopqrstuvwxy"
+        lower_case = "abcdefghijklmnopqrstuvwxyz"
         self.alphabet = upper_case + lower_case + "*"
 
 
