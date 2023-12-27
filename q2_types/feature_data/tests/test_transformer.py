@@ -1336,11 +1336,14 @@ class TestProteinFASTAFormatTransformers(TestPluginBase):
     def test_series_to_proteinfasta_format(self):
         transformer = self.get_transformer(pd.Series, ProteinFASTAFormat)
 
-        index = pd.Index(['sequence1', 'sequence2'])
+        index = pd.Index(['sequence1', 'sequence2', 'sequence3'])
         input = pd.Series(['MTTRDLTAAQFNETIQSSDMVLVDYWASWCGPCRAFAPTFAESSEK'
                            'HPDVVHAKVDTEAERELAAAAQIR',
                            'MVKQIESKTAFQEALDAAGDKLVVVDFSATWCGPCKMIKPFFHSLS'
-                           'EKYSNVIFLEVDVDDCQDVASECEVKCMPTFQFFKKGQKVGEFSGAN'],
+                           'EKYSNVIFLEVDVDDCQDVASECEVKCMPTFQFFKKGQKVGEFSGAN*',
+                           'TEPDZNZWKRUZQYTWUYKSWUQFPUNHMDBGHFDZ'
+                           'SPIYKCZHQXLCEBYJREOAUJVDLIRPEGPOGMEJ'
+                           'ZQQRHCFQXUPZLDWDGOXTOQTCIQDD*'],
                           index=index, dtype=object)
 
         obs = transformer(input)
@@ -1418,13 +1421,16 @@ class TestProteinFASTAFormatTransformers(TestPluginBase):
         transformer = self.get_transformer(
             pd.Series, AlignedProteinFASTAFormat)
 
-        index = pd.Index(['sequence1', 'sequence2'])
+        index = pd.Index(['sequence1', 'sequence2', 'sequence3'])
         input = pd.Series(['------------------------VDFSATWCGPC'
                            'KMIKPFFHSLSEKYSNVIFLEVDVDDCQDVASECE'
                            'VKCMPTFQFFKKGQKVGEFSGAN',
                            'MVKQIESKTAFQEALDAAGDKLVVVDFSATWCGPC'
                            'KMIKPFFHSLSEKYSNVIFLEVDVDDCQDVASECE'
-                           'VKCMPTFQ-------VGEFSGAN'],
+                           'VKCMPTFQ-------VGEFSGAN',
+                           'MVKQIESKTAFQJALDAAGDKLVVVDFSATWCGPC'
+                           'KMIKPFFHSLSEKYSNUIFLEVDVDDCQD'
+                           'VASECEVKCMPTFO-------VGEFSGAN'],
                           index=index, dtype=object)
 
         obs = transformer(input)
@@ -1442,6 +1448,11 @@ class TestProteinFASTAFormatTransformers(TestPluginBase):
                          'MVKQIESKTAFQEALDAAGDKLVVVDFSATWCGPC'
                          'KMIKPFFHSLSEKYSNVIFLEVDVDDCQDVASECE'
                          'VKCMPTFQ-------VGEFSGAN\n')
+        self.assertEqual(obs_lines[4], '>sequence3\n')
+        self.assertEqual(obs_lines[5],
+                         'MVKQIESKTAFQJALDAAGDKLVVVDFSATWCGPC'
+                         'KMIKPFFHSLSEKYSNUIFLEVDVDDCQD'
+                         'VASECEVKCMPTFO-------VGEFSGAN\n')
 
     def test_aligned_protein_fasta_format_to_protein_iterator(self):
         input, obs = self.transform_format(

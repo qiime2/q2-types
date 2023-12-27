@@ -812,7 +812,7 @@ class TestProteinFASTAFormats(TestPluginBase):
 
         format.validate()
 
-    def test_mixed_case_aligned_protein_fasta_format_positive(self):
+    def test_mixed_case_aligned_protein_fasta_format_validate_positive(self):
         filepath = self.get_data_path(
             'mixed-case-aligned-protein-sequences.fasta'
             )
@@ -829,19 +829,21 @@ class TestProteinFASTAFormats(TestPluginBase):
                 ValidationError, 'line 5 was length 95.* previous .* 70'):
             format.validate()
 
-    def test_mixed_case_protein_fasta_format(self):
+    def test_mixed_case_protein_fasta_format_validate_positive(self):
         filepath = self.get_data_path('mixed-case-protein-sequences.fasta')
         format = MixedCaseProteinFASTAFormat(filepath, mode='r')
 
         format.validate()
 
-    def test_mixed_case_protein_fasta_format_negative(self):
+    def test_mixed_case_protein_fasta_format_invalid_characters(self):
         filepath = self.get_data_path(
             'mixed-case-aligned-protein-sequences.fasta'
             )
         format = MixedCaseProteinFASTAFormat(filepath, mode='r')
 
-        with self.assertRaises(ValidationError):
+        with self.assertRaisesRegex(
+                ValidationError,
+                "Invalid character '-' at position 0 on line 2"):
             format.validate()
 
     def test_mixed_case_aligned_protein_sequences_directory_format(self):

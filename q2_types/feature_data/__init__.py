@@ -66,6 +66,7 @@ __all__ = [
     'MixedCaseProteinFASTAFormat',
     'MixedCaseAlignedProteinFASTAFormat',
     'MixedCaseProteinSequencesDirectoryFormat',
-    'MixedCaseAlignedProteinSequencesDirectoryFormat',]
+    'MixedCaseAlignedProteinSequencesDirectoryFormat',
+    ]
 
 importlib.import_module('q2_types.feature_data._transformer')
