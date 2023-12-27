@@ -1321,11 +1321,14 @@ class TestProteinFASTAFormatTransformers(TestPluginBase):
 
         obs = obs.astype(str)
 
-        index = pd.Index(['sequence1', 'sequence2'])
+        index = pd.Index(['sequence1', 'sequence2', 'sequence3'])
         exp = pd.Series(['MTTRDLTAAQFNETIQSSDMVLVDYWASWCGPCRAFAPTFAESSEK'
                          'HPDVVHAKVDTEAERELAAAAQIR',
                          'MVKQIESKTAFQEALDAAGDKLVVVDFSATWCGPCKMIKPFFHSLS'
-                         'EKYSNVIFLEVDVDDCQDVASECEVKCMPTFQFFKKGQKVGEFSGAN*'],
+                         'EKYSNVIFLEVDVDDCQDVASECEVKCMPTFQFFKKGQKVGEFSGAN*',
+                         'TEPDZNZWKRUZQYTWUYKSWUQFPUNHMDBGHFDZ'
+                         'SPIYKCZHQXLCEBYJREOAUJVDLIRPEGPOGMEJ'
+                         'ZQQRHCFQXUPZLDWDGOXTOQTCIQDD*'],
                         index=index, dtype=object)
 
         assert_series_equal(exp, obs)
@@ -1333,11 +1336,14 @@ class TestProteinFASTAFormatTransformers(TestPluginBase):
     def test_series_to_proteinfasta_format(self):
         transformer = self.get_transformer(pd.Series, ProteinFASTAFormat)
 
-        index = pd.Index(['sequence1', 'sequence2'])
+        index = pd.Index(['sequence1', 'sequence2', 'sequence3'])
         input = pd.Series(['MTTRDLTAAQFNETIQSSDMVLVDYWASWCGPCRAFAPTFAESSEK'
                            'HPDVVHAKVDTEAERELAAAAQIR',
                            'MVKQIESKTAFQEALDAAGDKLVVVDFSATWCGPCKMIKPFFHSLS'
-                           'EKYSNVIFLEVDVDDCQDVASECEVKCMPTFQFFKKGQKVGEFSGAN'],
+                           'EKYSNVIFLEVDVDDCQDVASECEVKCMPTFQFFKKGQKVGEFSGAN*',
+                           'TEPDZNZWKRUZQYTWUYKSWUQFPUNHMDBGHFDZ'
+                           'SPIYKCZHQXLCEBYJREOAUJVDLIRPEGPOGMEJ'
+                           'ZQQRHCFQXUPZLDWDGOXTOQTCIQDD*'],
                           index=index, dtype=object)
 
         obs = transformer(input)
@@ -1354,12 +1360,17 @@ class TestProteinFASTAFormatTransformers(TestPluginBase):
     def test_proteinfasta_format_to_metadata(self):
         _, obs = self.transform_format(ProteinFASTAFormat, qiime2.Metadata,
                                        'protein-sequences.fasta')
-        index = pd.Index(['sequence1', 'sequence2'], name='Feature ID')
+        index = pd.Index(
+            ['sequence1', 'sequence2', 'sequence3'], name='Feature ID'
+        )
         exp_df = pd.DataFrame(['MTTRDLTAAQFNETIQSSDMVLVDYWASWCGPCRA'
                                'FAPTFAESSEKHPDVVHAKVDTEAERELAAAAQIR',
                                'MVKQIESKTAFQEALDAAGDKLVVVDFSATWCGPC'
                                'KMIKPFFHSLSEKYSNVIFLEVDVDDCQDVASECE'
-                               'VKCMPTFQFFKKGQKVGEFSGAN*'],
+                               'VKCMPTFQFFKKGQKVGEFSGAN*',
+                               'TEPDZNZWKRUZQYTWUYKSWUQFPUNHMDBGHFDZ'
+                               'SPIYKCZHQXLCEBYJREOAUJVDLIRPEGPOGMEJ'
+                               'ZQQRHCFQXUPZLDWDGOXTOQTCIQDD*'],
                               index=index, columns=['Sequence'], dtype=object)
         exp = qiime2.Metadata(exp_df)
 
@@ -1369,13 +1380,18 @@ class TestProteinFASTAFormatTransformers(TestPluginBase):
         _, obs = self.transform_format(AlignedProteinFASTAFormat,
                                        qiime2.Metadata,
                                        'aligned-protein-sequences.fasta')
-        index = pd.Index(['sequence1', 'sequence2'], name='Feature ID')
+        index = pd.Index(
+            ['sequence1', 'sequence2', 'sequence3'], name='Feature ID'
+        )
         exp_df = pd.DataFrame(['------------------------VDFSATWCGPC'
                                'KMIKPFFHSLSEKYSNVIFLEVDVDDCQDVASECE'
                                'VKCMPTFQFFKKGQKVGEFSGAN',
                                'MVKQIESKTAFQEALDAAGDKLVVVDFSATWCGPC'
                                'KMIKPFFHSLSEKYSNVIFLEVDVDDCQDVASECE'
-                               'VKCMPTFQ-------VGEFSGAN'],
+                               'VKCMPTFQ-------VGEFSGAN',
+                               'MVKQIESKTAFQJALDAAGDKLVVVDFSATWCGPC'
+                               'KMIKPFFHSLSEKYSNUIFLEVDVDDCQD'
+                               'VASECEVKCMPTFO-------VGEFSGAN'],
                               index=index, columns=['Sequence'], dtype=object)
         exp = qiime2.Metadata(exp_df)
 
@@ -1387,13 +1403,16 @@ class TestProteinFASTAFormatTransformers(TestPluginBase):
 
         obs = obs.astype(str)
 
-        index = pd.Index(['sequence1', 'sequence2'])
+        index = pd.Index(['sequence1', 'sequence2', 'sequence3'])
         exp = pd.Series(['------------------------VDFSATWCGPC'
                          'KMIKPFFHSLSEKYSNVIFLEVDVDDCQDVASECE'
                          'VKCMPTFQFFKKGQKVGEFSGAN',
                          'MVKQIESKTAFQEALDAAGDKLVVVDFSATWCGPC'
                          'KMIKPFFHSLSEKYSNVIFLEVDVDDCQDVASECE'
-                         'VKCMPTFQ-------VGEFSGAN'],
+                         'VKCMPTFQ-------VGEFSGAN',
+                         'MVKQIESKTAFQJALDAAGDKLVVVDFSATWCGPC'
+                         'KMIKPFFHSLSEKYSNUIFLEVDVDDCQD'
+                         'VASECEVKCMPTFO-------VGEFSGAN'],
                         index=index, dtype=object)
 
         assert_series_equal(exp, obs)
@@ -1402,13 +1421,16 @@ class TestProteinFASTAFormatTransformers(TestPluginBase):
         transformer = self.get_transformer(
             pd.Series, AlignedProteinFASTAFormat)
 
-        index = pd.Index(['sequence1', 'sequence2'])
+        index = pd.Index(['sequence1', 'sequence2', 'sequence3'])
         input = pd.Series(['------------------------VDFSATWCGPC'
                            'KMIKPFFHSLSEKYSNVIFLEVDVDDCQDVASECE'
                            'VKCMPTFQFFKKGQKVGEFSGAN',
                            'MVKQIESKTAFQEALDAAGDKLVVVDFSATWCGPC'
                            'KMIKPFFHSLSEKYSNVIFLEVDVDDCQDVASECE'
-                           'VKCMPTFQ-------VGEFSGAN'],
+                           'VKCMPTFQ-------VGEFSGAN',
+                           'MVKQIESKTAFQJALDAAGDKLVVVDFSATWCGPC'
+                           'KMIKPFFHSLSEKYSNUIFLEVDVDDCQD'
+                           'VASECEVKCMPTFO-------VGEFSGAN'],
                           index=index, dtype=object)
 
         obs = transformer(input)
@@ -1426,6 +1448,11 @@ class TestProteinFASTAFormatTransformers(TestPluginBase):
                          'MVKQIESKTAFQEALDAAGDKLVVVDFSATWCGPC'
                          'KMIKPFFHSLSEKYSNVIFLEVDVDDCQDVASECE'
                          'VKCMPTFQ-------VGEFSGAN\n')
+        self.assertEqual(obs_lines[4], '>sequence3\n')
+        self.assertEqual(obs_lines[5],
+                         'MVKQIESKTAFQJALDAAGDKLVVVDFSATWCGPC'
+                         'KMIKPFFHSLSEKYSNUIFLEVDVDDCQD'
+                         'VASECEVKCMPTFO-------VGEFSGAN\n')
 
     def test_aligned_protein_fasta_format_to_protein_iterator(self):
         input, obs = self.transform_format(
