@@ -13,8 +13,11 @@ from q2_types.per_sample_sequences import (
     Sequences, SequencesWithQuality, PairedEndSequencesWithQuality,
     JoinedSequencesWithQuality, QIIME1DemuxDirFmt,
     SingleLanePerSampleSingleEndFastqDirFmt,
-    SingleLanePerSamplePairedEndFastqDirFmt
-)
+    SingleLanePerSamplePairedEndFastqDirFmt,
+    EMPSingleEndDirFmt, EMPPairedEndDirFmt,
+    ErrorCorrectionDetailsDirFmt, RawSequences,
+    EMPSingleEndSequences, EMPPairedEndSequences,
+    ErrorCorrectionDetails)
 from qiime2.plugin.testing import TestPluginBase
 
 
@@ -36,8 +39,19 @@ class TestTypes(TestPluginBase):
     def test_sequences_semantic_type_to_format_registration(self):
         self.assertSemanticTypeRegisteredToFormat(
             SampleData[Sequences],
-            QIIME1DemuxDirFmt
-        )
+            QIIME1DemuxDirFmt)
+
+    def test_raw_sequences_semantic_type_registration(self):
+        self.assertRegisteredSemanticType(RawSequences)
+
+    def test_emp_single_end_sequences_semantic_type_registration(self):
+        self.assertRegisteredSemanticType(EMPSingleEndSequences)
+
+    def test_emp_paired_end_sequences_semantic_type_registration(self):
+        self.assertRegisteredSemanticType(EMPPairedEndSequences)
+
+    def test_error_correction_details_semantic_type_registration(self):
+        self.assertRegisteredSemanticType(ErrorCorrectionDetails)
 
     def test_sequences_with_quality_semantic_type_to_format_registration(self):
         self.assertSemanticTypeRegisteredToFormat(
@@ -56,6 +70,26 @@ class TestTypes(TestPluginBase):
             SampleData[JoinedSequencesWithQuality],
             SingleLanePerSampleSingleEndFastqDirFmt
         )
+
+    def test_error_correction_details_semantic_type_to_format_reg(self):
+        self.assertSemanticTypeRegisteredToFormat(
+            SampleData[ErrorCorrectionDetails],
+            ErrorCorrectionDetailsDirFmt)
+
+    def test_emp_paired_end_sequences_semantic_type_to_format_reg(self):
+        self.assertSemanticTypeRegisteredToFormat(
+            SampleData[EMPPairedEndSequences],
+            EMPPairedEndDirFmt)
+
+    def test_emp_single_end_sequences_semantic_type_to_format_reg(self):
+        self.assertSemanticTypeRegisteredToFormat(
+            SampleData[EMPSingleEndSequences],
+            EMPSingleEndDirFmt)
+
+    def test_raw_sequences_semantic_type_to_format_registration(self):
+        self.assertSemanticTypeRegisteredToFormat(
+            RawSequences,
+            EMPSingleEndDirFmt)
 
 
 if __name__ == '__main__':

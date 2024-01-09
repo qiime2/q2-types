@@ -23,10 +23,22 @@ from ._format import (CasavaOneEightSingleLanePerSampleDirFmt,
                       PairedEndFastqManifestPhred33V2,
                       PairedEndFastqManifestPhred64V2,
                       QIIME1DemuxFormat, QIIME1DemuxDirFmt,
-                      SampleIdIndexedSingleEndPerSampleDirFmt)
+                      SampleIdIndexedSingleEndPerSampleDirFmt,
+                      EMPMultiplexedDirFmt,
+                      ErrorCorrectionDetailsFmt,
+                      ErrorCorrectionDetailsDirFmt,
+                      EMPSingleEndDirFmt,
+                      EMPSingleEndCasavaDirFmt,
+                      EMPPairedEndDirFmt,
+                      EMPPairedEndCasavaDirFmt)
+
 from ._type import (Sequences, SequencesWithQuality,
                     PairedEndSequencesWithQuality,
-                    JoinedSequencesWithQuality)
+                    JoinedSequencesWithQuality,
+                    RawSequences,
+                    EMPSingleEndSequences,
+                    EMPPairedEndSequences,
+                    ErrorCorrectionDetails)
 
 __all__ = ['CasavaOneEightSingleLanePerSampleDirFmt',
            'CasavaOneEightLanelessPerSampleDirFmt',
@@ -41,6 +53,12 @@ __all__ = ['CasavaOneEightSingleLanePerSampleDirFmt',
            'SingleEndFastqManifestPhred64V2',
            'PairedEndFastqManifestPhred33V2',
            'PairedEndFastqManifestPhred64V2', 'QIIME1DemuxFormat',
-           'QIIME1DemuxDirFmt', 'SampleIdIndexedSingleEndPerSampleDirFmt']
+           'QIIME1DemuxDirFmt', 'SampleIdIndexedSingleEndPerSampleDirFmt',
+           'RawSequences', 'EMPSingleEndSequences', 'EMPPairedEndSequences',
+           'EMPMultiplexedDirFmt',
+           'ErrorCorrectionDetails', 'ErrorCorrectionDetailsFmt',
+           'ErrorCorrectionDetailsDirFmt', 'EMPSingleEndDirFmt',
+           'EMPSingleEndCasavaDirFmt', 'EMPPairedEndDirFmt',
+           'EMPPairedEndCasavaDirFmt']
 
 importlib.import_module('q2_types.per_sample_sequences._transformer')

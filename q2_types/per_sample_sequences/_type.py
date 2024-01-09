@@ -11,7 +11,8 @@ from qiime2.plugin import SemanticType
 from ..plugin_setup import plugin
 from ..sample_data import SampleData
 from . import (QIIME1DemuxDirFmt, SingleLanePerSampleSingleEndFastqDirFmt,
-               SingleLanePerSamplePairedEndFastqDirFmt)
+               SingleLanePerSamplePairedEndFastqDirFmt, EMPSingleEndDirFmt,
+               EMPPairedEndDirFmt, ErrorCorrectionDetailsDirFmt)
 
 
 Sequences = SemanticType('Sequences', variant_of=SampleData.field['type'])
@@ -21,10 +22,17 @@ PairedEndSequencesWithQuality = SemanticType(
     'PairedEndSequencesWithQuality', variant_of=SampleData.field['type'])
 JoinedSequencesWithQuality = SemanticType(
     'JoinedSequencesWithQuality', variant_of=SampleData.field['type'])
+RawSequences = SemanticType('RawSequences')
+EMPSingleEndSequences = SemanticType('EMPSingleEndSequences')
+EMPPairedEndSequences = SemanticType('EMPPairedEndSequences')
+ErrorCorrectionDetails = SemanticType('ErrorCorrectionDetails')
 
 plugin.register_semantic_types(Sequences, SequencesWithQuality,
                                PairedEndSequencesWithQuality,
-                               JoinedSequencesWithQuality)
+                               JoinedSequencesWithQuality,
+                               RawSequences, EMPSingleEndSequences,
+                               EMPPairedEndSequences,
+                               ErrorCorrectionDetails)
 
 plugin.register_artifact_class(
     SampleData[Sequences],
@@ -51,4 +59,23 @@ plugin.register_artifact_class(
     description=("Collections of unjoined paired-end sequences with quality "
                  "scores associated with specified samples (i.e., "
                  "demultiplexed sequences).")
+)
+plugin.register_semantic_type_to_format(
+    RawSequences,
+    artifact_format=EMPSingleEndDirFmt
+)
+
+plugin.register_semantic_type_to_format(
+    EMPSingleEndSequences,
+    artifact_format=EMPSingleEndDirFmt
+)
+
+plugin.register_semantic_type_to_format(
+    EMPPairedEndSequences,
+    artifact_format=EMPPairedEndDirFmt
+)
+
+plugin.register_semantic_type_to_format(
+    ErrorCorrectionDetails,
+    artifact_format=ErrorCorrectionDetailsDirFmt
 )
