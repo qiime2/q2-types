@@ -16,7 +16,10 @@ from ._format import (
     AlignedDNASequencesDirectoryFormat, DifferentialFormat,
     DifferentialDirectoryFormat, FASTAFormat, AlignedFASTAFormatMixin,
     AlignedProteinSequencesDirectoryFormat, ProteinSequencesDirectoryFormat,
-    ProteinFASTAFormat, AlignedProteinFASTAFormat, RNASequencesDirectoryFormat,
+    MixedCaseProteinSequencesDirectoryFormat,
+    MixedCaseAlignedProteinSequencesDirectoryFormat,
+    ProteinFASTAFormat, AlignedProteinFASTAFormat, MixedCaseProteinFASTAFormat,
+    MixedCaseAlignedProteinFASTAFormat, RNASequencesDirectoryFormat,
     RNAFASTAFormat, AlignedRNAFASTAFormat, AlignedRNASequencesDirectoryFormat,
     PairedRNASequencesDirectoryFormat, BLAST6Format, BLAST6DirectoryFormat,
     MixedCaseDNAFASTAFormat, MixedCaseDNASequencesDirectoryFormat,
@@ -62,6 +65,11 @@ __all__ = [
     'MixedCaseAlignedRNAFASTAFormat',
     'MixedCaseAlignedRNASequencesDirectoryFormat',
     'BarcodePairedSequenceFastqIterator',
-    'BarcodeSequenceFastqIterator']
+    'BarcodeSequenceFastqIterator'
+    'MixedCaseProteinFASTAFormat',
+    'MixedCaseAlignedProteinFASTAFormat',
+    'MixedCaseProteinSequencesDirectoryFormat',
+    'MixedCaseAlignedProteinSequencesDirectoryFormat',
+    ]
 
 importlib.import_module('q2_types.feature_data._transformer')
