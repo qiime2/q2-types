@@ -31,7 +31,7 @@ from q2_types.per_sample_sequences import (
 from qiime2.plugin.testing import TestPluginBase
 from qiime2.plugin import ValidationError
 
-from q2_demux._format import ErrorCorrectionDetailsFmt
+from q2_types.per_sample_sequences import ErrorCorrectionDetailsFmt
 
 
 class TestAbsoluteFastqManifestV2Formats(TestPluginBase):

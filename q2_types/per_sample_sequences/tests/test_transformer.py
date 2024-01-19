@@ -6,6 +6,7 @@
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
 
+import qiime2
 import functools
 import unittest
 import os
@@ -51,7 +52,6 @@ from q2_types.per_sample_sequences._util import (
 )
 from qiime2.plugin import ValidationError
 from qiime2.plugin.testing import TestPluginBase
-
 
 _parse_and_validate_manifest_partial = functools.partial(
     _parse_and_validate_manifest,
@@ -1564,6 +1564,63 @@ class TestFastqManifestV2Transformers(TestPluginBase):
         with self.assertRaisesRegex(ValueError, 'extra.*reverse'):
             transformer(EMPPairedEndCasavaDirFmt(
                 self.get_data_path('emp-paired-end-sequences'), 'r'))
+
+
+class TestErrorCorrectionDetailsFmtTransformers(TestPluginBase):
+    package = 'q2_demux.tests'
+
+    def setUp(self):
+        super().setUp()
+
+        self.df = pd.DataFrame([
+                ['s1', 'seq-1',  'AAC', 'AAA', 2.],
+                ['s1', 'seq-4',  'ACA', 'AAA', 20.],
+                ['s2', 'seq-5',  'CCA', 'CCC', 1.],
+                ['s3', 'seq-50', 'GGT', 'GGG', 1.],
+            ],
+            columns=['sample', 'barcode-sequence-id', 'barcode-uncorrected',
+                     'barcode-corrected', 'barcode-errors'],
+            index=pd.Index(['record-1', 'record-2', 'record-3', 'record-4'],
+                           name='id'))
+
+        self.serialized = (
+            'id\tsample\tbarcode-sequence-id\tbarcode-uncorrected\t'
+            'barcode-corrected\tbarcode-errors\n'
+            '#q2:types\tcategorical\tcategorical\tcategorical\tcategorical\t'
+            'numeric\n'
+            'record-1\ts1\tseq-1\tAAC\tAAA\t2\n'
+            'record-2\ts1\tseq-4\tACA\tAAA\t20\n'
+            'record-3\ts2\tseq-5\tCCA\tCCC\t1\n'
+            'record-4\ts3\tseq-50\tGGT\tGGG\t1\n'
+        )
+
+    def test_df_to_error_correction_details_fmt(self):
+        transformer = self.get_transformer(
+            pd.DataFrame, ErrorCorrectionDetailsFmt)
+        obs = transformer(self.df)
+
+        with obs.open() as obs:
+            self.assertEqual(obs.read(), self.serialized)
+
+    def test_error_correction_details_fmt_to_df(self):
+        transformer = self.get_transformer(
+            ErrorCorrectionDetailsFmt, pd.DataFrame)
+        ff = ErrorCorrectionDetailsFmt()
+        with ff.open() as fh:
+            fh.write(self.serialized)
+        obs = transformer(ff)
+
+        pdt.assert_frame_equal(obs, self.df)
+
+    def test_error_correction_details_fmt_to_metadata(self):
+        transformer = self.get_transformer(
+            ErrorCorrectionDetailsFmt, qiime2.Metadata)
+        ff = ErrorCorrectionDetailsFmt()
+        with ff.open() as fh:
+            fh.write(self.serialized)
+        obs = transformer(ff)
+
+        self.assertEqual(obs, qiime2.Metadata(self.df))
 
 
 if __name__ == '__main__':

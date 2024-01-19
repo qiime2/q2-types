@@ -507,6 +507,7 @@ QIIME1DemuxDirFmt = model.SingleFileDirectoryFormat(
     'QIIME1DemuxDirFmt', 'seqs.fna', QIIME1DemuxFormat)
 
 
+# TODO: deprecate this and alias it
 class EMPMultiplexedDirFmt(model.DirectoryFormat):
     sequences = model.File(
         r'sequences.fastq.gz', format=FastqGzFormat)
@@ -515,8 +516,9 @@ class EMPMultiplexedDirFmt(model.DirectoryFormat):
         r'barcodes.fastq.gz', format=FastqGzFormat)
 
 
+# The new cannonical name for EMPMultiplexedDirFmt
 class EMPSingleEndDirFmt(EMPMultiplexedDirFmt):
-    pass
+    pass  # contents inherited
 
 
 class EMPPairedEndDirFmt(model.DirectoryFormat):
@@ -530,6 +532,8 @@ class EMPPairedEndDirFmt(model.DirectoryFormat):
         r'barcodes.fastq.gz', format=FastqGzFormat)
 
 
+# Originally called EMPMultiplexedSingleEndDirFmt, rename was possible as no
+# artifacts where created with this view, it is just for import.
 class EMPSingleEndCasavaDirFmt(model.DirectoryFormat):
     # TODO: generalize this with a regex when we have validation in place for
     # model.FileCollections. The file names are currently designed more

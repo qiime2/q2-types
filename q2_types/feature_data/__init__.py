@@ -34,7 +34,8 @@ from ._type import (
 from ._transformer import (
     NucleicAcidIterator, DNAIterator, PairedDNAIterator, AlignedDNAIterator,
     ProteinIterator, AlignedProteinIterator, RNAIterator, AlignedRNAIterator,
-    PairedRNAIterator)
+    PairedRNAIterator, BarcodePairedSequenceFastqIterator,
+    BarcodeSequenceFastqIterator)
 
 __all__ = [
     'TaxonomyFormat', 'TaxonomyDirectoryFormat', 'HeaderlessTSVTaxonomyFormat',
@@ -59,6 +60,8 @@ __all__ = [
     'MixedCaseAlignedDNAFASTAFormat',
     'MixedCaseAlignedDNASequencesDirectoryFormat',
     'MixedCaseAlignedRNAFASTAFormat',
-    'MixedCaseAlignedRNASequencesDirectoryFormat']
+    'MixedCaseAlignedRNASequencesDirectoryFormat',
+    'BarcodePairedSequenceFastqIterator',
+    'BarcodeSequenceFastqIterator']
 
 importlib.import_module('q2_types.feature_data._transformer')

@@ -60,6 +60,7 @@ plugin.register_artifact_class(
                  "scores associated with specified samples (i.e., "
                  "demultiplexed sequences).")
 )
+# TODO: remove when aliasing exists
 plugin.register_semantic_type_to_format(
     RawSequences,
     artifact_format=EMPSingleEndDirFmt
