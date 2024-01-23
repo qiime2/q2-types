@@ -11,10 +11,10 @@ from itertools import zip_longest
 
 import itertools
 from ._util import _read_fastq_seqs
-from q2_types.per_sample_sequences import (EMPMultiplexedDirFmt,
-                                           EMPSingleEndDirFmt,
-                                           EMPPairedEndDirFmt,
-                                           FastqGzFormat)
+from q2_types.per_sample_sequences import FastqGzFormat
+from q2_types.multiplexed_sequences import (EMPMultiplexedDirFmt,
+                                            EMPSingleEndDirFmt,
+                                            EMPPairedEndDirFmt)
 
 import pandas as pd
 import biom

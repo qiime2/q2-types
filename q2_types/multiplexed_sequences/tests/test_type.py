@@ -13,7 +13,12 @@ from q2_types.multiplexed_sequences import (
     MultiplexedPairedEndBarcodeInSequence,
     MultiplexedSingleEndBarcodeInSequenceDirFmt,
     MultiplexedPairedEndBarcodeInSequenceDirFmt,
+    EMPSingleEndDirFmt, EMPPairedEndDirFmt,
+    ErrorCorrectionDetailsDirFmt, RawSequences,
+    EMPSingleEndSequences, EMPPairedEndSequences,
+    ErrorCorrectionDetails
 )
+from q2_types.sample_data import SampleData
 from qiime2.plugin.testing import TestPluginBase
 
 
@@ -39,6 +44,38 @@ class TestMultiplexedBarcodeInSequenceTypes(TestPluginBase):
             MultiplexedPairedEndBarcodeInSequence,
             MultiplexedPairedEndBarcodeInSequenceDirFmt,
         )
+
+    def test_raw_sequences_semantic_type_registration(self):
+        self.assertRegisteredSemanticType(RawSequences)
+
+    def test_emp_single_end_sequences_semantic_type_registration(self):
+        self.assertRegisteredSemanticType(EMPSingleEndSequences)
+
+    def test_emp_paired_end_sequences_semantic_type_registration(self):
+        self.assertRegisteredSemanticType(EMPPairedEndSequences)
+
+    def test_error_correction_details_semantic_type_registration(self):
+        self.assertRegisteredSemanticType(ErrorCorrectionDetails)
+
+    def test_error_correction_details_semantic_type_to_format_reg(self):
+        self.assertSemanticTypeRegisteredToFormat(
+            SampleData[ErrorCorrectionDetails],
+            ErrorCorrectionDetailsDirFmt)
+
+    def test_emp_paired_end_sequences_semantic_type_to_format_reg(self):
+        self.assertSemanticTypeRegisteredToFormat(
+            SampleData[EMPPairedEndSequences],
+            EMPPairedEndDirFmt)
+
+    def test_emp_single_end_sequences_semantic_type_to_format_reg(self):
+        self.assertSemanticTypeRegisteredToFormat(
+            SampleData[EMPSingleEndSequences],
+            EMPSingleEndDirFmt)
+
+    def test_raw_sequences_semantic_type_to_format_registration(self):
+        self.assertSemanticTypeRegisteredToFormat(
+            RawSequences,
+            EMPSingleEndDirFmt)
 
 
 if __name__ == '__main__':
