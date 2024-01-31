@@ -603,7 +603,7 @@ class TestQIIME1DemuxFormat(TestPluginBase):
 
 
 class TestErrorCorrectionDetailsFmt(TestPluginBase):
-    package = 'q2_demux.tests'
+    package = 'q2_types.per_sample_sequences.tests'
 
     def test_validate_positive(self):
         fp = self.get_data_path('error_correction_details/positive.tsv')

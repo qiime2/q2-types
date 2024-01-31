@@ -34,8 +34,8 @@ from qiime2.plugin.testing import TestPluginBase
 
 import tempfile
 
-from q2_types.per_sample_sequences import (EMPSingleEndDirFmt,
-                                           EMPSingleEndCasavaDirFmt)
+from q2_types.multiplexed_sequences import (EMPSingleEndDirFmt,
+                                            EMPSingleEndCasavaDirFmt)
 from qiime2.plugin import ValidationError
 
 
@@ -1514,7 +1514,7 @@ class TestBLAST6Transformer(TestPluginBase):
 
 
 class TestTransformers(TestPluginBase):
-    package = 'q2_demux.tests'
+    package = 'q2_types.feature_data.tests'
 
     def setUp(self):
         # TODO generalize plugin lookup when ported to framework. This code

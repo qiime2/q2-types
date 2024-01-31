@@ -18,3 +18,14 @@ def _read_fastq_seqs(filepath):
     for seq_header, seq, qual_header, qual in itertools.zip_longest(*[fh] * 4):
         yield (seq_header.strip(), seq.strip(), qual_header.strip(),
                qual.strip())
+
+
+# TODO: Remove _PlotQualView once QIIME 2 #220 completed
+class _PlotQualView:
+    """
+    A very simple pass-through view which is made up of a single-end or
+    paired-end directory format with a bool indicating if single or paired.
+    """
+    def __init__(self, directory_format, paired):
+        self.directory_format = directory_format
+        self.paired = paired

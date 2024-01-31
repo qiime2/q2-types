@@ -65,7 +65,7 @@ __all__ = [
     'MixedCaseAlignedRNAFASTAFormat',
     'MixedCaseAlignedRNASequencesDirectoryFormat',
     'BarcodePairedSequenceFastqIterator',
-    'BarcodeSequenceFastqIterator'
+    'BarcodeSequenceFastqIterator',
     'MixedCaseProteinFASTAFormat',
     'MixedCaseAlignedProteinFASTAFormat',
     'MixedCaseProteinSequencesDirectoryFormat',

@@ -87,7 +87,7 @@ class TestMultiplexedSequencesTransformers(TestPluginBase):
 # only things asserted here are facts about the manifest and not the actual
 # data assets, themselves.
 class TestFastqManifestV2Transformers(TestPluginBase):
-    package = "q2_types.per_sample_sequences.tests"
+    package = "q2_types.multiplexed_sequences.tests"
 
     def setUp(self):
         super().setUp()
@@ -535,7 +535,7 @@ class TestFastqManifestV2Transformers(TestPluginBase):
 
 
 class TestErrorCorrectionDetailsFmtTransformers(TestPluginBase):
-    package = 'q2_demux.tests'
+    package = 'q2_types.multiplexed_sequences.tests'
 
     def setUp(self):
         super().setUp()

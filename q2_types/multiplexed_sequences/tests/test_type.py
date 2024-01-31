@@ -18,7 +18,7 @@ from q2_types.multiplexed_sequences import (
     EMPSingleEndSequences, EMPPairedEndSequences,
     ErrorCorrectionDetails
 )
-from q2_types.sample_data import SampleData
+# from q2_types.sample_data import SampleData
 from qiime2.plugin.testing import TestPluginBase
 
 
@@ -59,17 +59,17 @@ class TestMultiplexedBarcodeInSequenceTypes(TestPluginBase):
 
     def test_error_correction_details_semantic_type_to_format_reg(self):
         self.assertSemanticTypeRegisteredToFormat(
-            SampleData[ErrorCorrectionDetails],
+            ErrorCorrectionDetails,
             ErrorCorrectionDetailsDirFmt)
 
     def test_emp_paired_end_sequences_semantic_type_to_format_reg(self):
         self.assertSemanticTypeRegisteredToFormat(
-            SampleData[EMPPairedEndSequences],
+            EMPPairedEndSequences,
             EMPPairedEndDirFmt)
 
     def test_emp_single_end_sequences_semantic_type_to_format_reg(self):
         self.assertSemanticTypeRegisteredToFormat(
-            SampleData[EMPSingleEndSequences],
+            EMPSingleEndSequences,
             EMPSingleEndDirFmt)
 
     def test_raw_sequences_semantic_type_to_format_registration(self):

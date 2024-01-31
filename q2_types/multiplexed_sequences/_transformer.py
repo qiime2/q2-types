@@ -16,14 +16,14 @@ from . import (MultiplexedFastaQualDirFmt,
                EMPSingleEndDirFmt,
                EMPSingleEndCasavaDirFmt,
                EMPPairedEndDirFmt,
-               EMPPairedEndCasavaDirFmt,
-               FastqGzFormat,
-               SingleLanePerSampleSingleEndFastqDirFmt,
-               SingleLanePerSamplePairedEndFastqDirFmt)
+               EMPPairedEndCasavaDirFmt)
+from ..per_sample_sequences import (SingleLanePerSampleSingleEndFastqDirFmt,
+                                    SingleLanePerSamplePairedEndFastqDirFmt)
 import shutil
 from qiime2 import Metadata
-from q2_demux._summarize import (_PlotQualView)
+from ..feature_data._util import _PlotQualView
 from ..plugin_setup import plugin
+from .._util import FastqGzFormat
 
 
 @plugin.register_transformer

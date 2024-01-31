@@ -8,8 +8,7 @@
 
 import qiime2.plugin.model as model
 
-from ..per_sample_sequences import FastqGzFormat
-from ..feature_data import FASTAFormat, DNAFASTAFormat
+from .._util import FASTAFormat, DNAFASTAFormat, FastqGzFormat
 
 from ..plugin_setup import plugin
 
