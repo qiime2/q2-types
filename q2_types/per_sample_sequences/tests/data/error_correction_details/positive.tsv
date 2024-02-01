@@ -1,0 +1,6 @@
+id	sample	barcode-sequence-id	barcode-uncorrected	barcode-corrected	barcode-errors
+#q2:types	categorical	categorical	categorical	categorical	numeric
+record-1	s1	seq-1	AAC	AAA	2
+record-2	s1	seq-4	ACA	AAA	20
+record-3	s2	seq-5	CCA	CCC	1
+record-4	s3	seq-50	GGT	GGG	1

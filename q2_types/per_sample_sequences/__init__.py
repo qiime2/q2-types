@@ -24,6 +24,7 @@ from ._format import (CasavaOneEightSingleLanePerSampleDirFmt,
                       PairedEndFastqManifestPhred64V2,
                       QIIME1DemuxFormat, QIIME1DemuxDirFmt,
                       SampleIdIndexedSingleEndPerSampleDirFmt)
+
 from ._type import (Sequences, SequencesWithQuality,
                     PairedEndSequencesWithQuality,
                     JoinedSequencesWithQuality)

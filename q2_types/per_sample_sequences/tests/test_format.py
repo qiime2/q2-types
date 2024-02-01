@@ -29,6 +29,8 @@ from q2_types.per_sample_sequences import (
 from qiime2.plugin.testing import TestPluginBase
 from qiime2.plugin import ValidationError
 
+from q2_types.multiplexed_sequences import ErrorCorrectionDetailsFmt
+
 
 class TestAbsoluteFastqManifestV2Formats(TestPluginBase):
     package = 'q2_types.per_sample_sequences.tests'
@@ -598,6 +600,28 @@ class TestQIIME1DemuxFormat(TestPluginBase):
         with self.assertRaisesRegex(ValidationError,
                                     r'QIIME1DemuxDirFmt.*seqs\.fna'):
             QIIME1DemuxDirFmt(self.temp_dir.name, mode='r').validate()
+
+# Start tests to keep
+
+
+class TestErrorCorrectionDetailsFmt(TestPluginBase):
+    package = 'q2_types.per_sample_sequences.tests'
+
+    def test_validate_positive(self):
+        fp = self.get_data_path('error_correction_details/positive.tsv')
+        ErrorCorrectionDetailsFmt(fp, mode='r').validate()
+
+    def test_validate_invalid_format(self):
+        fp = self.get_data_path('error_correction_details/invalid.tsv')
+        with self.assertRaisesRegex(ValidationError,
+                                    'Failed to locate header.'):
+            ErrorCorrectionDetailsFmt(fp, mode='r').validate()
+
+    def test_validate_missing_columns(self):
+        fp = self.get_data_path('error_correction_details/missing_columns.tsv')
+        with self.assertRaisesRegex(ValidationError,
+                                    'barcode-corrected.*is not a column'):
+            ErrorCorrectionDetailsFmt(fp, mode='r').validate()
 
 
 if __name__ == "__main__":

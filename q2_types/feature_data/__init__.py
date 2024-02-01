@@ -37,7 +37,8 @@ from ._type import (
 from ._transformer import (
     NucleicAcidIterator, DNAIterator, PairedDNAIterator, AlignedDNAIterator,
     ProteinIterator, AlignedProteinIterator, RNAIterator, AlignedRNAIterator,
-    PairedRNAIterator)
+    PairedRNAIterator, BarcodePairedSequenceFastqIterator,
+    BarcodeSequenceFastqIterator)
 
 __all__ = [
     'TaxonomyFormat', 'TaxonomyDirectoryFormat', 'HeaderlessTSVTaxonomyFormat',
@@ -63,6 +64,8 @@ __all__ = [
     'MixedCaseAlignedDNASequencesDirectoryFormat',
     'MixedCaseAlignedRNAFASTAFormat',
     'MixedCaseAlignedRNASequencesDirectoryFormat',
+    'BarcodePairedSequenceFastqIterator',
+    'BarcodeSequenceFastqIterator',
     'MixedCaseProteinFASTAFormat',
     'MixedCaseAlignedProteinFASTAFormat',
     'MixedCaseProteinSequencesDirectoryFormat',
