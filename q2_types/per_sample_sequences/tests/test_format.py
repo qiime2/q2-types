@@ -601,6 +601,8 @@ class TestQIIME1DemuxFormat(TestPluginBase):
                                     r'QIIME1DemuxDirFmt.*seqs\.fna'):
             QIIME1DemuxDirFmt(self.temp_dir.name, mode='r').validate()
 
+# Start tests to keep
+
 
 class TestErrorCorrectionDetailsFmt(TestPluginBase):
     package = 'q2_types.per_sample_sequences.tests'

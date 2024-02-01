@@ -12,6 +12,9 @@ import itertools
 import qiime2.plugin.model as model
 from qiime2.plugin import ValidationError
 
+# These classes and their helper functions are located in this module to avoid
+# circular imports.
+
 
 def _construct_validator_from_alphabet(alphabet_str):
     if alphabet_str:

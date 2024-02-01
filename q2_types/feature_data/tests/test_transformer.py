@@ -1512,6 +1512,8 @@ class TestBLAST6Transformer(TestPluginBase):
         exp.index = pd.Index(exp.index.astype(str), name='id')
         assert_frame_equal(obs.to_dataframe(), exp)
 
+# Start tests to keep
+
 
 class TestTransformers(TestPluginBase):
     package = 'q2_types.feature_data.tests'
@@ -1520,7 +1522,7 @@ class TestTransformers(TestPluginBase):
         # TODO generalize plugin lookup when ported to framework. This code
         # is adapted from the base class.
         try:
-            from q2_demux.plugin_setup import plugin
+            from q2_types.plugin_setup import plugin
         except ImportError:
             self.fail("Could not import plugin object.")
 
@@ -1529,7 +1531,7 @@ class TestTransformers(TestPluginBase):
         # TODO use qiime temp dir when ported to framework, and when the
         # configurable temp dir exists
         self.temp_dir = tempfile.TemporaryDirectory(
-            prefix='q2-demux-test-temp-')
+            prefix='q2-types-test-temp-')
 
     def test_emp_multiplexed_format_barcode_sequence_iterator(self):
         transformer = self.get_transformer(EMPSingleEndDirFmt,
@@ -1597,6 +1599,7 @@ class TestTransformers(TestPluginBase):
                                            EMPSingleEndDirFmt)
         with self.assertRaises(ValidationError):
             transformer(EMPSingleEndCasavaDirFmt(dirpath, 'r'))
+# End tests to keep coming from q2-demux
 
 
 class BarcodeSequenceFastqIteratorTests(unittest.TestCase):

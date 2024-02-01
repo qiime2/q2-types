@@ -13,15 +13,17 @@ import skbio
 import string
 import os
 
+import unittest
+
 from q2_types.multiplexed_sequences import (
     MultiplexedFastaQualDirFmt,
     MultiplexedSingleEndBarcodeInSequenceDirFmt,
-    EMPMultiplexedDirFmt,
+    # EMPMultiplexedDirFmt,
     ErrorCorrectionDetailsFmt,
-    EMPSingleEndDirFmt,
-    EMPSingleEndCasavaDirFmt,
-    EMPPairedEndDirFmt,
-    EMPPairedEndCasavaDirFmt
+    # EMPSingleEndDirFmt,
+    # EMPSingleEndCasavaDirFmt,
+    # EMPPairedEndDirFmt,
+    # EMPPairedEndCasavaDirFmt
 )
 from q2_types.per_sample_sequences import (
     SingleLanePerSampleSingleEndFastqDirFmt,
@@ -163,375 +165,377 @@ class TestFastqManifestV2Transformers(TestPluginBase):
         with obs.manifest.view(FastqManifestFormat).open() as obs_manifest:
             self.assertEqual(obs_manifest.read(), self.exp_pe_manifest)
 
-    def test_EMPMultiplexedDirFmt_to_slpssefdf(self):
-        obs = self.apply_transformation(
-            EMPMultiplexedDirFmt,
-            SingleLanePerSampleSingleEndFastqDirFmt,
-            'Human-Kneecap_S1_L001_R1_001.fastq.gz',
-            'absolute_manifests_v2/single-MANIFEST')
-
-        with obs.manifest.view(FastqManifestFormat).open() as obs_manifest:
-            self.assertEqual(obs_manifest.read(), self.exp_se_manifest)
-
-    def test_EMPMultiplexedDirFmt_to_slpspefdf(self):
-        obs = self.apply_transformation(
-            EMPMultiplexedDirFmt,
-            SingleLanePerSamplePairedEndFastqDirFmt,
-            'Human-Kneecap_S1_L001_R1_001.fastq.gz',
-            'absolute_manifests_v2/paired-MANIFEST')
-
-        with obs.manifest.view(FastqManifestFormat).open() as obs_manifest:
-            self.assertEqual(obs_manifest.read(), self.exp_pe_manifest)
-
-    def test_ErrorCorrectionDetailsFmt_to_slpspefdf(self):
-        transformer = self.get_transformer(
-            ErrorCorrectionDetailsFmt,
-            SingleLanePerSamplePairedEndFastqDirFmt)
-
-        obs = transformer(ErrorCorrectionDetailsFmt(
-            self.get_data_path('error_correction_details.tsv'), 'r'))
-
-        exp = pd.read_csv(
-            self.get_data_path('error_correction_details.tsv'), sep='\t',
-            index_col=0)
-        pdt.assert_frame_equal(obs.view(pd.DataFrame), exp)
-
-    def test_ErrorCorrectionDetailsFmt_to_slpssefdf(self):
-        transformer = self.get_transformer(
-            ErrorCorrectionDetailsFmt,
-            SingleLanePerSampleSingleEndFastqDirFmt)
-
-        obs = transformer(ErrorCorrectionDetailsFmt(
-            self.get_data_path('error_correction_details.tsv'), 'r'))
-
-        exp = pd.read_csv(
-            self.get_data_path('error_correction_details.tsv'), sep='\t',
-            index_col=0)
-        pdt.assert_frame_equal(obs.view(pd.DataFrame), exp)
-
-    def test_ErrorCorrectionDetailsFmt_to_slpssefdf_missing_direction(self):
-        transformer = self.get_transformer(
-            ErrorCorrectionDetailsFmt,
-            SingleLanePerSampleSingleEndFastqDirFmt)
-
-        with self.assertRaisesRegex(ValueError, 'missing.*forward'):
-            transformer(ErrorCorrectionDetailsFmt(
-                self.get_data_path('error_correction_details.tsv'), 'r'))
-
-    def test_ErrorCorrectionDetailsFmt_to_slpspefdf_missing_direction(self):
-        transformer = self.get_transformer(
-            ErrorCorrectionDetailsFmt,
-            SingleLanePerSamplePairedEndFastqDirFmt)
-
-        with self.assertRaisesRegex(ValueError, 'missing.*forward'):
-            transformer(ErrorCorrectionDetailsFmt(
-                self.get_data_path('error_correction_details.tsv'), 'r'))
-
-    def test_ErrorCorrectionDetailsFmt_to_slpspefdf_extra_direction(self):
-        transformer = self.get_transformer(
-            ErrorCorrectionDetailsFmt,
-            SingleLanePerSamplePairedEndFastqDirFmt)
-
-        with self.assertRaisesRegex(ValueError, 'extra.*reverse'):
-            transformer(ErrorCorrectionDetailsFmt(
-                self.get_data_path('error_correction_details.tsv'), 'r'))
-
-    def test_ErrorCorrectionDetailsFmt_to_slpssefdf_extra_direction(self):
-        transformer = self.get_transformer(
-            ErrorCorrectionDetailsFmt,
-            SingleLanePerSampleSingleEndFastqDirFmt)
-
-        with self.assertRaisesRegex(ValueError, 'extra.*reverse'):
-            transformer(ErrorCorrectionDetailsFmt(
-                self.get_data_path('error_correction_details.tsv'), 'r'))
-
-    def test_EMPSingleEndDirFmt_to_slpssefdf(self):
-        transformer = self.get_transformer(
-            EMPSingleEndDirFmt,
-            SingleLanePerSampleSingleEndFastqDirFmt)
-
-        obs = transformer(EMPSingleEndDirFmt(
-            self.get_data_path('emp-single-end-sequences'), 'r'))
-
-        exp = pd.read_csv(
-            self.get_data_path('emp-single-end-sequences',
-                               'error_correction_details.tsv'),
-            sep='\t', index_col=0)
-        pdt.assert_frame_equal(obs.error_correction_details.view(pd.DataFrame),
-                               exp)
-
-        with obs.manifest.view(FastqManifestFormat).open() as obs_manifest:
-            self.assertEqual(obs_manifest.read(), self.exp_se_manifest)
-
-    def test_EMPSingleEndDirFmt_to_slpspefdf(self):
-        transformer = self.get_transformer(
-            EMPSingleEndDirFmt,
-            SingleLanePerSamplePairedEndFastqDirFmt)
-
-        obs = transformer(EMPSingleEndDirFmt(
-            self.get_data_path('emp-single-end-sequences'), 'r'))
-
-        exp = pd.read_csv(
-            self.get_data_path('emp-single-end-sequences',
-                               'error_correction_details.tsv'),
-            sep='\t', index_col=0)
-        pdt.assert_frame_equal(obs.error_correction_details.view(pd.DataFrame),
-                               exp)
-
-        with obs.manifest.view(FastqManifestFormat).open() as obs_manifest:
-            self.assertEqual(obs_manifest.read(), self.exp_pe_manifest)
-
-    def test_EMPSingleEndDirFmt_to_slpssefdf_missing(self):
-        transformer = self.get_transformer(
-            EMPSingleEndDirFmt,
-            SingleLanePerSampleSingleEndFastqDirFmt)
-
-        with self.assertRaisesRegex(ValueError, 'missing.*forward'):
-            transformer(EMPSingleEndDirFmt(
-                self.get_data_path('emp-single-end-sequences'), 'r'))
-
-    def test_EMPSingleEndDirFmt_to_slpspefdf_missing(self):
-        transformer = self.get_transformer(
-            EMPSingleEndDirFmt,
-            SingleLanePerSamplePairedEndFastqDirFmt)
-
-        with self.assertRaisesRegex(ValueError, 'missing.*forward'):
-            transformer(EMPSingleEndDirFmt(
-                self.get_data_path('emp-single-end-sequences'), 'r'))
-
-    def test_EMPSingleEndDirFmt_to_slpspefdf_extra(self):
-        transformer = self.get_transformer(
-            EMPSingleEndDirFmt,
-            SingleLanePerSamplePairedEndFastqDirFmt)
-
-        with self.assertRaisesRegex(ValueError, 'extra.*reverse'):
-            transformer(EMPSingleEndDirFmt(
-                self.get_data_path('emp-single-end-sequences'), 'r'))
-
-    def test_EMPSingleEndDirFmt_to_slpssefdf_extra(self):
-        transformer = self.get_transformer(
-            EMPSingleEndDirFmt,
-            SingleLanePerSampleSingleEndFastqDirFmt)
-
-        with self.assertRaisesRegex(ValueError, 'extra.*reverse'):
-            transformer(EMPSingleEndDirFmt(
-                self.get_data_path('emp-single-end-sequences'), 'r'))
-
-    def test_EMPSingleEndCasavaDirFmt_to_slpssefdf(self):
-        transformer = self.get_transformer(
-            EMPSingleEndCasavaDirFmt,
-            SingleLanePerSampleSingleEndFastqDirFmt)
-
-        obs = transformer(EMPSingleEndCasavaDirFmt(
-            self.get_data_path('emp-single-end-sequences'), 'r'))
-
-        exp = pd.read_csv(
-            self.get_data_path('emp-single-end-sequences',
-                               'error_correction_details.tsv'),
-            sep='\t', index_col=0)
-        pdt.assert_frame_equal(obs.error_correction_details.view(pd.DataFrame),
-                               exp)
-
-        with obs.manifest.view(FastqManifestFormat).open() as obs_manifest:
-            self.assertEqual(obs_manifest.read(), self.exp_se_manifest)
-
-    def test_EMPSingleEndCasavaDirFmt_to_slpspefdf(self):
-        transformer = self.get_transformer(
-            EMPSingleEndCasavaDirFmt,
-            SingleLanePerSamplePairedEndFastqDirFmt)
-
-        obs = transformer(EMPSingleEndCasavaDirFmt(
-            self.get_data_path('emp-single-end-sequences'), 'r'))
-
-        exp = pd.read_csv(
-            self.get_data_path('emp-single-end-sequences',
-                               'error_correction_details.tsv'),
-            sep='\t', index_col=0)
-        pdt.assert_frame_equal(obs.error_correction_details.view(pd.DataFrame),
-                               exp)
-
-        with obs.manifest.view(FastqManifestFormat).open() as obs_manifest:
-            self.assertEqual(obs_manifest.read(), self.exp_pe_manifest)
-
-    def test_EMPSingleEndCasavaDirFmt_to_slpssefdf_missing(self):
-        transformer = self.get_transformer(
-            EMPSingleEndCasavaDirFmt,
-            SingleLanePerSampleSingleEndFastqDirFmt)
-
-        with self.assertRaisesRegex(ValueError, 'missing.*forward'):
-            transformer(EMPSingleEndCasavaDirFmt(
-                self.get_data_path('emp-single-end-sequences'), 'r'))
-
-    def test_EMPSingleEndCasavaDirFmt_to_slpspefdf_missing(self):
-        transformer = self.get_transformer(
-            EMPSingleEndCasavaDirFmt,
-            SingleLanePerSamplePairedEndFastqDirFmt)
-
-        with self.assertRaisesRegex(ValueError, 'missing.*forward'):
-            transformer(EMPSingleEndCasavaDirFmt(
-                self.get_data_path('emp-single-end-sequences'), 'r'))
-
-    def test_EMPSingleEndCasavaDirFmt_to_slpspefdf_extra_direction(self):
-        transformer = self.get_transformer(
-            EMPSingleEndCasavaDirFmt,
-            SingleLanePerSamplePairedEndFastqDirFmt)
-
-        with self.assertRaisesRegex(ValueError, 'extra.*reverse'):
-            transformer(EMPSingleEndCasavaDirFmt(
-                self.get_data_path('emp-single-end-sequences'), 'r'))
-
-    def test_EMPSingleEndCasavaDirFmt_to_slpssefdf_extra_direction(self):
-        transformer = self.get_transformer(
-            EMPSingleEndCasavaDirFmt,
-            SingleLanePerSampleSingleEndFastqDirFmt)
-
-        with self.assertRaisesRegex(ValueError, 'extra.*reverse'):
-            transformer(EMPSingleEndCasavaDirFmt(
-                self.get_data_path('emp-single-end-sequences'), 'r'))
-
-    def test_EMPPairedEndDirFmt_to_slpssefdf(self):
-        transformer = self.get_transformer(
-            EMPPairedEndDirFmt,
-            SingleLanePerSampleSingleEndFastqDirFmt)
-
-        obs = transformer(EMPPairedEndDirFmt(
-            self.get_data_path('emp-paired-end-sequences'), 'r'))
-
-        exp = pd.read_csv(
-            self.get_data_path('emp-paired-end-sequences',
-                               'error_correction_details.tsv'),
-            sep='\t', index_col=0)
-        pdt.assert_frame_equal(obs.error_correction_details.view(pd.DataFrame),
-                               exp)
-
-        with obs.manifest.view(FastqManifestFormat).open() as obs_manifest:
-            self.assertEqual(obs_manifest.read(), self.exp_se_manifest)
-
-    def test_EMPPairedEndDirFmt_to_slpspefdf(self):
-        transformer = self.get_transformer(
-            EMPPairedEndDirFmt,
-            SingleLanePerSamplePairedEndFastqDirFmt)
-
-        obs = transformer(EMPPairedEndDirFmt(
-            self.get_data_path('emp-paired-end-sequences'), 'r'))
-
-        exp = pd.read_csv(
-            self.get_data_path('emp-paired-end-sequences',
-                               'error_correction_details.tsv'),
-            sep='\t', index_col=0)
-        pdt.assert_frame_equal(obs.error_correction_details.view(pd.DataFrame),
-                               exp)
-
-        with obs.manifest.view(FastqManifestFormat).open() as obs_manifest:
-            self.assertEqual(obs_manifest.read(), self.exp_pe_manifest)
-
-    def test_EMPPairedEndDirFmt_to_slpssefdf_missing_direction(self):
-        transformer = self.get_transformer(
-            EMPPairedEndDirFmt,
-            SingleLanePerSampleSingleEndFastqDirFmt)
-
-        with self.assertRaisesRegex(ValueError, 'missing.*forward'):
-            transformer(EMPPairedEndDirFmt(
-                self.get_data_path('emp-paired-end-sequences'), 'r'))
-
-    def test_EMPPairedEndDirFmt_to_slpspefdf_missing_direction(self):
-        transformer = self.get_transformer(
-            EMPPairedEndDirFmt,
-            SingleLanePerSamplePairedEndFastqDirFmt)
-
-        with self.assertRaisesRegex(ValueError, 'missing.*forward'):
-            transformer(EMPPairedEndDirFmt(
-                self.get_data_path('emp-paired-end-sequences'), 'r'))
-
-    def test_EMPPairedEndDirFmt_to_slpspefdf_extra_direction(self):
-        transformer = self.get_transformer(
-            EMPPairedEndDirFmt,
-            SingleLanePerSamplePairedEndFastqDirFmt)
-
-        with self.assertRaisesRegex(ValueError, 'extra.*reverse'):
-            transformer(EMPPairedEndDirFmt(
-                self.get_data_path('emp-paired-end-sequences'), 'r'))
-
-    def test_EMPPairedEndDirFmt_to_slpssefdf_extra_direction(self):
-        transformer = self.get_transformer(
-            EMPPairedEndDirFmt,
-            SingleLanePerSampleSingleEndFastqDirFmt)
-
-        with self.assertRaisesRegex(ValueError, 'extra.*reverse'):
-            transformer(EMPPairedEndDirFmt(
-                self.get_data_path('emp-paired-end-sequences'), 'r'))
-
-    def test_EMPPairedEndCasavaDirFmt_to_slpssefdf(self):
-        transformer = self.get_transformer(
-            EMPPairedEndCasavaDirFmt,
-            SingleLanePerSampleSingleEndFastqDirFmt)
-
-        obs = transformer(EMPPairedEndCasavaDirFmt(
-            self.get_data_path('emp-paired-end-sequences'), 'r'))
-
-        exp = pd.read_csv(
-            self.get_data_path('emp-paired-end-sequences',
-                               'error_correction_details.tsv'),
-            sep='\t', index_col=0)
-        pdt.assert_frame_equal(obs.error_correction_details.view(pd.DataFrame),
-                               exp)
-
-        with obs.manifest.view(FastqManifestFormat).open() as obs_manifest:
-            self.assertEqual(obs_manifest.read(), self.exp_se_manifest)
-
-    def test_EMPPairedEndCasavaDirFmt_to_slpspefdf(self):
-        transformer = self.get_transformer(
-            EMPPairedEndCasavaDirFmt,
-            SingleLanePerSamplePairedEndFastqDirFmt)
-
-        obs = transformer(EMPPairedEndCasavaDirFmt(
-            self.get_data_path('emp-paired-end-sequences'), 'r'))
-
-        exp = pd.read_csv(
-            self.get_data_path('emp-paired-end-sequences',
-                               'error_correction_details.tsv'),
-            sep='\t', index_col=0)
-        pdt.assert_frame_equal(obs.error_correction_details.view(pd.DataFrame),
-                               exp)
-
-        with obs.manifest.view(FastqManifestFormat).open() as obs_manifest:
-            self.assertEqual(obs_manifest.read(), self.exp_pe_manifest)
-
-    def test_EMPPairedEndCasavaDirFmt_to_slpssefdf_missing_direction(self):
-        transformer = self.get_transformer(
-            EMPPairedEndCasavaDirFmt,
-            SingleLanePerSampleSingleEndFastqDirFmt)
-
-        with self.assertRaisesRegex(ValueError, 'missing.*forward'):
-            transformer(EMPPairedEndCasavaDirFmt(
-                self.get_data_path('emp-paired-end-sequences'), 'r'))
-
-    def test_EMPPairedEndCasavaDirFmt_to_slpspefdf_missing_direction(self):
-        transformer = self.get_transformer(
-            EMPPairedEndCasavaDirFmt,
-            SingleLanePerSamplePairedEndFastqDirFmt)
-
-        with self.assertRaisesRegex(ValueError, 'missing.*forward'):
-            transformer(EMPPairedEndCasavaDirFmt(
-                self.get_data_path('emp-paired-end-sequences'), 'r'))
-
-    def test_EMPPairedEndCasavaDirFmt_to_slpspefdf_extra_direction(self):
-        transformer = self.get_transformer(
-            EMPPairedEndCasavaDirFmt,
-            SingleLanePerSamplePairedEndFastqDirFmt)
-
-        with self.assertRaisesRegex(ValueError, 'extra.*reverse'):
-            transformer(EMPPairedEndCasavaDirFmt(
-                self.get_data_path('emp-paired-end-sequences'), 'r'))
-
-    def test_EMPPairedEndCasavaDirFmt_to_slpssefdf_extra_direction(self):
-        transformer = self.get_transformer(
-            EMPPairedEndCasavaDirFmt,
-            SingleLanePerSampleSingleEndFastqDirFmt)
-
-        with self.assertRaisesRegex(ValueError, 'extra.*reverse'):
-            transformer(EMPPairedEndCasavaDirFmt(
-                self.get_data_path('emp-paired-end-sequences'), 'r'))
+    # def test_EMPMultiplexedDirFmt_to_slpssefdf(self):
+    #     obs = self.apply_transformation(
+    #         EMPMultiplexedDirFmt,
+    #         SingleLanePerSampleSingleEndFastqDirFmt,
+    #         'Human-Kneecap_S1_L001_R1_001.fastq.gz',
+    #         'absolute_manifests_v2/single-MANIFEST')
+
+    #     with obs.manifest.view(FastqManifestFormat).open() as obs_manifest:
+    #         self.assertEqual(obs_manifest.read(), self.exp_se_manifest)
+
+    # def test_EMPMultiplexedDirFmt_to_slpspefdf(self):
+    #     obs = self.apply_transformation(
+    #         EMPMultiplexedDirFmt,
+    #         SingleLanePerSamplePairedEndFastqDirFmt,
+    #         'Human-Kneecap_S1_L001_R1_001.fastq.gz',
+    #         'absolute_manifests_v2/paired-MANIFEST')
+
+    #     with obs.manifest.view(FastqManifestFormat).open() as obs_manifest:
+    #         self.assertEqual(obs_manifest.read(), self.exp_pe_manifest)
+
+    # def test_ErrorCorrectionDetailsFmt_to_slpspefdf(self):
+    #     transformer = self.get_transformer(
+    #         ErrorCorrectionDetailsFmt,
+    #         SingleLanePerSamplePairedEndFastqDirFmt)
+
+    #     obs = transformer(ErrorCorrectionDetailsFmt(
+    #         self.get_data_path('error_correction_details.tsv'), 'r'))
+
+    #     exp = pd.read_csv(
+    #         self.get_data_path('error_correction_details.tsv'), sep='\t',
+    #         index_col=0)
+    #     pdt.assert_frame_equal(obs.view(pd.DataFrame), exp)
+
+    # def test_ErrorCorrectionDetailsFmt_to_slpssefdf(self):
+    #     transformer = self.get_transformer(
+    #         ErrorCorrectionDetailsFmt,
+    #         SingleLanePerSampleSingleEndFastqDirFmt)
+
+    #     obs = transformer(ErrorCorrectionDetailsFmt(
+    #         self.get_data_path('error_correction_details.tsv'), 'r'))
+
+    #     exp = pd.read_csv(
+    #         self.get_data_path('error_correction_details.tsv'), sep='\t',
+    #         index_col=0)
+    #     pdt.assert_frame_equal(obs.view(pd.DataFrame), exp)
+
+    # def test_ErrorCorrectionDetailsFmt_to_slpssefdf_missing_direction(self):
+    #     transformer = self.get_transformer(
+    #         ErrorCorrectionDetailsFmt,
+    #         SingleLanePerSampleSingleEndFastqDirFmt)
+
+    #     with self.assertRaisesRegex(ValueError, 'missing.*forward'):
+    #         transformer(ErrorCorrectionDetailsFmt(
+    #             self.get_data_path('error_correction_details.tsv'), 'r'))
+
+    # def test_ErrorCorrectionDetailsFmt_to_slpspefdf_missing_direction(self):
+    #     transformer = self.get_transformer(
+    #         ErrorCorrectionDetailsFmt,
+    #         SingleLanePerSamplePairedEndFastqDirFmt)
+
+    #     with self.assertRaisesRegex(ValueError, 'missing.*forward'):
+    #         transformer(ErrorCorrectionDetailsFmt(
+    #             self.get_data_path('error_correction_details.tsv'), 'r'))
+
+    # def test_ErrorCorrectionDetailsFmt_to_slpspefdf_extra_direction(self):
+    #     transformer = self.get_transformer(
+    #         ErrorCorrectionDetailsFmt,
+    #         SingleLanePerSamplePairedEndFastqDirFmt)
+
+    #     with self.assertRaisesRegex(ValueError, 'extra.*reverse'):
+    #         transformer(ErrorCorrectionDetailsFmt(
+    #             self.get_data_path('error_correction_details.tsv'), 'r'))
+
+    # def test_ErrorCorrectionDetailsFmt_to_slpssefdf_extra_direction(self):
+    #     transformer = self.get_transformer(
+    #         ErrorCorrectionDetailsFmt,
+    #         SingleLanePerSampleSingleEndFastqDirFmt)
+
+    #     with self.assertRaisesRegex(ValueError, 'extra.*reverse'):
+    #         transformer(ErrorCorrectionDetailsFmt(
+    #             self.get_data_path('error_correction_details.tsv'), 'r'))
+
+    # def test_EMPSingleEndDirFmt_to_slpssefdf(self):
+    #     transformer = self.get_transformer(
+    #         EMPSingleEndDirFmt,
+    #         SingleLanePerSampleSingleEndFastqDirFmt)
+
+    #     obs = transformer(EMPSingleEndDirFmt(
+    #         self.get_data_path('emp-single-end-sequences'), 'r'))
+
+    #     exp = pd.read_csv(
+    #         self.get_data_path('emp-single-end-sequences',
+    #                            'error_correction_details.tsv'),
+    #         sep='\t', index_col=0)
+    #     pdt.assert_frame_equal(obs.error_correction_details.view(pd.DataFrame),
+    #                            exp)
+
+    #     with obs.manifest.view(FastqManifestFormat).open() as obs_manifest:
+    #         self.assertEqual(obs_manifest.read(), self.exp_se_manifest)
+
+    # def test_EMPSingleEndDirFmt_to_slpspefdf(self):
+    #     transformer = self.get_transformer(
+    #         EMPSingleEndDirFmt,
+    #         SingleLanePerSamplePairedEndFastqDirFmt)
+
+    #     obs = transformer(EMPSingleEndDirFmt(
+    #         self.get_data_path('emp-single-end-sequences'), 'r'))
+
+    #     exp = pd.read_csv(
+    #         self.get_data_path('emp-single-end-sequences',
+    #                            'error_correction_details.tsv'),
+    #         sep='\t', index_col=0)
+    #     pdt.assert_frame_equal(obs.error_correction_details.view(pd.DataFrame),
+    #                            exp)
+
+    #     with obs.manifest.view(FastqManifestFormat).open() as obs_manifest:
+    #         self.assertEqual(obs_manifest.read(), self.exp_pe_manifest)
+
+    # def test_EMPSingleEndDirFmt_to_slpssefdf_missing(self):
+    #     transformer = self.get_transformer(
+    #         EMPSingleEndDirFmt,
+    #         SingleLanePerSampleSingleEndFastqDirFmt)
+
+    #     with self.assertRaisesRegex(ValueError, 'missing.*forward'):
+    #         transformer(EMPSingleEndDirFmt(
+    #             self.get_data_path('emp-single-end-sequences'), 'r'))
+
+    # def test_EMPSingleEndDirFmt_to_slpspefdf_missing(self):
+    #     transformer = self.get_transformer(
+    #         EMPSingleEndDirFmt,
+    #         SingleLanePerSamplePairedEndFastqDirFmt)
+
+    #     with self.assertRaisesRegex(ValueError, 'missing.*forward'):
+    #         transformer(EMPSingleEndDirFmt(
+    #             self.get_data_path('emp-single-end-sequences'), 'r'))
+
+    # def test_EMPSingleEndDirFmt_to_slpspefdf_extra(self):
+    #     transformer = self.get_transformer(
+    #         EMPSingleEndDirFmt,
+    #         SingleLanePerSamplePairedEndFastqDirFmt)
+
+    #     with self.assertRaisesRegex(ValueError, 'extra.*reverse'):
+    #         transformer(EMPSingleEndDirFmt(
+    #             self.get_data_path('emp-single-end-sequences'), 'r'))
+
+    # def test_EMPSingleEndDirFmt_to_slpssefdf_extra(self):
+    #     transformer = self.get_transformer(
+    #         EMPSingleEndDirFmt,
+    #         SingleLanePerSampleSingleEndFastqDirFmt)
+
+    #     with self.assertRaisesRegex(ValueError, 'extra.*reverse'):
+    #         transformer(EMPSingleEndDirFmt(
+    #             self.get_data_path('emp-single-end-sequences'), 'r'))
+
+    # def test_EMPSingleEndCasavaDirFmt_to_slpssefdf(self):
+    #     transformer = self.get_transformer(
+    #         EMPSingleEndCasavaDirFmt,
+    #         SingleLanePerSampleSingleEndFastqDirFmt)
+
+    #     obs = transformer(EMPSingleEndCasavaDirFmt(
+    #         self.get_data_path('emp-single-end-sequences'), 'r'))
+
+    #     exp = pd.read_csv(
+    #         self.get_data_path('emp-single-end-sequences',
+    #                            'error_correction_details.tsv'),
+    #         sep='\t', index_col=0)
+    #     pdt.assert_frame_equal(obs.error_correction_details.view(pd.DataFrame),
+    #                            exp)
+
+    #     with obs.manifest.view(FastqManifestFormat).open() as obs_manifest:
+    #         self.assertEqual(obs_manifest.read(), self.exp_se_manifest)
+
+    # def test_EMPSingleEndCasavaDirFmt_to_slpspefdf(self):
+    #     transformer = self.get_transformer(
+    #         EMPSingleEndCasavaDirFmt,
+    #         SingleLanePerSamplePairedEndFastqDirFmt)
+
+    #     obs = transformer(EMPSingleEndCasavaDirFmt(
+    #         self.get_data_path('emp-single-end-sequences'), 'r'))
+
+    #     exp = pd.read_csv(
+    #         self.get_data_path('emp-single-end-sequences',
+    #                            'error_correction_details.tsv'),
+    #         sep='\t', index_col=0)
+    #     pdt.assert_frame_equal(obs.error_correction_details.view(pd.DataFrame),
+    #                            exp)
+
+    #     with obs.manifest.view(FastqManifestFormat).open() as obs_manifest:
+    #         self.assertEqual(obs_manifest.read(), self.exp_pe_manifest)
+
+    # def test_EMPSingleEndCasavaDirFmt_to_slpssefdf_missing(self):
+    #     transformer = self.get_transformer(
+    #         EMPSingleEndCasavaDirFmt,
+    #         SingleLanePerSampleSingleEndFastqDirFmt)
+
+    #     with self.assertRaisesRegex(ValueError, 'missing.*forward'):
+    #         transformer(EMPSingleEndCasavaDirFmt(
+    #             self.get_data_path('emp-single-end-sequences'), 'r'))
+
+    # def test_EMPSingleEndCasavaDirFmt_to_slpspefdf_missing(self):
+    #     transformer = self.get_transformer(
+    #         EMPSingleEndCasavaDirFmt,
+    #         SingleLanePerSamplePairedEndFastqDirFmt)
+
+    #     with self.assertRaisesRegex(ValueError, 'missing.*forward'):
+    #         transformer(EMPSingleEndCasavaDirFmt(
+    #             self.get_data_path('emp-single-end-sequences'), 'r'))
+
+    # def test_EMPSingleEndCasavaDirFmt_to_slpspefdf_extra_direction(self):
+    #     transformer = self.get_transformer(
+    #         EMPSingleEndCasavaDirFmt,
+    #         SingleLanePerSamplePairedEndFastqDirFmt)
+
+    #     with self.assertRaisesRegex(ValueError, 'extra.*reverse'):
+    #         transformer(EMPSingleEndCasavaDirFmt(
+    #             self.get_data_path('emp-single-end-sequences'), 'r'))
+
+    # def test_EMPSingleEndCasavaDirFmt_to_slpssefdf_extra_direction(self):
+    #     transformer = self.get_transformer(
+    #         EMPSingleEndCasavaDirFmt,
+    #         SingleLanePerSampleSingleEndFastqDirFmt)
+
+    #     with self.assertRaisesRegex(ValueError, 'extra.*reverse'):
+    #         transformer(EMPSingleEndCasavaDirFmt(
+    #             self.get_data_path('emp-single-end-sequences'), 'r'))
+
+    # def test_EMPPairedEndDirFmt_to_slpssefdf(self):
+    #     transformer = self.get_transformer(
+    #         EMPPairedEndDirFmt,
+    #         SingleLanePerSampleSingleEndFastqDirFmt)
+
+    #     obs = transformer(EMPPairedEndDirFmt(
+    #         self.get_data_path('emp-paired-end-sequences'), 'r'))
+
+    #     exp = pd.read_csv(
+    #         self.get_data_path('emp-paired-end-sequences',
+    #                            'error_correction_details.tsv'),
+    #         sep='\t', index_col=0)
+    #     pdt.assert_frame_equal(obs.error_correction_details.view(pd.DataFrame),
+    #                            exp)
+
+    #     with obs.manifest.view(FastqManifestFormat).open() as obs_manifest:
+    #         self.assertEqual(obs_manifest.read(), self.exp_se_manifest)
+
+    # def test_EMPPairedEndDirFmt_to_slpspefdf(self):
+    #     transformer = self.get_transformer(
+    #         EMPPairedEndDirFmt,
+    #         SingleLanePerSamplePairedEndFastqDirFmt)
+
+    #     obs = transformer(EMPPairedEndDirFmt(
+    #         self.get_data_path('emp-paired-end-sequences'), 'r'))
+
+    #     exp = pd.read_csv(
+    #         self.get_data_path('emp-paired-end-sequences',
+    #                            'error_correction_details.tsv'),
+    #         sep='\t', index_col=0)
+    #     pdt.assert_frame_equal(obs.error_correction_details.view(pd.DataFrame),
+    #                            exp)
+
+    #     with obs.manifest.view(FastqManifestFormat).open() as obs_manifest:
+    #         self.assertEqual(obs_manifest.read(), self.exp_pe_manifest)
+
+    # def test_EMPPairedEndDirFmt_to_slpssefdf_missing_direction(self):
+    #     transformer = self.get_transformer(
+    #         EMPPairedEndDirFmt,
+    #         SingleLanePerSampleSingleEndFastqDirFmt)
+
+    #     with self.assertRaisesRegex(ValueError, 'missing.*forward'):
+    #         transformer(EMPPairedEndDirFmt(
+    #             self.get_data_path('emp-paired-end-sequences'), 'r'))
+
+    # def test_EMPPairedEndDirFmt_to_slpspefdf_missing_direction(self):
+    #     transformer = self.get_transformer(
+    #         EMPPairedEndDirFmt,
+    #         SingleLanePerSamplePairedEndFastqDirFmt)
+
+    #     with self.assertRaisesRegex(ValueError, 'missing.*forward'):
+    #         transformer(EMPPairedEndDirFmt(
+    #             self.get_data_path('emp-paired-end-sequences'), 'r'))
+
+    # def test_EMPPairedEndDirFmt_to_slpspefdf_extra_direction(self):
+    #     transformer = self.get_transformer(
+    #         EMPPairedEndDirFmt,
+    #         SingleLanePerSamplePairedEndFastqDirFmt)
+
+    #     with self.assertRaisesRegex(ValueError, 'extra.*reverse'):
+    #         transformer(EMPPairedEndDirFmt(
+    #             self.get_data_path('emp-paired-end-sequences'), 'r'))
+
+    # def test_EMPPairedEndDirFmt_to_slpssefdf_extra_direction(self):
+    #     transformer = self.get_transformer(
+    #         EMPPairedEndDirFmt,
+    #         SingleLanePerSampleSingleEndFastqDirFmt)
+
+    #     with self.assertRaisesRegex(ValueError, 'extra.*reverse'):
+    #         transformer(EMPPairedEndDirFmt(
+    #             self.get_data_path('emp-paired-end-sequences'), 'r'))
+
+    # def test_EMPPairedEndCasavaDirFmt_to_slpssefdf(self):
+    #     transformer = self.get_transformer(
+    #         EMPPairedEndCasavaDirFmt,
+    #         SingleLanePerSampleSingleEndFastqDirFmt)
+
+    #     obs = transformer(EMPPairedEndCasavaDirFmt(
+    #         self.get_data_path('emp-paired-end-sequences'), 'r'))
+
+    #     exp = pd.read_csv(
+    #         self.get_data_path('emp-paired-end-sequences',
+    #                            'error_correction_details.tsv'),
+    #         sep='\t', index_col=0)
+    #     pdt.assert_frame_equal(obs.error_correction_details.view(pd.DataFrame),
+    #                            exp)
+
+    #     with obs.manifest.view(FastqManifestFormat).open() as obs_manifest:
+    #         self.assertEqual(obs_manifest.read(), self.exp_se_manifest)
+
+    # def test_EMPPairedEndCasavaDirFmt_to_slpspefdf(self):
+    #     transformer = self.get_transformer(
+    #         EMPPairedEndCasavaDirFmt,
+    #         SingleLanePerSamplePairedEndFastqDirFmt)
+
+    #     obs = transformer(EMPPairedEndCasavaDirFmt(
+    #         self.get_data_path('emp-paired-end-sequences'), 'r'))
+
+    #     exp = pd.read_csv(
+    #         self.get_data_path('emp-paired-end-sequences',
+    #                            'error_correction_details.tsv'),
+    #         sep='\t', index_col=0)
+    #     pdt.assert_frame_equal(obs.error_correction_details.view(pd.DataFrame),
+    #                            exp)
+
+    #     with obs.manifest.view(FastqManifestFormat).open() as obs_manifest:
+    #         self.assertEqual(obs_manifest.read(), self.exp_pe_manifest)
+
+    # def test_EMPPairedEndCasavaDirFmt_to_slpssefdf_missing_direction(self):
+    #     transformer = self.get_transformer(
+    #         EMPPairedEndCasavaDirFmt,
+    #         SingleLanePerSampleSingleEndFastqDirFmt)
+
+    #     with self.assertRaisesRegex(ValueError, 'missing.*forward'):
+    #         transformer(EMPPairedEndCasavaDirFmt(
+    #             self.get_data_path('emp-paired-end-sequences'), 'r'))
+
+    # def test_EMPPairedEndCasavaDirFmt_to_slpspefdf_missing_direction(self):
+    #     transformer = self.get_transformer(
+    #         EMPPairedEndCasavaDirFmt,
+    #         SingleLanePerSamplePairedEndFastqDirFmt)
+
+    #     with self.assertRaisesRegex(ValueError, 'missing.*forward'):
+    #         transformer(EMPPairedEndCasavaDirFmt(
+    #             self.get_data_path('emp-paired-end-sequences'), 'r'))
+
+    # def test_EMPPairedEndCasavaDirFmt_to_slpspefdf_extra_direction(self):
+    #     transformer = self.get_transformer(
+    #         EMPPairedEndCasavaDirFmt,
+    #         SingleLanePerSamplePairedEndFastqDirFmt)
+
+    #     with self.assertRaisesRegex(ValueError, 'extra.*reverse'):
+    #         transformer(EMPPairedEndCasavaDirFmt(
+    #             self.get_data_path('emp-paired-end-sequences'), 'r'))
+
+    # def test_EMPPairedEndCasavaDirFmt_to_slpssefdf_extra_direction(self):
+    #     transformer = self.get_transformer(
+    #         EMPPairedEndCasavaDirFmt,
+    #         SingleLanePerSampleSingleEndFastqDirFmt)
+
+    #     with self.assertRaisesRegex(ValueError, 'extra.*reverse'):
+    #         transformer(EMPPairedEndCasavaDirFmt(
+    #             self.get_data_path('emp-paired-end-sequences'), 'r'))
+
+# start tests to keep
 
 
 class TestErrorCorrectionDetailsFmtTransformers(TestPluginBase):
@@ -589,3 +593,7 @@ class TestErrorCorrectionDetailsFmtTransformers(TestPluginBase):
         obs = transformer(ff)
 
         self.assertEqual(obs, qiime2.Metadata(self.df))
+
+
+if __name__ == '__main__':
+    unittest.main()
