@@ -20,8 +20,7 @@ from q2_types.per_sample_data import (
     SingleBowtie2Index, MultiBowtie2Index, MultiBowtie2IndexDirFmt, BAMDirFmt,
     MultiBAMDirFmt
 )
-from q2_types.per_sample_data._type import (AlignmentMap,
-                                                     MultiAlignmentMap)
+from q2_types.per_sample_data._type import (AlignmentMap, MultiAlignmentMap)
 from q2_types.genome_data import SeedOrthologDirFmt
 
 
