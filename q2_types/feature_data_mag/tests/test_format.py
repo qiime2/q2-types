@@ -19,7 +19,7 @@ from q2_types.feature_data_mag._format import (
 
 
 class TestFormats(TestPluginBase):
-    package = 'q2_types.feature_data.tests'
+    package = 'q2_types.feature_data_mag.tests'
 
     def test_mag_dirfmt_fa(self):
         dirpath = self.get_data_path('mags-fa')

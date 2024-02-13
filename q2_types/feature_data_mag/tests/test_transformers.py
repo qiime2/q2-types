@@ -22,7 +22,7 @@ from q2_types.feature_data_mag._transformer import _get_filename
 
 
 class TestTransformers(TestPluginBase):
-    package = 'q2_types.feature_data.tests'
+    package = 'q2_types.feature_data_mag.tests'
 
     def setUp(self):
         super().setUp()

@@ -17,7 +17,7 @@ from q2_types.feature_data_mag import (
 
 
 class TestTypes(TestPluginBase):
-    package = 'q2_types.feature_data.tests'
+    package = 'q2_types.feature_data_mag.tests'
 
     def test_mag_semantic_type_registration(self):
         self.assertRegisteredSemanticType(MAG)
