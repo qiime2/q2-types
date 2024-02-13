@@ -25,11 +25,12 @@ requirements:
     - ijson
     - h5py
     - qiime2 {{ qiime2_epoch }}.*
+    - samtools
 
 test:
   commands:
     - py.test --pyargs q2_types
-    
+
   requires:
     - pytest
     - qiime2 >={{ qiime2 }}
