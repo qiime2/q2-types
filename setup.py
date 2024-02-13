@@ -45,15 +45,13 @@ setup(
              'data/qiime1-demux-format/*',
              'data/single-end-two-sample-data1/*',
              'data/single-end-two-sample-data2/*',
-             'data/single-end-two-sample-data3/*'],
-        'q2_types.sample_data.tests': ['data/*'],
-        'q2_types.tree.tests': ['data/*'],
-        'q2_types.per_sample_data.tests':
-            ['data/*',
+             'data/single-end-two-sample-data3/*',
              'data/mags/*/*', 'data/mags/*/*/*',
              'data/manifests/*', 'data/contigs/*',
              'data/diamond_hit/*',
              'data/bowtie/*/*', 'data/bowtie/*/*/*/*', 'data/bowtie/*/*/*'],
+        'q2_types.sample_data.tests': ['data/*'],
+        'q2_types.tree.tests': ['data/*'],
         'q2_types.feature_data_mag.tests':
             ['data/*', 'data/*/*',
              'data/mags-fa/*', 'data/mags-fasta/*'],
