@@ -47,7 +47,42 @@ setup(
              'data/single-end-two-sample-data2/*',
              'data/single-end-two-sample-data3/*'],
         'q2_types.sample_data.tests': ['data/*'],
-        'q2_types.tree.tests': ['data/*']
+        'q2_types.tree.tests': ['data/*'],
+        'q2_types.per_sample_data.tests':
+            ['data/*',
+             'data/mags/*/*', 'data/mags/*/*/*',
+             'data/manifests/*', 'data/contigs/*',
+             'data/diamond_hit/*',
+             'data/bowtie/*/*', 'data/bowtie/*/*/*/*', 'data/bowtie/*/*/*'],
+        'q2_types.feature_data_mag.tests':
+            ['data/*', 'data/*/*',
+             'data/mags-fa/*', 'data/mags-fasta/*'],
+        'q2_types.genome_data.tests':
+            ['data/*/', 'data/genes-with-prefix/*',
+             'data/genes-with-suffix/*', 'data/genes-with-wrong-prefix/*',
+             'data/loci-invalid/*',  'data/loci-with-prefix/*',
+             'data/loci-with-suffix/*', 'data/loci-with-wrong-prefix/*',
+             'data/ortholog/*', 'data/proteins-with-suffix/*',
+             'data/proteins-with-prefix/*',
+             'data/proteins-with-wrong-prefix/*',
+             ],
+        'q2_types.kraken2.tests': [
+            'data/*',
+            'data/kraken2-db/*',
+            'data/bracken-db/*',
+            'data/outputs-single/*',
+            'data/outputs-reads/*/*',
+            'data/outputs-contigs/*',
+            'data/outputs-mags/*/*',
+            'data/reports-single/*',
+            'data/reports-reads/*/*',
+            'data/reports-mags/*/*',
+            'data/db-reports/**/*'
+        ],
+        'q2_types.kaiju.tests':
+            ['data/*', 'data/db-valid/*'],
+        'q2_types.reference_db.tests':
+            ['data/*', 'data/*/*', 'data/*/*/*'],
     },
     zip_safe=False,
 )
