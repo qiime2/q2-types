@@ -1,0 +1,11 @@
+100.00	17	R	1	root
+ 92.58	0	R1	131567	  cellular organisms
+ 92.58	2	D	2	    Bacteria
+ 91.70	0	D1	1783272	      Terrabacteria group
+ 91.70	0	P	1239	        Firmicutes
+ 91.70	0	C	91061	          Bacilli
+ 91.27	2	O	1385	            Bacillales
+ 90.39	1	F	90964	              Staphylococcaceae
+ 89.96	195	G	1279	                Staphylococcus
+  4.80	11	S	1280	                  Staphylococcus aureus
+  0.44	1	O	186826	            Lactobacillales
