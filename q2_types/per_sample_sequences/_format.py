@@ -24,7 +24,6 @@ from qiime2.plugin import ValidationError
 
 from q2_types.bowtie2 import Bowtie2IndexDirFmt
 from q2_types.feature_data import DNAFASTAFormat
-from qiime2.core.exceptions import ValidationError
 
 from ..plugin_setup import plugin
 from ._util import (

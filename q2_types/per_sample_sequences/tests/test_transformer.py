@@ -1259,5 +1259,6 @@ class TestMAGTransformers(TestPluginBase):
 
         assert_frame_equal(exp, obs)
 
+
 if __name__ == '__main__':
     unittest.main()

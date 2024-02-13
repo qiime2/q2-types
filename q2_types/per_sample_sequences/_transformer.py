@@ -260,6 +260,7 @@ def _27(dirfmt: SampleIdIndexedSingleEndPerSampleDirFmt) \
         dirfmt, SingleLanePerSampleSingleEndFastqDirFmt,
         parse_sample_id_only=True)
 
+
 @plugin.register_transformer
 def _28(dirfmt: MultiFASTADirectoryFormat) \
         -> MultiMAGSequencesDirFmt:

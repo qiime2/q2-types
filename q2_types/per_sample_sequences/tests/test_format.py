@@ -655,7 +655,7 @@ class TestMultiMAGManifestFormat(TestPluginBase):
             format.validate()
 
 
-class TestFormats(TestPluginBase):
+class TestMultiFormats(TestPluginBase):
     package = 'q2_types.per_sample_sequences.tests'
 
     def test_multifasta_dirfmt_fa(self):

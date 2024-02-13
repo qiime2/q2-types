@@ -7,7 +7,6 @@
 # ----------------------------------------------------------------------------
 
 from q2_types.bowtie2 import Bowtie2IndexDirFmt
-from q2_types.sample_data import SampleData
 from q2_types.feature_data import BLAST6
 from qiime2.plugin import SemanticType
 
