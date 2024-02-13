@@ -8,13 +8,22 @@
 
 import unittest
 
+from q2_types.bowtie2 import Bowtie2IndexDirFmt
+from q2_types.feature_data import BLAST6
 from q2_types.sample_data import SampleData
 from q2_types.per_sample_sequences import (
     Sequences, SequencesWithQuality, PairedEndSequencesWithQuality,
     JoinedSequencesWithQuality, QIIME1DemuxDirFmt,
     SingleLanePerSampleSingleEndFastqDirFmt,
-    SingleLanePerSamplePairedEndFastqDirFmt
+    SingleLanePerSamplePairedEndFastqDirFmt,
+    MAGs, MultiMAGSequencesDirFmt,
+    Contigs, ContigSequencesDirFmt,
+    SingleBowtie2Index, MultiBowtie2Index, MultiBowtie2IndexDirFmt, BAMDirFmt,
+    MultiBAMDirFmt
 )
+from q2_types.per_sample_sequences._type import (AlignmentMap,
+                                                 MultiAlignmentMap)
+from q2_types.genome_data import SeedOrthologDirFmt
 from qiime2.plugin.testing import TestPluginBase
 
 
@@ -55,6 +64,66 @@ class TestTypes(TestPluginBase):
         self.assertSemanticTypeRegisteredToFormat(
             SampleData[JoinedSequencesWithQuality],
             SingleLanePerSampleSingleEndFastqDirFmt
+        )
+
+    def test_mags_semantic_type_registration(self):
+        self.assertRegisteredSemanticType(MAGs)
+
+    def test_mags_semantic_type_to_format_registration(self):
+        self.assertSemanticTypeRegisteredToFormat(
+            SampleData[MAGs],
+            MultiMAGSequencesDirFmt
+        )
+
+    def test_contigs_semantic_type_registration(self):
+        self.assertRegisteredSemanticType(Contigs)
+
+    def test_contigs_semantic_type_to_format_registration(self):
+        self.assertSemanticTypeRegisteredToFormat(
+            SampleData[Contigs],
+            ContigSequencesDirFmt
+        )
+
+    def test_singlebowtie_semantic_type_registration(self):
+        self.assertRegisteredSemanticType(SingleBowtie2Index)
+
+    def test_singlebowtie_semantic_type_to_format_registration(self):
+        self.assertSemanticTypeRegisteredToFormat(
+            SampleData[SingleBowtie2Index],
+            Bowtie2IndexDirFmt
+        )
+
+    def test_multibowtie_index_semantic_type_registration(self):
+        self.assertRegisteredSemanticType(MultiBowtie2Index)
+
+    def test_multibowtie_index_semantic_type_to_format_registration(self):
+        self.assertSemanticTypeRegisteredToFormat(
+            SampleData[MultiBowtie2Index],
+            MultiBowtie2IndexDirFmt
+        )
+
+    def test_aln_map_semantic_type_registration(self):
+        self.assertRegisteredSemanticType(AlignmentMap)
+
+    def test_aln_map_semantic_type_to_format_registration(self):
+        self.assertSemanticTypeRegisteredToFormat(
+            SampleData[AlignmentMap],
+            BAMDirFmt
+        )
+
+    def test_multi_aln_map_semantic_type_registration(self):
+        self.assertRegisteredSemanticType(MultiAlignmentMap)
+
+    def test_multi_aln_map_semantic_type_to_format_registration(self):
+        self.assertSemanticTypeRegisteredToFormat(
+            SampleData[MultiAlignmentMap],
+            MultiBAMDirFmt
+        )
+
+    def test_sdb6_semantic_type_to_format_registration(self):
+        self.assertSemanticTypeRegisteredToFormat(
+            SampleData[BLAST6],
+            SeedOrthologDirFmt
         )
 
 

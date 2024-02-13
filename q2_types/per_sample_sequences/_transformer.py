@@ -6,6 +6,7 @@
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
 
+import os
 import functools
 import re
 import warnings
@@ -14,6 +15,7 @@ import skbio
 import yaml
 import pandas as pd
 import qiime2.util
+from q2_types.feature_data import DNAFASTAFormat
 
 from ..plugin_setup import plugin
 from . import (
@@ -35,6 +37,9 @@ from . import (
     PairedEndFastqManifestPhred64V2,
     QIIME1DemuxDirFmt,
     SampleIdIndexedSingleEndPerSampleDirFmt,
+    MultiMAGManifestFormat,
+    MultiMAGSequencesDirFmt,
+    MultiFASTADirectoryFormat
 )
 from ._util import (
     _single_lane_per_sample_fastq_helper,
@@ -46,6 +51,7 @@ from ._util import (
     _write_phred64_to_phred33,
     _manifest_v2_to_v1,
     _manifest_to_df,
+    _mag_manifest_helper
 )
 
 
@@ -253,3 +259,19 @@ def _27(dirfmt: SampleIdIndexedSingleEndPerSampleDirFmt) \
     return _single_lane_per_sample_fastq_helper_partial(
         dirfmt, SingleLanePerSampleSingleEndFastqDirFmt,
         parse_sample_id_only=True)
+
+@plugin.register_transformer
+def _28(dirfmt: MultiFASTADirectoryFormat) \
+        -> MultiMAGSequencesDirFmt:
+    return _mag_manifest_helper(
+        dirfmt, MultiMAGSequencesDirFmt,
+        MultiMAGManifestFormat, DNAFASTAFormat)
+
+
+@plugin.register_transformer
+def _29(ff: MultiMAGManifestFormat) -> pd.DataFrame:
+    df = pd.read_csv(str(ff), header=0, comment='#')
+    df.filename = df.filename.apply(
+        lambda f: os.path.join(ff.path.parent, f))
+    df.set_index(['sample-id', 'mag-id'], inplace=True)
+    return df

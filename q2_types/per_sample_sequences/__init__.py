@@ -23,10 +23,15 @@ from ._format import (CasavaOneEightSingleLanePerSampleDirFmt,
                       PairedEndFastqManifestPhred33V2,
                       PairedEndFastqManifestPhred64V2,
                       QIIME1DemuxFormat, QIIME1DemuxDirFmt,
-                      SampleIdIndexedSingleEndPerSampleDirFmt)
+                      SampleIdIndexedSingleEndPerSampleDirFmt,
+                      MultiMAGSequencesDirFmt, MultiMAGManifestFormat,
+                      ContigSequencesDirFmt, MultiBowtie2IndexDirFmt,
+                      BAMFormat, BAMDirFmt, MultiBAMDirFmt,
+                      MultiFASTADirectoryFormat)
 from ._type import (Sequences, SequencesWithQuality,
                     PairedEndSequencesWithQuality,
-                    JoinedSequencesWithQuality)
+                    JoinedSequencesWithQuality, MAGs, Contigs,
+                    SingleBowtie2Index, MultiBowtie2Index)
 
 __all__ = ['CasavaOneEightSingleLanePerSampleDirFmt',
            'CasavaOneEightLanelessPerSampleDirFmt',
@@ -41,6 +46,11 @@ __all__ = ['CasavaOneEightSingleLanePerSampleDirFmt',
            'SingleEndFastqManifestPhred64V2',
            'PairedEndFastqManifestPhred33V2',
            'PairedEndFastqManifestPhred64V2', 'QIIME1DemuxFormat',
-           'QIIME1DemuxDirFmt', 'SampleIdIndexedSingleEndPerSampleDirFmt']
+           'QIIME1DemuxDirFmt', 'SampleIdIndexedSingleEndPerSampleDirFmt',
+           'MAGs', 'MultiMAGSequencesDirFmt', 'MultiMAGManifestFormat',
+           'ContigSequencesDirFmt', 'Contigs', 'SingleBowtie2Index',
+           'MultiBowtie2Index', 'MultiBowtie2IndexDirFmt',
+           'BAMFormat', 'BAMDirFmt', 'MultiBAMDirFmt',
+           'MultiFASTADirectoryFormat']
 
 importlib.import_module('q2_types.per_sample_sequences._transformer')
