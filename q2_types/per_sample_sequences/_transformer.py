@@ -7,6 +7,7 @@
 # ----------------------------------------------------------------------------
 
 import os
+import shutil
 import functools
 import re
 import warnings
@@ -276,3 +277,15 @@ def _29(ff: MultiMAGManifestFormat) -> pd.DataFrame:
         lambda f: os.path.join(ff.path.parent, f))
     df.set_index(['sample-id', 'mag-id'], inplace=True)
     return df
+
+@plugin.register_transformer
+def _30(dirfmt: MultiMAGSequencesDirFmt) \
+        -> MultiFASTADirectoryFormat:
+    result = MultiFASTADirectoryFormat()
+    for sample_id, mag in dirfmt.sample_dict().items():
+        os.makedirs(os.path.join(result.path, sample_id))
+        for mag_id, mag_fp in mag.items():
+            shutil.copy(
+                mag_fp, os.path.join(result.path, sample_id, f"{mag_id}.fa")
+            )
+    return result
