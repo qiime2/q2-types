@@ -278,6 +278,7 @@ def _29(ff: MultiMAGManifestFormat) -> pd.DataFrame:
     df.set_index(['sample-id', 'mag-id'], inplace=True)
     return df
 
+
 @plugin.register_transformer
 def _30(dirfmt: MultiMAGSequencesDirFmt) \
         -> MultiFASTADirectoryFormat:
