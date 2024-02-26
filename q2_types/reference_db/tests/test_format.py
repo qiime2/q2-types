@@ -7,11 +7,11 @@
 # ----------------------------------------------------------------------------
 from qiime2.plugin.testing import TestPluginBase
 from q2_types.reference_db._format import (
-        DiamondDatabaseFileFmt, DiamondDatabaseDirFmt, EggnogRefBinFileFmt,
-        EggnogRefDirFmt, NCBITaxonomyNamesFormat, NCBITaxonomyNodesFormat,
-        NCBITaxonomyDirFmt, NCBITaxonomyBinaryFileFmt,
-        EggnogProteinSequencesDirFmt, EggnogRefTextFileFmt
-        )
+    DiamondDatabaseFileFmt, DiamondDatabaseDirFmt, EggnogRefBinFileFmt,
+    EggnogRefDirFmt, NCBITaxonomyNamesFormat, NCBITaxonomyNodesFormat,
+    NCBITaxonomyDirFmt, NCBITaxonomyBinaryFileFmt,
+    EggnogProteinSequencesDirFmt, EggnogRefTextFileFmt, BuscoDatabaseDirFmt
+)
 from qiime2.plugin import ValidationError
 
 
@@ -264,5 +264,23 @@ class TestNCBIFormats(TestPluginBase):
         with self.assertRaisesRegex(
                 ValidationError,
                 r"['A0A009IHW8', 'A0A009IHW8.1', '1310613', '1835922267s']"
+        ):
+            format.validate()
+
+
+class TestBuscoFormat(TestPluginBase):
+    package = "q2_types.reference_db.tests"
+
+    def test_BuscoDatabaseDirFmt_valid(self):
+        dirpath = self.get_data_path("busco_DB/valid")
+        format = BuscoDatabaseDirFmt(dirpath, mode="r")
+        format.validate()
+
+    def test_BuscoDatabaseDirFmt_invalid(self):
+        dirpath = self.get_data_path("busco_DB/invalid")
+        format = BuscoDatabaseDirFmt(dirpath, mode="r")
+        with self.assertRaisesRegex(
+            ValidationError,
+            "Missing one or more files"
         ):
             format.validate()
