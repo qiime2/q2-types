@@ -22,4 +22,4 @@ __all__ = [
         'OrthologAnnotationDirFmt', 'OrthologFileFmt',
         ]
 
-importlib.import_module('q2_types.feature_data._transformer')
+importlib.import_module('q2_types.feature_data_mag._transformer')
