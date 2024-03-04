@@ -13,7 +13,6 @@ from q2_types.feature_data_mag._format import (
         )
 from qiime2.core.type import SemanticType
 
-from ..per_sample_sequences import ContigSequencesDirFmt
 from ..plugin_setup import plugin
 
 
@@ -23,14 +22,6 @@ plugin.register_semantic_types(MAG)
 plugin.register_semantic_type_to_format(
     FeatureData[MAG],
     artifact_format=MAGSequencesDirFmt
-)
-
-Contig = SemanticType('Contig', variant_of=FeatureData.field['type'])
-
-plugin.register_semantic_types(Contig)
-plugin.register_semantic_type_to_format(
-    FeatureData[Contig],
-    artifact_format=ContigSequencesDirFmt
 )
 
 NOG = SemanticType('NOG', variant_of=FeatureData.field['type'])

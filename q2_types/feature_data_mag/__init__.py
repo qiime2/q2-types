@@ -14,12 +14,12 @@ from ._format import (
         OrthologFileFmt
         )
 
-from ._type import MAG, NOG, OG, KEGG, Contig
+from ._type import MAG, NOG, OG, KEGG
 from ._transformer import MAGIterator
 
 __all__ = [
         'MAG', 'MAGSequencesDirFmt', 'MAGIterator', 'NOG', 'OG', 'KEGG',
-        'OrthologAnnotationDirFmt', 'OrthologFileFmt', 'Contig'
+        'OrthologAnnotationDirFmt', 'OrthologFileFmt',
         ]
 
 importlib.import_module('q2_types.feature_data._transformer')
