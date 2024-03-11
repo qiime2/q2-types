@@ -678,6 +678,39 @@ class TestMultiFormats(TestPluginBase):
                 ValidationError, 'should be .* per-sample directories'):
             format.validate()
 
+    def test_multifasta_dirfmt_sample_dict(self):
+        filepath = self.get_data_path('mags/mags-fasta')
+        shutil.copytree(filepath, self.temp_dir.name, dirs_exist_ok=True)
+        multifasta = MultiFASTADirectoryFormat(self.temp_dir.name, mode='r')
+
+        obs = multifasta.sample_dict()
+        exp = {
+            'sample1': {
+                'mag1': str(Path(multifasta.path / 'sample1/mag1.fasta')),
+                'mag2': str(Path(multifasta.path / 'sample1/mag2.fasta')),
+                'mag3': str(Path(multifasta.path / 'sample1/mag3.fasta'))
+            },
+            'sample2': {
+                'mag1': str(Path(multifasta.path / 'sample2/mag1.fasta')),
+                'mag2': str(Path(multifasta.path / 'sample2/mag2.fasta'))
+            },
+        }
+        self.assertDictEqual(obs, exp)
+
+        obs = multifasta.sample_dict(relative=True)
+        exp = {
+            'sample1': {
+                'mag1': 'sample1/mag1.fasta',
+                'mag2': 'sample1/mag2.fasta',
+                'mag3': 'sample1/mag3.fasta'
+            },
+            'sample2': {
+                'mag1': 'sample2/mag1.fasta',
+                'mag2': 'sample2/mag2.fasta'
+            },
+        }
+        self.assertDictEqual(obs, exp)
+
     def test_multibowtie_index_dirfmt(self):
         dirpath = self.get_data_path('bowtie/index-valid')
         format = MultiBowtie2IndexDirFmt(dirpath, mode='r')
@@ -708,7 +741,7 @@ class TestMultiFormats(TestPluginBase):
             'sample2': str(Path(contigs.path / 'sample2_contigs.fa')),
             'sample3': str(Path(contigs.path / 'sample3_contigs.fa'))
         }
-        self.assertEqual(obs, exp)
+        self.assertDictEqual(obs, exp)
 
         obs = contigs.sample_dict(relative=True)
         exp = {
@@ -716,7 +749,7 @@ class TestMultiFormats(TestPluginBase):
             'sample2': 'sample2_contigs.fa',
             'sample3': 'sample3_contigs.fa'
         }
-        self.assertEqual(obs, exp)
+        self.assertDictEqual(obs, exp)
 
     @patch('subprocess.run', return_value=Mock(returncode=0))
     def test_bam_dirmt(self, p):

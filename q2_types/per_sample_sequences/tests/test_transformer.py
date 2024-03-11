@@ -1259,6 +1259,14 @@ class TestMAGTransformers(TestPluginBase):
 
         assert_frame_equal(exp, obs)
 
+    def test_mag_seqs_dirfmt_to_multifile_dirfmt(self):
+        obs = self.apply_transformation(
+            MultiMAGSequencesDirFmt,
+            MultiFASTADirectoryFormat,
+            'mags/mags-fa-with-manifest'
+        )
+        obs.validate()
+
 
 if __name__ == '__main__':
     unittest.main()
