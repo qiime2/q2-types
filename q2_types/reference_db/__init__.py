@@ -5,13 +5,10 @@
 #
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
-
-
 from q2_types.reference_db._type import (
     ReferenceDB, Diamond, Eggnog, NCBITaxonomy,
-    EggnogProteinSequences
+    EggnogProteinSequences, BuscoDB
 )
-
 from q2_types.reference_db._format import (
     EggnogRefDirFmt,
     EggnogRefTextFileFmt,
@@ -19,10 +16,15 @@ from q2_types.reference_db._format import (
     DiamondDatabaseFileFmt,
     DiamondDatabaseDirFmt,
     NCBITaxonomyDirFmt,
-    EggnogProteinSequencesDirFmt
-    )
+    EggnogProteinSequencesDirFmt,
+    BuscoDatabaseDirFmt
+)
 
-__all__ = ['ReferenceDB', 'Diamond', 'Eggnog', 'DiamondDatabaseFileFmt',
-           'DiamondDatabaseDirFmt', 'EggnogRefDirFmt', 'EggnogRefTextFileFmt',
-           'EggnogRefBinFileFmt', 'NCBITaxonomyDirFmt', 'NCBITaxonomy',
-           'EggnogProteinSequencesDirFmt', 'EggnogProteinSequences']
+
+__all__ = [
+    'ReferenceDB', 'Diamond', 'Eggnog', 'DiamondDatabaseFileFmt',
+    'DiamondDatabaseDirFmt', 'EggnogRefDirFmt', 'EggnogRefTextFileFmt',
+    'EggnogRefBinFileFmt', 'NCBITaxonomyDirFmt', 'NCBITaxonomy',
+    'EggnogProteinSequencesDirFmt', 'EggnogProteinSequences',
+    'BuscoDatabaseDirFmt', 'BuscoDB'
+]

@@ -5,8 +5,6 @@
 #
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
-
-
 import gzip
 import re
 from qiime2.plugin import model
@@ -14,9 +12,11 @@ from qiime2.core.exceptions import ValidationError
 from q2_types.plugin_setup import plugin
 from q2_types.reference_db._type import (
     ReferenceDB, Eggnog, Diamond, NCBITaxonomy,
-    EggnogProteinSequences
+    EggnogProteinSequences, BuscoDB
 )
-from q2_types.feature_data import MixedCaseProteinFASTAFormat
+from q2_types.feature_data import (
+    MixedCaseProteinFASTAFormat, AlignedProteinFASTAFormat
+)
 
 
 class EggnogRefTextFileFmt(model.TextFileFormat):
@@ -294,3 +294,104 @@ class EggnogProteinSequencesDirFmt(model.DirectoryFormat):
 plugin.register_formats(EggnogProteinSequencesDirFmt)
 plugin.register_semantic_type_to_format(ReferenceDB[EggnogProteinSequences],
                                         EggnogProteinSequencesDirFmt)
+
+
+class BuscoGenericTextFileFmt(model.TextFileFormat):
+    def _validate_(self, level):
+        pass
+
+
+class BuscoGenericBinaryFileFmt(model.BinaryFileFormat):
+    def _validate_(self, level):
+        pass
+
+
+class BuscoDatabaseDirFmt(model.DirectoryFormat):
+    # File collections for text files
+    (
+        ancestral,
+        dataset,
+        lengths_cutoff,
+        scores_cutoff,
+        links_to_ODB,
+        ancestral_variants,
+        ogs_id,
+        species,
+        hmms,
+        refseq_db_md5
+    ) = [
+            model.FileCollection(
+                rf"busco_downloads\/lineages\/.+\/{pattern}",
+                format=BuscoGenericTextFileFmt
+            )
+            for pattern in [
+                r'ancestral$',
+                r'dataset\.cfg$',
+                r'lengths_cutoff$',
+                r'scores_cutoff$',
+                r'links_to_ODB.+\.txt$',
+                r'ancestral_variants$',
+                r'info\/ogs\.id\.info$',
+                r'info\/species\.info$',
+                r'hmms\/.+\.hmm$',
+                r'refseq_db\.faa\.gz\.md5'
+            ]
+        ]
+
+    # Placement_files. Optional because they are not in virus DB
+    (
+        list_of_reference_markers,
+        mapping_taxid_lineage,
+        mapping_taxids_busco_dataset_name,
+        tree,
+        tree_metadata,
+    ) = [
+            model.FileCollection(
+                rf"busco_downloads\/placement_files\/{pattern}",
+                format=BuscoGenericTextFileFmt,
+                optional=True
+            )
+            for pattern in [
+                r'list_of_reference_markers\..+\.txt$',
+                r'mapping_taxid-lineage\..+\.txt$',
+                r'mapping_taxids-busco_dataset_name\..+\.txt$',
+                r'tree\..+\.nwk$',
+                r'tree_metadata\..+\.txt$',
+            ]
+        ]
+
+    # Others
+    supermatrix_aln = model.FileCollection(
+        r'busco_downloads\/placement_files\/supermatrix\.aln\..+\.faa$',
+        format=AlignedProteinFASTAFormat,
+        optional=True
+    )
+    prfls = model.FileCollection(
+        r'busco_downloads\/lineages\/.+\/prfl\/.+\.prfl$',
+        format=BuscoGenericTextFileFmt,
+        optional=True
+    )
+    version_file = model.File(
+        'busco_downloads/file_versions.tsv', format=BuscoGenericTextFileFmt
+    )
+    refseq_db = model.FileCollection(
+        r'busco_downloads\/lineages\/.+refseq_db\.faa\.gz',
+        format=BuscoGenericBinaryFileFmt
+    )
+
+    def _path_maker(self, name):
+        return str(name)
+
+    def __init__(self, path, mode):
+        super().__init__(path, mode)
+
+        # Overwrite path maker methods for all file collections
+        for var_name, var_value in vars(self.__class__).items():
+            if isinstance(var_value, model.FileCollection):
+                var_value.set_path_maker(self._path_maker)
+
+
+plugin.register_formats(BuscoDatabaseDirFmt)
+plugin.register_semantic_type_to_format(
+    ReferenceDB[BuscoDB], BuscoDatabaseDirFmt
+)

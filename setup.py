@@ -79,8 +79,15 @@ setup(
         ],
         'q2_types.kaiju.tests':
             ['data/*', 'data/db-valid/*'],
-        'q2_types.reference_db.tests':
-            ['data/*', 'data/*/*', 'data/*/*/*'],
+        'q2_types.reference_db.tests': [
+            'data/*',
+            'data/*/*',
+            'data/*/*/*',
+            'data/*/*/*/*',
+            'data/*/*/*/*/*',
+            'data/*/*/*/*/*/*',
+            'data/*/*/*/*/*/*/*'
+        ]
     },
     zip_safe=False,
 )
