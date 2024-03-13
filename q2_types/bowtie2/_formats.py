@@ -9,7 +9,6 @@
 import itertools
 
 from qiime2.plugin import model
-from ..plugin_setup import plugin, citations
 
 
 class Bowtie2IndexFileFormat(model.BinaryFileFormat):
@@ -44,7 +43,3 @@ def _get_prefix(strings):
     char_tuples = zip(*strings)
     prefix_tuples = itertools.takewhile(all_same, char_tuples)
     return ''.join(x[0] for x in prefix_tuples)
-
-
-plugin.register_views(Bowtie2IndexDirFmt,
-                      citations=[citations['langmead2012fast']])
