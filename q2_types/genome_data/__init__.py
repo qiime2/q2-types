@@ -24,4 +24,6 @@ __all__ = [
     'SeedOrthologDirFmt', 'BLAST6',
     ]
 
+importlib.import_module('q2_types.genome_data._format')
 importlib.import_module('q2_types.genome_data._transformer')
+importlib.import_module('q2_types.genome_data._type')
