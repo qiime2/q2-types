@@ -8,14 +8,18 @@
 
 import os.path
 import unittest
+import tempfile
 
 import pandas as pd
 import pandas.errors
+from pandas.testing import assert_frame_equal, assert_series_equal
 import biom
 import skbio
-import qiime2
 
-from pandas.testing import assert_frame_equal, assert_series_equal
+import qiime2
+from qiime2.plugin import ValidationError
+from qiime2.plugin.testing import TestPluginBase
+
 from q2_types.feature_table import BIOMV210Format
 from q2_types.feature_data import (
     TaxonomyFormat, HeaderlessTSVTaxonomyFormat, TSVTaxonomyFormat,
@@ -29,14 +33,11 @@ from q2_types.feature_data import (
 )
 from q2_types.feature_data._transformer import (
     _taxonomy_formats_to_dataframe, _dataframe_to_tsv_taxonomy_format,
-    ProteinIterator, AlignedProteinIterator)
-from qiime2.plugin.testing import TestPluginBase
-
-import tempfile
-
-from q2_types.multiplexed_sequences import (EMPSingleEndDirFmt,
-                                            EMPSingleEndCasavaDirFmt)
-from qiime2.plugin import ValidationError
+    ProteinIterator, AlignedProteinIterator
+)
+from q2_types.multiplexed_sequences import (
+    EMPSingleEndDirFmt, EMPSingleEndCasavaDirFmt
+)
 
 
 # NOTE: these tests are fairly high-level and mainly test the transformer
