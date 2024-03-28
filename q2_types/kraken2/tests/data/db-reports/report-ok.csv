@@ -1,0 +1,46 @@
+perc_minimizers_covered,n_minimizers_covered,n_minimizers_assigned,rank,taxon_id,name
+100.00,26047,0,R,1,root
+100.00,26047,0,R1,131567,  cellular organisms
+ 75.81,19746,0,D,2,    Bacteria
+ 75.81,19746,0,D1,1783272,      Terrabacteria group
+ 75.81,19746,0,P,1239,        Bacillota
+ 75.81,19746,0,C,91061,          Bacilli
+ 75.81,19746,0,O,1385,            Bacillales
+ 49.84,12983,0,F,90964,              Staphylococcaceae
+ 49.84,12983,0,G,1279,                Staphylococcus
+ 25.11,6540,6540,S,1282,                  Staphylococcus epidermidis
+ 24.74,6443,6443,S,1280,                  Staphylococcus aureus
+ 25.96,6763,0,F,186817,              Bacillaceae
+ 25.96,6763,0,G,1386,                Bacillus
+ 25.96,6763,0,G1,86661,                  Bacillus cereus group
+ 25.96,6763,6763,S,1392,                    Bacillus anthracis
+ 24.19,6301,0,D,2759,    Eukaryota
+ 24.19,6301,0,D1,33154,      Opisthokonta
+ 24.19,6301,0,K,33208,        Metazoa
+ 24.19,6301,0,K1,6072,          Eumetazoa
+ 24.19,6301,0,K2,33213,            Bilateria
+ 24.19,6301,0,K3,33511,              Deuterostomia
+ 24.19,6301,0,P,7711,                Chordata
+ 24.19,6301,0,P1,89593,                  Craniata
+ 24.19,6301,0,P2,7742,                    Vertebrata
+ 24.19,6301,0,P3,7776,                      Gnathostomata
+ 24.19,6301,0,P4,117570,                        Teleostomi
+ 24.19,6301,0,P5,117571,                          Euteleostomi
+ 24.19,6301,0,P6,8287,                            Sarcopterygii
+ 24.19,6301,0,P7,1338369,                              Dipnotetrapodomorpha
+ 24.19,6301,0,P8,32523,                                Tetrapoda
+ 24.19,6301,0,P9,32524,                                  Amniota
+ 24.19,6301,0,C,40674,                                    Mammalia
+ 24.19,6301,0,C1,32525,                                      Theria
+ 24.19,6301,0,C2,9347,                                        Eutheria
+ 24.19,6301,0,C3,1437010,                                          Boreoeutheria
+ 24.19,6301,0,C4,314146,                                            Euarchontoglires
+ 24.19,6301,0,C5,314147,                                              Glires
+ 24.19,6301,0,O,9989,                                                Rodentia
+ 24.19,6301,0,O1,1963758,                                                  Myomorpha
+ 24.19,6301,0,O2,337687,                                                    Muroidea
+ 24.19,6301,0,F,10066,                                                      Muridae
+ 24.19,6301,0,F1,39107,                                                        Murinae
+ 24.19,6301,0,G,10088,                                                          Mus
+ 24.19,6301,0,G1,862507,                                                            Mus
+ 24.19,6301,6301,S,10090,                                                              Mus musculus

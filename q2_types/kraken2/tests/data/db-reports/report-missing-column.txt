@@ -1,0 +1,52 @@
+# Database options: nucleotide db, k = 35, l = 31
+# Spaced mask = 11111111111111111111111111111111110011001100110011001100110011
+# Toggle mask = 1110001101111110001010001100010000100111000110110101101000101101
+# Total taxonomy nodes: 46
+# Table size: 26047
+# Table capacity: 51565
+# Min clear hash value = 0
+26047	0	R	1	root
+26047	0	R1	131567	  cellular organisms
+19746	0	D	2	    Bacteria
+19746	0	D1	1783272	      Terrabacteria group
+19746	0	P	1239	        Bacillota
+19746	0	C	91061	          Bacilli
+19746	0	O	1385	            Bacillales
+12983	0	F	90964	              Staphylococcaceae
+12983	0	G	1279	                Staphylococcus
+6540	6540	S	1282	                  Staphylococcus epidermidis
+6443	6443	S	1280	                  Staphylococcus aureus
+6763	0	F	186817	              Bacillaceae
+6763	0	G	1386	                Bacillus
+6763	0	G1	86661	                  Bacillus cereus group
+6763	6763	S	1392	                    Bacillus anthracis
+6301	0	D	2759	    Eukaryota
+6301	0	D1	33154	      Opisthokonta
+6301	0	K	33208	        Metazoa
+6301	0	K1	6072	          Eumetazoa
+6301	0	K2	33213	            Bilateria
+6301	0	K3	33511	              Deuterostomia
+6301	0	P	7711	                Chordata
+6301	0	P1	89593	                  Craniata
+6301	0	P2	7742	                    Vertebrata
+6301	0	P3	7776	                      Gnathostomata
+6301	0	P4	117570	                        Teleostomi
+6301	0	P5	117571	                          Euteleostomi
+6301	0	P6	8287	                            Sarcopterygii
+6301	0	P7	1338369	                              Dipnotetrapodomorpha
+6301	0	P8	32523	                                Tetrapoda
+6301	0	P9	32524	                                  Amniota
+6301	0	C	40674	                                    Mammalia
+6301	0	C1	32525	                                      Theria
+6301	0	C2	9347	                                        Eutheria
+6301	0	C3	1437010	                                          Boreoeutheria
+6301	0	C4	314146	                                            Euarchontoglires
+6301	0	C5	314147	                                              Glires
+6301	0	O	9989	                                                Rodentia
+6301	0	O1	1963758	                                                  Myomorpha
+6301	0	O2	337687	                                                    Muroidea
+6301	0	F	10066	                                                      Muridae
+6301	0	F1	39107	                                                        Murinae
+6301	0	G	10088	                                                          Mus
+6301	0	G1	862507	                                                            Mus
+6301	6301	S	10090	                                                              Mus musculus
