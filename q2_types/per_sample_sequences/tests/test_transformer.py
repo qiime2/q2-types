@@ -19,6 +19,9 @@ import yaml
 import pandas as pd
 from pandas._testing import assert_frame_equal
 
+from qiime2.plugin import ValidationError
+from qiime2.plugin.testing import TestPluginBase
+
 from q2_types.per_sample_sequences import (
     SingleLanePerSampleSingleEndFastqDirFmt,
     SingleLanePerSamplePairedEndFastqDirFmt,
@@ -47,8 +50,7 @@ from q2_types.per_sample_sequences._util import (
     _validate_paired_end_fastq_manifest_directions,
     _parse_and_validate_manifest
 )
-from qiime2.plugin import ValidationError
-from qiime2.plugin.testing import TestPluginBase
+
 
 _parse_and_validate_manifest_partial = functools.partial(
     _parse_and_validate_manifest,

@@ -10,18 +10,13 @@ import os
 import shutil
 import unittest
 
-# from qiime2.plugin import ValidationError
+from qiime2.plugin.testing import TestPluginBase
 
 from q2_types.multiplexed_sequences import (
     MultiplexedSingleEndBarcodeInSequenceDirFmt,
     MultiplexedPairedEndBarcodeInSequenceDirFmt,
-    MultiplexedFastaQualDirFmt,
-    # EMPMultiplexedDirFmt,
-    # ErrorCorrectionDetailsDirFmt, EMPSingleEndDirFmt,
-    # EMPSingleEndCasavaDirFmt, EMPPairedEndDirFmt,
-    # EMPPairedEndCasavaDirFmt
+    MultiplexedFastaQualDirFmt
 )
-from qiime2.plugin.testing import TestPluginBase
 
 
 class TestMultiplexedSingleEndBarcodeInSequenceDirFmt(TestPluginBase):
@@ -74,203 +69,30 @@ class TestMultiplexedFastaQualDirFmt(TestPluginBase):
         # Should not error.
         format.validate()
 
-# These test may or may not be useful for future testing
-# class TestEMPMultiplexedDirFmt(TestPluginBase):
-#     package = 'q2_types.per_sample_sequences.tests'
 
-#     def test_validate_positive(self):
-#         filenames = ('Human-Kneecap_S1_L001_R1_001.fastq.gz',
-#                      'Human-Kneecap_S1_L001_R2_001.fastq.gz',
-#                      'Human-Armpit_S2_L001_R1_001.fastq.gz',
-#                      'Human-Armpit_S2_L001_R2_001.fastq.gz')
-#         for filename in filenames:
-#             filepath = self.get_data_path(filename)
-#             shutil.copy(filepath, self.temp_dir.name)
-
-#         format = EMPMultiplexedDirFmt(self.temp_dir.name, mode='r')
-#         format.validate()
-
-#     def test_validate_negative(self):
-#         filenames = ('Human-Kneecap_S1_L001_R1_001.fastq.gz',
-#                      'Human-Kneecap_S1_L001_R2_001.fastq.gz',
-#                      'Human-Armpit_S2_L001_R1_001.fastq.gz',
-#                      'Human-Armpit_S2_L001_R2_001.fastq.gz',
-#                      'Human-Other_S3_L001_R1_001.fastq.gz')
-#         for filename in filenames:
-#             filepath = self.get_data_path(filename)
-#             shutil.copy(filepath, self.temp_dir.name)
-
-#         format = EMPMultiplexedDirFmt(self.temp_dir.name, mode='r')
-#         with self.assertRaisesRegex(ValidationError,
-#                                     'EMPMultiplexedDirFmt'):
-#             format.validate()
+# TODO: write the following tests
+class TestEMPMultiplexedDirFmt(TestPluginBase):
+    pass
 
 
-# class TestEMPSingleEndDirFmt(TestPluginBase):
-#     package = 'q2_types.per_sample_sequences.tests'
-
-#     def test_validate_positive(self):
-#         filenames = ('Human-Kneecap_S1_L001_R1_001.fastq.gz',
-#                      'Human-Armpit_S2_L001_R1_001.fastq.gz',
-#                      'Human-Other_S3_L001_R1_001.fastq.gz',
-#                      'Human-Other_S4_L001_R1_001.fastq.gz',
-#                      'Human-Other_S5_L001_R1_001.fastq.gz',
-#                      'Human-Other_S6_L001_R1_001.fastq.gz',
-#                      'Human-Other_S7_L001_R1_001.fastq.gz')
-#         for filename in filenames:
-#             filepath = self.get_data_path(filename)
-#             shutil.copy(filepath, self.temp_dir.name)
-
-#             format = EMPSingleEndDirFmt(self.temp_dir.name, mode='r')
-#             format.validate()
-
-#     def test_validate_negative(self):
-#         filenames = ('Human-Kneecap_S1_L001_R1_001.fastq.gz',
-#                      'Human-Armpit_S2_L001_R1_001.fastq.gz',
-#                      'Human-Other_S3_L001_R1_001.fastq.gz',
-#                      'Human-Other_S4_L001_R1_001.fastq.gz',
-#                      'Human-Other_S5_L001_R1_001.fastq.gz',
-#                      'Human-Other_S6_L001_R1_001.fastq.gz',
-#                      'Human-Other_S7_L001_R1_001.fastq.gz')
-#         for filename in filenames:
-#             filepath = self.get_data_path(filename)
-#             shutil.copy(filepath, self.temp_dir.name)
-
-#         format = EMPSingleEndDirFmt(self.temp_dir.name, mode='r')
-#         with self.assertRaisesRegex(ValidationError,
-#                                     'EMPSingleEndDirFmt'):
-#             format.validate()
+class TestEMPSingleEndDirFmt(TestPluginBase):
+    pass
 
 
-# class TestEMPSingleEndCasavaDirFmt(TestPluginBase):
-#     package = 'q2_types.per_sample_sequences.tests'
-
-#     def test_validate_positive(self):
-#         filenames = ('Human-Kneecap_S1_L001_R1_001.fastq.gz',
-#                      'Human-Armpit_S2_L001_R1_001.fastq.gz',
-#                      'Human-Other_S3_L001_R1_001.fastq.gz',
-#                      'Human-Other_S4_L001_R1_001.fastq.gz',
-#                      'Human-Other_S5_L001_R1_001.fastq.gz',
-#                      'Human-Other_S6_L001_R1_001.fastq.gz',
-#                      'Human-Other_S7_L001_R1_001.fastq.gz')
-#         for filename in filenames:
-#             filepath = self.get_data_path(filename)
-#             shutil.copy(filepath, self.temp_dir.name)
-
-#             format = EMPSingleEndCasavaDirFmt(self.temp_dir.name, mode='r')
-#             format.validate()
-
-#     def test_validate_negative(self):
-#         filenames = ('Human-Kneecap_S1_L001_R1_001.fastq.gz',
-#                      'Human-Armpit_S2_L001_R1_001.fastq.gz',
-#                      'Human-Other_S3_L001_R1_001.fastq.gz',
-#                      'Human-Other_S4_L001_R1_001.fastq.gz',
-#                      'Human-Other_S5_L001_R1_001.fastq.gz',
-#                      'Human-Other_S6_L001_R1_001.fastq.gz',
-#                      'Human-Other_S7_L001_R1_001.fastq.gz')
-#         for filename in filenames:
-#             filepath = self.get_data_path(filename)
-#             shutil.copy(filepath, self.temp_dir.name)
-
-#         format = EMPSingleEndCasavaDirFmt(self.temp_dir.name, mode='r')
-#         with self.assertRaisesRegex(ValidationError,
-#                                     'EMPSingleEndCasavaDirFmt'):
-#             format.validate()
+class TestEMPSingleEndCasavaDirFmt(TestPluginBase):
+    pass
 
 
-# class TestEMPPairedEndDirFmt(TestPluginBase):
-#     package = 'q2_types.per_sample_sequences.tests'
+class TestEMPPairedEndDirFmt(TestPluginBase):
+    pass
 
-#     def test_validate_positive(self):
-#         filenames = ('Human-Kneecap_S1_L001_R1_001.fastq.gz',
-#                      'Human-Kneecap_S1_L001_R2_001.fastq.gz',
-#                      'Human-Armpit_S2_L001_R1_001.fastq.gz',
-#                      'Human-Armpit_S2_L001_R2_001.fastq.gz',
-#                      'Human-Other_S3_L001_R1_001.fastq.gz',
-#                      'Human-Other_S3_L001_R2_001.fastq.gz'
-#                      )
-#         for filename in filenames:
-#             filepath = self.get_data_path(filename)
-#             shutil.copy(filepath, self.temp_dir.name)
 
-#             format = EMPPairedEndDirFmt(self.temp_dir.name, mode='r')
-#             format.validate()
+class TestEMPPairedEndCasavaDirFmt(TestPluginBase):
+    pass
 
-#     def test_validate_negative(self):
-#         filenames = ('Human-Kneecap_S1_L001_R1_001.fastq.gz',
-#                      'Human-Kneecap_S1_L001_R2_001.fastq.gz',
-#                      'Human-Armpit_S2_L001_R1_001.fastq.gz',
-#                      'Human-Armpit_S2_L001_R2_001.fastq.gz',
-#                      'Human-Other_S3_L001_R1_001.fastq.gz',
-#                      'Human-Other_S3_L001_R2_001.fastq.gz'
-#                      )
-#         for filename in filenames:
-#             filepath = self.get_data_path(filename)
-#             shutil.copy(filepath, self.temp_dir.name)
 
-#         format = EMPPairedEndDirFmt(self.temp_dir.name, mode='r')
-#         with self.assertRaisesRegex(ValidationError,
-#                                     'EMPPairedEndDirFmt'):
-#             format.validate()
-
-#     class TestEMPPairedEndCasavaDirFmt(TestPluginBase):
-#         package = 'q2_types.per_sample_sequences.tests'
-
-#         def test_validate_positive(self):
-#             filenames = ('Human-Kneecap_S1_L001_R1_001.fastq.gz',
-#                          'Human-Kneecap_S1_L001_R2_001.fastq.gz',
-#                          'Human-Armpit_S2_L001_R1_001.fastq.gz',
-#                          'Human-Armpit_S2_L001_R2_001.fastq.gz',
-#                          'Human-Other_S3_L001_R1_001.fastq.gz',
-#                          'Human-Other_S3_L001_R2_001.fastq.gz'
-#                          )
-#             for filename in filenames:
-#                 filepath = self.get_data_path(filename)
-#                 shutil.copy(filepath, self.temp_dir.name)
-
-#        format = EMPPairedEndCasavaDirFmt(self.temp_dir.name, mode='r')
-#                 format.validate()
-
-#         def test_validate_negative(self):
-#             filenames = ('Human-Kneecap_S1_L001_R1_001.fastq.gz',
-#                          'Human-Kneecap_S1_L001_R2_001.fastq.gz',
-#                          'Human-Armpit_S2_L001_R1_001.fastq.gz',
-#                          'Human-Armpit_S2_L001_R2_001.fastq.gz',
-#                          'Human-Other_S3_L001_R1_001.fastq.gz',
-#                          'Human-Other_S3_L001_R2_001.fastq.gz',
-#                          )
-#             for filename in filenames:
-#                 filepath = self.get_data_path(filename)
-#                 shutil.copy(filepath, self.temp_dir.name)
-
-#             format = EMPPairedEndCasavaDirFmt(self.temp_dir.name, mode='r')
-#             with self.assertRaisesRegex(ValidationError,
-#                                         'EMPPairedEndCasavaDirFmt'):
-#                 format.validate()
-
-#     class TestErrorCorrectionDetailsDirFmt(TestPluginBase):
-#         package = 'q2_types.per_sample_sequences.tests'
-
-#         def test_validate_positive(self):
-#             filenames = ('error_correction_details/positive.tsv')
-#             for filename in filenames:
-#                 filepath = self.get_data_path(filename)
-#                 shutil.copy(filepath, self.temp_dir.name)
-
-#                 format = ErrorCorrectionDetailsDirFmt(self.temp_dir.name,
-#                                                       mode='r')
-#                 format.validate()
-
-#         def test_validate_negative(self):
-#             filenames = ('error_correction_details/invalid.tsv')
-#             for filename in filenames:
-#                 filepath = self.get_data_path(filename)
-#                 shutil.copy(filepath, self.temp_dir.name)
-
-#   format = ErrorCorrectionDetailsDirFmt(self.temp_dir.name, mode='r')
-#             with self.assertRaisesRegex(ValidationError,
-#                                         'ErrorCorrectionDetailsDirFmt'):
-#                 format.validate()
+class TestErrorCorrectionDetailsDirFmt(TestPluginBase):
+    pass
 
 
 if __name__ == '__main__':

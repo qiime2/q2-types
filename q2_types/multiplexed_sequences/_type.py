@@ -9,11 +9,13 @@
 from qiime2.plugin import SemanticType
 
 from ..plugin_setup import plugin
-from . import (MultiplexedSingleEndBarcodeInSequenceDirFmt,
-               MultiplexedPairedEndBarcodeInSequenceDirFmt,
-               EMPSingleEndDirFmt,
-               EMPPairedEndDirFmt,
-               ErrorCorrectionDetailsDirFmt)
+from . import (
+    MultiplexedSingleEndBarcodeInSequenceDirFmt,
+    MultiplexedPairedEndBarcodeInSequenceDirFmt,
+    EMPSingleEndDirFmt,
+    EMPPairedEndDirFmt,
+    ErrorCorrectionDetailsDirFmt
+)
 
 
 MultiplexedSingleEndBarcodeInSequence = \

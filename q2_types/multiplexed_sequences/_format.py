@@ -7,12 +7,11 @@
 # ----------------------------------------------------------------------------
 
 import qiime2.plugin.model as model
+from qiime2.plugin import ValidationError
 
 from .._util import FASTAFormat, DNAFASTAFormat, FastqGzFormat
-
 from ..plugin_setup import plugin
 
-from qiime2.plugin import ValidationError
 
 # MultiplexedSingleEndBarcodeInSequenceDirFmt &
 # MultiplexedPairedEndBarcodeInSequenceDirFmt represent multiplexed sequences

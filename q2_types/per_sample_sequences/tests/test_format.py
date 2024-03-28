@@ -14,6 +14,11 @@ from pathlib import Path
 from unittest.mock import patch, Mock
 
 import pandas as pd
+
+from qiime2.plugin.testing import TestPluginBase
+from qiime2.plugin import ValidationError
+
+from q2_types.multiplexed_sequences import ErrorCorrectionDetailsFmt
 from q2_types.per_sample_sequences import (
     CasavaOneEightSingleLanePerSampleDirFmt,
     CasavaOneEightLanelessPerSampleDirFmt,
@@ -30,10 +35,6 @@ from q2_types.per_sample_sequences import (
     MultiFASTADirectoryFormat, MultiBowtie2IndexDirFmt, ContigSequencesDirFmt,
     MultiBAMDirFmt, BAMDirFmt
 )
-from qiime2.plugin.testing import TestPluginBase
-from qiime2.plugin import ValidationError
-
-from q2_types.multiplexed_sequences import ErrorCorrectionDetailsFmt
 
 
 class TestAbsoluteFastqManifestV2Formats(TestPluginBase):
@@ -604,8 +605,6 @@ class TestQIIME1DemuxFormat(TestPluginBase):
         with self.assertRaisesRegex(ValidationError,
                                     r'QIIME1DemuxDirFmt.*seqs\.fna'):
             QIIME1DemuxDirFmt(self.temp_dir.name, mode='r').validate()
-
-# Start tests to keep
 
 
 class TestErrorCorrectionDetailsFmt(TestPluginBase):

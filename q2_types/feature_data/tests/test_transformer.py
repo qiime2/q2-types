@@ -1513,8 +1513,6 @@ class TestBLAST6Transformer(TestPluginBase):
         exp.index = pd.Index(exp.index.astype(str), name='id')
         assert_frame_equal(obs.to_dataframe(), exp)
 
-# Start tests to keep
-
 
 class TestTransformers(TestPluginBase):
     package = 'q2_types.feature_data.tests'
@@ -1600,7 +1598,6 @@ class TestTransformers(TestPluginBase):
                                            EMPSingleEndDirFmt)
         with self.assertRaises(ValidationError):
             transformer(EMPSingleEndCasavaDirFmt(dirpath, 'r'))
-# End tests to keep coming from q2-demux
 
 
 class BarcodeSequenceFastqIteratorTests(unittest.TestCase):

@@ -6,21 +6,27 @@
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
 
-import skbio.io
-import pandas as pd
-
-from . import (MultiplexedFastaQualDirFmt,
-               MultiplexedSingleEndBarcodeInSequenceDirFmt,
-               EMPMultiplexedDirFmt,
-               ErrorCorrectionDetailsFmt,
-               EMPSingleEndDirFmt,
-               EMPSingleEndCasavaDirFmt,
-               EMPPairedEndDirFmt,
-               EMPPairedEndCasavaDirFmt)
-from ..per_sample_sequences import (SingleLanePerSampleSingleEndFastqDirFmt,
-                                    SingleLanePerSamplePairedEndFastqDirFmt)
 import shutil
+
+import pandas as pd
+import skbio.io
+
 from qiime2 import Metadata
+
+from . import (
+    MultiplexedFastaQualDirFmt,
+    MultiplexedSingleEndBarcodeInSequenceDirFmt,
+    EMPMultiplexedDirFmt,
+    ErrorCorrectionDetailsFmt,
+    EMPSingleEndDirFmt,
+    EMPSingleEndCasavaDirFmt,
+    EMPPairedEndDirFmt,
+    EMPPairedEndCasavaDirFmt
+)
+from ..per_sample_sequences import (
+    SingleLanePerSampleSingleEndFastqDirFmt,
+    SingleLanePerSamplePairedEndFastqDirFmt
+)
 from ..feature_data._util import _PlotQualView
 from ..plugin_setup import plugin
 from .._util import FastqGzFormat
