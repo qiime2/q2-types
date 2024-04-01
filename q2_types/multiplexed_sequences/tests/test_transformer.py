@@ -20,12 +20,8 @@ from qiime2.plugin.testing import TestPluginBase
 from q2_types.multiplexed_sequences import (
     MultiplexedFastaQualDirFmt,
     MultiplexedSingleEndBarcodeInSequenceDirFmt,
-    EMPMultiplexedDirFmt,
-    ErrorCorrectionDetailsFmt,
-    EMPSingleEndDirFmt,
-    EMPSingleEndCasavaDirFmt,
-    EMPPairedEndDirFmt,
-    EMPPairedEndCasavaDirFmt
+    ErrorCorrectionDetailsFmt
+
 )
 from q2_types.per_sample_sequences import (
     SingleLanePerSampleSingleEndFastqDirFmt,
@@ -34,7 +30,7 @@ from q2_types.per_sample_sequences import (
     SingleEndFastqManifestPhred64V2,
     PairedEndFastqManifestPhred33V2,
     PairedEndFastqManifestPhred64V2,
-    FastqManifestFormat
+    FastqManifestFormat,
 )
 
 
