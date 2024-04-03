@@ -74,7 +74,7 @@ class TestFormats(TestPluginBase):
 
     def test_ortholog_annotations_annot_dict(self):
         annotations = OrthologAnnotationDirFmt(
-            self.get_data_path('good_ortholog_annotation_multi'), mode='r'
+            self.get_data_path('ortholog_annotation_samples'), mode='r'
         )
 
         obs = annotations.annotation_dict()
