@@ -49,7 +49,7 @@ class TestFormats(TestPluginBase):
             '6232c7e1-8ed7-47c8-9bdb-b94706a26931':
                 str(mags.path / '6232c7e1-8ed7-47c8-9bdb-b94706a26931.fasta'),
         }
-        self.assertEqual(obs, exp)
+        self.assertDictEqual(obs, exp)
 
         obs = mags.feature_dict(relative=True)
         exp = {
@@ -58,7 +58,7 @@ class TestFormats(TestPluginBase):
             '6232c7e1-8ed7-47c8-9bdb-b94706a26931':
                 '6232c7e1-8ed7-47c8-9bdb-b94706a26931.fasta',
         }
-        self.assertEqual(obs, exp)
+        self.assertDictEqual(obs, exp)
 
     def test_ortholog_annotation_dir_fmt_passing(self):
         dirpath = self.get_data_path('good_ortholog_annotation')
@@ -71,6 +71,25 @@ class TestFormats(TestPluginBase):
 
         with self.assertRaisesRegex(ValidationError, "Unrecognized file"):
             fmt_obj.validate()
+
+    def test_ortholog_annotations_annot_dict(self):
+        annotations = OrthologAnnotationDirFmt(
+            self.get_data_path('good_ortholog_annotation_multi'), mode='r'
+        )
+
+        obs = annotations.annotation_dict()
+        exp = {
+            'test_output1': str(annotations.path / 'test_output1.emapper.annotations'),
+            'test_output2': str(annotations.path / 'test_output2.emapper.annotations')
+        }
+        self.assertDictEqual(obs, exp)
+
+        obs = annotations.annotation_dict(relative=True)
+        exp = {
+            'test_output1': 'test_output1.emapper.annotations',
+            'test_output2': 'test_output2.emapper.annotations'
+        }
+        self.assertDictEqual(obs, exp)
 
 
 if __name__ == '__main__':
