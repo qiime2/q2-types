@@ -158,6 +158,6 @@ def _7(data: OrthologAnnotationDirFmt) -> pd.DataFrame:
 
 
 @plugin.register_transformer
-def _7(data: OrthologAnnotationDirFmt) -> qiime2.Metadata:
+def _8(data: OrthologAnnotationDirFmt) -> qiime2.Metadata:
     annotations = _annotations_to_dataframe(data)
     return qiime2.Metadata(annotations)

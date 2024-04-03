@@ -19,7 +19,9 @@ from skbio import DNA
 from q2_types.feature_data_mag import (
     MAGSequencesDirFmt, MAGIterator, OrthologAnnotationDirFmt
 )
-from q2_types.feature_data_mag._transformer import _get_filename, _annotations_to_dataframe
+from q2_types.feature_data_mag._transformer import (
+    _get_filename, _annotations_to_dataframe
+)
 
 
 class TestTransformers(TestPluginBase):

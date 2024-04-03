@@ -79,8 +79,10 @@ class TestFormats(TestPluginBase):
 
         obs = annotations.annotation_dict()
         exp = {
-            'test_output1': str(annotations.path / 'test_output1.emapper.annotations'),
-            'test_output2': str(annotations.path / 'test_output2.emapper.annotations')
+            'test_output1':
+                str(annotations.path / 'test_output1.emapper.annotations'),
+            'test_output2':
+                str(annotations.path / 'test_output2.emapper.annotations')
         }
         self.assertDictEqual(obs, exp)
 
