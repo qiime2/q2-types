@@ -97,6 +97,20 @@ def _5(data: MAGIterator) -> MAGSequencesDirFmt:
 
 
 def _is_valid_uuid4(uuid_string: str):
+    """
+    Check if a given string is a valid UUID version 4.
+
+    This function checks if the provided string is a valid UUID version 4.
+    The only purpose of doing that here is to identify whether provided
+    string was a MAG ID (UUID4) or a sample ID. For that reason, we don't
+    print any statements or raise any exceptions.
+
+    Parameters:
+    uuid_string (str): The string to check for UUID version 4 validity.
+
+    Returns:
+    bool: True if the string is a valid UUID version 4, False otherwise.
+    """
     try:
         uuid_obj = uuid.UUID(uuid_string, version=4)
     except ValueError:

@@ -75,17 +75,15 @@ class OrthologAnnotationDirFmt(model.DirectoryFormat):
     def annotation_dict(self, relative=False) -> dict:
         ids = {}
         for path in self.path.iterdir():
-            if not re.compile(self.pathspec).match(path.name):
-                continue
-
-            _id = re.sub('.emapper$', '', path.stem)
-            absolute_path = path.absolute()
-            if relative:
-                ids[_id] = str(
-                    absolute_path.relative_to(self.path.absolute())
-                )
-            else:
-                ids[_id] = str(absolute_path)
+            if re.compile(self.pathspec).match(path.name):
+                _id = re.sub('.emapper$', '', path.stem)
+                absolute_path = path.absolute()
+                if relative:
+                    ids[_id] = str(
+                        absolute_path.relative_to(self.path.absolute())
+                    )
+                else:
+                    ids[_id] = str(absolute_path)
 
         return dict(sorted(ids.items()))
 
