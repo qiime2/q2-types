@@ -5,6 +5,7 @@
 #
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
+import importlib
 from q2_types.reference_db._type import (
     ReferenceDB, Diamond, Eggnog, NCBITaxonomy,
     EggnogProteinSequences, BuscoDB
@@ -28,3 +29,6 @@ __all__ = [
     'EggnogProteinSequencesDirFmt', 'EggnogProteinSequences',
     'BuscoDatabaseDirFmt', 'BuscoDB'
 ]
+
+importlib.import_module('q2_types.reference_db._format')
+importlib.import_module('q2_types.reference_db._type')

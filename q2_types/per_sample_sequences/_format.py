@@ -597,12 +597,59 @@ class MultiDirValidationMixin:
 
 class MultiFASTADirectoryFormat(MultiDirValidationMixin,
                                 model.DirectoryFormat):
-    sequences = model.FileCollection(r'.+\.(fa|fasta)$', format=DNAFASTAFormat)
+    pathspec = r'.+\.(fa|fasta)$'
+    sequences = model.FileCollection(pathspec, format=DNAFASTAFormat)
 
     @sequences.set_path_maker
     def sequences_path_maker(self, sample_id, mag_id):
         # write out with fasta extension, regardless if input was fa or fasta
         return '%s/%s.fasta' % (sample_id, mag_id)
+
+    def sample_dict(self, relative=False):
+        """
+        Returns a mapping of sample id to another dictionary where keys
+        represent the MAG ID and values correspond to the filepath for
+        each MAG.
+
+        Parameters
+        ---------
+        relative : bool
+            Whether to return filepaths relative to the directory's location.
+            Returns absolute filepaths by default.
+
+        Returns
+        -------
+        dict
+            Mapping of sample id -> dict {mag_id: mag_filepath} as
+            described above. Both levels of the dictionary are
+            sorted alphabetically by key.
+        """
+        mags_pattern = re.compile(self.pathspec)
+        ids = {}
+        for d in self.path.iterdir():
+            if not d.is_dir():
+                continue
+
+            sample_id = d.name.rsplit('/', 1)[0]
+            if sample_id not in ids:
+                ids[sample_id] = {}
+
+            for path in d.iterdir():
+                if not mags_pattern.match(path.name):
+                    continue
+
+                mag_id = os.path.splitext(os.path.basename(path.name))[0]
+                absolute_path = path.absolute()
+                if relative:
+                    ids[sample_id][mag_id] = str(
+                        absolute_path.relative_to(self.path.absolute())
+                    )
+                else:
+                    ids[sample_id][mag_id] = str(absolute_path)
+
+            ids[sample_id] = dict(sorted(ids[sample_id].items()))
+
+        return dict(sorted(ids.items()))
 
 
 class MultiMAGSequencesDirFmt(MultiFASTADirectoryFormat):

@@ -1,0 +1,6 @@
+sample-id,mag-id,filename
+sample1,mag1,sample1/mag1.fasta
+sample1,mag2,sample1/mag2.fasta
+sample1,mag3,sample1/mag3.fasta
+sample2,mag1,sample2/mag1.fasta
+sample2,mag2,sample2/mag2.fasta

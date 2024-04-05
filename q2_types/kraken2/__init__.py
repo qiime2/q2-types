@@ -24,4 +24,6 @@ __all__ = [
     'BrackenDBFormat', 'BrackenDBDirectoryFormat'
 ]
 
+importlib.import_module('q2_types.kraken2._format')
 importlib.import_module('q2_types.kraken2._transformer')
+importlib.import_module('q2_types.kraken2._type')

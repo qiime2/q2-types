@@ -6,8 +6,6 @@
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
 
-import importlib
-
 import pandas as pd
 import qiime2.plugin
 import qiime2.sdk
@@ -28,12 +26,4 @@ plugin = qiime2.plugin.Plugin(
 plugin.register_views(pd.Series, pd.DataFrame,
                       citations=[citations['mckinney-proc-scipy-2010']])
 
-importlib.import_module('q2_types.feature_table')
-importlib.import_module('q2_types.distance_matrix')
-importlib.import_module('q2_types.tree')
-importlib.import_module('q2_types.ordination')
-importlib.import_module('q2_types.sample_data')
-importlib.import_module('q2_types.feature_data')
-importlib.import_module('q2_types.per_sample_sequences')
-importlib.import_module('q2_types.multiplexed_sequences')
-importlib.import_module('q2_types.bowtie2')
+# __init__.py loads first and imports all of the subpackages.
