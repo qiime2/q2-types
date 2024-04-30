@@ -19,21 +19,21 @@ class OrthologFileFmt(model.TextFileFormat):
 
 
 class GenesDirectoryFormat(model.DirectoryFormat):
-    genes = model.FileCollection(r'(.*\_)?genes[0-9]*\.(fa|fna|fasta)$',
+    genes = model.FileCollection(r'(.*\/)?(.*)\.(fa|fna|fasta)$',
                                  format=DNAFASTAFormat)
 
     @genes.set_path_maker
     def genes_path_maker(self, genome_id):
-        return '%s_genes.fasta' % genome_id
+        return '%s.fasta' % genome_id
 
 
 class ProteinsDirectoryFormat(model.DirectoryFormat):
-    proteins = model.FileCollection(r'(.*\_)?proteins[0-9]*\.(fa|faa|fasta)$',
+    proteins = model.FileCollection(r'(.*\/)?(.*)\.(fa|faa|fasta)$',
                                     format=ProteinFASTAFormat)
 
     @proteins.set_path_maker
     def proteins_path_maker(self, genome_id):
-        return '%s_proteins.fasta' % genome_id
+        return '%s.fasta' % genome_id
 
 
 class GFF3Format(model.TextFileFormat):
@@ -160,12 +160,12 @@ class GFF3Format(model.TextFileFormat):
 
 
 class LociDirectoryFormat(model.DirectoryFormat):
-    loci = model.FileCollection(r'(.*\_)?loci[0-9]*\.gff$',
+    loci = model.FileCollection(r'(.*\/)?(.*)\.gff$',
                                 format=GFF3Format)
 
     @loci.set_path_maker
     def loci_path_maker(self, genome_id):
-        return '%s_loci.gff' % genome_id
+        return '%s.gff' % genome_id
 
 
 plugin.register_formats(
