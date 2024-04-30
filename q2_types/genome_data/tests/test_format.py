@@ -65,15 +65,11 @@ class TestFormats(TestPluginBase):
 
         fmt.validate()
 
-    def test_genes_dirfmt_fa_with_wrong_prefix(self):
-        dirpath = self.get_data_path('genes-with-wrong-prefix')
+    def test_genes_dirfmt_fa_with_sample_dir(self):
+        dirpath = self.get_data_path('genes-with-sample-dir')
         fmt = GenesDirectoryFormat(dirpath, mode='r')
 
-        with self.assertRaisesRegex(
-                ValidationError,
-                'Missing one or more files for GenesDirectoryFormat'
-        ):
-            fmt.validate()
+        fmt.validate()
 
     def test_proteins_dirfmt_fa_with_suffix(self):
         dirpath = self.get_data_path('proteins-with-suffix')
@@ -87,15 +83,11 @@ class TestFormats(TestPluginBase):
 
         fmt.validate()
 
-    def test_proteins_dirfmt_fa_with_wrong_prefix(self):
-        dirpath = self.get_data_path('proteins-with-wrong-prefix')
+    def test_proteins_dirfmt_fa_with_sample_dir(self):
+        dirpath = self.get_data_path('proteins-with-sample-dir')
         fmt = ProteinsDirectoryFormat(dirpath, mode='r')
 
-        with self.assertRaisesRegex(
-            ValidationError,
-            'Missing one or more files for ProteinsDirectoryFormat'
-        ):
-            fmt.validate()
+        fmt.validate()
 
     def test_gff_format_positive_with_suffix(self):
         filepath = self.get_data_path('loci-with-suffix/loci1.gff')
@@ -115,15 +107,11 @@ class TestFormats(TestPluginBase):
 
         fmt.validate()
 
-    def test_loci_dirfmt_with_wrong_prefix(self):
-        dirpath = self.get_data_path('loci-with-wrong-prefix')
+    def test_loci_dirfmt_with_sample_dir(self):
+        dirpath = self.get_data_path('loci-with-sample-dir')
         fmt = LociDirectoryFormat(dirpath, mode='r')
 
-        with self.assertRaisesRegex(
-                ValidationError,
-                'Missing one or more files for LociDirectoryFormat'
-        ):
-            fmt.validate()
+        fmt.validate()
 
     def test_gff_format_wrong_version(self):
         filepath = self.get_data_path('loci-invalid/loci-wrong-version.gff')
