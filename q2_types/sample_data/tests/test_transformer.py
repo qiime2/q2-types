@@ -27,9 +27,9 @@ class TestTransformers(TestPluginBase):
 
         obs = transformer(exp)
 
-        # Squeeze equals true to return series instead of dataframe
-        obs = pd.read_csv(str(obs), sep='\t', header=0, index_col=0,
-                          squeeze=True)
+        obs = pd.read_csv(str(obs), sep='\t', header=0, index_col=0)
+        # Squeeze into series instead of dataframe
+        obs = obs.squeeze('columns')
 
         assert_series_equal(exp, obs)
 
