@@ -9,5 +9,9 @@
 from ._formats import (Bowtie2IndexFileFormat, Bowtie2IndexDirFmt)
 from ._types import Bowtie2Index
 
+from ..plugin_setup import plugin, citations
+
+plugin.register_views(Bowtie2IndexDirFmt,
+                      citations=[citations['langmead2012fast']])
 
 __all__ = ['Bowtie2IndexFileFormat', 'Bowtie2IndexDirFmt', 'Bowtie2Index']
