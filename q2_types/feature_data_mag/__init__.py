@@ -21,5 +21,6 @@ __all__ = [
         'MAG', 'MAGSequencesDirFmt', 'MAGIterator', 'NOG', 'OG', 'KEGG',
         'OrthologAnnotationDirFmt', 'OrthologFileFmt',
         ]
-
+importlib.import_module('q2_types.feature_data_mag._format')
 importlib.import_module('q2_types.feature_data_mag._transformer')
+importlib.import_module('q2_types.feature_data_mag._type')
