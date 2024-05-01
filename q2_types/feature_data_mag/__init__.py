@@ -22,6 +22,6 @@ __all__ = [
         'OrthologAnnotationDirFmt', 'OrthologFileFmt', 'Contig'
         ]
 
-importlib.import_module('q2_types.feature_data._format')
-importlib.import_module('q2_types.feature_data._transformer')
-importlib.import_module('q2_types.feature_data._type')
+importlib.import_module('q2_types.feature_data_mag._format')
+importlib.import_module('q2_types.feature_data_mag._transformer')
+importlib.import_module('q2_types.feature_data_mag._type')
