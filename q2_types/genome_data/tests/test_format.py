@@ -59,32 +59,8 @@ class TestFormats(TestPluginBase):
 
         fmt.validate()
 
-    def test_genes_dirfmt_fa_with_prefix(self):
-        dirpath = self.get_data_path('genes-with-prefix')
-        fmt = GenesDirectoryFormat(dirpath, mode='r')
-
-        fmt.validate()
-
-    def test_genes_dirfmt_fa_with_sample_dir(self):
-        dirpath = self.get_data_path('genes-with-sample-dir')
-        fmt = GenesDirectoryFormat(dirpath, mode='r')
-
-        fmt.validate()
-
     def test_proteins_dirfmt_fa_with_suffix(self):
         dirpath = self.get_data_path('proteins-with-suffix')
-        fmt = ProteinsDirectoryFormat(dirpath, mode='r')
-
-        fmt.validate()
-
-    def test_proteins_dirfmt_fa_with_prefix(self):
-        dirpath = self.get_data_path('proteins-with-prefix')
-        fmt = ProteinsDirectoryFormat(dirpath, mode='r')
-
-        fmt.validate()
-
-    def test_proteins_dirfmt_fa_with_sample_dir(self):
-        dirpath = self.get_data_path('proteins-with-sample-dir')
         fmt = ProteinsDirectoryFormat(dirpath, mode='r')
 
         fmt.validate()
@@ -97,18 +73,6 @@ class TestFormats(TestPluginBase):
 
     def test_loci_dirfmt_with_suffix(self):
         dirpath = self.get_data_path('loci-with-suffix')
-        fmt = LociDirectoryFormat(dirpath, mode='r')
-
-        fmt.validate()
-
-    def test_loci_dirfmt_with_prefix(self):
-        dirpath = self.get_data_path('loci-with-prefix')
-        fmt = LociDirectoryFormat(dirpath, mode='r')
-
-        fmt.validate()
-
-    def test_loci_dirfmt_with_sample_dir(self):
-        dirpath = self.get_data_path('loci-with-sample-dir')
         fmt = LociDirectoryFormat(dirpath, mode='r')
 
         fmt.validate()

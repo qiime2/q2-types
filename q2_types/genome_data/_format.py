@@ -19,7 +19,7 @@ class OrthologFileFmt(model.TextFileFormat):
 
 
 class GenesDirectoryFormat(model.DirectoryFormat):
-    genes = model.FileCollection(r'(.*\/)?(.*)\.(fa|fna|fasta)$',
+    genes = model.FileCollection(r'.+\.(fa|fna|fasta)$',
                                  format=DNAFASTAFormat)
 
     @genes.set_path_maker
@@ -28,7 +28,7 @@ class GenesDirectoryFormat(model.DirectoryFormat):
 
 
 class ProteinsDirectoryFormat(model.DirectoryFormat):
-    proteins = model.FileCollection(r'(.*\/)?(.*)\.(fa|faa|fasta)$',
+    proteins = model.FileCollection(r'.+\.(fa|faa|fasta)$',
                                     format=ProteinFASTAFormat)
 
     @proteins.set_path_maker
@@ -160,7 +160,7 @@ class GFF3Format(model.TextFileFormat):
 
 
 class LociDirectoryFormat(model.DirectoryFormat):
-    loci = model.FileCollection(r'(.*\/)?(.*)\.gff$',
+    loci = model.FileCollection(r'.+\.gff$',
                                 format=GFF3Format)
 
     @loci.set_path_maker
