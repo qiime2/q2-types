@@ -64,8 +64,8 @@ class TestRefFormats(TestPluginBase):
         fmt_obj.validate()
 
     def test_eggnog_dir_fmt_all_files(self):
-        fp = self.get_data_path('good_eggnog')
-        fmt_obj = EggnogRefDirFmt(fp, mode='r')
+        dirpath = self.get_data_path('good_eggnog')
+        fmt_obj = EggnogRefDirFmt(dirpath, mode='r')
 
         self.assertEqual(
                 len([(relpath, obj) for relpath, obj
@@ -73,8 +73,8 @@ class TestRefFormats(TestPluginBase):
                 3)
 
     def test_eggnog_dir_fmt_single_file(self):
-        fp = self.get_data_path('single_eggnog')
-        fmt_obj = EggnogRefDirFmt(fp, mode='r')
+        dirpath = self.get_data_path('single_eggnog')
+        fmt_obj = EggnogRefDirFmt(dirpath, mode='r')
 
         self.assertEqual(
                 len([(relpath, obj) for relpath, obj
@@ -84,14 +84,14 @@ class TestRefFormats(TestPluginBase):
         fmt_obj.validate()
 
     def test_eggnog_dir_fmt(self):
-        fp = self.get_data_path('good_eggnog')
-        fmt_obj = EggnogRefDirFmt(fp, mode='r')
+        dirpath = self.get_data_path('good_eggnog')
+        fmt_obj = EggnogRefDirFmt(dirpath, mode='r')
 
         fmt_obj.validate()
 
     def test_eggnog_sequence_taxa_dir_fmt(self):
-        fp = self.get_data_path('eggnog_seq_tax')
-        fmt_obj = EggnogProteinSequencesDirFmt(fp, mode='r')
+        dirpath = self.get_data_path('eggnog_seq_tax')
+        fmt_obj = EggnogProteinSequencesDirFmt(dirpath, mode='r')
 
         fmt_obj.validate()
 
@@ -202,8 +202,8 @@ class TestNCBIFormats(TestPluginBase):
             format.validate()
 
     def test_ncbi_taxonomy_dir_fmt(self):
-        fp = self.get_data_path("ncbi/db-valid")
-        format = NCBITaxonomyDirFmt(fp, mode="r")
+        dirpath = self.get_data_path("ncbi/db-valid")
+        format = NCBITaxonomyDirFmt(dirpath, mode="r")
         format.validate()
 
     def test_binary_file_fmt_positive(self):
