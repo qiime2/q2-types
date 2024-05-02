@@ -46,28 +46,26 @@ class TestRefFormats(TestPluginBase):
             dmnd_obj.validate()
 
     def test_eggnog_ref_bin_main(self):
-        path_to_file = self.get_data_path('good_eggnog/eggnog.db')
-        fmt_obj = EggnogRefBinFileFmt(path_to_file, mode='r')
+        fp = self.get_data_path('good_eggnog/eggnog.db')
+        fmt_obj = EggnogRefBinFileFmt(fp, mode='r')
 
         fmt_obj.validate()
 
     def test_eggnog_ref_bin_pickle(self):
-        path_to_file = self.get_data_path(
-            'good_eggnog/eggnog.taxa.db.traverse.pkl'
-        )
-        fmt_obj = EggnogRefBinFileFmt(path_to_file, mode='r')
+        fp = self.get_data_path('good_eggnog/eggnog.taxa.db.traverse.pkl')
+        fmt_obj = EggnogRefBinFileFmt(fp, mode='r')
 
         fmt_obj.validate()
 
     def test_eggnog_ref_bin_taxa(self):
-        path_to_file = self.get_data_path('good_eggnog/eggnog.taxa.db')
-        fmt_obj = EggnogRefBinFileFmt(path_to_file, mode='r')
+        fp = self.get_data_path('good_eggnog/eggnog.taxa.db')
+        fmt_obj = EggnogRefBinFileFmt(fp, mode='r')
 
         fmt_obj.validate()
 
     def test_eggnog_dir_fmt_all_files(self):
-        path_to_file = self.get_data_path('good_eggnog')
-        fmt_obj = EggnogRefDirFmt(path_to_file, mode='r')
+        fp = self.get_data_path('good_eggnog')
+        fmt_obj = EggnogRefDirFmt(fp, mode='r')
 
         self.assertEqual(
                 len([(relpath, obj) for relpath, obj
@@ -75,8 +73,8 @@ class TestRefFormats(TestPluginBase):
                 3)
 
     def test_eggnog_dir_fmt_single_file(self):
-        path_to_file = self.get_data_path('single_eggnog')
-        fmt_obj = EggnogRefDirFmt(path_to_file, mode='r')
+        fp = self.get_data_path('single_eggnog')
+        fmt_obj = EggnogRefDirFmt(fp, mode='r')
 
         self.assertEqual(
                 len([(relpath, obj) for relpath, obj
@@ -86,26 +84,26 @@ class TestRefFormats(TestPluginBase):
         fmt_obj.validate()
 
     def test_eggnog_dir_fmt(self):
-        path_to_file = self.get_data_path('good_eggnog')
-        fmt_obj = EggnogRefDirFmt(path_to_file, mode='r')
+        fp = self.get_data_path('good_eggnog')
+        fmt_obj = EggnogRefDirFmt(fp, mode='r')
 
         fmt_obj.validate()
 
     def test_eggnog_sequence_taxa_dir_fmt(self):
-        path_to_file = self.get_data_path('eggnog_seq_tax')
-        fmt_obj = EggnogProteinSequencesDirFmt(path_to_file, mode='r')
+        fp = self.get_data_path('eggnog_seq_tax')
+        fmt_obj = EggnogProteinSequencesDirFmt(fp, mode='r')
 
         fmt_obj.validate()
 
     def test_EggnogRefTextFileFmt_valid(self):
-        filepath = self.get_data_path('eggnog_seq_tax/e5.taxid_info.tsv')
-        fmt_obj = EggnogRefTextFileFmt(filepath, mode='r')
+        fp = self.get_data_path('eggnog_seq_tax/e5.taxid_info.tsv')
+        fmt_obj = EggnogRefTextFileFmt(fp, mode='r')
 
         fmt_obj.validate()
 
     def test_EggnogRefTextFileFmt_invalid_col(self):
-        filepath = self.get_data_path('eggnog_seq_tax_bad/invalid_col.tsv')
-        fmt_obj = EggnogRefTextFileFmt(filepath, mode='r')
+        fp = self.get_data_path('eggnog_seq_tax_bad/invalid_col.tsv')
+        fmt_obj = EggnogRefTextFileFmt(fp, mode='r')
 
         with self.assertRaisesRegex(
             ValidationError,
@@ -114,8 +112,8 @@ class TestRefFormats(TestPluginBase):
             fmt_obj.validate()
 
     def test_EggnogRefTextFileFmt_too_many_cols(self):
-        filepath = self.get_data_path('eggnog_seq_tax_bad/too_many_cols.tsv')
-        fmt_obj = EggnogRefTextFileFmt(filepath, mode='r')
+        fp = self.get_data_path('eggnog_seq_tax_bad/too_many_cols.tsv')
+        fmt_obj = EggnogRefTextFileFmt(fp, mode='r')
 
         with self.assertRaisesRegex(
             ValidationError,
@@ -124,8 +122,8 @@ class TestRefFormats(TestPluginBase):
             fmt_obj.validate()
 
     def test_EggnogRefTextFileFmt_invalid_rank(self):
-        filepath = self.get_data_path('eggnog_seq_tax_bad/invalid_rank.tsv')
-        fmt_obj = EggnogRefTextFileFmt(filepath, mode='r')
+        fp = self.get_data_path('eggnog_seq_tax_bad/invalid_rank.tsv')
+        fmt_obj = EggnogRefTextFileFmt(fp, mode='r')
 
         with self.assertRaisesRegex(
             ValidationError,
@@ -134,8 +132,8 @@ class TestRefFormats(TestPluginBase):
             fmt_obj.validate()
 
     def test_EggnogRefTextFileFmt_invalid_taxid(self):
-        filepath = self.get_data_path('eggnog_seq_tax_bad/invalid_taxid.tsv')
-        fmt_obj = EggnogRefTextFileFmt(filepath, mode='r')
+        fp = self.get_data_path('eggnog_seq_tax_bad/invalid_taxid.tsv')
+        fmt_obj = EggnogRefTextFileFmt(fp, mode='r')
 
         with self.assertRaisesRegex(
             ValidationError,
@@ -144,9 +142,8 @@ class TestRefFormats(TestPluginBase):
             fmt_obj.validate()
 
     def test_EggnogRefTextFileFmt_invalid_taxid_lineage(self):
-        filepath = self.get_data_path(
-            'eggnog_seq_tax_bad/invalid_taxid_lineage.tsv')
-        fmt_obj = EggnogRefTextFileFmt(filepath, mode='r')
+        fp = self.get_data_path('eggnog_seq_tax_bad/invalid_taxid_lineage.tsv')
+        fmt_obj = EggnogRefTextFileFmt(fp, mode='r')
 
         with self.assertRaisesRegex(
             ValidationError,
@@ -205,20 +202,18 @@ class TestNCBIFormats(TestPluginBase):
             format.validate()
 
     def test_ncbi_taxonomy_dir_fmt(self):
-        path_to_file = self.get_data_path("ncbi/db-valid")
-        format = NCBITaxonomyDirFmt(path_to_file, mode="r")
+        fp = self.get_data_path("ncbi/db-valid")
+        format = NCBITaxonomyDirFmt(fp, mode="r")
         format.validate()
 
     def test_binary_file_fmt_positive(self):
-        path_to_file = self.get_data_path(
-            "ncbi/db-valid/prot.accession2taxid.gz"
-        )
-        format = NCBITaxonomyBinaryFileFmt(path_to_file, mode="r")
+        fp = self.get_data_path("ncbi/db-valid/prot.accession2taxid.gz")
+        format = NCBITaxonomyBinaryFileFmt(fp, mode="r")
         format.validate()
 
     def test_binary_file_fmt_wrong_col(self):
-        path_to_file = self.get_data_path("ncbi/wrong_col.gz")
-        format = NCBITaxonomyBinaryFileFmt(path_to_file, mode="r")
+        fp = self.get_data_path("ncbi/wrong_col.gz")
+        format = NCBITaxonomyBinaryFileFmt(fp, mode="r")
         with self.assertRaisesRegex(
                 ValidationError,
                 r"['accession', 'accession_version', 'taxid', 'gi']"
@@ -226,8 +221,8 @@ class TestNCBIFormats(TestPluginBase):
             format.validate()
 
     def test_binary_file_fmt_extra_col(self):
-        path_to_file = self.get_data_path("ncbi/too_many_cols.gz")
-        format = NCBITaxonomyBinaryFileFmt(path_to_file, mode="r")
+        fp = self.get_data_path("ncbi/too_many_cols.gz")
+        format = NCBITaxonomyBinaryFileFmt(fp, mode="r")
         with self.assertRaisesRegex(
                 ValidationError,
                 r"['accession', 'accession.version', "
@@ -236,8 +231,8 @@ class TestNCBIFormats(TestPluginBase):
             format.validate()
 
     def test_binary_file_fmt_wrong_accession(self):
-        path_to_file = self.get_data_path("ncbi/wrong_accession.gz")
-        format = NCBITaxonomyBinaryFileFmt(path_to_file, mode="r")
+        fp = self.get_data_path("ncbi/wrong_accession.gz")
+        format = NCBITaxonomyBinaryFileFmt(fp, mode="r")
         with self.assertRaisesRegex(
                 ValidationError,
                 r"['P1ABC1234', 'A0A009IHW8.1', '1310613', '1835922267']"
@@ -245,8 +240,8 @@ class TestNCBIFormats(TestPluginBase):
             format.validate()
 
     def test_binary_file_fmt_wrong_accession_version(self):
-        path_to_file = self.get_data_path("ncbi/wrong_accession_version.gz")
-        format = NCBITaxonomyBinaryFileFmt(path_to_file, mode="r")
+        fp = self.get_data_path("ncbi/wrong_accession_version.gz")
+        format = NCBITaxonomyBinaryFileFmt(fp, mode="r")
         with self.assertRaisesRegex(
                 ValidationError,
                 r"['A0A009IHW8', 'A0A009IHW8.1a', '1310613', '1835922267']"
@@ -254,8 +249,8 @@ class TestNCBIFormats(TestPluginBase):
             format.validate()
 
     def test_binary_file_fmt_wrong_taxid(self):
-        path_to_file = self.get_data_path("ncbi/wrong_taxid.gz")
-        format = NCBITaxonomyBinaryFileFmt(path_to_file, mode="r")
+        fp = self.get_data_path("ncbi/wrong_taxid.gz")
+        format = NCBITaxonomyBinaryFileFmt(fp, mode="r")
         with self.assertRaisesRegex(
                 ValidationError,
                 r"['A0A009IHW8', 'A0A009IHW8.1', '1310613a', '1835922267']"
@@ -263,8 +258,8 @@ class TestNCBIFormats(TestPluginBase):
             format.validate()
 
     def test_binary_file_fmt_wrong_gi(self):
-        path_to_file = self.get_data_path("ncbi/wrong_gi.gz")
-        format = NCBITaxonomyBinaryFileFmt(path_to_file, mode="r")
+        fp = self.get_data_path("ncbi/wrong_gi.gz")
+        format = NCBITaxonomyBinaryFileFmt(fp, mode="r")
         with self.assertRaisesRegex(
                 ValidationError,
                 r"['A0A009IHW8', 'A0A009IHW8.1', '1310613', '1835922267s']"
