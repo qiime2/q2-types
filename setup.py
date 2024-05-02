@@ -57,11 +57,11 @@ setup(
              'data/mags-fa/*', 'data/mags-fasta/*'],
         'q2_types.genome_data.tests':
             ['data/*/',
-             'data/genes-with-suffix/*',
+             'data/genes/*',
              'data/loci-invalid/*',
-             'data/loci-with-suffix/*',
+             'data/loci/*',
              'data/ortholog/*',
-             'data/proteins-with-suffix/*',
+             'data/proteins/*',
              ],
         'q2_types.kraken2.tests': [
             'data/*',

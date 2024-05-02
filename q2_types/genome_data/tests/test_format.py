@@ -54,25 +54,25 @@ class TestFormats(TestPluginBase):
             obj.validate()
 
     def test_genes_dirfmt_fa_with_suffix(self):
-        dirpath = self.get_data_path('genes-with-suffix')
+        dirpath = self.get_data_path('genes')
         fmt = GenesDirectoryFormat(dirpath, mode='r')
 
         fmt.validate()
 
     def test_proteins_dirfmt_fa_with_suffix(self):
-        dirpath = self.get_data_path('proteins-with-suffix')
+        dirpath = self.get_data_path('proteins')
         fmt = ProteinsDirectoryFormat(dirpath, mode='r')
 
         fmt.validate()
 
     def test_gff_format_positive_with_suffix(self):
-        filepath = self.get_data_path('loci-with-suffix/loci1.gff')
+        filepath = self.get_data_path('loci/loci1.gff')
         fmt = GFF3Format(filepath, mode='r')
 
         fmt.validate()
 
     def test_loci_dirfmt_with_suffix(self):
-        dirpath = self.get_data_path('loci-with-suffix')
+        dirpath = self.get_data_path('loci')
         fmt = LociDirectoryFormat(dirpath, mode='r')
 
         fmt.validate()
