@@ -7,7 +7,7 @@
 # ----------------------------------------------------------------------------
 
 from q2_types.bowtie2 import Bowtie2IndexDirFmt
-from q2_types.feature_data import BLAST6
+from q2_types.feature_data import BLAST6, FeatureData
 from qiime2.plugin import SemanticType
 
 from ..genome_data import SeedOrthologDirFmt
@@ -31,11 +31,15 @@ MAGs = SemanticType(
 Contigs = SemanticType(
     'Contigs', variant_of=SampleData.field['type'])
 SingleBowtie2Index = SemanticType(
-    'SingleBowtie2Index', variant_of=SampleData.field['type'])
+    'SingleBowtie2Index',
+    variant_of=[SampleData.field['type'], FeatureData.field['type']]
+)
 MultiBowtie2Index = SemanticType(
     'MultiBowtie2Index', variant_of=SampleData.field['type'])
 AlignmentMap = SemanticType(
-    'AlignmentMap', variant_of=SampleData.field['type'])
+    'AlignmentMap',
+    variant_of=[SampleData.field['type'], FeatureData.field['type']]
+)
 MultiAlignmentMap = SemanticType(
     'MultiAlignmentMap', variant_of=SampleData.field['type'])
 
@@ -88,6 +92,10 @@ plugin.register_semantic_type_to_format(
 )
 plugin.register_semantic_type_to_format(
     SampleData[AlignmentMap],
+    artifact_format=BAMDirFmt
+)
+plugin.register_semantic_type_to_format(
+    FeatureData[AlignmentMap],
     artifact_format=BAMDirFmt
 )
 plugin.register_semantic_type_to_format(
