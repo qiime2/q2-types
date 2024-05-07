@@ -16,7 +16,9 @@ from q2_types.feature_data_mag import (
         MAG, MAGSequencesDirFmt, OrthologAnnotationDirFmt,
         NOG, OG, KEGG, Contig
 )
-from q2_types.per_sample_sequences import ContigSequencesDirFmt, SingleBowtie2Index
+from q2_types.per_sample_sequences import (
+    ContigSequencesDirFmt, SingleBowtie2Index
+)
 
 
 class TestTypes(TestPluginBase):
