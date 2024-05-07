@@ -13,7 +13,8 @@ from q2_types.feature_data_mag._format import (
         )
 from qiime2.core.type import SemanticType
 
-from ..per_sample_sequences import ContigSequencesDirFmt
+from ..bowtie2 import Bowtie2IndexDirFmt
+from ..per_sample_sequences import ContigSequencesDirFmt, SingleBowtie2Index
 from ..plugin_setup import plugin
 
 
@@ -55,3 +56,8 @@ plugin.register_semantic_types(KEGG)
 plugin.register_artifact_class(
         FeatureData[KEGG],
         directory_format=OrthologAnnotationDirFmt)
+
+plugin.register_semantic_type_to_format(
+    FeatureData[SingleBowtie2Index],
+    artifact_format=Bowtie2IndexDirFmt
+)
