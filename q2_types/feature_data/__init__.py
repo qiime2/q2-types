@@ -27,11 +27,13 @@ from ._format import (
     MixedCaseAlignedDNAFASTAFormat,
     MixedCaseAlignedDNASequencesDirectoryFormat,
     MixedCaseAlignedRNAFASTAFormat,
-    MixedCaseAlignedRNASequencesDirectoryFormat)
+    MixedCaseAlignedRNASequencesDirectoryFormat,
+    SequenceCharacteristicsDirectoryFormat,
+    SequenceCharacteristicsFormat)
 from ._type import (
     FeatureData, Taxonomy, Sequence, PairedEndSequence, AlignedSequence,
     Differential, ProteinSequence, AlignedProteinSequence, RNASequence,
-    AlignedRNASequence, PairedEndRNASequence, BLAST6)
+    AlignedRNASequence, PairedEndRNASequence, BLAST6, SequenceCharacteristics)
 
 # TODO remove these imports when tests are rewritten. Remove from __all__ too
 from ._transformer import (
@@ -67,6 +69,8 @@ __all__ = [
     'MixedCaseAlignedProteinFASTAFormat',
     'MixedCaseProteinSequencesDirectoryFormat',
     'MixedCaseAlignedProteinSequencesDirectoryFormat',
+    'SequenceCharacteristics', 'SequenceCharacteristicsDirectoryFormat',
+    'SequenceCharacteristicsFormat'
     ]
 
 importlib.import_module('q2_types.feature_data._transformer')

@@ -5,7 +5,7 @@
 #
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
-
+import filecmp
 import os.path
 import unittest
 
@@ -25,7 +25,7 @@ from q2_types.feature_data import (
     AlignedProteinFASTAFormat, RNAFASTAFormat, AlignedRNAFASTAFormat,
     RNAIterator, AlignedRNAIterator, BLAST6Format, MixedCaseDNAFASTAFormat,
     MixedCaseRNAFASTAFormat, MixedCaseAlignedDNAFASTAFormat,
-    MixedCaseAlignedRNAFASTAFormat
+    MixedCaseAlignedRNAFASTAFormat, SequenceCharacteristicsFormat
 )
 from q2_types.feature_data._transformer import (
     _taxonomy_formats_to_dataframe, _dataframe_to_tsv_taxonomy_format,
@@ -1505,6 +1505,33 @@ class TestBLAST6Transformer(TestPluginBase):
                                        filename='blast6.tsv')
         exp.index = pd.Index(exp.index.astype(str), name='id')
         assert_frame_equal(obs.to_dataframe(), exp)
+
+
+class TestSequenceCharacteristicsTransformer(TestPluginBase):
+    package = 'q2_types.feature_data.tests'
+
+    def setUp(self):
+        super().setUp()
+        self.exp_file = self.get_data_path(
+            "sequence_characteristics_length.txt")
+        self.exp_df = pd.DataFrame({'length': [876, 54]},
+                                   index=pd.Index([1, 2], name='id'))
+
+    def test_df_to_sequence_characteristics_format(self):
+        transformer = self.get_transformer(pd.DataFrame,
+                                           SequenceCharacteristicsFormat)
+        obs = transformer(self.exp_df)
+
+        self.assertIsInstance(obs, SequenceCharacteristicsFormat)
+        assert filecmp.cmp(self.exp_file, obs.path)
+
+    def test_sequence_characteristics_format_to_df(self):
+        transformer = self.get_transformer(SequenceCharacteristicsFormat,
+                                           pd.DataFrame)
+        format = SequenceCharacteristicsFormat(self.exp_file, mode="r")
+        obs = transformer(format)
+
+        assert_frame_equal(self.exp_df, obs)
 
 
 if __name__ == '__main__':

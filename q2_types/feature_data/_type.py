@@ -5,7 +5,9 @@
 #
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
-
+import pandas as pd
+from qiime2.core.exceptions import ValidationError
+from qiime2.core.type import Properties
 from qiime2.plugin import SemanticType
 
 from ..plugin_setup import plugin
@@ -15,7 +17,8 @@ from . import (TSVTaxonomyDirectoryFormat, DNASequencesDirectoryFormat,
                DifferentialDirectoryFormat, ProteinSequencesDirectoryFormat,
                AlignedProteinSequencesDirectoryFormat,
                RNASequencesDirectoryFormat, AlignedRNASequencesDirectoryFormat,
-               PairedRNASequencesDirectoryFormat, BLAST6DirectoryFormat)
+               PairedRNASequencesDirectoryFormat, BLAST6DirectoryFormat,
+               SequenceCharacteristicsDirectoryFormat)
 from q2_types.sample_data import SampleData
 
 
@@ -52,13 +55,40 @@ BLAST6 = SemanticType('BLAST6',
                       variant_of=[FeatureData.field['type'],
                                   SampleData.field['type']])
 
+SequenceCharacteristics = SemanticType('SequenceCharacteristics',
+                                       variant_of=FeatureData.field['type'])
+
+
+@plugin.register_validator(FeatureData[SequenceCharacteristics %
+                                       Properties("length")])
+def validate_sequence_characteristics_length(data: pd.DataFrame, level):
+    """
+    Semantic validator that validates a numerical column called 'length',
+    which cannot contain empty or negative values, for the
+    FeatureData[SequenceCharacteristics] type with property "length".
+    """
+    if 'length' not in data.columns:
+        raise ValidationError("Column 'length' has to exist in the file.")
+
+    if data['length'].isnull().any():
+        raise ValidationError("Column 'length' cannot contain empty (NaN) "
+                              "values.")
+
+    if not pd.api.types.is_numeric_dtype(data['length']):
+        raise ValidationError("Values in column 'length' have to be "
+                              "numerical.")
+
+    if not (data['length'] > 0).all():
+        raise ValidationError("Column 'length' cannot contain negative "
+                              "values.")
+
+
 plugin.register_semantic_types(FeatureData, Taxonomy, Sequence,
                                PairedEndSequence, AlignedSequence,
                                Differential, ProteinSequence,
                                AlignedProteinSequence, RNASequence,
                                AlignedRNASequence, PairedEndRNASequence,
-                               BLAST6)
-
+                               BLAST6, SequenceCharacteristics)
 
 plugin.register_artifact_class(
     FeatureData[Taxonomy],
@@ -120,3 +150,8 @@ plugin.register_artifact_class(
     directory_format=BLAST6DirectoryFormat,
     description=("BLAST results associated with a set of feature "
                  "identifiers."))
+plugin.register_artifact_class(
+    FeatureData[SequenceCharacteristics],
+    directory_format=SequenceCharacteristicsDirectoryFormat,
+    description=("Characteristics of sequences (e.g., the length of a genes "
+                 "in basepairs)."))

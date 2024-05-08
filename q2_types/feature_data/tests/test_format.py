@@ -29,7 +29,9 @@ from q2_types.feature_data import (
     MixedCaseRNAFASTAFormat, MixedCaseRNASequencesDirectoryFormat,
     MixedCaseAlignedDNAFASTAFormat,
     MixedCaseAlignedDNASequencesDirectoryFormat,
-    MixedCaseAlignedRNAFASTAFormat, MixedCaseAlignedRNASequencesDirectoryFormat
+    MixedCaseAlignedRNAFASTAFormat,
+    MixedCaseAlignedRNASequencesDirectoryFormat,
+    SequenceCharacteristicsDirectoryFormat, SequenceCharacteristicsFormat
 )
 from qiime2.plugin.testing import TestPluginBase
 from qiime2.plugin import ValidationError
@@ -899,6 +901,38 @@ class TestBLAST6Format(TestPluginBase):
         shutil.copy(filepath, os.path.join(temp_dir, 'blast6.tsv'))
         with self.assertRaisesRegex(ValidationError, 'Invalid BLAST6 format.'):
             BLAST6DirectoryFormat(temp_dir, mode='r').validate()
+
+
+class TestSequenceCharacteristicsFormat(TestPluginBase):
+    package = 'q2_types.feature_data.tests'
+
+    def test_sequence_characteristics_directory_format(self):
+        filepath = self.get_data_path('sequence_characteristics_length.txt')
+        temp_dir = self.temp_dir.name
+        shutil.copy(filepath, os.path.join(temp_dir,
+                                           'sequence_characteristics.txt'))
+        format = SequenceCharacteristicsDirectoryFormat(temp_dir, mode='r')
+        format.validate()
+
+    def test_sequence_characteristics_format(self):
+        filepath = self.get_data_path('sequence_characteristics_length.txt')
+        format = SequenceCharacteristicsFormat(filepath, mode='r')
+        format.validate()
+
+    def test_sequence_characteristics_format_empty(self):
+        path = self.get_data_path('empty.txt')
+        format = SequenceCharacteristicsFormat(path, mode='r')
+        with self.assertRaises(ValidationError) as context:
+            format.validate()
+        self.assertEqual(str(context.exception), 'File cannot be empty.')
+
+    def test_sequence_characteristics_format_only_index(self):
+        path = self.get_data_path('sequence_characteristics_only_index.txt')
+        format = SequenceCharacteristicsFormat(path, mode='r')
+        with self.assertRaises(ValidationError) as context:
+            format.validate()
+        self.assertEqual(str(context.exception),
+                         'File needs to have at least two columns.')
 
 
 if __name__ == '__main__':
