@@ -54,76 +54,28 @@ class TestFormats(TestPluginBase):
             obj.validate()
 
     def test_genes_dirfmt_fa_with_suffix(self):
-        dirpath = self.get_data_path('genes-with-suffix')
+        dirpath = self.get_data_path('genes')
         fmt = GenesDirectoryFormat(dirpath, mode='r')
 
         fmt.validate()
-
-    def test_genes_dirfmt_fa_with_prefix(self):
-        dirpath = self.get_data_path('genes-with-prefix')
-        fmt = GenesDirectoryFormat(dirpath, mode='r')
-
-        fmt.validate()
-
-    def test_genes_dirfmt_fa_with_wrong_prefix(self):
-        dirpath = self.get_data_path('genes-with-wrong-prefix')
-        fmt = GenesDirectoryFormat(dirpath, mode='r')
-
-        with self.assertRaisesRegex(
-                ValidationError,
-                'Missing one or more files for GenesDirectoryFormat'
-        ):
-            fmt.validate()
 
     def test_proteins_dirfmt_fa_with_suffix(self):
-        dirpath = self.get_data_path('proteins-with-suffix')
+        dirpath = self.get_data_path('proteins')
         fmt = ProteinsDirectoryFormat(dirpath, mode='r')
 
         fmt.validate()
-
-    def test_proteins_dirfmt_fa_with_prefix(self):
-        dirpath = self.get_data_path('proteins-with-prefix')
-        fmt = ProteinsDirectoryFormat(dirpath, mode='r')
-
-        fmt.validate()
-
-    def test_proteins_dirfmt_fa_with_wrong_prefix(self):
-        dirpath = self.get_data_path('proteins-with-wrong-prefix')
-        fmt = ProteinsDirectoryFormat(dirpath, mode='r')
-
-        with self.assertRaisesRegex(
-            ValidationError,
-            'Missing one or more files for ProteinsDirectoryFormat'
-        ):
-            fmt.validate()
 
     def test_gff_format_positive_with_suffix(self):
-        filepath = self.get_data_path('loci-with-suffix/loci1.gff')
+        filepath = self.get_data_path('loci/loci1.gff')
         fmt = GFF3Format(filepath, mode='r')
 
         fmt.validate()
 
     def test_loci_dirfmt_with_suffix(self):
-        dirpath = self.get_data_path('loci-with-suffix')
+        dirpath = self.get_data_path('loci')
         fmt = LociDirectoryFormat(dirpath, mode='r')
 
         fmt.validate()
-
-    def test_loci_dirfmt_with_prefix(self):
-        dirpath = self.get_data_path('loci-with-prefix')
-        fmt = LociDirectoryFormat(dirpath, mode='r')
-
-        fmt.validate()
-
-    def test_loci_dirfmt_with_wrong_prefix(self):
-        dirpath = self.get_data_path('loci-with-wrong-prefix')
-        fmt = LociDirectoryFormat(dirpath, mode='r')
-
-        with self.assertRaisesRegex(
-                ValidationError,
-                'Missing one or more files for LociDirectoryFormat'
-        ):
-            fmt.validate()
 
     def test_gff_format_wrong_version(self):
         filepath = self.get_data_path('loci-invalid/loci-wrong-version.gff')

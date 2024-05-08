@@ -262,7 +262,7 @@ def _fastaformats_to_metadata(ff, constructor=skbio.DNA, lowercase=False):
 
 def _series_to_fasta_format(ff, data, sequence_type="DNA", lowercase=False):
     with ff.open() as f:
-        for id_, seq in data.iteritems():
+        for id_, seq in data.items():
             if sequence_type == "protein":
                 sequence = skbio.Protein(seq, metadata={'id': id_},
                                          lowercase=lowercase)
