@@ -45,6 +45,9 @@ class TestMultiplexedBarcodeInSequenceTypes(TestPluginBase):
             MultiplexedPairedEndBarcodeInSequenceDirFmt,
         )
 
+# Tests below added to match tests in place in q2-types for types migrated
+# from q2-demux
+
     def test_raw_sequences_semantic_type_registration(self):
         self.assertRegisteredSemanticType(RawSequences)
 
