@@ -8,6 +8,7 @@
 
 import unittest
 
+from q2_types.bowtie2 import Bowtie2IndexDirFmt
 from q2_types.feature_data import FeatureData
 from qiime2.plugin.testing import TestPluginBase
 
@@ -15,7 +16,9 @@ from q2_types.feature_data_mag import (
         MAG, MAGSequencesDirFmt, OrthologAnnotationDirFmt,
         NOG, OG, KEGG, Contig
 )
-from q2_types.per_sample_sequences import ContigSequencesDirFmt
+from q2_types.per_sample_sequences import (
+    ContigSequencesDirFmt, SingleBowtie2Index
+)
 
 
 class TestTypes(TestPluginBase):
@@ -62,6 +65,12 @@ class TestTypes(TestPluginBase):
         self.assertSemanticTypeRegisteredToFormat(
                 FeatureData[KEGG],
                 OrthologAnnotationDirFmt)
+
+    def test_bowtie_index_semantic_type_to_format_registration(self):
+        self.assertSemanticTypeRegisteredToFormat(
+            FeatureData[SingleBowtie2Index],
+            Bowtie2IndexDirFmt
+        )
 
 
 if __name__ == '__main__':

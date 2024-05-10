@@ -42,7 +42,7 @@ def _8(ortholog_file: OrthologFileFmt) -> pd.DataFrame:
 def _series_to_fasta(series, ff, seq_type='DNA'):
     fp = os.path.join(ff.path, f'{series.name}.fasta')
     with open(fp, 'w') as fh:
-        for id_, seq in series.iteritems():
+        for id_, seq in series.items():
             if seq:
                 sequence = CONSTRUCTORS[seq_type](seq, metadata={'id': id_})
                 skbio.io.write(sequence, format='fasta', into=fh)

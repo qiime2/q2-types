@@ -9,7 +9,7 @@
 import unittest
 
 from q2_types.bowtie2 import Bowtie2IndexDirFmt
-from q2_types.feature_data import BLAST6
+from q2_types.feature_data import BLAST6, FeatureData
 from q2_types.sample_data import SampleData
 from q2_types.per_sample_sequences import (
     Sequences, SequencesWithQuality, PairedEndSequencesWithQuality,
@@ -87,9 +87,15 @@ class TestTypes(TestPluginBase):
     def test_singlebowtie_semantic_type_registration(self):
         self.assertRegisteredSemanticType(SingleBowtie2Index)
 
-    def test_singlebowtie_semantic_type_to_format_registration(self):
+    def test_singlebowtie_sd_semantic_type_to_format_registration(self):
         self.assertSemanticTypeRegisteredToFormat(
             SampleData[SingleBowtie2Index],
+            Bowtie2IndexDirFmt
+        )
+
+    def test_singlebowtie_fd_semantic_type_to_format_registration(self):
+        self.assertSemanticTypeRegisteredToFormat(
+            FeatureData[SingleBowtie2Index],
             Bowtie2IndexDirFmt
         )
 
@@ -105,9 +111,15 @@ class TestTypes(TestPluginBase):
     def test_aln_map_semantic_type_registration(self):
         self.assertRegisteredSemanticType(AlignmentMap)
 
-    def test_aln_map_semantic_type_to_format_registration(self):
+    def test_aln_map_sd_semantic_type_to_format_registration(self):
         self.assertSemanticTypeRegisteredToFormat(
             SampleData[AlignmentMap],
+            BAMDirFmt
+        )
+
+    def test_aln_map_fd_semantic_type_to_format_registration(self):
+        self.assertSemanticTypeRegisteredToFormat(
+            FeatureData[AlignmentMap],
             BAMDirFmt
         )
 
