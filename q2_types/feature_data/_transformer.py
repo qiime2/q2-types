@@ -810,3 +810,10 @@ def _229(data: pd.DataFrame) -> SequenceCharacteristicsFormat:
     ff = SequenceCharacteristicsFormat()
     data.to_csv(str(ff), sep='\t')
     return ff
+
+
+@plugin.register_transformer
+def _230(ff: SequenceCharacteristicsFormat) -> qiime2.Metadata:
+    df = pd.read_csv(str(ff), sep="\t", index_col=0)
+    df.index = pd.Index(df.index.astype(str), name='id')
+    return qiime2.Metadata(df)

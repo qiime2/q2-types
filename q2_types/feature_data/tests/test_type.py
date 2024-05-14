@@ -26,7 +26,7 @@ from q2_types.feature_data import (
 from qiime2.plugin.testing import TestPluginBase
 
 from q2_types.feature_data._type import \
-    validate_sequence_characteristics_length
+    validate_seq_char_len
 
 
 class TestTypes(TestPluginBase):
@@ -135,7 +135,7 @@ class TestTypes(TestPluginBase):
 
     def test_validate_sequence_characteristics_length(self):
         data = self._setup_df()
-        validate_sequence_characteristics_length(data, None)
+        validate_seq_char_len(data, None)
 
     def test_validate_sequence_characteristics_length_no_length_column(self):
         data = self._setup_df()
@@ -167,7 +167,7 @@ class TestTypes(TestPluginBase):
 
     def _assert_validation_error(self, data, error_message):
         with self.assertRaises(ValidationError) as context:
-            validate_sequence_characteristics_length(data, None)
+            validate_seq_char_len(data, None)
         self.assertEqual(str(context.exception), error_message)
 
 

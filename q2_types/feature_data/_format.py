@@ -479,8 +479,7 @@ class SequenceCharacteristicsFormat(model.TextFileFormat):
     The file cannot be empty and must have at least two columns.
 
     Validation for additional columns can be added with a semantic validator
-    tied to a property. For example the
-    "validate_sequence_characteristics_length" validator for
+    tied to a property. For example the "validate_seq_char_len" validator for
     "FeatureData[SequenceCharacteristics % Properties("length")]"
     adds validation for a numerical column called "length".
     """

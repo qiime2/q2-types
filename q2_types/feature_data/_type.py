@@ -61,7 +61,7 @@ SequenceCharacteristics = SemanticType('SequenceCharacteristics',
 
 @plugin.register_validator(FeatureData[SequenceCharacteristics %
                                        Properties("length")])
-def validate_sequence_characteristics_length(data: pd.DataFrame, level):
+def validate_seq_char_len(data: pd.DataFrame, level):
     """
     Semantic validator that validates a numerical column called 'length',
     which cannot contain empty or negative values, for the

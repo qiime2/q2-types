@@ -1533,6 +1533,17 @@ class TestSequenceCharacteristicsTransformer(TestPluginBase):
 
         assert_frame_equal(self.exp_df, obs)
 
+    def test_sequence_characteristics_format_to_metadata(self):
+        transformer = self.get_transformer(SequenceCharacteristicsFormat,
+                                           qiime2.Metadata)
+        format = SequenceCharacteristicsFormat(self.exp_file, mode="r")
+        obs = transformer(format)
+
+        self.exp_df.index = pd.Index(self.exp_df.index.astype(str))
+        self.exp_df['length'] = self.exp_df['length'].astype('float64')
+
+        assert_frame_equal(obs.to_dataframe(), self.exp_df)
+
 
 if __name__ == '__main__':
     unittest.main()
