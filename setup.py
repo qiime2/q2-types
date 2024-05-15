@@ -36,6 +36,7 @@ setup(
         'q2_types.ordination.tests': ['data/*'],
         'q2_types.per_sample_sequences.tests':
             ['data/*',
+             'data/**',
              'data/paired_end_data/*',
              'data/paired_end_data_numeric/*',
              'data/single_end_data/*',
