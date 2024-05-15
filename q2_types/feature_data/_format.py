@@ -496,7 +496,7 @@ class SequenceCharacteristicsFormat(model.TextFileFormat):
 
 SequenceCharacteristicsDirectoryFormat = model.SingleFileDirectoryFormat(
     "SequenceCharacteristicsDirectoryFormat",
-    "sequence_characteristics.txt", SequenceCharacteristicsFormat
+    "sequence_characteristics.tsv", SequenceCharacteristicsFormat
 )
 
 plugin.register_formats(
