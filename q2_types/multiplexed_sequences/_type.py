@@ -9,17 +9,28 @@
 from qiime2.plugin import SemanticType
 
 from ..plugin_setup import plugin
-from . import (MultiplexedSingleEndBarcodeInSequenceDirFmt,
-               MultiplexedPairedEndBarcodeInSequenceDirFmt)
+from . import (
+    MultiplexedSingleEndBarcodeInSequenceDirFmt,
+    MultiplexedPairedEndBarcodeInSequenceDirFmt,
+    EMPSingleEndDirFmt,
+    EMPPairedEndDirFmt,
+    ErrorCorrectionDetailsDirFmt
+)
 
 
 MultiplexedSingleEndBarcodeInSequence = \
     SemanticType('MultiplexedSingleEndBarcodeInSequence')
 MultiplexedPairedEndBarcodeInSequence = \
     SemanticType('MultiplexedPairedEndBarcodeInSequence')
-
+RawSequences = SemanticType('RawSequences')
+EMPSingleEndSequences = SemanticType('EMPSingleEndSequences')
+EMPPairedEndSequences = SemanticType('EMPPairedEndSequences')
+ErrorCorrectionDetails = SemanticType('ErrorCorrectionDetails')
 plugin.register_semantic_types(MultiplexedSingleEndBarcodeInSequence,
-                               MultiplexedPairedEndBarcodeInSequence)
+                               MultiplexedPairedEndBarcodeInSequence,
+                               RawSequences, EMPSingleEndSequences,
+                               EMPPairedEndSequences,
+                               ErrorCorrectionDetails)
 
 plugin.register_artifact_class(
     MultiplexedSingleEndBarcodeInSequence,
@@ -36,4 +47,24 @@ plugin.register_artifact_class(
                  "difference samples), which are paired-end reads, and which "
                  "contain the barcode (i.e., index) indicating the source "
                  "sample as part of the sequence read.")
+)
+# TODO: remove when aliasing exists
+plugin.register_semantic_type_to_format(
+    RawSequences,
+    artifact_format=EMPSingleEndDirFmt
+)
+
+plugin.register_semantic_type_to_format(
+    EMPSingleEndSequences,
+    artifact_format=EMPSingleEndDirFmt
+)
+
+plugin.register_semantic_type_to_format(
+    EMPPairedEndSequences,
+    artifact_format=EMPPairedEndDirFmt
+)
+
+plugin.register_semantic_type_to_format(
+    ErrorCorrectionDetails,
+    artifact_format=ErrorCorrectionDetailsDirFmt
 )

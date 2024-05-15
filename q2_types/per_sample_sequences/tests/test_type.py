@@ -45,8 +45,7 @@ class TestTypes(TestPluginBase):
     def test_sequences_semantic_type_to_format_registration(self):
         self.assertSemanticTypeRegisteredToFormat(
             SampleData[Sequences],
-            QIIME1DemuxDirFmt
-        )
+            QIIME1DemuxDirFmt)
 
     def test_sequences_with_quality_semantic_type_to_format_registration(self):
         self.assertSemanticTypeRegisteredToFormat(

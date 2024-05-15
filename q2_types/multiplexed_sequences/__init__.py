@@ -10,16 +10,33 @@ import importlib
 
 from ._format import (MultiplexedSingleEndBarcodeInSequenceDirFmt,
                       MultiplexedPairedEndBarcodeInSequenceDirFmt,
-                      MultiplexedFastaQualDirFmt)
+                      MultiplexedFastaQualDirFmt,
+                      EMPMultiplexedDirFmt,
+                      ErrorCorrectionDetailsFmt,
+                      ErrorCorrectionDetailsDirFmt,
+                      EMPSingleEndDirFmt,
+                      EMPSingleEndCasavaDirFmt,
+                      EMPPairedEndDirFmt,
+                      EMPPairedEndCasavaDirFmt)
 from ._type import (MultiplexedSingleEndBarcodeInSequence,
-                    MultiplexedPairedEndBarcodeInSequence)
+                    MultiplexedPairedEndBarcodeInSequence,
+                    RawSequences,
+                    EMPSingleEndSequences,
+                    EMPPairedEndSequences,
+                    ErrorCorrectionDetails)
 
 __all__ = [
     'MultiplexedSingleEndBarcodeInSequence',
     'MultiplexedPairedEndBarcodeInSequence',
     'MultiplexedSingleEndBarcodeInSequenceDirFmt',
     'MultiplexedPairedEndBarcodeInSequenceDirFmt',
-    'MultiplexedFastaQualDirFmt'
+    'MultiplexedFastaQualDirFmt',
+    'RawSequences', 'EMPSingleEndSequences', 'EMPPairedEndSequences',
+    'EMPMultiplexedDirFmt',
+    'ErrorCorrectionDetails', 'ErrorCorrectionDetailsFmt',
+    'ErrorCorrectionDetailsDirFmt', 'EMPSingleEndDirFmt',
+    'EMPSingleEndCasavaDirFmt', 'EMPPairedEndDirFmt',
+    'EMPPairedEndCasavaDirFmt'
 ]
 
 importlib.import_module('q2_types.multiplexed_sequences._transformer')
