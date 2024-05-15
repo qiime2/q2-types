@@ -55,7 +55,10 @@ setup(
              'data/mags/*/*', 'data/mags/*/*/*',
              'data/manifests/*', 'data/contigs/*',
              'data/diamond_hit/*',
-             'data/bowtie/*/*', 'data/bowtie/*/*/*/*', 'data/bowtie/*/*/*'],
+             'data/bowtie/*/*',
+             'data/bowtie/*/*/*/*',
+             'data/bowtie/*/*/*',
+             'data/error_correction_details/*'],
         'q2_types.sample_data.tests': ['data/*'],
         'q2_types.tree.tests': ['data/*'],
         'q2_types.feature_data_mag.tests':
