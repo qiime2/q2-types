@@ -10,12 +10,13 @@ import os
 import shutil
 import unittest
 
+from qiime2.plugin.testing import TestPluginBase
+
 from q2_types.multiplexed_sequences import (
     MultiplexedSingleEndBarcodeInSequenceDirFmt,
     MultiplexedPairedEndBarcodeInSequenceDirFmt,
     MultiplexedFastaQualDirFmt
 )
-from qiime2.plugin.testing import TestPluginBase
 
 
 class TestMultiplexedSingleEndBarcodeInSequenceDirFmt(TestPluginBase):
@@ -67,6 +68,31 @@ class TestMultiplexedFastaQualDirFmt(TestPluginBase):
 
         # Should not error.
         format.validate()
+
+
+# TODO: write the following tests
+class TestEMPMultiplexedDirFmt(TestPluginBase):
+    pass
+
+
+class TestEMPSingleEndDirFmt(TestPluginBase):
+    pass
+
+
+class TestEMPSingleEndCasavaDirFmt(TestPluginBase):
+    pass
+
+
+class TestEMPPairedEndDirFmt(TestPluginBase):
+    pass
+
+
+class TestEMPPairedEndCasavaDirFmt(TestPluginBase):
+    pass
+
+
+class TestErrorCorrectionDetailsDirFmt(TestPluginBase):
+    pass
 
 
 if __name__ == '__main__':

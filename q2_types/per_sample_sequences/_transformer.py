@@ -11,7 +11,6 @@ import shutil
 import functools
 import re
 import warnings
-
 import skbio
 import yaml
 import pandas as pd
@@ -91,47 +90,47 @@ _dirfmt_to_casava_partial = functools.partial(
 
 
 @plugin.register_transformer
-def _3(dirfmt: CasavaOneEightSingleLanePerSampleDirFmt) \
+def _1(dirfmt: CasavaOneEightSingleLanePerSampleDirFmt) \
         -> SingleLanePerSampleSingleEndFastqDirFmt:
     return _single_lane_per_sample_fastq_helper_partial(
         dirfmt, SingleLanePerSampleSingleEndFastqDirFmt)
 
 
 @plugin.register_transformer
-def _3_and_a_half(dirfmt_in: SingleLanePerSampleSingleEndFastqDirFmt) \
+def _2(dirfmt_in: SingleLanePerSampleSingleEndFastqDirFmt) \
         -> CasavaOneEightSingleLanePerSampleDirFmt:
     return _dirfmt_to_casava_partial(dirfmt_in)
 
 
 @plugin.register_transformer
-def _4(dirfmt: CasavaOneEightSingleLanePerSampleDirFmt) \
+def _3(dirfmt: CasavaOneEightSingleLanePerSampleDirFmt) \
         -> SingleLanePerSamplePairedEndFastqDirFmt:
     return _single_lane_per_sample_fastq_helper_partial(
         dirfmt, SingleLanePerSamplePairedEndFastqDirFmt)
 
 
 @plugin.register_transformer
-def _4_and_a_half(dirfmt_in: SingleLanePerSamplePairedEndFastqDirFmt) \
+def _4(dirfmt_in: SingleLanePerSamplePairedEndFastqDirFmt) \
         -> CasavaOneEightSingleLanePerSampleDirFmt:
     return _dirfmt_to_casava_partial(dirfmt_in)
 
 
 @plugin.register_transformer
-def _10(dirfmt: CasavaOneEightLanelessPerSampleDirFmt) \
+def _5(dirfmt: CasavaOneEightLanelessPerSampleDirFmt) \
         -> SingleLanePerSampleSingleEndFastqDirFmt:
     return _single_lane_per_sample_fastq_helper_partial(
         dirfmt, SingleLanePerSampleSingleEndFastqDirFmt, parse_lane=False)
 
 
 @plugin.register_transformer
-def _11(dirfmt: CasavaOneEightLanelessPerSampleDirFmt) \
+def _6(dirfmt: CasavaOneEightLanelessPerSampleDirFmt) \
         -> SingleLanePerSamplePairedEndFastqDirFmt:
     return _single_lane_per_sample_fastq_helper_partial(
         dirfmt, SingleLanePerSamplePairedEndFastqDirFmt, parse_lane=False)
 
 
 @plugin.register_transformer
-def _5(dirfmt: SingleLanePerSamplePairedEndFastqDirFmt) \
+def _7(dirfmt: SingleLanePerSamplePairedEndFastqDirFmt) \
         -> SingleLanePerSampleSingleEndFastqDirFmt:
     with dirfmt.manifest.view(FastqManifestFormat).open() as fh:
         input_manifest = _parse_and_validate_manifest_partial(
@@ -156,14 +155,14 @@ def _5(dirfmt: SingleLanePerSamplePairedEndFastqDirFmt) \
 
 
 @plugin.register_transformer
-def _6(fmt: SingleEndFastqManifestPhred33) \
+def _8(fmt: SingleEndFastqManifestPhred33) \
         -> SingleLanePerSampleSingleEndFastqDirFmt:
     return _fastq_manifest_helper_partial(fmt, _copy_with_compression,
                                           single_end=True)
 
 
 @plugin.register_transformer
-def _7(fmt: SingleEndFastqManifestPhred64) \
+def _9(fmt: SingleEndFastqManifestPhred64) \
         -> SingleLanePerSampleSingleEndFastqDirFmt:
     warnings.warn(_phred64_warning)
     return _fastq_manifest_helper_partial(fmt, _write_phred64_to_phred33,
@@ -171,14 +170,14 @@ def _7(fmt: SingleEndFastqManifestPhred64) \
 
 
 @plugin.register_transformer
-def _8(fmt: PairedEndFastqManifestPhred33) \
+def _10(fmt: PairedEndFastqManifestPhred33) \
         -> SingleLanePerSamplePairedEndFastqDirFmt:
     return _fastq_manifest_helper_partial(fmt, _copy_with_compression,
                                           single_end=False)
 
 
 @plugin.register_transformer
-def _9(fmt: PairedEndFastqManifestPhred64) \
+def _11(fmt: PairedEndFastqManifestPhred64) \
         -> SingleLanePerSamplePairedEndFastqDirFmt:
     warnings.warn(_phred64_warning)
     return _fastq_manifest_helper_partial(fmt, _write_phred64_to_phred33,
@@ -216,12 +215,12 @@ def _12(dirfmt: SingleLanePerSampleSingleEndFastqDirFmt) \
 
 
 @plugin.register_transformer
-def _21(ff: FastqManifestFormat) -> pd.DataFrame:
+def _13(ff: FastqManifestFormat) -> pd.DataFrame:
     return _manifest_to_df(ff, ff.path.parent)
 
 
 @plugin.register_transformer
-def _23(fmt: SingleEndFastqManifestPhred33V2) \
+def _14(fmt: SingleEndFastqManifestPhred33V2) \
         -> SingleLanePerSampleSingleEndFastqDirFmt:
     old_fmt = _manifest_v2_to_v1(fmt, FastqManifestFormat)
     return _fastq_manifest_helper_partial(old_fmt, _copy_with_compression,
@@ -229,7 +228,7 @@ def _23(fmt: SingleEndFastqManifestPhred33V2) \
 
 
 @plugin.register_transformer
-def _24(fmt: SingleEndFastqManifestPhred64V2) \
+def _15(fmt: SingleEndFastqManifestPhred64V2) \
         -> SingleLanePerSampleSingleEndFastqDirFmt:
     warnings.warn(_phred64_warning)
     old_fmt = _manifest_v2_to_v1(fmt, FastqManifestFormat)
@@ -238,7 +237,7 @@ def _24(fmt: SingleEndFastqManifestPhred64V2) \
 
 
 @plugin.register_transformer
-def _25(fmt: PairedEndFastqManifestPhred33V2) \
+def _16(fmt: PairedEndFastqManifestPhred33V2) \
         -> SingleLanePerSamplePairedEndFastqDirFmt:
     old_fmt = _manifest_v2_to_v1(fmt, FastqManifestFormat)
     return _fastq_manifest_helper_partial(old_fmt, _copy_with_compression,
@@ -246,7 +245,7 @@ def _25(fmt: PairedEndFastqManifestPhred33V2) \
 
 
 @plugin.register_transformer
-def _26(fmt: PairedEndFastqManifestPhred64V2) \
+def _17(fmt: PairedEndFastqManifestPhred64V2) \
         -> SingleLanePerSamplePairedEndFastqDirFmt:
     warnings.warn(_phred64_warning)
     old_fmt = _manifest_v2_to_v1(fmt, FastqManifestFormat)
@@ -255,7 +254,7 @@ def _26(fmt: PairedEndFastqManifestPhred64V2) \
 
 
 @plugin.register_transformer
-def _27(dirfmt: SampleIdIndexedSingleEndPerSampleDirFmt) \
+def _18(dirfmt: SampleIdIndexedSingleEndPerSampleDirFmt) \
         -> SingleLanePerSampleSingleEndFastqDirFmt:
     return _single_lane_per_sample_fastq_helper_partial(
         dirfmt, SingleLanePerSampleSingleEndFastqDirFmt,
@@ -263,7 +262,7 @@ def _27(dirfmt: SampleIdIndexedSingleEndPerSampleDirFmt) \
 
 
 @plugin.register_transformer
-def _28(dirfmt: MultiFASTADirectoryFormat) \
+def _19(dirfmt: MultiFASTADirectoryFormat) \
         -> MultiMAGSequencesDirFmt:
     return _mag_manifest_helper(
         dirfmt, MultiMAGSequencesDirFmt,
@@ -271,7 +270,7 @@ def _28(dirfmt: MultiFASTADirectoryFormat) \
 
 
 @plugin.register_transformer
-def _29(ff: MultiMAGManifestFormat) -> pd.DataFrame:
+def _20(ff: MultiMAGManifestFormat) -> pd.DataFrame:
     df = pd.read_csv(str(ff), header=0, comment='#')
     df.filename = df.filename.apply(
         lambda f: os.path.join(ff.path.parent, f))
@@ -280,7 +279,7 @@ def _29(ff: MultiMAGManifestFormat) -> pd.DataFrame:
 
 
 @plugin.register_transformer
-def _30(dirfmt: MultiMAGSequencesDirFmt) \
+def _21(dirfmt: MultiMAGSequencesDirFmt) \
         -> MultiFASTADirectoryFormat:
     result = MultiFASTADirectoryFormat()
     for sample_id, mag in dirfmt.sample_dict().items():

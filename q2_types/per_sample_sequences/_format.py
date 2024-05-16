@@ -8,7 +8,6 @@
 
 import os
 import re
-import gzip
 import itertools
 import collections
 import pathlib
@@ -18,18 +17,16 @@ import pandas as pd
 import skbio
 import skbio.io
 import yaml
+
 import qiime2
 import qiime2.plugin.model as model
 from qiime2.plugin import ValidationError
 
 from q2_types.bowtie2 import Bowtie2IndexDirFmt
 from q2_types.feature_data import DNAFASTAFormat
-
 from ..plugin_setup import plugin
-from ._util import (
-    _parse_sequence_filename,
-    _manifest_to_df,
-)
+from ._util import _parse_sequence_filename, _manifest_to_df
+from .._util import FastqGzFormat
 
 
 class FastqAbsolutePathManifestFormatV2(model.TextFileFormat):
@@ -231,62 +228,6 @@ class YamlFormat(model.TextFileFormat):
             except yaml.YAMLError:
                 return False
         return True
-
-
-class FastqGzFormat(model.BinaryFileFormat):
-    """
-    A gzipped fastq file.
-
-    """
-
-    def _check_n_records(self, n=None):
-        with gzip.open(str(self), mode='rt', encoding='ascii') as fh:
-            zipper = itertools.zip_longest(*[fh] * 4)
-            if n is None:
-                file_ = enumerate(zipper)
-            else:
-                file_ = zip(range(1, n), zipper)
-            for i, record in file_:
-                header, seq, sep, qual = record
-
-                if not header.startswith('@'):
-                    raise ValidationError('Header on line %d is not FASTQ, '
-                                          'records may be misaligned' %
-                                          (i * 4 + 1))
-
-                if seq is None or seq == '\n':
-                    raise ValidationError('Missing sequence for record '
-                                          'beginning on line %d'
-                                          % (i * 4 + 1))
-                elif not seq.isupper():
-                    raise ValidationError('Lowercase case sequence on line %d'
-                                          % (i * 4 + 2))
-
-                if sep is None:
-                    raise ValidationError('Missing separator for record '
-                                          'beginning on line %d'
-                                          % (i * 4 + 1))
-                elif not sep.startswith('+'):
-                    raise ValidationError('Invalid separator on line %d'
-                                          % (i * 4 + 3))
-
-                if qual is None:
-                    raise ValidationError('Missing quality for record '
-                                          'beginning on line %d'
-                                          % (i * 4 + 1))
-                elif len(qual) != len(seq):
-                    raise ValidationError('Quality score length doesn\'t '
-                                          'match sequence length for record '
-                                          'beginning on line %d'
-                                          % (i * 4 + 1))
-
-    def _validate_(self, level):
-        with self.open() as fh:
-            if fh.peek(2)[:2] != b'\x1f\x8b':
-                raise ValidationError('File is uncompressed')
-
-        record_count_map = {'min': 5, 'max': None}
-        self._check_n_records(record_count_map[level])
 
 
 class CasavaOneEightSingleLanePerSampleDirFmt(model.DirectoryFormat):

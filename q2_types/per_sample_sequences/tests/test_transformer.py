@@ -6,17 +6,21 @@
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
 
+
 import functools
 import unittest
 import os
-import shutil
 import io
+import shutil
 import string
 
 import skbio
 import yaml
 import pandas as pd
 from pandas._testing import assert_frame_equal
+
+from qiime2.plugin import ValidationError
+from qiime2.plugin.testing import TestPluginBase
 
 from q2_types.per_sample_sequences import (
     SingleLanePerSampleSingleEndFastqDirFmt,
@@ -25,26 +29,27 @@ from q2_types.per_sample_sequences import (
     CasavaOneEightLanelessPerSampleDirFmt,
     SingleEndFastqManifestPhred33,
     SingleEndFastqManifestPhred64,
-    PairedEndFastqManifestPhred33,
-    PairedEndFastqManifestPhred64,
-    FastqAbsolutePathManifestFormat,
-    FastqManifestFormat,
     SingleEndFastqManifestPhred33V2,
     SingleEndFastqManifestPhred64V2,
+    PairedEndFastqManifestPhred33,
+    PairedEndFastqManifestPhred64,
     PairedEndFastqManifestPhred33V2,
     PairedEndFastqManifestPhred64V2,
+    FastqAbsolutePathManifestFormat,
+    FastqManifestFormat,
     QIIME1DemuxDirFmt,
     FastqGzFormat,
     SampleIdIndexedSingleEndPerSampleDirFmt,
-    MultiFASTADirectoryFormat, MultiMAGManifestFormat, MultiMAGSequencesDirFmt)
+    MultiFASTADirectoryFormat,
+    MultiMAGManifestFormat,
+    MultiMAGSequencesDirFmt
+)
 from q2_types.per_sample_sequences._util import (
     _validate_header,
     _validate_single_end_fastq_manifest_directions,
     _validate_paired_end_fastq_manifest_directions,
     _parse_and_validate_manifest
 )
-from qiime2.plugin import ValidationError
-from qiime2.plugin.testing import TestPluginBase
 
 
 _parse_and_validate_manifest_partial = functools.partial(
