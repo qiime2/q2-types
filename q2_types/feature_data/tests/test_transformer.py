@@ -1513,7 +1513,7 @@ class TestSequenceCharacteristicsTransformer(TestPluginBase):
     def setUp(self):
         super().setUp()
         self.exp_file = self.get_data_path(
-            "sequence_characteristics_length.txt")
+            "sequence_characteristics_length.tsv")
         self.exp_df = pd.DataFrame({'length': [876, 54]},
                                    index=pd.Index([1, 2], name='id'))
 

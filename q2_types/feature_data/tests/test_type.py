@@ -162,7 +162,7 @@ class TestTypes(TestPluginBase):
                                             "negative values.")
 
     def _setup_df(self):
-        data_path = self.get_data_path("sequence_characteristics_length.txt")
+        data_path = self.get_data_path("sequence_characteristics_length.tsv")
         return pd.read_csv(data_path, sep="\t", index_col=0)
 
     def _assert_validation_error(self, data, error_message):

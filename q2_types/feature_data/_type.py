@@ -153,5 +153,5 @@ plugin.register_artifact_class(
 plugin.register_artifact_class(
     FeatureData[SequenceCharacteristics],
     directory_format=SequenceCharacteristicsDirectoryFormat,
-    description=("Characteristics of sequences (e.g., the length of a genes "
+    description=("Characteristics of sequences (e.g., the length of a gene "
                  "in basepairs)."))

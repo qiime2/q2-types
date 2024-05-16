@@ -907,27 +907,27 @@ class TestSequenceCharacteristicsFormat(TestPluginBase):
     package = 'q2_types.feature_data.tests'
 
     def test_sequence_characteristics_directory_format(self):
-        filepath = self.get_data_path('sequence_characteristics_length.txt')
+        filepath = self.get_data_path('sequence_characteristics_length.tsv')
         temp_dir = self.temp_dir.name
         shutil.copy(filepath, os.path.join(temp_dir,
-                                           'sequence_characteristics.txt'))
+                                           'sequence_characteristics.tsv'))
         format = SequenceCharacteristicsDirectoryFormat(temp_dir, mode='r')
         format.validate()
 
     def test_sequence_characteristics_format(self):
-        filepath = self.get_data_path('sequence_characteristics_length.txt')
+        filepath = self.get_data_path('sequence_characteristics_length.tsv')
         format = SequenceCharacteristicsFormat(filepath, mode='r')
         format.validate()
 
     def test_sequence_characteristics_format_empty(self):
-        path = self.get_data_path('empty.txt')
+        path = self.get_data_path('empty.tsv')
         format = SequenceCharacteristicsFormat(path, mode='r')
         with self.assertRaises(ValidationError) as context:
             format.validate()
         self.assertEqual(str(context.exception), 'File cannot be empty.')
 
     def test_sequence_characteristics_format_only_index(self):
-        path = self.get_data_path('sequence_characteristics_only_index.txt')
+        path = self.get_data_path('sequence_characteristics_only_index.tsv')
         format = SequenceCharacteristicsFormat(path, mode='r')
         with self.assertRaises(ValidationError) as context:
             format.validate()
