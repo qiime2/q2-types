@@ -29,7 +29,8 @@ from . import (TaxonomyFormat, HeaderlessTSVTaxonomyFormat, TSVTaxonomyFormat,
                AlignedProteinFASTAFormat, RNAFASTAFormat,
                AlignedRNAFASTAFormat, PairedRNASequencesDirectoryFormat,
                BLAST6Format, MixedCaseDNAFASTAFormat, MixedCaseRNAFASTAFormat,
-               MixedCaseAlignedDNAFASTAFormat, MixedCaseAlignedRNAFASTAFormat)
+               MixedCaseAlignedDNAFASTAFormat, MixedCaseAlignedRNAFASTAFormat,
+               SequenceCharacteristicsFormat)
 
 
 # Taxonomy format transformers
@@ -1004,3 +1005,22 @@ def _90(ff: BLAST6Format) -> qiime2.Metadata:
     # default int index but cast to a str and give it a name.
     data.index = pd.Index(data.index.astype(str), name='id')
     return qiime2.Metadata(data)
+
+
+@plugin.register_transformer
+def _228(ff: SequenceCharacteristicsFormat) -> pd.DataFrame:
+    return pd.read_csv(str(ff), sep='\t', index_col=0)
+
+
+@plugin.register_transformer
+def _229(data: pd.DataFrame) -> SequenceCharacteristicsFormat:
+    ff = SequenceCharacteristicsFormat()
+    data.to_csv(str(ff), sep='\t')
+    return ff
+
+
+@plugin.register_transformer
+def _230(ff: SequenceCharacteristicsFormat) -> qiime2.Metadata:
+    df = pd.read_csv(str(ff), sep='\t', index_col=0)
+    df.index = pd.Index(df.index.astype(str), name='id')
+    return qiime2.Metadata(df)
