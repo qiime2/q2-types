@@ -802,7 +802,7 @@ def _227(ff: BLAST6Format) -> qiime2.Metadata:
 
 @plugin.register_transformer
 def _228(ff: SequenceCharacteristicsFormat) -> pd.DataFrame:
-    return pd.read_csv(str(ff), sep="\t", index_col=0)
+    return pd.read_csv(str(ff), sep='\t', index_col=0)
 
 
 @plugin.register_transformer
