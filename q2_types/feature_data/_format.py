@@ -486,7 +486,7 @@ class SequenceCharacteristicsFormat(model.TextFileFormat):
 
     def validate(self, n_records=None):
         try:
-            data = pd.read_csv(str(self), sep="\t", index_col=0)
+            data = pd.read_csv(str(self), sep='\t', index_col=0)
         except pd.errors.EmptyDataError:
             raise ValidationError('File cannot be empty.')
 

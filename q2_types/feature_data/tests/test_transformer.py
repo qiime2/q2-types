@@ -1513,7 +1513,7 @@ class TestSequenceCharacteristicsTransformer(TestPluginBase):
     def setUp(self):
         super().setUp()
         self.exp_file = self.get_data_path(
-            "sequence_characteristics_length.tsv")
+            'sequence_characteristics_length.tsv')
         self.exp_df = pd.DataFrame({'length': [876, 54]},
                                    index=pd.Index([1, 2], name='id'))
 
@@ -1528,7 +1528,7 @@ class TestSequenceCharacteristicsTransformer(TestPluginBase):
     def test_sequence_characteristics_format_to_df(self):
         transformer = self.get_transformer(SequenceCharacteristicsFormat,
                                            pd.DataFrame)
-        format = SequenceCharacteristicsFormat(self.exp_file, mode="r")
+        format = SequenceCharacteristicsFormat(self.exp_file, mode='r')
         obs = transformer(format)
 
         assert_frame_equal(self.exp_df, obs)
@@ -1536,7 +1536,7 @@ class TestSequenceCharacteristicsTransformer(TestPluginBase):
     def test_sequence_characteristics_format_to_metadata(self):
         transformer = self.get_transformer(SequenceCharacteristicsFormat,
                                            qiime2.Metadata)
-        format = SequenceCharacteristicsFormat(self.exp_file, mode="r")
+        format = SequenceCharacteristicsFormat(self.exp_file, mode='r')
         obs = transformer(format)
 
         self.exp_df.index = pd.Index(self.exp_df.index.astype(str))

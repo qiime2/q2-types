@@ -68,19 +68,19 @@ def validate_seq_char_len(data: pd.DataFrame, level):
     FeatureData[SequenceCharacteristics] type with property "length".
     """
     if 'length' not in data.columns:
-        raise ValidationError("Column 'length' has to exist in the file.")
+        raise ValidationError('Column "length" has to exist in the file.')
 
     if data['length'].isnull().any():
-        raise ValidationError("Column 'length' cannot contain empty (NaN) "
-                              "values.")
+        raise ValidationError('Column "length" cannot contain empty (NaN) '
+                              'values.')
 
     if not pd.api.types.is_numeric_dtype(data['length']):
-        raise ValidationError("Values in column 'length' have to be "
-                              "numerical.")
+        raise ValidationError('Values in column "length" have to be '
+                              'numerical.')
 
     if not (data['length'] > 0).all():
-        raise ValidationError("Column 'length' cannot contain negative "
-                              "values.")
+        raise ValidationError('Column "length" cannot contain negative '
+                              'values.')
 
 
 plugin.register_semantic_types(FeatureData, Taxonomy, Sequence,
