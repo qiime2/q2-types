@@ -14,9 +14,11 @@ from qiime2.core.exceptions import ValidationError
 from q2_types.plugin_setup import plugin
 from q2_types.reference_db._type import (
     ReferenceDB, Eggnog, Diamond, NCBITaxonomy,
-    EggnogProteinSequences
+    EggnogProteinSequences, HMMER
 )
-from q2_types.feature_data import MixedCaseProteinFASTAFormat
+from q2_types.feature_data import (
+    MixedCaseProteinFASTAFormat, ProteinFASTAFormat
+)
 
 
 class EggnogRefTextFileFmt(model.TextFileFormat):
@@ -294,3 +296,42 @@ class EggnogProteinSequencesDirFmt(model.DirectoryFormat):
 plugin.register_formats(EggnogProteinSequencesDirFmt)
 plugin.register_semantic_type_to_format(ReferenceDB[EggnogProteinSequences],
                                         EggnogProteinSequencesDirFmt)
+
+
+class HmmerBinaryFileFmt(model.BinaryFileFormat):
+    def _validate_(self, level):
+        pass
+
+
+class HmmerDirFmt(model.DirectoryFormat):
+    """
+    The  <hmmfile>.h3m file contains the profile HMMs
+    and their annotation in a binary format. The <hmmfile>.h3i file is an
+    SSI index for the <hmmfile>.h3m file.  The <hmmfile>.h3f file contains
+    precomputed data structures for the fast heuristic filter
+    (the MSV filter).  The <hmmfile>.h3p file contains precomputed data
+    structures for the rest of each profile.
+
+    - Dont know what the idmap file is for.
+    - Also dont know why there are fasta files but they are needed for
+    eggnog-hmmer-search action in q2-moshpit.
+    """
+    h3m = model.File(r'.*\.hmm\.h3m', format=HmmerBinaryFileFmt)
+    h3i = model.File(r'.*\.hmm\.h3i', format=HmmerBinaryFileFmt)
+    h3f = model.File(r'.*\.hmm\.h3f', format=HmmerBinaryFileFmt)
+    h3p = model.File(r'.*\.hmm\.h3p', format=HmmerBinaryFileFmt)
+    idmap = model.File(r'.*\.hmm\.idmap', format=HmmerBinaryFileFmt)
+    fasta_files = model.FileCollection(
+        r'.*\.(fa|fasta|faa)$',
+        format=ProteinFASTAFormat,
+        optional=False,
+    )
+
+    @fasta_files.set_path_maker
+    def fasta_files_path_maker(self, name):
+        return str(name)
+
+
+plugin.register_formats(HmmerDirFmt)
+plugin.register_semantic_type_to_format(ReferenceDB[HMMER],
+                                        HmmerDirFmt)

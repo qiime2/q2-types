@@ -5,13 +5,16 @@
 #
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
+import tempfile
+import shutil
+import os
 from qiime2.plugin.testing import TestPluginBase
 from q2_types.reference_db._format import (
-        DiamondDatabaseFileFmt, DiamondDatabaseDirFmt, EggnogRefBinFileFmt,
-        EggnogRefDirFmt, NCBITaxonomyNamesFormat, NCBITaxonomyNodesFormat,
-        NCBITaxonomyDirFmt, NCBITaxonomyBinaryFileFmt,
-        EggnogProteinSequencesDirFmt, EggnogRefTextFileFmt
-        )
+    DiamondDatabaseFileFmt, DiamondDatabaseDirFmt, EggnogRefBinFileFmt,
+    EggnogRefDirFmt, NCBITaxonomyNamesFormat, NCBITaxonomyNodesFormat,
+    NCBITaxonomyDirFmt, NCBITaxonomyBinaryFileFmt,
+    EggnogProteinSequencesDirFmt, EggnogRefTextFileFmt, HmmerDirFmt
+)
 from qiime2.plugin import ValidationError
 
 
@@ -150,6 +153,35 @@ class TestRefFormats(TestPluginBase):
             r"Invalid line at line 9"
         ):
             fmt_obj.validate()
+
+    def test_HmmerDirFmt(self):
+        fmt = HmmerDirFmt(self.get_data_path("hmmer"), 'r')
+        fmt.validate()
+
+    def test_HmmerDirFmt_missing_hmm(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            shutil.copytree(
+                self.get_data_path("hmmer"), tmp, dirs_exist_ok=True
+            )
+            os.remove(f"{tmp}/bacteria/bacteria.hmm.h3f")
+            fmt = HmmerDirFmt(tmp, 'r')
+            with self.assertRaisesRegex(
+                ValidationError, "Missing one or more files"
+            ):
+                fmt.validate(level="min")
+
+    def test_HmmerDirFmt_missing_fa(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            shutil.copytree(
+                self.get_data_path("hmmer"), tmp, dirs_exist_ok=True
+            )
+            for file in ["a", "b", "b2"]:
+                os.remove(f"{tmp}/bacteria/{file}.fa")
+            fmt = HmmerDirFmt(tmp, 'r')
+            with self.assertRaisesRegex(
+                ValidationError, "Missing one or more files"
+            ):
+                fmt.validate(level="min")
 
 
 class TestNCBIFormats(TestPluginBase):
