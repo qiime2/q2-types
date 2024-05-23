@@ -303,6 +303,36 @@ class HmmerBinaryFileFmt(model.BinaryFileFormat):
         pass
 
 
+class HmmerIdmapFileFmt(model.TextFileFormat):
+    def _validate_(self, level):
+        with open(str(self), 'r') as file:
+            # Set the number of rows to be parsed
+            max_lines = {"min": 100, "max": 10000000}[level]
+            lines = file.readlines()
+            for i, line in enumerate(lines, 1):
+                # Check number of lines parsed so far
+                if i > max_lines:
+                    break
+
+                # Validate line
+                if not re.match(r'^(\d+) ([A-Z0-9]+)$', line):
+                    raise ValidationError(
+                        f"Invalid line {i}.\n"
+                        f"{line} \n"
+                        "Expected index and an alphanumeric code separated "
+                        "by a single space."
+                    )
+
+                # Check index is equal to line number
+                idx, code = line.rstrip("\n").split(sep=" ")
+                if not idx == str(i):
+                    raise ValidationError(
+                        f"Invalid line {i}.\n"
+                        f"{line} \n"
+                        f"Expected index {i} but got {idx} instead.\n"
+                    )
+
+
 class HmmerDirFmt(model.DirectoryFormat):
     """
     The  <hmmfile>.h3m file contains the profile HMMs
@@ -320,7 +350,7 @@ class HmmerDirFmt(model.DirectoryFormat):
     h3i = model.File(r'.*\.hmm\.h3i', format=HmmerBinaryFileFmt)
     h3f = model.File(r'.*\.hmm\.h3f', format=HmmerBinaryFileFmt)
     h3p = model.File(r'.*\.hmm\.h3p', format=HmmerBinaryFileFmt)
-    idmap = model.File(r'.*\.hmm\.idmap', format=HmmerBinaryFileFmt)
+    idmap = model.File(r'.*\.hmm\.idmap', format=HmmerIdmapFileFmt)
     fasta_files = model.FileCollection(
         r'.*\.(fa|fasta|faa)$',
         format=ProteinFASTAFormat,
