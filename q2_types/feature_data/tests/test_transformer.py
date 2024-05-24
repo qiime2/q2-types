@@ -757,6 +757,47 @@ class TestDNAFASTAFormatTransformers(TestPluginBase):
         for observed, expected in zip(obs, exp):
             self.assertEqual(observed, expected)
 
+    def test_biom_table_to_dna_fasta_format(self):
+        table_fn = 'feature-table-with-sequence-metadata.biom'
+        input, obs = self.transform_format(
+            BIOMV210Format, DNAFASTAFormat, table_fn
+        )
+
+        self.assertIsInstance(obs, DNAFASTAFormat)
+
+        table_fp = self.get_data_path(table_fn)
+        table = biom.load_table(table_fp)
+
+        with open(str(obs)) as fh:
+            lines = fh.readlines()
+            fasta_header = lines[0].strip()
+            fasta_sequence = lines[1].strip()
+            num_lines = len(lines)
+
+        ids = table.ids(axis='observation')
+        # two lines (header & sequence) per feature
+        self.assertEqual(len(ids), num_lines / 2)
+
+        first_id = ids[0]
+        first_seq = table.metadata(axis='observation')[0]['Sequence']
+        self.assertEqual(fasta_header, f'>{first_id}')
+        self.assertEqual(fasta_sequence, first_seq)
+
+    def test_biom_table_to_dna_fasta_format_no_md(self):
+        table_fp = os.path.join('taxonomy', 'feature-table_v210.biom')
+        with self.assertRaisesRegex(TypeError, 'observation metadata'):
+            self.transform_format(BIOMV210Format, DNAFASTAFormat, table_fp)
+
+    def test_biom_table_to_dna_fasta_format_no_md_sequence_key(self):
+        table_fp = os.path.join(
+            'taxonomy', 'feature-table-with-taxonomy-metadata_v210.biom'
+        )
+
+        with self.assertRaisesRegex(
+            ValueError, 'Observation .* does not have a sequence key.*'
+        ):
+            self.transform_format(BIOMV210Format, DNAFASTAFormat, table_fp)
+
 
 class TestRNAFASTAFormatTransformers(TestPluginBase):
     package = 'q2_types.feature_data.tests'
