@@ -28,6 +28,9 @@ from ._format import (CasavaOneEightSingleLanePerSampleDirFmt,
                       ContigSequencesDirFmt, MultiBowtie2IndexDirFmt,
                       BAMFormat, BAMDirFmt, MultiBAMDirFmt,
                       MultiFASTADirectoryFormat)
+
+from ._methods import partition_sample_data_mags, collate_sample_data_mags
+
 from ._type import (Sequences, SequencesWithQuality,
                     PairedEndSequencesWithQuality,
                     JoinedSequencesWithQuality, MAGs, Contigs,
@@ -51,6 +54,8 @@ __all__ = ['CasavaOneEightSingleLanePerSampleDirFmt',
            'ContigSequencesDirFmt', 'Contigs', 'SingleBowtie2Index',
            'MultiBowtie2Index', 'MultiBowtie2IndexDirFmt',
            'BAMFormat', 'BAMDirFmt', 'MultiBAMDirFmt',
-           'MultiFASTADirectoryFormat']
+           'MultiFASTADirectoryFormat', 'partition_sample_data_mags',
+           'collate_sample_data_mags'
+           ]
 
 importlib.import_module('q2_types.per_sample_sequences._transformer')

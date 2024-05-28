@@ -13,13 +13,17 @@ from ._format import (
         OrthologAnnotationDirFmt,
         OrthologFileFmt
         )
+from ._methods import partition_feature_data_mags, collate_feature_data_mags, \
+        collate_ortholog_annotations
 
 from ._type import MAG, NOG, OG, KEGG, Contig
 from ._transformer import MAGIterator
 
 __all__ = [
         'MAG', 'MAGSequencesDirFmt', 'MAGIterator', 'NOG', 'OG', 'KEGG',
-        'OrthologAnnotationDirFmt', 'OrthologFileFmt', 'Contig'
+        'OrthologAnnotationDirFmt', 'OrthologFileFmt', 'Contig',
+        'partition_feature_data_mags', 'collate_feature_data_mags',
+        'collate_ortholog_annotations',
         ]
 
 importlib.import_module('q2_types.feature_data_mag._format')

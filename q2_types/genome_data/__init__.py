@@ -12,6 +12,7 @@ from ._format import (
     GenesDirectoryFormat, ProteinsDirectoryFormat,
     GFF3Format, LociDirectoryFormat, OrthologFileFmt, SeedOrthologDirFmt,
 )
+from ._methods import collate_orthologs, partition_orthologs
 from ._transformer import IntervalMetadataIterator
 from ._type import (
     GenomeData, Genes, Proteins, Loci, Ortholog, BLAST6
@@ -21,7 +22,7 @@ __all__ = [
     'GenomeData', 'Genes', 'Proteins', 'Loci', 'GFF3Format',
     'GenesDirectoryFormat', 'ProteinsDirectoryFormat', 'LociDirectoryFormat',
     'IntervalMetadataIterator', 'OrthologFileFmt', 'Ortholog',
-    'SeedOrthologDirFmt', 'BLAST6',
+    'SeedOrthologDirFmt', 'BLAST6', 'collate_orthologs', 'partition_orthologs',
     ]
 
 importlib.import_module('q2_types.genome_data._format')
