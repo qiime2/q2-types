@@ -24,11 +24,12 @@ class TestTransformers(TestPluginBase):
         self.assertEqual(obs, exp_md)
 
     def test_non_metadata(self):
-        filename = 'invalid-metadata-1.tsv'
         with self.assertRaisesRegex(MetadataFileError,
                                     "column name 'bad-id-label'"):
-            self.transform_format(ImmutableMetadataFormat, qiime2.Metadata,
-                                  filename)
+            transformer = self.get_transformer(
+                ImmutableMetadataFormat, qiime2.Metadata)
+            input = self.get_data_path('invalid-metadata-1.tsv')
+            transformer(input)
 
     def test_metadata_to_metadata_format(self):
         filename = 'metadata.tsv'

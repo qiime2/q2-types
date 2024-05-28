@@ -144,7 +144,7 @@ class TestTransformers(TestPluginBase):
 
         input, dirfmt = self.transform_format(
             CasavaOneEightLanelessPerSampleDirFmt,
-            SingleLanePerSamplePairedEndFastqDirFmt, filenames=filenames
+            SingleLanePerSampleSingleEndFastqDirFmt, filenames=filenames
         )
         expected_filepaths = ['Human-Kneecap_S1_L001_R1_001.fastq.gz',
                               'Human-Armpit_S2_L001_R1_001.fastq.gz']
@@ -179,7 +179,7 @@ class TestTransformers(TestPluginBase):
         filenames = ('Human-Kneecap_S1_L001_R1_001.fastq.gz',)
         input, obs = self.transform_format(
             CasavaOneEightSingleLanePerSampleDirFmt,
-            SingleLanePerSamplePairedEndFastqDirFmt, filenames=filenames
+            SingleLanePerSampleSingleEndFastqDirFmt, filenames=filenames
         )
 
         input = skbio.io.read(
@@ -216,7 +216,7 @@ class TestTransformers(TestPluginBase):
     def test_miseq_demux_dirfmt_to_slpspefdf(self):
         input, obs = self.transform_format(
             CasavaOneEightLanelessPerSampleDirFmt,
-            SingleLanePerSamplePairedEndFastqDirFmt,
+            SingleLanePerSampleSingleEndFastqDirFmt,
             filenames=('Human-Kneecap_S1_R1_001.fastq.gz',),
         )
 

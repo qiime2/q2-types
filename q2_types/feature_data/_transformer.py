@@ -285,6 +285,8 @@ def _fastaformats_to_series(ff, constructor=skbio.DNA, lowercase=False):
     for sequence in _read_from_fasta(str(ff), constructor,
                                      lowercase=lowercase):
         id_ = sequence.metadata['id']
+        # this may no longer do anything b/c of format validation, but leaving
+        # here as a safeguard & we may want to examine/address later
         if id_ in data:
             raise ValueError("FASTA format sequence IDs must be unique. The "
                              "following ID was found more than once: %s."
