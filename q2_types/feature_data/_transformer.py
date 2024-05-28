@@ -287,6 +287,8 @@ def _fastaformats_to_series(ff, constructor=skbio.DNA, lowercase=False):
         id_ = sequence.metadata['id']
         # this may no longer do anything b/c of format validation, but leaving
         # here as a safeguard & we may want to examine/address later
+        # relevant PR associated with this change:
+        # https://github.com/qiime2/q2-types/pull/335
         if id_ in data:
             raise ValueError("FASTA format sequence IDs must be unique. The "
                              "following ID was found more than once: %s."
