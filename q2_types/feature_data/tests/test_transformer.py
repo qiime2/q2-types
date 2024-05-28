@@ -679,8 +679,10 @@ class TestDNAFASTAFormatTransformers(TestPluginBase):
 
     def test_dnafasta_format_with_duplicate_ids_to_series(self):
         with self.assertRaisesRegex(ValueError, 'unique.*SEQUENCE1'):
-            self.transform_format(DNAFASTAFormat, pd.Series,
-                                  'dna-sequences-with-duplicate-ids.fasta')
+            transformer = self.get_transformer(DNAFASTAFormat, pd.Series)
+            input = self.get_data_path(
+                'dna-sequences-with-duplicate-ids.fasta')
+            transformer(input)
 
     def test_dnafasta_format_to_metadata(self):
         _, obs = self.transform_format(DNAFASTAFormat, qiime2.Metadata,
@@ -901,8 +903,10 @@ class TestRNAFASTAFormatTransformers(TestPluginBase):
 
     def test_rnafasta_format_with_duplicate_ids_to_series(self):
         with self.assertRaisesRegex(ValueError, 'unique.*RNASEQUENCE1'):
-            self.transform_format(RNAFASTAFormat, pd.Series,
-                                  'rna-sequences-with-duplicate-ids.fasta')
+            transformer = self.get_transformer(RNAFASTAFormat, pd.Series)
+            input = self.get_data_path(
+                'rna-sequences-with-duplicate-ids.fasta')
+            transformer(input)
 
     def test_rnafasta_format_to_metadata(self):
         _, obs = self.transform_format(RNAFASTAFormat, qiime2.Metadata,
@@ -1011,9 +1015,11 @@ class TestMixedCaseDNAFASTAFormatTransformers(TestPluginBase):
 
     def test_mixed_case_dna_fasta_format_with_duplicate_ids_to_series(self):
         with self.assertRaisesRegex(ValueError, 'unique.*SEQUENCE1'):
-            self.transform_format(
-                        MixedCaseDNAFASTAFormat, pd.Series,
-                        'dna-sequences-mixed-case-with-duplicate-ids.fasta')
+            transformer = self.get_transformer(
+                        MixedCaseDNAFASTAFormat, pd.Series)
+            input = self.get_data_path(
+                'dna-sequences-mixed-case-with-duplicate-ids.fasta')
+            transformer(input)
 
     def test_mixed_case_dna_fasta_format_to_metadata(self):
         _, obs = self.transform_format(MixedCaseDNAFASTAFormat,
@@ -1077,9 +1083,11 @@ class TestMixedCaseRNAFASTAFormatTransformers(TestPluginBase):
 
     def test_mixed_case_rna_fasta_format_with_duplicate_ids_to_series(self):
         with self.assertRaisesRegex(ValueError, 'unique.*SEQUENCE1'):
-            self.transform_format(
-                        MixedCaseRNAFASTAFormat, pd.Series,
-                        'rna-sequences-mixed-case-with-duplicate-ids.fasta')
+            transformer = self.get_transformer(
+                        MixedCaseRNAFASTAFormat, pd.Series)
+            input = self.get_data_path(
+                'rna-sequences-mixed-case-with-duplicate-ids.fasta')
+            transformer(input)
 
     def test_mixed_case_rna_fasta_format_to_metadata(self):
         _, obs = self.transform_format(MixedCaseRNAFASTAFormat,
@@ -1145,9 +1153,11 @@ class TestMixedCaseAlignedDNAFASTAFormatTransformers(TestPluginBase):
 
     def test_mixed_case_aln_dna_fasta_format_w_duplicate_ids_to_series(self):
         with self.assertRaisesRegex(ValueError, 'unique.*SEQUENCE1'):
-            self.transform_format(
-                        MixedCaseAlignedDNAFASTAFormat, pd.Series,
-                        'dna-sequences-mixed-case-with-duplicate-ids.fasta')
+            transformer = self.get_transformer(
+                        MixedCaseAlignedDNAFASTAFormat, pd.Series)
+            input = self.get_data_path(
+                'dna-sequences-mixed-case-with-duplicate-ids.fasta')
+            transformer(input)
 
     def test_mixed_case_aln_dna_fasta_format_to_metadata(self):
         _, obs = self.transform_format(
@@ -1215,9 +1225,11 @@ class TestMixedCaseAlignedRNAFASTAFormatTransformers(TestPluginBase):
 
     def test_mixed_case_aln_rna_fasta_format_w_duplicate_ids_to_series(self):
         with self.assertRaisesRegex(ValueError, 'unique.*SEQUENCE1'):
-            self.transform_format(
-                        MixedCaseAlignedRNAFASTAFormat, pd.Series,
-                        'rna-sequences-mixed-case-with-duplicate-ids.fasta')
+            transformer = self.get_transformer(
+                MixedCaseAlignedRNAFASTAFormat, pd.Series)
+            input = self.get_data_path(
+                'rna-sequences-mixed-case-with-duplicate-ids.fasta')
+            transformer(input)
 
     def test_mixed_case_aln_rna_fasta_format_to_metadata(self):
         _, obs = self.transform_format(
@@ -1402,10 +1414,9 @@ class TestProteinFASTAFormatTransformers(TestPluginBase):
 
     def test_proteinfasta_format_with_duplicate_ids_to_series(self):
         with self.assertRaisesRegex(ValueError, 'unique.*sequence1'):
-            self.transform_format(
-                ProteinFASTAFormat,
-                pd.Series,
-                'protein-sequences-duplicate-ids.fasta')
+            transformer = self.get_transformer(ProteinFASTAFormat, pd.Series)
+            input = self.get_data_path('protein-sequences-duplicate-ids.fasta')
+            transformer(input)
 
     def test_proteinfasta_format_to_metadata(self):
         _, obs = self.transform_format(ProteinFASTAFormat, qiime2.Metadata,
