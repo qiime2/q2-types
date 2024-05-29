@@ -68,11 +68,11 @@ def collate_ortholog_annotations(
     ortholog_annotations: OrthologAnnotationDirFmt
 ) -> OrthologAnnotationDirFmt:
     # Init output
-    collated_annotations = OrthologAnnotationDirFmt()
+    collated_ortholog_annotations = OrthologAnnotationDirFmt()
 
     # Copy annotations into output
     for anno in ortholog_annotations:
         for fp in anno.path.iterdir():
-            duplicate(fp, collated_annotations.path / fp.name)
+            duplicate(fp, collated_ortholog_annotations.path / fp.name)
 
-    return collated_annotations
+    return collated_ortholog_annotations
