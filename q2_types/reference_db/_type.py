@@ -22,6 +22,10 @@ EggnogProteinSequences = SemanticType(
 HMMER = SemanticType(
     'HMMER', variant_of=ReferenceDB.field['type']
 )
+HMMERpressed = SemanticType(
+    'HMMERpressed', variant_of=ReferenceDB.field['type']
+)
 plugin.register_semantic_types(
-    ReferenceDB, Diamond, Eggnog, NCBITaxonomy, EggnogProteinSequences, HMMER
+    ReferenceDB, Diamond, Eggnog, NCBITaxonomy, EggnogProteinSequences, HMMER,
+    HMMERpressed
 )

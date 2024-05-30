@@ -14,7 +14,7 @@ from qiime2.core.exceptions import ValidationError
 from q2_types.plugin_setup import plugin
 from q2_types.reference_db._type import (
     ReferenceDB, Eggnog, Diamond, NCBITaxonomy,
-    EggnogProteinSequences, HMMER
+    EggnogProteinSequences, HMMER, HMMERpressed
 )
 from q2_types.feature_data import (
     MixedCaseProteinFASTAFormat, ProteinFASTAFormat
@@ -333,24 +333,7 @@ class HmmerIdmapFileFmt(model.TextFileFormat):
                     )
 
 
-class HmmerDirFmt(model.DirectoryFormat):
-    """
-    The  <hmmfile>.h3m file contains the profile HMMs
-    and their annotation in a binary format. The <hmmfile>.h3i file is an
-    SSI index for the <hmmfile>.h3m file.  The <hmmfile>.h3f file contains
-    precomputed data structures for the fast heuristic filter
-    (the MSV filter).  The <hmmfile>.h3p file contains precomputed data
-    structures for the rest of each profile.
-
-    - Dont know what the idmap file is for.
-    - Also dont know why there are fasta files but they are needed for
-    eggnog-hmmer-search action in q2-moshpit.
-    """
-    h3m = model.File(r'.*\.hmm\.h3m', format=HmmerBinaryFileFmt)
-    h3i = model.File(r'.*\.hmm\.h3i', format=HmmerBinaryFileFmt)
-    h3f = model.File(r'.*\.hmm\.h3f', format=HmmerBinaryFileFmt)
-    h3p = model.File(r'.*\.hmm\.h3p', format=HmmerBinaryFileFmt)
-    idmap = model.File(r'.*\.hmm\.idmap', format=HmmerIdmapFileFmt)
+class HmmerBaseDirFmt(model.DirectoryFormat):
     fasta_files = model.FileCollection(
         r'.*\.(fa|fasta|faa)$',
         format=ProteinFASTAFormat,
@@ -362,6 +345,189 @@ class HmmerDirFmt(model.DirectoryFormat):
         return str(name)
 
 
-plugin.register_formats(HmmerDirFmt)
+class HmmerPressedDirFmt(HmmerBaseDirFmt):
+    """
+    The  <hmmfile>.h3m file contains the profile HMMs
+    and their annotation in a binary format. The <hmmfile>.h3i file is an
+    SSI index for the <hmmfile>.h3m file.  The <hmmfile>.h3f file contains
+    precomputed data structures for the fast heuristic filter
+    (the MSV filter).  The <hmmfile>.h3p file contains precomputed data
+    structures for the rest of each profile.
+    """
+    h3m = model.File(r'.*\.hmm\.h3m', format=HmmerBinaryFileFmt)
+    h3i = model.File(r'.*\.hmm\.h3i', format=HmmerBinaryFileFmt)
+    h3f = model.File(r'.*\.hmm\.h3f', format=HmmerBinaryFileFmt)
+    h3p = model.File(r'.*\.hmm\.h3p', format=HmmerBinaryFileFmt)
+    idmap = model.File(
+        r'.*\.hmm\.idmap', format=HmmerIdmapFileFmt, optional=True
+    )
+
+
+class HmmFileFmt(model.TextFileFormat):
+    alphabets = {
+        "AMINO": "ACDEFGHIKLMNPQRSTVWY",
+        "DNA": "ACGT",
+        "RNA": "ACGU"
+    }
+    is_valid_value = {
+        "HMMER2.0": lambda x: re.match(r"^.+$", x),
+        "HMMER3/a": lambda x: re.match(r"^.+$", x),
+        "HMMER3/b": lambda x: re.match(r"^.+$", x),
+        "HMMER3/c": lambda x: re.match(r"^.+$", x),
+        "HMMER3/d": lambda x: re.match(r"^.+$", x),
+        "HMMER3/e": lambda x: re.match(r"^.+$", x),
+        "HMMER3/f": lambda x: re.match(r"^.+$", x),
+        "NAME": lambda x: re.match(r"^\S+$", x),
+        "ACC": lambda x: re.match(r"^\w+$", x),
+        "DESC": lambda x: re.match(r"^.+$", x),
+        "LENG": lambda x: re.match(r"^\d+$", x),
+        "MAXL": lambda x: re.match(r"^\d+$", x),
+        "ALPH": lambda x: re.match(r"^(amino|DNA|RNA)$", x, re.IGNORECASE),
+        "RF": lambda x: re.match(r"^(yes|no)$", x, re.IGNORECASE),
+        "MM": lambda x: re.match(r"^(yes|no)$", x, re.IGNORECASE),
+        "CONS": lambda x: re.match(r"^(yes|no)$", x, re.IGNORECASE),
+        "CS": lambda x: re.match(r"^(yes|no)$", x, re.IGNORECASE),
+        "MAP": lambda x: re.match(r"^(yes|no)$", x, re.IGNORECASE),
+        "DATE": lambda x: re.match(r"^.+$", x),
+        "COM": lambda x: re.match(r"^\d+ \w+$", x),
+        "NSEQ": lambda x: re.match(r"^\d+$", x),
+        "EFFN": lambda x: re.match(r"^\d+\.?\d+$", x),
+        "CKSUM": lambda x: re.match(r"^\d+$", x),
+        "GA": lambda x: re.match(r"^(\d+\.?\d+) (\d+\.?\d+)$", x),
+        "TC": lambda x: re.match(r"^(\d+\.?\d+) (\d+\.?\d+)$", x),
+        "NC": lambda x: re.match(r"^(\d+\.?\d+) (\d+\.?\d+)$", x),
+        "STATS": lambda x: re.match(
+            r"^LOCAL (MSV|VITERBI|FORWARD) (\d+\.?\d+) (\d+\.?\d+)$", x
+        ),
+        "HMM": lambda x: re.match(r"^.+$", x),
+        "COMPO": lambda x: re.match(r"^(\d+\.?\d+ ?)+$", x),
+    }
+
+    def _parse_header(self, lines):
+        tag_values = {}
+        for line in lines:
+            tag, value = (re.split(r"\s+", line, 1))
+            tag_values[tag] = value
+
+        # check that all mandatory tags are present
+        mandatory_tags = {"NAME", "LENG", "ALPH", "HMM"}
+        HMMER_tags = {[
+            f"HMMER{i}"
+            for i in ["3/a", "3/b", "3/c", "3/d", "3/e", "3/f", "2.0"]
+        ]}
+        tags_in_header = tag_values.keys()
+        if not (
+            mandatory_tags.issubset(tags_in_header) and
+            len(HMMER_tags.intersection(tags_in_header)) == 1
+        ):
+            raise ValidationError(
+                "Missing tag(s) in header: \n"
+                f"{mandatory_tags.difference(tags_in_header)} \n"
+                "Printing lines: \n"
+                f"{lines}"
+            )
+
+        for tag, value in tag_values.items():
+            if not self.is_valid_value[tag](value):
+                raise ValidationError(
+                    f"Invalid value '{value}' for tag '{tag}'\n"
+                    "Printing lines: \n"
+                    f"{lines}"
+                )
+
+        # Validate alphabet
+        expected_alph = self.alphabets[tag_values["ALPH"].upper()]
+        observed_alph = "".join(re.split(r"\s+", tag_values["HMM"]))
+        if observed_alph != expected_alph:
+            raise ValidationError(
+                f"Invalid alphabet."
+                f"Expected: {self.alph}\n"
+                f"Observed: {observed_alph}\n"
+            )
+
+        # Save alphabet length
+        self.alph_len = len(observed_alph)
+
+    def _parse_body(self):
+        """
+        Parse the HMMER profile section of the file
+        """
+
+    def _validate_(self, level):
+        """
+        Check http://eddylab.org/software/hmmer/Userguide.pdf
+        section "HMMER profile HMM files" for full description of
+        hmm file format.
+        """
+
+        with open(str(self), 'r') as file:
+            # Check if hmm file has more than one profile
+            profiles_found = 0
+            parse_n_profiles = 1
+            for line in file:
+                if line.startswith("//"):
+                    profiles_found += 1
+                    if profiles_found > 1:
+                        # If more than one profile is found use level to set
+                        # the number of profiles to parse
+                        parse_n_profiles = {"min": 3, "max": 300000}[level]
+                        break
+
+            # Reset cursor to beginning of file
+            file.seek(0)
+
+            # Parse
+            profiles_parsed = 0
+            while profiles_parsed < parse_n_profiles:
+                # Validate header
+                header = []
+                for line in file:
+                    header.append(line)
+                    if line.startswith("HMM"):
+                        break
+                self._parse_header(header)
+
+                # Consume column headers for the state transition probability
+                # fields
+                observed_headers = set(re.split(r"\s+", file.readline()))
+                expected_headers = {
+                    "m->m", "m->i", "m->d", "i->m", "i->i", "d->m", "d->d"
+                }
+                if observed_headers != expected_headers:
+                    raise ValidationError(
+                        f"Invalid headers."
+                        f"Expected: {expected_headers}\n"
+                        f"Observed: {observed_headers}\n"
+                    )
+
+                # Validate HMMER model
+                body = []
+                for line in file:
+                    if line.startswith("//"):
+                        break
+                    else:
+                        body.append(line)
+                self._parse_body(body)
+
+                # Increase count of parsed profiles
+                profiles_parsed += 1
+
+
+class HmmerDirFmt(HmmerBaseDirFmt):
+    """
+    One or more HMMER profile files.
+    """
+    hmm_files = model.FileCollection(
+        r'.*\.(hmm)$', format=HmmFileFmt
+    )
+
+    @hmm_files.set_path_maker
+    def hmm_files_path_maker(self, name):
+        return str(name)
+
+
+plugin.register_formats(HmmerDirFmt, HmmerPressedDirFmt)
 plugin.register_semantic_type_to_format(ReferenceDB[HMMER],
                                         HmmerDirFmt)
+plugin.register_semantic_type_to_format(ReferenceDB[HMMERpressed],
+                                        HmmerPressedDirFmt)
