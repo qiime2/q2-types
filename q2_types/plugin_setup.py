@@ -15,7 +15,6 @@ import q2_types
 from q2_types import __version__
 
 from q2_types.feature_data_mag import MAG, NOG
-# from q2_types.genome_data import
 from q2_types.per_sample_sequences import MAGs
 from q2_types.feature_data import FeatureData
 from q2_types.genome_data import BLAST6
