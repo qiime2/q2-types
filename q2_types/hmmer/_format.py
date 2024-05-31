@@ -10,10 +10,6 @@ from pyhmmer.plan7 import HMMFile
 from qiime2.plugin import model
 from qiime2.core.exceptions import ValidationError
 from q2_types.plugin_setup import plugin
-from q2_types.hmmer._type import (
-    HMM, MultipleAminoProfilesPressed, MultipleDNAProfilesPressed,
-    MultipleRNAProfilesPressed
-)
 
 
 class HmmBinaryFileFmt(model.BinaryFileFormat):
@@ -51,7 +47,7 @@ class HmmIdmapFileFmt(model.TextFileFormat):
                     )
 
 
-class BaseHmmPressedDirFmt(model.directory_format):
+class BaseHmmPressedDirFmt(model.DirectoryFormat):
     """
     The  <hmmfile>.h3m file contains the profile HMMs
     and their annotation in a binary format. The <hmmfile>.h3i file is an
@@ -67,19 +63,6 @@ class BaseHmmPressedDirFmt(model.directory_format):
     idmap = model.File(
         r'.*\.hmm\.idmap', format=HmmIdmapFileFmt, optional=True
     )
-
-
-plugin.register_semantic_type_to_format(
-    HMM[MultipleAminoProfilesPressed], BaseHmmPressedDirFmt
-)
-
-plugin.register_semantic_type_to_format(
-    HMM[MultipleDNAProfilesPressed], BaseHmmPressedDirFmt
-)
-
-plugin.register_semantic_type_to_format(
-    HMM[MultipleRNAProfilesPressed], BaseHmmPressedDirFmt
-)
 
 
 class HmmBaseFileFmt(model.TextFileFormat):

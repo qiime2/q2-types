@@ -6,8 +6,10 @@
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
 from ._format import (
-    AminoHmmMultipleProfilesFileFmt, DnaHmmMultipleProfilesFileFmt,
-    RnaHmmMultipleProfilesFileFmt, AminoHmmMultipleProfilesDirectoryFormat,
+    AminoHmmMultipleProfilesFileFmt,
+    DnaHmmMultipleProfilesFileFmt,
+    RnaHmmMultipleProfilesFileFmt,
+    AminoHmmMultipleProfilesDirectoryFormat,
     DnaHmmMultipleProfilesDirectoryFormat,
     RnaHmmMultipleProfilesDirectoryFormat,
     AminoHmmFileFmt, DnaHmmFileFmt, RnaHmmFileFmt,

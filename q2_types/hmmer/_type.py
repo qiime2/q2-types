@@ -7,15 +7,31 @@
 # ----------------------------------------------------------------------------
 from qiime2.plugin import SemanticType
 from q2_types.plugin_setup import plugin
-from . import (
+from q2_types.hmmer._format import (
     AminoHmmMultipleProfilesDirectoryFormat,
     DnaHmmMultipleProfilesDirectoryFormat,
     RnaHmmMultipleProfilesDirectoryFormat,
-    AminoHmmDirectoryFormat, DnaHmmDirectoryFormat, RnaHmmDirectoryFormat
+    AminoHmmDirectoryFormat, DnaHmmDirectoryFormat, RnaHmmDirectoryFormat,
+    MultipleAminoProfilesPressed,
+    MultipleDNAProfilesPressed,
+    MultipleRNAProfilesPressed,
+    BaseHmmPressedDirFmt
 )
 
 
 HMM = SemanticType('HMM', field_names='type')
+plugin.register_semantic_type_to_format(
+    HMM[MultipleAminoProfilesPressed], BaseHmmPressedDirFmt
+)
+
+plugin.register_semantic_type_to_format(
+    HMM[MultipleDNAProfilesPressed], BaseHmmPressedDirFmt
+)
+
+plugin.register_semantic_type_to_format(
+    HMM[MultipleRNAProfilesPressed], BaseHmmPressedDirFmt
+)
+
 SingleAminoProfile = SemanticType(
     'SingleAminoProfile', variant_of=HMM.field['type']
 )
