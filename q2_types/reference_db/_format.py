@@ -12,12 +12,10 @@ from qiime2.plugin import model
 from qiime2.core.exceptions import ValidationError
 from q2_types.plugin_setup import plugin
 from q2_types.reference_db._type import (
-    ReferenceDB, Eggnog, Diamond, NCBITaxonomy,
-    EggnogProteinSequences, HMMER, HMMERpressed
+    ReferenceDB, Eggnog, Diamond, NCBITaxonomy, EggnogProteinSequences,
+    aminoHMM, dnaHMM, rnaHMM, aminoHMMpressed, rnaHMMpressed, dnaHMMpressed
 )
-from q2_types.feature_data import (
-    MixedCaseProteinFASTAFormat, ProteinFASTAFormat
-)
+from q2_types.feature_data import MixedCaseProteinFASTAFormat
 
 
 class EggnogRefTextFileFmt(model.TextFileFormat):
@@ -297,12 +295,12 @@ plugin.register_semantic_type_to_format(ReferenceDB[EggnogProteinSequences],
                                         EggnogProteinSequencesDirFmt)
 
 
-class HmmerBinaryFileFmt(model.BinaryFileFormat):
+class HmmBinaryFileFmt(model.BinaryFileFormat):
     def _validate_(self, level):
         pass
 
 
-class HmmerIdmapFileFmt(model.TextFileFormat):
+class HmmIdmapFileFmt(model.TextFileFormat):
     def _validate_(self, level):
         with open(str(self), 'r') as file:
             # Set the number of rows to be parsed
@@ -332,19 +330,7 @@ class HmmerIdmapFileFmt(model.TextFileFormat):
                     )
 
 
-class HmmerBaseDirFmt(model.DirectoryFormat):
-    fasta_files = model.FileCollection(
-        r'.*\.(fa|fasta|faa)$',
-        format=ProteinFASTAFormat,
-        optional=False,
-    )
-
-    @fasta_files.set_path_maker
-    def fasta_files_path_maker(self, name):
-        return str(name)
-
-
-class HmmerPressedDirFmt(HmmerBaseDirFmt):
+class BaseHmmPressedDirFmt(model.directory_format):
     """
     The  <hmmfile>.h3m file contains the profile HMMs
     and their annotation in a binary format. The <hmmfile>.h3i file is an
@@ -353,17 +339,44 @@ class HmmerPressedDirFmt(HmmerBaseDirFmt):
     (the MSV filter).  The <hmmfile>.h3p file contains precomputed data
     structures for the rest of each profile.
     """
-    h3m = model.File(r'.*\.hmm\.h3m', format=HmmerBinaryFileFmt)
-    h3i = model.File(r'.*\.hmm\.h3i', format=HmmerBinaryFileFmt)
-    h3f = model.File(r'.*\.hmm\.h3f', format=HmmerBinaryFileFmt)
-    h3p = model.File(r'.*\.hmm\.h3p', format=HmmerBinaryFileFmt)
+    h3m = model.File(r'.*\.hmm\.h3m', format=HmmBinaryFileFmt)
+    h3i = model.File(r'.*\.hmm\.h3i', format=HmmBinaryFileFmt)
+    h3f = model.File(r'.*\.hmm\.h3f', format=HmmBinaryFileFmt)
+    h3p = model.File(r'.*\.hmm\.h3p', format=HmmBinaryFileFmt)
     idmap = model.File(
-        r'.*\.hmm\.idmap', format=HmmerIdmapFileFmt, optional=True
+        r'.*\.hmm\.idmap', format=HmmIdmapFileFmt, optional=True
     )
 
 
-class HmmFileFmt(model.TextFileFormat):
-    def _validate_(self, level):
+class AminoHmmPressedDirFmt(BaseHmmPressedDirFmt):
+    alphabet = "amino"
+
+
+class DnaHmmPressedDirFmt(BaseHmmPressedDirFmt):
+    alphabet = "dna"
+
+
+class RnaHmmPressedDirFmt(BaseHmmPressedDirFmt):
+    alphabet = "rna"
+
+
+plugin.register_semantic_type_to_format(
+    ReferenceDB[aminoHMMpressed], AminoHmmPressedDirFmt
+)
+
+plugin.register_semantic_type_to_format(
+    ReferenceDB[dnaHMMpressed], AminoHmmPressedDirFmt
+)
+
+plugin.register_semantic_type_to_format(
+    ReferenceDB[rnaHMMpressed], AminoHmmPressedDirFmt
+)
+
+
+class HmmBaseFileFmt(model.TextFileFormat):
+    def _validate_file_fmt(
+            self, level: str, alphabet: str, single_profile: bool
+    ):
         """
         Check http://eddylab.org/software/hmmer/Userguide.pdf
         section "HMMER profile HMM files" for full description of
@@ -371,27 +384,98 @@ class HmmFileFmt(model.TextFileFormat):
         """
         parse_n_profiles = {"min": 3, "max": None}[level]
         tolerance = 0.0001
+
         with HMMFile(str(self)) as hmm_file:
             hmm_profiles = list(hmm_file)
+
+            if len(hmm_profiles) > 1 and single_profile:
+                raise ValidationError(
+                        f"Expected 1 profile, found {len(hmm_profiles)}."
+                    )
+
             for hmm_profile in hmm_profiles[:parse_n_profiles]:
                 hmm_profile.validate(tolerance=tolerance)
 
-
-class HmmerDirFmt(HmmerBaseDirFmt):
-    """
-    One or more HMMER profile files.
-    """
-    hmm_files = model.FileCollection(
-        r'.*\.(hmm)$', format=HmmFileFmt
-    )
-
-    @hmm_files.set_path_maker
-    def hmm_files_path_maker(self, name):
-        return str(name)
+                if hmm_profile.alphabet.lower() != alphabet:
+                    raise ValidationError(
+                        "Found profile with alphabet: "
+                        f"{hmm_profile.alph.lower()}\n"
+                        f"{self.__class__} only accepts {alphabet} profiles."
+                    )
 
 
-plugin.register_formats(HmmerDirFmt, HmmerPressedDirFmt)
-plugin.register_semantic_type_to_format(ReferenceDB[HMMER],
-                                        HmmerDirFmt)
-plugin.register_semantic_type_to_format(ReferenceDB[HMMERpressed],
-                                        HmmerPressedDirFmt)
+class AminoHmmFileFmt(HmmBaseFileFmt):
+    alphabet = "amino"
+
+    def _validate_(self, level):
+        self._validate_file_fmt(self, level, self.alphabet, True)
+
+
+class DnaHmmFileFmt(HmmBaseFileFmt):
+    alphabet = "dna"
+
+    def _validate_(self, level):
+        self._validate_file_fmt(self, level, self.alphabet, True)
+
+
+class RnaHmmFileFmt(HmmBaseFileFmt):
+    alphabet = "rna"
+
+    def _validate_(self, level):
+        self._validate_file_fmt(self, level, self.alphabet, True)
+
+
+DifferentialDirectoryFormat = model.SingleFileDirectoryFormat(
+    'AminoHmmFileFmt', 'profile.hmm', AminoHmmFileFmt)
+
+DifferentialDirectoryFormat = model.SingleFileDirectoryFormat(
+    'DnaHmmFileFmt', 'profile.hmm', DnaHmmFileFmt)
+
+DifferentialDirectoryFormat = model.SingleFileDirectoryFormat(
+    'RnaHmmFileFmt', 'profile.hmm', RnaHmmFileFmt)
+
+plugin.register_formats(AminoHmmFileFmt, DnaHmmFileFmt, RnaHmmFileFmt)
+
+
+class HmmAminoDBFileFmt(AminoHmmFileFmt):
+    def _validate_(self, level):
+        self._validate_file_fmt(self, level, self.alphabet, False)
+
+
+class HmmDnaDBFileFmt(DnaHmmFileFmt):
+    def _validate_(self, level):
+        self._validate_file_fmt(self, level, self.alphabet, False)
+
+
+class HmmRnaDBFileFmt(RnaHmmFileFmt):
+    def _validate_(self, level):
+        self._validate_file_fmt(self, level, self.alphabet, False)
+
+
+DifferentialDirectoryFormat = model.SingleFileDirectoryFormat(
+    'HmmAminoDBFileFmt', 'profile.hmm', HmmAminoDBFileFmt
+)
+
+DifferentialDirectoryFormat = model.SingleFileDirectoryFormat(
+    'HmmDnaDBFileFmt', 'profile.hmm', HmmDnaDBFileFmt
+)
+
+DifferentialDirectoryFormat = model.SingleFileDirectoryFormat(
+    'HmmRnaDBFileFmt', 'profile.hmm', HmmRnaDBFileFmt
+)
+
+plugin.register_formats(
+    HmmAminoDBFileFmt, HmmDnaDBFileFmt, HmmRnaDBFileFmt
+)
+
+plugin.register_semantic_type_to_format(
+    ReferenceDB[aminoHMM], HmmAminoDBFileFmt
+)
+
+plugin.register_semantic_type_to_format(
+    ReferenceDB[dnaHMM], HmmAminoDBFileFmt
+)
+
+plugin.register_semantic_type_to_format(
+    ReferenceDB[rnaHMM], HmmAminoDBFileFmt
+)

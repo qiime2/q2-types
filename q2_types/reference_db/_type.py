@@ -19,13 +19,25 @@ NCBITaxonomy = SemanticType(
 EggnogProteinSequences = SemanticType(
     'EggnogProteinSequences', variant_of=ReferenceDB.field['type']
 )
-HMMER = SemanticType(
-    'HMMER', variant_of=ReferenceDB.field['type']
+aminoHMM = SemanticType(
+    'aminoHMM', variant_of=ReferenceDB.field['type']
 )
-HMMERpressed = SemanticType(
-    'HMMERpressed', variant_of=ReferenceDB.field['type']
+dnaHMM = SemanticType(
+    'dnaHMM', variant_of=ReferenceDB.field['type']
+)
+rnaHMM = SemanticType(
+    'rnaHMM', variant_of=ReferenceDB.field['type']
+)
+aminoHMMpressed = SemanticType(
+    'aminoHMMpressed', variant_of=ReferenceDB.field['type']
+)
+dnaHMMpressed = SemanticType(
+    'dnaHMMpressed', variant_of=ReferenceDB.field['type']
+)
+rnaHMMpressed = SemanticType(
+    'rnaHMMpressed', variant_of=ReferenceDB.field['type']
 )
 plugin.register_semantic_types(
-    ReferenceDB, Diamond, Eggnog, NCBITaxonomy, EggnogProteinSequences, HMMER,
-    HMMERpressed
+    ReferenceDB, Diamond, Eggnog, NCBITaxonomy, EggnogProteinSequences,
+    aminoHMM, dnaHMM, rnaHMM, aminoHMMpressed, rnaHMMpressed, dnaHMMpressed
 )
