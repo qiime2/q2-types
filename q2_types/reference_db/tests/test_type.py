@@ -10,11 +10,10 @@ from qiime2.plugin.testing import TestPluginBase
 
 from q2_types.reference_db._format import (
     DiamondDatabaseDirFmt, EggnogRefDirFmt, NCBITaxonomyDirFmt,
-    EggnogProteinSequencesDirFmt, HmmerDirFmt
+    EggnogProteinSequencesDirFmt
 )
 from q2_types.reference_db._type import (
-    ReferenceDB, Diamond, Eggnog, NCBITaxonomy, EggnogProteinSequences,
-    HMMER
+    ReferenceDB, Diamond, Eggnog, NCBITaxonomy, EggnogProteinSequences
 )
 
 
@@ -55,11 +54,3 @@ class TestReferenceType(TestPluginBase):
         self.assertSemanticTypeRegisteredToFormat(
                 ReferenceDB[EggnogProteinSequences],
                 EggnogProteinSequencesDirFmt)
-
-    def test_hmmer_registration(self):
-        self.assertRegisteredSemanticType(HMMER)
-
-    def test_HMMER_semantic_type_registered_to_DirFmt(self):
-        self.assertSemanticTypeRegisteredToFormat(
-            ReferenceDB[HMMER], HmmerDirFmt
-        )

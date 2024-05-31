@@ -13,6 +13,9 @@ from ._format import (
     AminoHmmFileFmt, DnaHmmFileFmt, RnaHmmFileFmt,
     AminoHmmDirectoryFormat, DnaHmmDirectoryFormat, RnaHmmDirectoryFormat
 )
+from ._type import (
+    HMM
+)
 
 __all__ = [
     "AminoHmmMultipleProfilesFileFmt", "DnaHmmMultipleProfilesFileFmt",
@@ -20,5 +23,6 @@ __all__ = [
     "DnaHmmMultipleProfilesDirectoryFormat",
     "RnaHmmMultipleProfilesDirectoryFormat",
     "AminoHmmFileFmt", "DnaHmmFileFmt", "RnaHmmFileFmt",
-    "AminoHmmDirectoryFormat", "DnaHmmDirectoryFormat", "RnaHmmDirectoryFormat"
+    "AminoHmmDirectoryFormat", "DnaHmmDirectoryFormat",
+    "RnaHmmDirectoryFormat", "HMM"
 ]
