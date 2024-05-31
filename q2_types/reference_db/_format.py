@@ -11,7 +11,8 @@ from qiime2.plugin import model
 from qiime2.core.exceptions import ValidationError
 from q2_types.plugin_setup import plugin
 from q2_types.reference_db._type import (
-    ReferenceDB, Eggnog, Diamond, NCBITaxonomy, EggnogProteinSequences,
+    ReferenceDB, Eggnog, Diamond, NCBITaxonomy,
+    EggnogProteinSequences
 )
 from q2_types.feature_data import MixedCaseProteinFASTAFormat
 

@@ -18,5 +18,5 @@ EggnogProteinSequences = SemanticType(
     'EggnogProteinSequences', variant_of=ReferenceDB.field['type']
 )
 plugin.register_semantic_types(
-    Diamond, Eggnog, NCBITaxonomy, EggnogProteinSequences,
+    ReferenceDB, Diamond, Eggnog, NCBITaxonomy, EggnogProteinSequences
 )

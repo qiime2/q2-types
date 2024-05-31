@@ -20,15 +20,13 @@ from q2_types.reference_db._format import (
     DiamondDatabaseFileFmt,
     DiamondDatabaseDirFmt,
     NCBITaxonomyDirFmt,
-    EggnogProteinSequencesDirFmt,
-    )
+    EggnogProteinSequencesDirFmt
+)
 
-__all__ = [
-    'ReferenceDB', 'Diamond', 'Eggnog', 'DiamondDatabaseFileFmt',
-    'DiamondDatabaseDirFmt', 'EggnogRefDirFmt', 'EggnogRefTextFileFmt',
-    'EggnogRefBinFileFmt', 'NCBITaxonomyDirFmt', 'NCBITaxonomy',
-    'EggnogProteinSequencesDirFmt', 'EggnogProteinSequences'
-]
+__all__ = ['ReferenceDB', 'Diamond', 'Eggnog', 'DiamondDatabaseFileFmt',
+           'DiamondDatabaseDirFmt', 'EggnogRefDirFmt', 'EggnogRefTextFileFmt',
+           'EggnogRefBinFileFmt', 'NCBITaxonomyDirFmt', 'NCBITaxonomy',
+           'EggnogProteinSequencesDirFmt', 'EggnogProteinSequences']
 
 importlib.import_module('q2_types.reference_db._format')
 importlib.import_module('q2_types.reference_db._type')
