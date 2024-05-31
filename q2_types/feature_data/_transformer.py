@@ -29,7 +29,8 @@ from . import (TaxonomyFormat, HeaderlessTSVTaxonomyFormat, TSVTaxonomyFormat,
                AlignedProteinFASTAFormat, RNAFASTAFormat,
                AlignedRNAFASTAFormat, PairedRNASequencesDirectoryFormat,
                BLAST6Format, MixedCaseDNAFASTAFormat, MixedCaseRNAFASTAFormat,
-               MixedCaseAlignedDNAFASTAFormat, MixedCaseAlignedRNAFASTAFormat)
+               MixedCaseAlignedDNAFASTAFormat, MixedCaseAlignedRNAFASTAFormat,
+               SequenceCharacteristicsFormat)
 
 
 # Taxonomy format transformers
@@ -168,6 +169,38 @@ def _biom_to_tsv_taxonomy_format(table):
     return _dataframe_to_tsv_taxonomy_format(series.to_frame())
 
 
+def _biom_to_fasta_format(table: biom.Table):
+    metadata = table.metadata(axis='observation')
+    ids = table.ids(axis='observation')
+    if metadata is None:
+        raise TypeError('Table must have observation metadata.')
+
+    supported_sequence_keys = ('sequence', 'Sequence')
+
+    ff = DNAFASTAFormat()
+    with open(str(ff), 'w') as fh:
+        for header, md_entry in zip(ids, metadata):
+            for key in supported_sequence_keys:
+                try:
+                    sequence = md_entry[key]
+                    if sequence is None:
+                        continue
+                    break
+
+                except KeyError:
+                    pass
+            else:
+                raise ValueError(
+                    f'Observation {header} does not have a sequence key in '
+                    f'its metadata. Valid keys are {supported_sequence_keys}.'
+                )
+
+            fh.write(f'>{header}\n')
+            fh.write(f'{sequence}\n')
+
+    return ff
+
+
 @plugin.register_transformer
 def _4(ff: TaxonomyFormat) -> pd.DataFrame:
     return _taxonomy_formats_to_dataframe(str(ff), has_header=None)
@@ -230,6 +263,14 @@ def _27(ff: BIOMV210Format) -> TSVTaxonomyFormat:
     with ff.open() as fh:
         table = biom.Table.from_hdf5(fh)
     return _biom_to_tsv_taxonomy_format(table)
+
+
+@plugin.register_transformer
+def _30(ff: BIOMV210Format) -> DNAFASTAFormat:
+    with ff.open() as fh:
+        table = biom.Table.from_hdf5(fh)
+    return _biom_to_fasta_format(table)
+
 
 # common to all FASTA transformers
 
@@ -1004,3 +1045,22 @@ def _90(ff: BLAST6Format) -> qiime2.Metadata:
     # default int index but cast to a str and give it a name.
     data.index = pd.Index(data.index.astype(str), name='id')
     return qiime2.Metadata(data)
+
+
+@plugin.register_transformer
+def _228(ff: SequenceCharacteristicsFormat) -> pd.DataFrame:
+    return pd.read_csv(str(ff), sep='\t', index_col=0)
+
+
+@plugin.register_transformer
+def _229(data: pd.DataFrame) -> SequenceCharacteristicsFormat:
+    ff = SequenceCharacteristicsFormat()
+    data.to_csv(str(ff), sep='\t')
+    return ff
+
+
+@plugin.register_transformer
+def _230(ff: SequenceCharacteristicsFormat) -> qiime2.Metadata:
+    df = pd.read_csv(str(ff), sep='\t', index_col=0)
+    df.index = pd.Index(df.index.astype(str), name='id')
+    return qiime2.Metadata(df)

@@ -353,6 +353,35 @@ BLAST6DirectoryFormat = model.SingleFileDirectoryFormat(
     'BLAST6DirectoryFormat', 'blast6.tsv', BLAST6Format)
 
 
+class SequenceCharacteristicsFormat(model.TextFileFormat):
+    """
+    Format for a TSV file with information about sequences like length of a
+    feature. The first column contains feature identifiers and is followed by
+    other optional columns.
+
+    The file cannot be empty and must have at least two columns.
+
+    Validation for additional columns can be added with a semantic validator
+    tied to a property. For example the "validate_seq_char_len" validator for
+    "FeatureData[SequenceCharacteristics % Properties("length")]"
+    adds validation for a numerical column called "length".
+    """
+
+    def validate(self, n_records=None):
+        try:
+            data = pd.read_csv(str(self), sep='\t', index_col=0)
+        except pd.errors.EmptyDataError:
+            raise ValidationError('File cannot be empty.')
+
+        if not data.columns.any():
+            raise ValidationError('File needs to have at least two columns.')
+
+
+SequenceCharacteristicsDirectoryFormat = model.SingleFileDirectoryFormat(
+    "SequenceCharacteristicsDirectoryFormat",
+    "sequence_characteristics.tsv", SequenceCharacteristicsFormat
+)
+
 plugin.register_formats(
     TSVTaxonomyFormat, TSVTaxonomyDirectoryFormat,
     HeaderlessTSVTaxonomyFormat, HeaderlessTSVTaxonomyDirectoryFormat,
@@ -372,5 +401,6 @@ plugin.register_formats(
     MixedCaseRNASequencesDirectoryFormat, MixedCaseAlignedDNAFASTAFormat,
     MixedCaseAlignedDNASequencesDirectoryFormat,
     MixedCaseAlignedRNAFASTAFormat,
-    MixedCaseAlignedRNASequencesDirectoryFormat
+    MixedCaseAlignedRNASequencesDirectoryFormat, SequenceCharacteristicsFormat,
+    SequenceCharacteristicsDirectoryFormat
 )

@@ -6,6 +6,7 @@
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
 
+import filecmp
 import os.path
 import unittest
 import tempfile
@@ -29,7 +30,8 @@ from q2_types.feature_data import (
     AlignedProteinFASTAFormat, RNAFASTAFormat, AlignedRNAFASTAFormat,
     RNAIterator, AlignedRNAIterator, BLAST6Format, MixedCaseDNAFASTAFormat,
     MixedCaseRNAFASTAFormat, MixedCaseAlignedDNAFASTAFormat,
-    MixedCaseAlignedRNAFASTAFormat, BarcodeSequenceFastqIterator
+    MixedCaseAlignedRNAFASTAFormat, BarcodeSequenceFastqIterator,
+    SequenceCharacteristicsFormat
 )
 from q2_types.feature_data._transformer import (
     _taxonomy_formats_to_dataframe, _dataframe_to_tsv_taxonomy_format,
@@ -754,6 +756,47 @@ class TestDNAFASTAFormatTransformers(TestPluginBase):
 
         for observed, expected in zip(obs, exp):
             self.assertEqual(observed, expected)
+
+    def test_biom_table_to_dna_fasta_format(self):
+        table_fn = 'feature-table-with-sequence-metadata.biom'
+        input, obs = self.transform_format(
+            BIOMV210Format, DNAFASTAFormat, table_fn
+        )
+
+        self.assertIsInstance(obs, DNAFASTAFormat)
+
+        table_fp = self.get_data_path(table_fn)
+        table = biom.load_table(table_fp)
+
+        with open(str(obs)) as fh:
+            lines = fh.readlines()
+            fasta_header = lines[0].strip()
+            fasta_sequence = lines[1].strip()
+            num_lines = len(lines)
+
+        ids = table.ids(axis='observation')
+        # two lines (header & sequence) per feature
+        self.assertEqual(len(ids), num_lines / 2)
+
+        first_id = ids[0]
+        first_seq = table.metadata(axis='observation')[0]['Sequence']
+        self.assertEqual(fasta_header, f'>{first_id}')
+        self.assertEqual(fasta_sequence, first_seq)
+
+    def test_biom_table_to_dna_fasta_format_no_md(self):
+        table_fp = os.path.join('taxonomy', 'feature-table_v210.biom')
+        with self.assertRaisesRegex(TypeError, 'observation metadata'):
+            self.transform_format(BIOMV210Format, DNAFASTAFormat, table_fp)
+
+    def test_biom_table_to_dna_fasta_format_no_md_sequence_key(self):
+        table_fp = os.path.join(
+            'taxonomy', 'feature-table-with-taxonomy-metadata_v210.biom'
+        )
+
+        with self.assertRaisesRegex(
+            ValueError, 'Observation .* does not have a sequence key.*'
+        ):
+            self.transform_format(BIOMV210Format, DNAFASTAFormat, table_fp)
 
 
 class TestRNAFASTAFormatTransformers(TestPluginBase):
@@ -1753,6 +1796,44 @@ class BarcodeSequenceFastqIteratorTests(unittest.TestCase):
         bsi = BarcodeSequenceFastqIterator(barcodes, sequences)
         with self.assertRaises(ValueError):
             list(bsi)
+
+
+class TestSequenceCharacteristicsTransformer(TestPluginBase):
+    package = 'q2_types.feature_data.tests'
+
+    def setUp(self):
+        super().setUp()
+        self.exp_file = self.get_data_path(
+            'sequence_characteristics_length.tsv')
+        self.exp_df = pd.DataFrame({'length': [876, 54]},
+                                   index=pd.Index([1, 2], name='id'))
+
+    def test_df_to_sequence_characteristics_format(self):
+        transformer = self.get_transformer(pd.DataFrame,
+                                           SequenceCharacteristicsFormat)
+        obs = transformer(self.exp_df)
+
+        self.assertIsInstance(obs, SequenceCharacteristicsFormat)
+        assert filecmp.cmp(self.exp_file, obs.path)
+
+    def test_sequence_characteristics_format_to_df(self):
+        transformer = self.get_transformer(SequenceCharacteristicsFormat,
+                                           pd.DataFrame)
+        format = SequenceCharacteristicsFormat(self.exp_file, mode='r')
+        obs = transformer(format)
+
+        assert_frame_equal(self.exp_df, obs)
+
+    def test_sequence_characteristics_format_to_metadata(self):
+        transformer = self.get_transformer(SequenceCharacteristicsFormat,
+                                           qiime2.Metadata)
+        format = SequenceCharacteristicsFormat(self.exp_file, mode='r')
+        obs = transformer(format)
+
+        self.exp_df.index = pd.Index(self.exp_df.index.astype(str))
+        self.exp_df['length'] = self.exp_df['length'].astype('float64')
+
+        assert_frame_equal(obs.to_dataframe(), self.exp_df)
 
 
 if __name__ == '__main__':
