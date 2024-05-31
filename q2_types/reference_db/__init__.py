@@ -21,7 +21,7 @@ from q2_types.reference_db._format import (
     DiamondDatabaseDirFmt,
     NCBITaxonomyDirFmt,
     EggnogProteinSequencesDirFmt
-)
+    )
 
 __all__ = ['ReferenceDB', 'Diamond', 'Eggnog', 'DiamondDatabaseFileFmt',
            'DiamondDatabaseDirFmt', 'EggnogRefDirFmt', 'EggnogRefTextFileFmt',
