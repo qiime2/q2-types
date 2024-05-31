@@ -10,7 +10,7 @@ import importlib
 
 from q2_types.reference_db._type import (
     ReferenceDB, Diamond, Eggnog, NCBITaxonomy,
-    EggnogProteinSequences, HMMER
+    EggnogProteinSequences
 )
 
 from q2_types.reference_db._format import (
@@ -21,15 +21,13 @@ from q2_types.reference_db._format import (
     DiamondDatabaseDirFmt,
     NCBITaxonomyDirFmt,
     EggnogProteinSequencesDirFmt,
-    HmmerDirFmt
     )
 
 __all__ = [
     'ReferenceDB', 'Diamond', 'Eggnog', 'DiamondDatabaseFileFmt',
     'DiamondDatabaseDirFmt', 'EggnogRefDirFmt', 'EggnogRefTextFileFmt',
     'EggnogRefBinFileFmt', 'NCBITaxonomyDirFmt', 'NCBITaxonomy',
-    'EggnogProteinSequencesDirFmt', 'EggnogProteinSequences', 'HMMER',
-    'HmmerDirFmt'
+    'EggnogProteinSequencesDirFmt', 'EggnogProteinSequences'
 ]
 
 importlib.import_module('q2_types.reference_db._format')
