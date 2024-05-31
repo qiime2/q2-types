@@ -348,28 +348,16 @@ class BaseHmmPressedDirFmt(model.directory_format):
     )
 
 
-class AminoHmmPressedDirFmt(BaseHmmPressedDirFmt):
-    alphabet = "amino"
-
-
-class DnaHmmPressedDirFmt(BaseHmmPressedDirFmt):
-    alphabet = "dna"
-
-
-class RnaHmmPressedDirFmt(BaseHmmPressedDirFmt):
-    alphabet = "rna"
-
-
 plugin.register_semantic_type_to_format(
-    ReferenceDB[aminoHMMpressed], AminoHmmPressedDirFmt
+    ReferenceDB[aminoHMMpressed], BaseHmmPressedDirFmt
 )
 
 plugin.register_semantic_type_to_format(
-    ReferenceDB[dnaHMMpressed], AminoHmmPressedDirFmt
+    ReferenceDB[dnaHMMpressed], BaseHmmPressedDirFmt
 )
 
 plugin.register_semantic_type_to_format(
-    ReferenceDB[rnaHMMpressed], AminoHmmPressedDirFmt
+    ReferenceDB[rnaHMMpressed], BaseHmmPressedDirFmt
 )
 
 
@@ -425,57 +413,61 @@ class RnaHmmFileFmt(HmmBaseFileFmt):
         self._validate_file_fmt(self, level, self.alphabet, True)
 
 
-DifferentialDirectoryFormat = model.SingleFileDirectoryFormat(
+AminoHmmDirectoryFormat = model.SingleFileDirectoryFormat(
     'AminoHmmFileFmt', 'profile.hmm', AminoHmmFileFmt)
 
-DifferentialDirectoryFormat = model.SingleFileDirectoryFormat(
+DnaHmmDirectoryFormat = model.SingleFileDirectoryFormat(
     'DnaHmmFileFmt', 'profile.hmm', DnaHmmFileFmt)
 
-DifferentialDirectoryFormat = model.SingleFileDirectoryFormat(
+RnaHmmDirectoryFormat = model.SingleFileDirectoryFormat(
     'RnaHmmFileFmt', 'profile.hmm', RnaHmmFileFmt)
 
-plugin.register_formats(AminoHmmFileFmt, DnaHmmFileFmt, RnaHmmFileFmt)
-
-
-class HmmAminoDBFileFmt(AminoHmmFileFmt):
-    def _validate_(self, level):
-        self._validate_file_fmt(self, level, self.alphabet, False)
-
-
-class HmmDnaDBFileFmt(DnaHmmFileFmt):
-    def _validate_(self, level):
-        self._validate_file_fmt(self, level, self.alphabet, False)
-
-
-class HmmRnaDBFileFmt(RnaHmmFileFmt):
-    def _validate_(self, level):
-        self._validate_file_fmt(self, level, self.alphabet, False)
-
-
-DifferentialDirectoryFormat = model.SingleFileDirectoryFormat(
-    'HmmAminoDBFileFmt', 'profile.hmm', HmmAminoDBFileFmt
+plugin.register_formats(
+    AminoHmmFileFmt, DnaHmmFileFmt, RnaHmmFileFmt,
+    AminoHmmDirectoryFormat, DnaHmmDirectoryFormat, RnaHmmDirectoryFormat
 )
 
-DifferentialDirectoryFormat = model.SingleFileDirectoryFormat(
-    'HmmDnaDBFileFmt', 'profile.hmm', HmmDnaDBFileFmt
+
+class AminoHmmDBFileFmt(AminoHmmFileFmt):
+    def _validate_(self, level):
+        self._validate_file_fmt(self, level, self.alphabet, False)
+
+
+class DnaHmmDBFileFmt(DnaHmmFileFmt):
+    def _validate_(self, level):
+        self._validate_file_fmt(self, level, self.alphabet, False)
+
+
+class RnaHmmDBFileFmt(RnaHmmFileFmt):
+    def _validate_(self, level):
+        self._validate_file_fmt(self, level, self.alphabet, False)
+
+
+AminoHmmDbDirectoryFormat = model.SingleFileDirectoryFormat(
+    'HmmAminoDBFileFmt', 'profile.hmm', AminoHmmDBFileFmt
 )
 
-DifferentialDirectoryFormat = model.SingleFileDirectoryFormat(
-    'HmmRnaDBFileFmt', 'profile.hmm', HmmRnaDBFileFmt
+DnaHmmDbDirectoryFormat = model.SingleFileDirectoryFormat(
+    'HmmDnaDBFileFmt', 'profile.hmm', DnaHmmDBFileFmt
+)
+
+RnaHmmDbDirectoryFormat = model.SingleFileDirectoryFormat(
+    'HmmRnaDBFileFmt', 'profile.hmm', RnaHmmDBFileFmt
 )
 
 plugin.register_formats(
-    HmmAminoDBFileFmt, HmmDnaDBFileFmt, HmmRnaDBFileFmt
+    AminoHmmDbDirectoryFormat, DnaHmmDbDirectoryFormat, AminoHmmDBFileFmt,
+    RnaHmmDbDirectoryFormat, DnaHmmDBFileFmt, RnaHmmDBFileFmt
 )
 
 plugin.register_semantic_type_to_format(
-    ReferenceDB[aminoHMM], HmmAminoDBFileFmt
+    ReferenceDB[aminoHMM], AminoHmmDBFileFmt
 )
 
 plugin.register_semantic_type_to_format(
-    ReferenceDB[dnaHMM], HmmAminoDBFileFmt
+    ReferenceDB[dnaHMM], DnaHmmDBFileFmt
 )
 
 plugin.register_semantic_type_to_format(
-    ReferenceDB[rnaHMM], HmmAminoDBFileFmt
+    ReferenceDB[rnaHMM], RnaHmmDBFileFmt
 )
