@@ -165,6 +165,5 @@ plugin.register_formats(
     RnaHmmMultipleProfilesFileFmt, AminoHmmMultipleProfilesDirectoryFormat,
     DnaHmmMultipleProfilesDirectoryFormat,
     RnaHmmMultipleProfilesDirectoryFormat,
-    AminoHmmFileFmt, DnaHmmFileFmt, RnaHmmFileFmt,
     AminoHmmDirectoryFormat, DnaHmmDirectoryFormat, RnaHmmDirectoryFormat
 )
