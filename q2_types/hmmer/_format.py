@@ -88,7 +88,7 @@ class HmmBaseFileFmt(model.TextFileFormat):
             for hmm_profile in hmm_profiles[:parse_n_profiles]:
                 hmm_profile.validate(tolerance=tolerance)
 
-                if hmm_profile.alphabet.lower() != alphabet:
+                if hmm_profile.alphabet.type.lower() != alphabet:
                     raise ValidationError(
                         "Found profile with alphabet: "
                         f"{hmm_profile.alph.lower()}\n"
@@ -100,21 +100,21 @@ class AminoHmmFileFmt(HmmBaseFileFmt):
     alphabet = "amino"
 
     def _validate_(self, level):
-        self._validate_file_fmt(self, level, self.alphabet, True)
+        self._validate_file_fmt(level, self.alphabet, True)
 
 
 class DnaHmmFileFmt(HmmBaseFileFmt):
     alphabet = "dna"
 
     def _validate_(self, level):
-        self._validate_file_fmt(self, level, self.alphabet, True)
+        self._validate_file_fmt(level, self.alphabet, True)
 
 
 class RnaHmmFileFmt(HmmBaseFileFmt):
     alphabet = "rna"
 
     def _validate_(self, level):
-        self._validate_file_fmt(self, level, self.alphabet, True)
+        self._validate_file_fmt(level, self.alphabet, True)
 
 
 AminoHmmDirectoryFormat = model.SingleFileDirectoryFormat(
@@ -129,17 +129,17 @@ RnaHmmDirectoryFormat = model.SingleFileDirectoryFormat(
 
 class AminoHmmMultipleProfilesFileFmt(AminoHmmFileFmt):
     def _validate_(self, level):
-        self._validate_file_fmt(self, level, self.alphabet, False)
+        self._validate_file_fmt(level, self.alphabet, False)
 
 
 class DnaHmmMultipleProfilesFileFmt(DnaHmmFileFmt):
     def _validate_(self, level):
-        self._validate_file_fmt(self, level, self.alphabet, False)
+        self._validate_file_fmt(level, self.alphabet, False)
 
 
 class RnaHmmMultipleProfilesFileFmt(RnaHmmFileFmt):
     def _validate_(self, level):
-        self._validate_file_fmt(self, level, self.alphabet, False)
+        self._validate_file_fmt(level, self.alphabet, False)
 
 
 AminoHmmMultipleProfilesDirectoryFormat = model.SingleFileDirectoryFormat(
