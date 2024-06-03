@@ -44,6 +44,15 @@ MultipleDNAPressed = SemanticType(
 MultipleRNAPressed = SemanticType(
     'MultipleRNAPressed', variant_of=HMM.field['type']
 )
+
+plugin.register_semantic_types(
+    HMM,
+    SingleAmino, SingleDNA, SingleRNA,
+    MultipleAmino, MultipleDNA, MultipleRNA,
+    MultipleAminoPressed, MultipleDNAPressed,
+    MultipleRNAPressed
+)
+
 plugin.register_artifact_class(
     HMM[MultipleAminoPressed],
     directory_format=BaseHmmPressedDirFmt,
@@ -69,14 +78,6 @@ plugin.register_artifact_class(
         "A collection of Hidden Markov Model profiles for RNA "
         "sequences in binary format and indexed."
     )
-)
-
-plugin.register_semantic_types(
-    HMM,
-    SingleAmino, SingleDNA, SingleRNA,
-    MultipleAmino, MultipleDNA, MultipleRNA,
-    MultipleAminoPressed, MultipleDNAPressed,
-    MultipleRNAPressed
 )
 
 plugin.register_artifact_class(

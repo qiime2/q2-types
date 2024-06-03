@@ -13,10 +13,14 @@ from ._format import (
     DnaHmmMultipleProfilesDirectoryFormat,
     RnaHmmMultipleProfilesDirectoryFormat,
     AminoHmmFileFmt, DnaHmmFileFmt, RnaHmmFileFmt,
-    AminoHmmDirectoryFormat, DnaHmmDirectoryFormat, RnaHmmDirectoryFormat
+    AminoHmmDirectoryFormat, DnaHmmDirectoryFormat, RnaHmmDirectoryFormat,
+    BaseHmmPressedDirFmt
 )
 from ._type import (
-    HMM
+    HMM,
+    SingleAmino, SingleDNA, SingleRNA,
+    MultipleAmino, MultipleDNA, MultipleRNA,
+    MultipleAminoPressed, MultipleDNAPressed, MultipleRNAPressed
 )
 
 __all__ = [
@@ -26,5 +30,9 @@ __all__ = [
     "RnaHmmMultipleProfilesDirectoryFormat",
     "AminoHmmFileFmt", "DnaHmmFileFmt", "RnaHmmFileFmt",
     "AminoHmmDirectoryFormat", "DnaHmmDirectoryFormat",
-    "RnaHmmDirectoryFormat", "HMM"
+    "RnaHmmDirectoryFormat", "HMM",
+    "SingleAmino", "SingleDNA", "SingleRNA",
+    "MultipleAmino", "MultipleDNA", "MultipleRNA",
+    "MultipleAminoPressed", "MultipleDNAPressed", "MultipleRNAPressed",
+    "BaseHmmPressedDirFmt"
 ]
