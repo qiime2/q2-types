@@ -26,6 +26,7 @@ requirements:
     - h5py
     - qiime2 {{ qiime2_epoch }}.*
     - samtools
+    - pyhmmer
 
 test:
   commands:
