@@ -78,7 +78,13 @@ class HmmBaseFileFmt(model.TextFileFormat):
         tolerance = 0.0001
 
         with HMMFile(str(self)) as hmm_file:
-            hmm_profiles = list(hmm_file)
+            try:
+                hmm_profiles = list(hmm_file)
+            except TypeError as e:
+                raise ValidationError(
+                    "Found profiles with different alphabets.\n"
+                    f"{e}"
+                )
 
             if len(hmm_profiles) > 1 and single_profile:
                 raise ValidationError(
@@ -90,8 +96,8 @@ class HmmBaseFileFmt(model.TextFileFormat):
 
                 if hmm_profile.alphabet.type.lower() != alphabet:
                     raise ValidationError(
-                        "Found profile with alphabet: "
-                        f"{hmm_profile.alph.lower()}\n"
+                        "Found profile with alphabet "
+                        f"{hmm_profile.alphabet.type.lower()}\n"
                         f"{self.__class__} only accepts {alphabet} profiles."
                     )
 

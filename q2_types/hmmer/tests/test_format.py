@@ -11,7 +11,8 @@ import os
 from qiime2.plugin.testing import TestPluginBase
 from q2_types.hmmer._format import (
     HmmIdmapFileFmt, BaseHmmPressedDirFmt, AminoHmmFileFmt, DnaHmmFileFmt,
-    # RnaHmmFileFmt
+    RnaHmmFileFmt, AminoHmmMultipleProfilesFileFmt,
+    DnaHmmMultipleProfilesFileFmt, RnaHmmMultipleProfilesFileFmt
 )
 from qiime2.plugin import ValidationError
 
@@ -101,6 +102,73 @@ class TestHmmFormats(TestPluginBase):
         fmt = DnaHmmFileFmt(self.get_data_path("hmms/dna.hmm"), "r")
         fmt.validate()
 
-    # def test_RnaHmmFileFmt_valid(self):
-    #     fmt = RnaHmmFileFmt(self.get_data_path("hmms/rna.hmm"), "r")
-    #     fmt.validate()
+    def test_RnaHmmFileFmt_valid(self):
+        fmt = RnaHmmFileFmt(self.get_data_path("hmms/rna.hmm"), "r")
+        fmt.validate()
+
+    def test_AminoHmmFileFmt_invalid_alph(self):
+        for type in ["rna", "dna"]:
+            fmt = AminoHmmFileFmt(self.get_data_path(f"hmms/{type}.hmm"), "r")
+            with self.assertRaisesRegex(
+                ValidationError, "Found profile with alphabet "
+            ):
+                fmt.validate()
+
+    def test_DnaHmmFileFmt_invalid_alph(self):
+        for type in ["rna", "amino"]:
+            fmt = DnaHmmFileFmt(self.get_data_path(f"hmms/{type}.hmm"), "r")
+            with self.assertRaisesRegex(
+                ValidationError, "Found profile with alphabet "
+            ):
+                fmt.validate()
+
+    def test_RnaHmmFileFmt_invalid_alph(self):
+        for type in ["dna", "amino"]:
+            fmt = RnaHmmFileFmt(self.get_data_path(f"hmms/{type}.hmm"), "r")
+            with self.assertRaisesRegex(
+                ValidationError, "Found profile with alphabet "
+            ):
+                fmt.validate()
+
+    def test_AminoHmmFileFmt_too_many_profiles(self):
+        fmt = AminoHmmFileFmt(self.get_data_path("hmms/4_amino.hmm"), "r")
+        with self.assertRaisesRegex(
+            ValidationError, "Expected 1 profile, found 4."
+        ):
+            fmt.validate()
+
+    def test_AminoHmmMultipleProfilesFileFmt_valid(self):
+        fmt = AminoHmmMultipleProfilesFileFmt(
+            self.get_data_path("hmms/4_amino.hmm"), 'r'
+        )
+        fmt.validate()
+
+    def test_DnaHmmMultipleProfilesFileFmt_valid(self):
+        fmt = DnaHmmMultipleProfilesFileFmt(
+            self.get_data_path("hmms/2_dna.hmm"), "r"
+        )
+        fmt.validate()
+
+    def test_RnaHmmMultipleProfilesFileFmt_valid(self):
+        fmt = RnaHmmMultipleProfilesFileFmt(
+            self.get_data_path("hmms/2_rna.hmm"), "r"
+        )
+        fmt.validate()
+
+    def test_mixed_hmm_profiles_invalid_1(self):
+        fmt = AminoHmmMultipleProfilesFileFmt(
+            self.get_data_path("hmms/amino_dna.hmm"), 'r'
+        )
+        with self.assertRaisesRegex(
+            ValidationError, "Found profiles with different alphabets."
+        ):
+            fmt.validate()
+
+    def test_mixed_hmm_profiles_invalid_2(self):
+        fmt = DnaHmmMultipleProfilesFileFmt(
+            self.get_data_path("hmms/rna_dna.hmm"), 'r'
+        )
+        with self.assertRaisesRegex(
+            ValidationError, "Found profiles with different alphabets."
+        ):
+            fmt.validate()
