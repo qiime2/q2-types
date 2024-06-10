@@ -11,12 +11,12 @@ from qiime2.core.exceptions import ValidationError
 from q2_types.plugin_setup import plugin
 
 
-class HmmBinaryFileFmt(model.BinaryFileFormat):
+class ProfileHmmBinaryFileFmt(model.BinaryFileFormat):
     def _validate_(self, level):
         pass
 
 
-class BaseHmmPressedDirFmt(model.DirectoryFormat):
+class PressedProfileHmmsDirectoryFmt(model.DirectoryFormat):
     """
     The  <hmmfile>.h3m file contains the profile HMMs
     and their annotation in a binary format. The <hmmfile>.h3i file is an
@@ -25,16 +25,14 @@ class BaseHmmPressedDirFmt(model.DirectoryFormat):
     (the MSV filter).  The <hmmfile>.h3p file contains precomputed data
     structures for the rest of each profile.
     """
-    h3m = model.File(r'.*\.hmm\.h3m', format=HmmBinaryFileFmt)
-    h3i = model.File(r'.*\.hmm\.h3i', format=HmmBinaryFileFmt)
-    h3f = model.File(r'.*\.hmm\.h3f', format=HmmBinaryFileFmt)
-    h3p = model.File(r'.*\.hmm\.h3p', format=HmmBinaryFileFmt)
+    h3m = model.File(r'.*\.hmm\.h3m', format=ProfileHmmBinaryFileFmt)
+    h3i = model.File(r'.*\.hmm\.h3i', format=ProfileHmmBinaryFileFmt)
+    h3f = model.File(r'.*\.hmm\.h3f', format=ProfileHmmBinaryFileFmt)
+    h3p = model.File(r'.*\.hmm\.h3p', format=ProfileHmmBinaryFileFmt)
 
 
-class HmmBaseFileFmt(model.TextFileFormat):
-    def _validate_file_fmt(
-            self, level: str, alphabet: str, single_profile: bool
-    ):
+class ProfileHmmFileFmt(model.TextFileFormat):
+    def _validate_(self, level: str):
         """
         Check http://eddylab.org/software/hmmer/Userguide.pdf
         section "HMMER profile HMM files" for full description of
@@ -52,7 +50,7 @@ class HmmBaseFileFmt(model.TextFileFormat):
                     f"{e}"
                 )
 
-            if len(hmm_profiles) > 1 and single_profile:
+            if len(hmm_profiles) > 1 and self.single_profile:
                 raise ValidationError(
                         f"Expected 1 profile, found {len(hmm_profiles)}."
                     )
@@ -60,84 +58,80 @@ class HmmBaseFileFmt(model.TextFileFormat):
             for hmm_profile in hmm_profiles[:parse_n_profiles]:
                 hmm_profile.validate(tolerance=tolerance)
 
-                if hmm_profile.alphabet.type.lower() != alphabet:
+                if hmm_profile.alphabet.type.lower() != self.alphabet:
                     raise ValidationError(
                         "Found profile with alphabet "
                         f"{hmm_profile.alphabet.type.lower()}\n"
-                        f"{self.__class__} only accepts {alphabet} profiles."
+                        f"Expected alphabet: {self.alphabet}."
                     )
 
 
-class ProteinHmmFileFmt(HmmBaseFileFmt):
+class ProteinProfileHmmFileFmt(ProfileHmmFileFmt):
     alphabet = "amino"
 
-    def _validate_(self, level):
-        self._validate_file_fmt(level, self.alphabet, True)
+
+class ProteinSingleProfileHmmFileFmt(ProteinProfileHmmFileFmt):
+    single_profile = True
 
 
-class DnaHmmFileFmt(HmmBaseFileFmt):
+class ProteinMultipleProfileHmmFileFmt(ProteinProfileHmmFileFmt):
+    single_profile = False
+
+
+class DnaProfileHmmFileFmt(ProfileHmmFileFmt):
     alphabet = "dna"
 
-    def _validate_(self, level):
-        self._validate_file_fmt(level, self.alphabet, True)
+
+class DnaSingleProfileHmmFileFmt(DnaProfileHmmFileFmt):
+    single_profile = True
 
 
-class RnaHmmFileFmt(HmmBaseFileFmt):
+class DnaMultipleProfileHmmFileFmt(DnaProfileHmmFileFmt):
+    single_profile = False
+
+
+class RnaProfileHmmFileFmt(ProfileHmmFileFmt):
     alphabet = "rna"
 
-    def _validate_(self, level):
-        self._validate_file_fmt(level, self.alphabet, True)
+
+class RnaSingleProfileHmmFileFmt(RnaProfileHmmFileFmt):
+    single_profile = True
 
 
-ProteinHmmDirectoryFormat = model.SingleFileDirectoryFormat(
-    'AminoHmmFileFmt', r'.*\..hmm', ProteinHmmFileFmt)
-
-DnaHmmDirectoryFormat = model.SingleFileDirectoryFormat(
-    'DnaHmmFileFmt', r'.*\..hmm', DnaHmmFileFmt)
-
-RnaHmmDirectoryFormat = model.SingleFileDirectoryFormat(
-    'RnaHmmFileFmt', r'.*\..hmm', RnaHmmFileFmt)
+class RnaMultipleProfileHmmFileFmt(RnaProfileHmmFileFmt):
+    single_profile = False
 
 
-class ProteinHmmMultipleProfilesFileFmt(ProteinHmmFileFmt):
-    def _validate_(self, level):
-        self._validate_file_fmt(level, self.alphabet, False)
+class ProteinSingleProfileHmmDirectoryFmt(model.DirectoryFormat):
+    profile = model.File(r'.*\.hmm', format=ProteinSingleProfileHmmFileFmt)
 
 
-class DnaHmmMultipleProfilesFileFmt(DnaHmmFileFmt):
-    def _validate_(self, level):
-        self._validate_file_fmt(level, self.alphabet, False)
+class ProteinMultipleProfileHmmDirectoryFmt(model.DirectoryFormat):
+    profiles = model.File(r'.*\.hmm', format=ProteinMultipleProfileHmmFileFmt)
 
 
-class RnaHmmMultipleProfilesFileFmt(RnaHmmFileFmt):
-    def _validate_(self, level):
-        self._validate_file_fmt(level, self.alphabet, False)
+class DnaSingleProfileHmmDirectoryFmt(model.DirectoryFormat):
+    profile = model.File(r'.*\.hmm', format=DnaSingleProfileHmmFileFmt)
 
 
-ProteinHmmMultipleProfilesDirectoryFormat = model.SingleFileDirectoryFormat(
-    'AminoHmmMultipleProfilesDirectoryFormat',
-    r'.*\..hmm',
-    ProteinHmmMultipleProfilesFileFmt
-)
+class DnaMultipleProfileHmmDirectoryFmt(model.DirectoryFormat):
+    profiles = model.File(r'.*\.hmm', format=DnaMultipleProfileHmmFileFmt)
 
-DnaHmmMultipleProfilesDirectoryFormat = model.SingleFileDirectoryFormat(
-    'DnaHmmMultipleProfilesDirectoryFormat',
-    r'.*\..hmm',
-    DnaHmmMultipleProfilesFileFmt,
-)
 
-RnaHmmMultipleProfilesDirectoryFormat = model.SingleFileDirectoryFormat(
-    'RnaHmmMultipleProfilesDirectoryFormat',
-    r'.*\..hmm',
-    RnaHmmMultipleProfilesFileFmt,
-)
+class RnaSingleProfileHmmDirectoryFmt(model.DirectoryFormat):
+    profile = model.File(r'.*\.hmm', format=RnaSingleProfileHmmFileFmt)
+
+
+class RnaMultipleProfileHmmDirectoryFmt(model.DirectoryFormat):
+    profiles = model.File(r'.*\.hmm', format=RnaMultipleProfileHmmFileFmt)
+
 
 plugin.register_formats(
-    ProteinHmmMultipleProfilesFileFmt,
-    DnaHmmMultipleProfilesFileFmt,
-    RnaHmmMultipleProfilesFileFmt,
-    ProteinHmmMultipleProfilesDirectoryFormat,
-    DnaHmmMultipleProfilesDirectoryFormat,
-    RnaHmmMultipleProfilesDirectoryFormat,
-    ProteinHmmDirectoryFormat, DnaHmmDirectoryFormat, RnaHmmDirectoryFormat
+    PressedProfileHmmsDirectoryFmt,
+    ProteinSingleProfileHmmDirectoryFmt,
+    ProteinMultipleProfileHmmDirectoryFmt,
+    DnaSingleProfileHmmDirectoryFmt,
+    DnaMultipleProfileHmmDirectoryFmt,
+    RnaSingleProfileHmmDirectoryFmt,
+    RnaMultipleProfileHmmDirectoryFmt
 )

@@ -8,11 +8,13 @@
 from qiime2.plugin import SemanticType
 from q2_types.plugin_setup import plugin
 from q2_types.profile_hmms._format import (
-    ProteinHmmMultipleProfilesDirectoryFormat,
-    DnaHmmMultipleProfilesDirectoryFormat,
-    RnaHmmMultipleProfilesDirectoryFormat,
-    ProteinHmmDirectoryFormat, DnaHmmDirectoryFormat, RnaHmmDirectoryFormat,
-    BaseHmmPressedDirFmt
+    PressedProfileHmmsDirectoryFmt,
+    DnaSingleProfileHmmDirectoryFmt,
+    DnaMultipleProfileHmmDirectoryFmt,
+    RnaSingleProfileHmmDirectoryFmt,
+    RnaMultipleProfileHmmDirectoryFmt,
+    ProteinSingleProfileHmmDirectoryFmt,
+    ProteinMultipleProfileHmmDirectoryFmt
 )
 
 
@@ -54,7 +56,7 @@ plugin.register_semantic_types(
 
 plugin.register_artifact_class(
     ProfileHMM[PressedProtein],
-    directory_format=BaseHmmPressedDirFmt,
+    directory_format=PressedProfileHmmsDirectoryFmt,
     description=(
         "A collection of profile Hidden Markov Models for amino acid "
         "sequences in binary format and indexed."
@@ -63,7 +65,7 @@ plugin.register_artifact_class(
 
 plugin.register_artifact_class(
     ProfileHMM[PressedDNA],
-    directory_format=BaseHmmPressedDirFmt,
+    directory_format=PressedProfileHmmsDirectoryFmt,
     description=(
         "A collection of profile Hidden Markov Models for DNA "
         "sequences in binary format and indexed."
@@ -72,7 +74,7 @@ plugin.register_artifact_class(
 
 plugin.register_artifact_class(
     ProfileHMM[PressedRNA],
-    directory_format=BaseHmmPressedDirFmt,
+    directory_format=PressedProfileHmmsDirectoryFmt,
     description=(
         "A collection of profile Hidden Markov Models for RNA "
         "sequences in binary format and indexed."
@@ -81,7 +83,7 @@ plugin.register_artifact_class(
 
 plugin.register_artifact_class(
     ProfileHMM[SingleProtein],
-    directory_format=ProteinHmmDirectoryFormat,
+    directory_format=ProteinSingleProfileHmmDirectoryFmt,
     description=(
         "One single profile Hidden Markov Model representing a group "
         "of related proteins."
@@ -90,7 +92,7 @@ plugin.register_artifact_class(
 
 plugin.register_artifact_class(
     ProfileHMM[SingleDNA],
-    directory_format=DnaHmmDirectoryFormat,
+    directory_format=DnaSingleProfileHmmDirectoryFmt,
     description=(
         "One single profile Hidden Markov Model representing a group "
         "of related DNA sequences."
@@ -99,7 +101,7 @@ plugin.register_artifact_class(
 
 plugin.register_artifact_class(
     ProfileHMM[SingleRNA],
-    directory_format=RnaHmmDirectoryFormat,
+    directory_format=RnaSingleProfileHmmDirectoryFmt,
     description=(
         "One single profile Hidden Markov Model representing a group "
         "of related RNA sequences."
@@ -108,7 +110,7 @@ plugin.register_artifact_class(
 
 plugin.register_artifact_class(
     ProfileHMM[MultipleProtein],
-    directory_format=ProteinHmmMultipleProfilesDirectoryFormat,
+    directory_format=ProteinMultipleProfileHmmDirectoryFmt,
     description=(
         "A collection of profile Hidden Markov Models, "
         "each representing a group of related proteins."
@@ -117,7 +119,7 @@ plugin.register_artifact_class(
 
 plugin.register_artifact_class(
     ProfileHMM[MultipleDNA],
-    directory_format=DnaHmmMultipleProfilesDirectoryFormat,
+    directory_format=DnaMultipleProfileHmmDirectoryFmt,
     description=(
         "A collection of profile Hidden Markov Models, "
         "each representing a group of related DNA sequences."
@@ -126,7 +128,7 @@ plugin.register_artifact_class(
 
 plugin.register_artifact_class(
     ProfileHMM[MultipleRNA],
-    directory_format=RnaHmmMultipleProfilesDirectoryFormat,
+    directory_format=RnaMultipleProfileHmmDirectoryFmt,
     description=(
         "A collection of profile Hidden Markov Models, "
         "each representing a group of related RNA sequences."

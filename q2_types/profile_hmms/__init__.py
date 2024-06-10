@@ -6,15 +6,13 @@
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
 from ._format import (
-    ProteinHmmMultipleProfilesFileFmt,
-    DnaHmmMultipleProfilesFileFmt,
-    RnaHmmMultipleProfilesFileFmt,
-    ProteinHmmMultipleProfilesDirectoryFormat,
-    DnaHmmMultipleProfilesDirectoryFormat,
-    RnaHmmMultipleProfilesDirectoryFormat,
-    ProteinHmmFileFmt, DnaHmmFileFmt, RnaHmmFileFmt,
-    ProteinHmmDirectoryFormat, DnaHmmDirectoryFormat, RnaHmmDirectoryFormat,
-    BaseHmmPressedDirFmt
+    PressedProfileHmmsDirectoryFmt,
+    ProteinSingleProfileHmmDirectoryFmt,
+    ProteinMultipleProfileHmmDirectoryFmt,
+    DnaSingleProfileHmmDirectoryFmt,
+    DnaMultipleProfileHmmDirectoryFmt,
+    RnaSingleProfileHmmDirectoryFmt,
+    RnaMultipleProfileHmmDirectoryFmt
 )
 from ._type import (
     ProfileHMM,
@@ -24,17 +22,15 @@ from ._type import (
 )
 
 __all__ = [
-    "ProteinHmmMultipleProfilesFileFmt",
-    "DnaHmmMultipleProfilesFileFmt",
-    "RnaHmmMultipleProfilesFileFmt",
-    "ProteinHmmMultipleProfilesDirectoryFormat",
-    "DnaHmmMultipleProfilesDirectoryFormat",
-    "RnaHmmMultipleProfilesDirectoryFormat",
-    "ProteinHmmFileFmt", "DnaHmmFileFmt", "RnaHmmFileFmt",
-    "ProteinHmmDirectoryFormat",
-    "DnaHmmDirectoryFormat",
-    "RnaHmmDirectoryFormat",
-    "BaseHmmPressedDirFmt",
+    "ProfileHmmBinaryFileFmt",
+    "PressedProfileHmmsDirectoryFmt",
+    "ProfileHmmFileFmt",
+    "ProteinSingleProfileHmmDirectoryFmt",
+    "ProteinMultipleProfileHmmDirectoryFmt",
+    "DnaSingleProfileHmmDirectoryFmt",
+    "DnaMultipleProfileHmmDirectoryFmt",
+    "RnaSingleProfileHmmDirectoryFmt",
+    "RnaMultipleProfileHmmDirectoryFmt",
     "ProfileHMM",
     "SingleProtein", "SingleDNA", "SingleRNA",
     "MultipleProtein", "MultipleDNA", "MultipleRNA",

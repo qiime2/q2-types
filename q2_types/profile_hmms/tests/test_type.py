@@ -7,14 +7,17 @@
 # ----------------------------------------------------------------------------
 from qiime2.plugin.testing import TestPluginBase
 from q2_types.profile_hmms._type import (
-    ProfileHMM, BaseHmmPressedDirFmt,
-    ProteinHmmMultipleProfilesDirectoryFormat,
-    DnaHmmMultipleProfilesDirectoryFormat,
-    RnaHmmMultipleProfilesDirectoryFormat,
-    ProteinHmmDirectoryFormat, DnaHmmDirectoryFormat, RnaHmmDirectoryFormat,
+    ProfileHMM,
     SingleProtein, SingleDNA, SingleRNA,
     MultipleProtein, MultipleDNA, MultipleRNA,
-    PressedProtein, PressedDNA, PressedRNA
+    PressedProtein, PressedDNA, PressedRNA,
+    PressedProfileHmmsDirectoryFmt,
+    DnaSingleProfileHmmDirectoryFmt,
+    DnaMultipleProfileHmmDirectoryFmt,
+    RnaSingleProfileHmmDirectoryFmt,
+    RnaMultipleProfileHmmDirectoryFmt,
+    ProteinSingleProfileHmmDirectoryFmt,
+    ProteinMultipleProfileHmmDirectoryFmt
 )
 
 
@@ -26,46 +29,45 @@ class TestHMMType(TestPluginBase):
 
     def test_SingleAmino_semantic_type_registered_to_DirFmt(self):
         self.assertSemanticTypeRegisteredToFormat(
-            ProfileHMM[SingleProtein], ProteinHmmDirectoryFormat
+            ProfileHMM[SingleProtein], ProteinSingleProfileHmmDirectoryFmt
         )
 
     def test_SingleDNA_semantic_type_registered_to_DirFmt(self):
         self.assertSemanticTypeRegisteredToFormat(
-            ProfileHMM[SingleDNA], DnaHmmDirectoryFormat
+            ProfileHMM[SingleDNA], DnaSingleProfileHmmDirectoryFmt
         )
 
     def test_SingleRNA_semantic_type_registered_to_DirFmt(self):
         self.assertSemanticTypeRegisteredToFormat(
-            ProfileHMM[SingleRNA], RnaHmmDirectoryFormat
+            ProfileHMM[SingleRNA], RnaSingleProfileHmmDirectoryFmt
         )
 
     def test_MultipleAmino_semantic_type_registered_to_DirFmt(self):
         self.assertSemanticTypeRegisteredToFormat(
-            ProfileHMM[MultipleProtein],
-            ProteinHmmMultipleProfilesDirectoryFormat
+            ProfileHMM[MultipleProtein], ProteinMultipleProfileHmmDirectoryFmt
         )
 
     def test_MultipleDNA_semantic_type_registered_to_DirFmt(self):
         self.assertSemanticTypeRegisteredToFormat(
-            ProfileHMM[MultipleDNA], DnaHmmMultipleProfilesDirectoryFormat
+            ProfileHMM[MultipleDNA], DnaMultipleProfileHmmDirectoryFmt
         )
 
     def test_MultipleRNA_semantic_type_registered_to_DirFmt(self):
         self.assertSemanticTypeRegisteredToFormat(
-            ProfileHMM[MultipleRNA], RnaHmmMultipleProfilesDirectoryFormat
+            ProfileHMM[MultipleRNA], RnaMultipleProfileHmmDirectoryFmt
         )
 
     def test_MultipleAminoPressed_semantic_type_registered_to_DirFmt(self):
         self.assertSemanticTypeRegisteredToFormat(
-            ProfileHMM[PressedProtein], BaseHmmPressedDirFmt
+            ProfileHMM[PressedProtein], PressedProfileHmmsDirectoryFmt
         )
 
     def test_MultipleDNAPressed_semantic_type_registered_to_DirFmt(self):
         self.assertSemanticTypeRegisteredToFormat(
-            ProfileHMM[PressedDNA], BaseHmmPressedDirFmt
+            ProfileHMM[PressedDNA], PressedProfileHmmsDirectoryFmt
         )
 
     def test_MultipleRNAPressed_semantic_type_registered_to_DirFmt(self):
         self.assertSemanticTypeRegisteredToFormat(
-            ProfileHMM[PressedRNA], BaseHmmPressedDirFmt
+            ProfileHMM[PressedRNA], PressedProfileHmmsDirectoryFmt
         )
