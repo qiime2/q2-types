@@ -47,7 +47,7 @@ class ProfileHmmFileFmt(model.TextFileFormat):
             except TypeError as e:
                 raise ValidationError(
                     "Found profiles with different alphabets.\n"
-                    f"{e}"
+                    f"Printing pyhmmer error message: {e}"
                 )
 
             if len(hmm_profiles) > 1 and self.single_profile:
