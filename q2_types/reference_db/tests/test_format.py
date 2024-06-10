@@ -7,11 +7,11 @@
 # ----------------------------------------------------------------------------
 from qiime2.plugin.testing import TestPluginBase
 from q2_types.reference_db._format import (
-        DiamondDatabaseFileFmt, DiamondDatabaseDirFmt, EggnogRefBinFileFmt,
-        EggnogRefDirFmt, NCBITaxonomyNamesFormat, NCBITaxonomyNodesFormat,
-        NCBITaxonomyDirFmt, NCBITaxonomyBinaryFileFmt,
-        EggnogProteinSequencesDirFmt, EggnogRefTextFileFmt
-        )
+    DiamondDatabaseFileFmt, DiamondDatabaseDirFmt, EggnogRefBinFileFmt,
+    EggnogRefDirFmt, NCBITaxonomyNamesFormat, NCBITaxonomyNodesFormat,
+    NCBITaxonomyDirFmt, NCBITaxonomyBinaryFileFmt,
+    EggnogProteinSequencesDirFmt, EggnogRefTextFileFmt
+)
 from qiime2.plugin import ValidationError
 
 

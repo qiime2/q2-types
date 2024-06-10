@@ -5,7 +5,6 @@
 #
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
-import re
 from pyhmmer.plan7 import HMMFile
 from qiime2.plugin import model
 from qiime2.core.exceptions import ValidationError
@@ -15,36 +14,6 @@ from q2_types.plugin_setup import plugin
 class HmmBinaryFileFmt(model.BinaryFileFormat):
     def _validate_(self, level):
         pass
-
-
-class HmmIdmapFileFmt(model.TextFileFormat):
-    def _validate_(self, level):
-        with open(str(self), 'r') as file:
-            # Set the number of rows to be parsed
-            max_lines = {"min": 100, "max": 10000000}[level]
-            lines = file.readlines()
-            for i, line in enumerate(lines, 1):
-                # Check number of lines parsed so far
-                if i > max_lines:
-                    break
-
-                # Validate line
-                if not re.match(r'^(\d+) ([A-Z0-9]+)$', line):
-                    raise ValidationError(
-                        f"Invalid line {i}.\n"
-                        f"{line} \n"
-                        "Expected index and an alphanumeric code separated "
-                        "by a single space."
-                    )
-
-                # Check index is equal to line number
-                idx, code = line.rstrip("\n").split(sep=" ")
-                if not idx == str(i):
-                    raise ValidationError(
-                        f"Invalid line {i}.\n"
-                        f"{line} \n"
-                        f"Expected index {i} but got {idx} instead.\n"
-                    )
 
 
 class BaseHmmPressedDirFmt(model.DirectoryFormat):
@@ -60,9 +29,6 @@ class BaseHmmPressedDirFmt(model.DirectoryFormat):
     h3i = model.File(r'.*\.hmm\.h3i', format=HmmBinaryFileFmt)
     h3f = model.File(r'.*\.hmm\.h3f', format=HmmBinaryFileFmt)
     h3p = model.File(r'.*\.hmm\.h3p', format=HmmBinaryFileFmt)
-    idmap = model.File(
-        r'.*\.hmm\.idmap', format=HmmIdmapFileFmt, optional=True
-    )
 
 
 class HmmBaseFileFmt(model.TextFileFormat):
@@ -102,7 +68,7 @@ class HmmBaseFileFmt(model.TextFileFormat):
                     )
 
 
-class AminoHmmFileFmt(HmmBaseFileFmt):
+class ProteinHmmFileFmt(HmmBaseFileFmt):
     alphabet = "amino"
 
     def _validate_(self, level):
@@ -123,17 +89,17 @@ class RnaHmmFileFmt(HmmBaseFileFmt):
         self._validate_file_fmt(level, self.alphabet, True)
 
 
-AminoHmmDirectoryFormat = model.SingleFileDirectoryFormat(
-    'AminoHmmFileFmt', 'profile.hmm', AminoHmmFileFmt)
+ProteinHmmDirectoryFormat = model.SingleFileDirectoryFormat(
+    'AminoHmmFileFmt', r'.*\..hmm', ProteinHmmFileFmt)
 
 DnaHmmDirectoryFormat = model.SingleFileDirectoryFormat(
-    'DnaHmmFileFmt', 'profile.hmm', DnaHmmFileFmt)
+    'DnaHmmFileFmt', r'.*\..hmm', DnaHmmFileFmt)
 
 RnaHmmDirectoryFormat = model.SingleFileDirectoryFormat(
-    'RnaHmmFileFmt', 'profile.hmm', RnaHmmFileFmt)
+    'RnaHmmFileFmt', r'.*\..hmm', RnaHmmFileFmt)
 
 
-class AminoHmmMultipleProfilesFileFmt(AminoHmmFileFmt):
+class ProteinHmmMultipleProfilesFileFmt(ProteinHmmFileFmt):
     def _validate_(self, level):
         self._validate_file_fmt(level, self.alphabet, False)
 
@@ -148,28 +114,30 @@ class RnaHmmMultipleProfilesFileFmt(RnaHmmFileFmt):
         self._validate_file_fmt(level, self.alphabet, False)
 
 
-AminoHmmMultipleProfilesDirectoryFormat = model.SingleFileDirectoryFormat(
+ProteinHmmMultipleProfilesDirectoryFormat = model.SingleFileDirectoryFormat(
     'AminoHmmMultipleProfilesDirectoryFormat',
-    'profile.hmm',
-    AminoHmmMultipleProfilesFileFmt
+    r'.*\..hmm',
+    ProteinHmmMultipleProfilesFileFmt
 )
 
 DnaHmmMultipleProfilesDirectoryFormat = model.SingleFileDirectoryFormat(
     'DnaHmmMultipleProfilesDirectoryFormat',
-    'profile.hmm',
+    r'.*\..hmm',
     DnaHmmMultipleProfilesFileFmt,
 )
 
 RnaHmmMultipleProfilesDirectoryFormat = model.SingleFileDirectoryFormat(
     'RnaHmmMultipleProfilesDirectoryFormat',
-    'profile.hmm',
+    r'.*\..hmm',
     RnaHmmMultipleProfilesFileFmt,
 )
 
 plugin.register_formats(
-    AminoHmmMultipleProfilesFileFmt, DnaHmmMultipleProfilesFileFmt,
-    RnaHmmMultipleProfilesFileFmt, AminoHmmMultipleProfilesDirectoryFormat,
+    ProteinHmmMultipleProfilesFileFmt,
+    DnaHmmMultipleProfilesFileFmt,
+    RnaHmmMultipleProfilesFileFmt,
+    ProteinHmmMultipleProfilesDirectoryFormat,
     DnaHmmMultipleProfilesDirectoryFormat,
     RnaHmmMultipleProfilesDirectoryFormat,
-    AminoHmmDirectoryFormat, DnaHmmDirectoryFormat, RnaHmmDirectoryFormat
+    ProteinHmmDirectoryFormat, DnaHmmDirectoryFormat, RnaHmmDirectoryFormat
 )
