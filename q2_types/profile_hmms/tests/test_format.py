@@ -17,7 +17,7 @@ from qiime2.plugin import ValidationError
 
 
 class TestHmmFormats(TestPluginBase):
-    package = 'q2_types.hmmer.tests'
+    package = 'q2_types.profile_hmms.tests'
 
     def test_BaseHmmPressedDirFmt_valid(self):
         fmt = BaseHmmPressedDirFmt(self.get_data_path("bacteria"), 'r')
