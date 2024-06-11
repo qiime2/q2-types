@@ -89,6 +89,8 @@ setup(
             ['data/*', 'data/db-valid/*'],
         'q2_types.reference_db.tests':
             ['data/*', 'data/*/*', 'data/*/*/*'],
+        'q2_types.profile_hmm.tests':
+            ['data/*', 'data/*/*']
     },
     zip_safe=False,
 )
