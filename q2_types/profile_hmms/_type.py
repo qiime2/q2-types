@@ -9,10 +9,10 @@ from qiime2.plugin import SemanticType
 from q2_types.plugin_setup import plugin
 from q2_types.profile_hmms._format import (
     PressedProfileHmmsDirectoryFmt,
-    DnaSingleProfileHmmDirectoryFmt,
-    DnaMultipleProfileHmmDirectoryFmt,
-    RnaSingleProfileHmmDirectoryFmt,
-    RnaMultipleProfileHmmDirectoryFmt,
+    DNASingleProfileHmmDirectoryFmt,
+    DNAMultipleProfileHmmDirectoryFmt,
+    RNASingleProfileHmmDirectoryFmt,
+    RNAMultipleProfileHmmDirectoryFmt,
     ProteinSingleProfileHmmDirectoryFmt,
     ProteinMultipleProfileHmmDirectoryFmt
 )
@@ -92,7 +92,7 @@ plugin.register_artifact_class(
 
 plugin.register_artifact_class(
     ProfileHMM[SingleDNA],
-    directory_format=DnaSingleProfileHmmDirectoryFmt,
+    directory_format=DNASingleProfileHmmDirectoryFmt,
     description=(
         "One single profile Hidden Markov Model representing a group "
         "of related DNA sequences."
@@ -101,7 +101,7 @@ plugin.register_artifact_class(
 
 plugin.register_artifact_class(
     ProfileHMM[SingleRNA],
-    directory_format=RnaSingleProfileHmmDirectoryFmt,
+    directory_format=RNASingleProfileHmmDirectoryFmt,
     description=(
         "One single profile Hidden Markov Model representing a group "
         "of related RNA sequences."
@@ -119,7 +119,7 @@ plugin.register_artifact_class(
 
 plugin.register_artifact_class(
     ProfileHMM[MultipleDNA],
-    directory_format=DnaMultipleProfileHmmDirectoryFmt,
+    directory_format=DNAMultipleProfileHmmDirectoryFmt,
     description=(
         "A collection of profile Hidden Markov Models, "
         "each representing a group of related DNA sequences."
@@ -128,7 +128,7 @@ plugin.register_artifact_class(
 
 plugin.register_artifact_class(
     ProfileHMM[MultipleRNA],
-    directory_format=RnaMultipleProfileHmmDirectoryFmt,
+    directory_format=RNAMultipleProfileHmmDirectoryFmt,
     description=(
         "A collection of profile Hidden Markov Models, "
         "each representing a group of related RNA sequences."

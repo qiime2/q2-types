@@ -12,10 +12,10 @@ from q2_types.profile_hmms._type import (
     MultipleProtein, MultipleDNA, MultipleRNA,
     PressedProtein, PressedDNA, PressedRNA,
     PressedProfileHmmsDirectoryFmt,
-    DnaSingleProfileHmmDirectoryFmt,
-    DnaMultipleProfileHmmDirectoryFmt,
-    RnaSingleProfileHmmDirectoryFmt,
-    RnaMultipleProfileHmmDirectoryFmt,
+    DNASingleProfileHmmDirectoryFmt,
+    DNAMultipleProfileHmmDirectoryFmt,
+    RNASingleProfileHmmDirectoryFmt,
+    RNAMultipleProfileHmmDirectoryFmt,
     ProteinSingleProfileHmmDirectoryFmt,
     ProteinMultipleProfileHmmDirectoryFmt
 )
@@ -34,12 +34,12 @@ class TestHMMType(TestPluginBase):
 
     def test_SingleDNA_semantic_type_registered_to_DirFmt(self):
         self.assertSemanticTypeRegisteredToFormat(
-            ProfileHMM[SingleDNA], DnaSingleProfileHmmDirectoryFmt
+            ProfileHMM[SingleDNA], DNASingleProfileHmmDirectoryFmt
         )
 
     def test_SingleRNA_semantic_type_registered_to_DirFmt(self):
         self.assertSemanticTypeRegisteredToFormat(
-            ProfileHMM[SingleRNA], RnaSingleProfileHmmDirectoryFmt
+            ProfileHMM[SingleRNA], RNASingleProfileHmmDirectoryFmt
         )
 
     def test_MultipleAmino_semantic_type_registered_to_DirFmt(self):
@@ -49,12 +49,12 @@ class TestHMMType(TestPluginBase):
 
     def test_MultipleDNA_semantic_type_registered_to_DirFmt(self):
         self.assertSemanticTypeRegisteredToFormat(
-            ProfileHMM[MultipleDNA], DnaMultipleProfileHmmDirectoryFmt
+            ProfileHMM[MultipleDNA], DNAMultipleProfileHmmDirectoryFmt
         )
 
     def test_MultipleRNA_semantic_type_registered_to_DirFmt(self):
         self.assertSemanticTypeRegisteredToFormat(
-            ProfileHMM[MultipleRNA], RnaMultipleProfileHmmDirectoryFmt
+            ProfileHMM[MultipleRNA], RNAMultipleProfileHmmDirectoryFmt
         )
 
     def test_MultipleAminoPressed_semantic_type_registered_to_DirFmt(self):

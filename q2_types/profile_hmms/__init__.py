@@ -9,10 +9,10 @@ from ._format import (
     PressedProfileHmmsDirectoryFmt,
     ProteinSingleProfileHmmDirectoryFmt,
     ProteinMultipleProfileHmmDirectoryFmt,
-    DnaSingleProfileHmmDirectoryFmt,
-    DnaMultipleProfileHmmDirectoryFmt,
-    RnaSingleProfileHmmDirectoryFmt,
-    RnaMultipleProfileHmmDirectoryFmt
+    DNASingleProfileHmmDirectoryFmt,
+    DNAMultipleProfileHmmDirectoryFmt,
+    RNASingleProfileHmmDirectoryFmt,
+    RNAMultipleProfileHmmDirectoryFmt
 )
 from ._type import (
     ProfileHMM,
@@ -27,10 +27,10 @@ __all__ = [
     "ProfileHmmFileFmt",
     "ProteinSingleProfileHmmDirectoryFmt",
     "ProteinMultipleProfileHmmDirectoryFmt",
-    "DnaSingleProfileHmmDirectoryFmt",
-    "DnaMultipleProfileHmmDirectoryFmt",
-    "RnaSingleProfileHmmDirectoryFmt",
-    "RnaMultipleProfileHmmDirectoryFmt",
+    "DNASingleProfileHmmDirectoryFmt",
+    "DNAMultipleProfileHmmDirectoryFmt",
+    "RNASingleProfileHmmDirectoryFmt",
+    "RNAMultipleProfileHmmDirectoryFmt",
     "ProfileHMM",
     "SingleProtein", "SingleDNA", "SingleRNA",
     "MultipleProtein", "MultipleDNA", "MultipleRNA",

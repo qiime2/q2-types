@@ -78,27 +78,27 @@ class ProteinMultipleProfileHmmFileFmt(ProteinProfileHmmFileFmt):
     single = False
 
 
-class DnaProfileHmmFileFmt(ProfileHmmFileFmt):
+class DNAProfileHmmFileFmt(ProfileHmmFileFmt):
     alphabet = "dna"
 
 
-class DnaSingleProfileHmmFileFmt(DnaProfileHmmFileFmt):
+class DNASingleProfileHmmFileFmt(DNAProfileHmmFileFmt):
     single = True
 
 
-class DnaMultipleProfileHmmFileFmt(DnaProfileHmmFileFmt):
+class DNAMultipleProfileHmmFileFmt(DNAProfileHmmFileFmt):
     single = False
 
 
-class RnaProfileHmmFileFmt(ProfileHmmFileFmt):
+class RNAProfileHmmFileFmt(ProfileHmmFileFmt):
     alphabet = "rna"
 
 
-class RnaSingleProfileHmmFileFmt(RnaProfileHmmFileFmt):
+class RNASingleProfileHmmFileFmt(RNAProfileHmmFileFmt):
     single = True
 
 
-class RnaMultipleProfileHmmFileFmt(RnaProfileHmmFileFmt):
+class RNAMultipleProfileHmmFileFmt(RNAProfileHmmFileFmt):
     single = False
 
 
@@ -110,28 +110,28 @@ class ProteinMultipleProfileHmmDirectoryFmt(model.DirectoryFormat):
     profiles = model.File(r'.*\.hmm', format=ProteinMultipleProfileHmmFileFmt)
 
 
-class DnaSingleProfileHmmDirectoryFmt(model.DirectoryFormat):
-    profile = model.File(r'.*\.hmm', format=DnaSingleProfileHmmFileFmt)
+class DNASingleProfileHmmDirectoryFmt(model.DirectoryFormat):
+    profile = model.File(r'.*\.hmm', format=DNASingleProfileHmmFileFmt)
 
 
-class DnaMultipleProfileHmmDirectoryFmt(model.DirectoryFormat):
-    profiles = model.File(r'.*\.hmm', format=DnaMultipleProfileHmmFileFmt)
+class DNAMultipleProfileHmmDirectoryFmt(model.DirectoryFormat):
+    profiles = model.File(r'.*\.hmm', format=DNAMultipleProfileHmmFileFmt)
 
 
-class RnaSingleProfileHmmDirectoryFmt(model.DirectoryFormat):
-    profile = model.File(r'.*\.hmm', format=RnaSingleProfileHmmFileFmt)
+class RNASingleProfileHmmDirectoryFmt(model.DirectoryFormat):
+    profile = model.File(r'.*\.hmm', format=RNASingleProfileHmmFileFmt)
 
 
-class RnaMultipleProfileHmmDirectoryFmt(model.DirectoryFormat):
-    profiles = model.File(r'.*\.hmm', format=RnaMultipleProfileHmmFileFmt)
+class RNAMultipleProfileHmmDirectoryFmt(model.DirectoryFormat):
+    profiles = model.File(r'.*\.hmm', format=RNAMultipleProfileHmmFileFmt)
 
 
 plugin.register_formats(
     PressedProfileHmmsDirectoryFmt,
     ProteinSingleProfileHmmDirectoryFmt,
     ProteinMultipleProfileHmmDirectoryFmt,
-    DnaSingleProfileHmmDirectoryFmt,
-    DnaMultipleProfileHmmDirectoryFmt,
-    RnaSingleProfileHmmDirectoryFmt,
-    RnaMultipleProfileHmmDirectoryFmt
+    DNASingleProfileHmmDirectoryFmt,
+    DNAMultipleProfileHmmDirectoryFmt,
+    RNASingleProfileHmmDirectoryFmt,
+    RNAMultipleProfileHmmDirectoryFmt
 )

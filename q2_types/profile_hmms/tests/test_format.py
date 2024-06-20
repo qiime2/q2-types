@@ -10,10 +10,10 @@ from q2_types.profile_hmms._format import (
     PressedProfileHmmsDirectoryFmt,
     ProteinMultipleProfileHmmFileFmt,
     ProteinSingleProfileHmmFileFmt,
-    RnaMultipleProfileHmmFileFmt,
-    RnaSingleProfileHmmFileFmt,
-    DnaMultipleProfileHmmFileFmt,
-    DnaSingleProfileHmmFileFmt
+    RNAMultipleProfileHmmFileFmt,
+    RNASingleProfileHmmFileFmt,
+    DNAMultipleProfileHmmFileFmt,
+    DNASingleProfileHmmFileFmt
 )
 from qiime2.plugin import ValidationError
 
@@ -33,14 +33,14 @@ class TestHmmFormats(TestPluginBase):
         )
         fmt.validate()
 
-    def test_DnaSingleProfileHmmFileFmt_valid(self):
-        fmt = DnaSingleProfileHmmFileFmt(
+    def test_DNASingleProfileHmmFileFmt_valid(self):
+        fmt = DNASingleProfileHmmFileFmt(
             self.get_data_path("hmms/dna.hmm"), "r",
         )
         fmt.validate()
 
-    def test_RnaSingleProfileHmmFileFmt_valid(self):
-        fmt = RnaSingleProfileHmmFileFmt(
+    def test_RNASingleProfileHmmFileFmt_valid(self):
+        fmt = RNASingleProfileHmmFileFmt(
             self.get_data_path("hmms/rna.hmm"), "r"
         )
         fmt.validate()
@@ -55,9 +55,9 @@ class TestHmmFormats(TestPluginBase):
             ):
                 fmt.validate()
 
-    def test_DnaSingleProfileHmmFileFmt_invalid_alph(self):
+    def test_DNASingleProfileHmmFileFmt_invalid_alph(self):
         for typ in ["rna", "amino"]:
-            fmt = DnaSingleProfileHmmFileFmt(
+            fmt = DNASingleProfileHmmFileFmt(
                 self.get_data_path(f"hmms/{typ}.hmm"), "r"
             )
             with self.assertRaisesRegex(
@@ -65,9 +65,9 @@ class TestHmmFormats(TestPluginBase):
             ):
                 fmt.validate()
 
-    def test_RnaSingleProfileHmmFileFmt_invalid_alph(self):
+    def test_RNASingleProfileHmmFileFmt_invalid_alph(self):
         for typ in ["dna", "amino"]:
-            fmt = RnaSingleProfileHmmFileFmt(
+            fmt = RNASingleProfileHmmFileFmt(
                 self.get_data_path(f"hmms/{typ}.hmm"), "r"
             )
             with self.assertRaisesRegex(
@@ -90,14 +90,14 @@ class TestHmmFormats(TestPluginBase):
         )
         fmt.validate()
 
-    def test_DnaMultipleProfileHmmFileFmt_valid(self):
-        fmt = DnaMultipleProfileHmmFileFmt(
+    def test_DNAMultipleProfileHmmFileFmt_valid(self):
+        fmt = DNAMultipleProfileHmmFileFmt(
             self.get_data_path("hmms/2_dna.hmm"), "r"
         )
         fmt.validate()
 
-    def test_RnaMultipleProfileHmmFileFmt_valid(self):
-        fmt = RnaMultipleProfileHmmFileFmt(
+    def test_RNAMultipleProfileHmmFileFmt_valid(self):
+        fmt = RNAMultipleProfileHmmFileFmt(
             self.get_data_path("hmms/2_rna.hmm"), "r"
         )
         fmt.validate()
@@ -112,7 +112,7 @@ class TestHmmFormats(TestPluginBase):
             fmt.validate()
 
     def test_mixed_hmm_profiles_invalid_2(self):
-        fmt = DnaMultipleProfileHmmFileFmt(
+        fmt = DNAMultipleProfileHmmFileFmt(
             self.get_data_path("hmms/rna_dna.hmm"), 'r'
         )
         with self.assertRaisesRegex(
