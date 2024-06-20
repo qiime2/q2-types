@@ -50,7 +50,7 @@ class ProfileHmmFileFmt(model.TextFileFormat):
                     f"Printing pyhmmer error message: {e}"
                 )
 
-            if len(hmm_profiles) > 1 and self.single_profile:
+            if len(hmm_profiles) > 1 and self.single:
                 raise ValidationError(
                         f"Expected 1 profile, found {len(hmm_profiles)}."
                     )
@@ -71,11 +71,11 @@ class ProteinProfileHmmFileFmt(ProfileHmmFileFmt):
 
 
 class ProteinSingleProfileHmmFileFmt(ProteinProfileHmmFileFmt):
-    single_profile = True
+    single = True
 
 
 class ProteinMultipleProfileHmmFileFmt(ProteinProfileHmmFileFmt):
-    single_profile = False
+    single = False
 
 
 class DnaProfileHmmFileFmt(ProfileHmmFileFmt):
@@ -83,11 +83,11 @@ class DnaProfileHmmFileFmt(ProfileHmmFileFmt):
 
 
 class DnaSingleProfileHmmFileFmt(DnaProfileHmmFileFmt):
-    single_profile = True
+    single = True
 
 
 class DnaMultipleProfileHmmFileFmt(DnaProfileHmmFileFmt):
-    single_profile = False
+    single = False
 
 
 class RnaProfileHmmFileFmt(ProfileHmmFileFmt):
@@ -95,11 +95,11 @@ class RnaProfileHmmFileFmt(ProfileHmmFileFmt):
 
 
 class RnaSingleProfileHmmFileFmt(RnaProfileHmmFileFmt):
-    single_profile = True
+    single = True
 
 
 class RnaMultipleProfileHmmFileFmt(RnaProfileHmmFileFmt):
-    single_profile = False
+    single = False
 
 
 class ProteinSingleProfileHmmDirectoryFmt(model.DirectoryFormat):
