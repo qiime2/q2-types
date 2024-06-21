@@ -42,13 +42,7 @@ class ProfileHmmFileFmt(model.TextFileFormat):
         tolerance = 0.0001
 
         with HMMFile(str(self)) as hmm_file:
-            try:
-                hmm_profiles = list(hmm_file)
-            except TypeError as e:
-                raise ValidationError(
-                    "Found profiles with different alphabets.\n"
-                    f"Printing pyhmmer error message: {e}"
-                )
+            hmm_profiles = list(hmm_file)
 
             if len(hmm_profiles) > 1 and self.single:
                 raise ValidationError(

@@ -5,6 +5,7 @@
 #
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
+import pyhmmer
 from qiime2.plugin.testing import TestPluginBase
 from q2_types.profile_hmms._format import (
     PressedProfileHmmsDirectoryFmt,
@@ -107,15 +108,15 @@ class TestHmmFormats(TestPluginBase):
             self.get_data_path("hmms/amino_dna.hmm"), 'r'
         )
         with self.assertRaisesRegex(
-            ValidationError, "Found profiles with different alphabets."
+            pyhmmer.errors.AlphabetMismatch, "Expected amino alphabet"
         ):
             fmt.validate()
 
     def test_mixed_hmm_profiles_invalid_2(self):
-        fmt = DNAMultipleProfileHmmFileFmt(
+        fmt = RNAMultipleProfileHmmFileFmt(
             self.get_data_path("hmms/rna_dna.hmm"), 'r'
         )
         with self.assertRaisesRegex(
-            ValidationError, "Found profiles with different alphabets."
+            pyhmmer.errors.AlphabetMismatch, "Expected RNA alphabet"
         ):
             fmt.validate()
