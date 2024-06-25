@@ -6,6 +6,7 @@
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
 from pyhmmer.plan7 import HMMFile
+from pyhmmer.errors import AlphabetMismatch
 from qiime2.plugin import model
 from qiime2.core.exceptions import ValidationError
 from q2_types.plugin_setup import plugin
@@ -42,7 +43,13 @@ class ProfileHmmFileFmt(model.TextFileFormat):
         tolerance = 0.0001
 
         with HMMFile(str(self)) as hmm_file:
-            hmm_profiles = list(hmm_file)
+            try:
+                hmm_profiles = list(hmm_file)
+            except AlphabetMismatch:
+                raise ValidationError(
+                    "Found profiles with alphabet different from "
+                    f"'{self.alphabet}'"
+                )
 
             if len(hmm_profiles) > 1 and self.single:
                 raise ValidationError(
