@@ -9,13 +9,16 @@
 import unittest
 
 import pandas as pd
+import qiime2
 import skbio.io
 from qiime2.plugin.testing import TestPluginBase
 
 from q2_types.genome_data import (
     GenesDirectoryFormat, ProteinsDirectoryFormat, GFF3Format,
-    IntervalMetadataIterator
+    IntervalMetadataIterator, OrthologAnnotationDirFmt, NOG
 )
+from q2_types.genome_data._transformer import _annotations_to_dataframe
+from q2_types.sample_data import SampleData
 
 
 class TestTransformers(TestPluginBase):
@@ -119,6 +122,60 @@ class TestTransformers(TestPluginBase):
 
         for o, e in zip(obs, input):
             self.assertEqual(o, e)
+
+    def test_annotations_to_dataframe_samples(self):
+        annotations = OrthologAnnotationDirFmt(
+            self.get_data_path('ortholog_annotation_samples'),
+            mode='r'
+        )
+        obs = _annotations_to_dataframe(annotations)
+        self.assertEqual((11, 22), obs.shape)
+        self.assertTrue(obs.columns[0] == "Sample")
+        self.assertTrue(obs.index.is_unique)
+        self.assertEqual("id", obs.index.name)
+
+    def test_annotations_to_dataframe_mags(self):
+        annotations = OrthologAnnotationDirFmt(
+            self.get_data_path('ortholog_annotation_mags'),
+            mode='r'
+        )
+        obs = _annotations_to_dataframe(annotations)
+        self.assertEqual((11, 22), obs.shape)
+        self.assertTrue(obs.columns[0] == "MAG")
+        self.assertTrue(obs.index.is_unique)
+        self.assertEqual("id", obs.index.name)
+
+    def test_annotations_to_df_transformer(self):
+        annotations = OrthologAnnotationDirFmt(
+            self.get_data_path('ortholog_annotation_mags'),
+            mode='r'
+        )
+        transformer = self.get_transformer(
+            OrthologAnnotationDirFmt, pd.DataFrame
+        )
+
+        obs = transformer(annotations)
+        self.assertIsInstance(obs, pd.DataFrame)
+        self.assertEqual((11, 22), obs.shape)
+        self.assertTrue(obs.columns[0] == "MAG")
+        self.assertTrue(obs.index.is_unique)
+        self.assertEqual("id", obs.index.name)
+
+    def test_annotations_to_metadata_transformer(self):
+        annotations = OrthologAnnotationDirFmt(
+            self.get_data_path('ortholog_annotation_mags'),
+            mode='r'
+        )
+        transformer = self.get_transformer(
+            OrthologAnnotationDirFmt, qiime2.Metadata
+        )
+
+        obs = transformer(annotations)
+        self.assertIsInstance(obs, qiime2.Metadata)
+
+    def test_nog_registered_to_format(self):
+        self.assertSemanticTypeRegisteredToFormat(
+            SampleData[NOG], OrthologAnnotationDirFmt)
 
 
 if __name__ == '__main__':

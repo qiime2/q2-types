@@ -5,6 +5,7 @@
 #
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
+import re
 
 import qiime2.plugin.model as model
 from q2_types.feature_data import DNAFASTAFormat, ProteinFASTAFormat
@@ -168,9 +169,12 @@ class LociDirectoryFormat(model.DirectoryFormat):
         return '%s.gff' % genome_id
 
 
-plugin.register_formats(
-    GenesDirectoryFormat, ProteinsDirectoryFormat, LociDirectoryFormat
-)
+class GenomeSequencesDirectoryFormat(model.DirectoryFormat):
+    genomes = model.FileCollection(r'.+\.(fasta|fa)$', format=DNAFASTAFormat)
+
+    @genomes.set_path_maker
+    def genomes_path_maker(self, genome_id):
+        return '%s.fasta' % genome_id
 
 
 class SeedOrthologDirFmt(model.DirectoryFormat):
@@ -183,4 +187,32 @@ class SeedOrthologDirFmt(model.DirectoryFormat):
         return str(sample_name.split(sep=".")[0] + ".seed_orthologs")
 
 
-plugin.register_formats(OrthologFileFmt, SeedOrthologDirFmt)
+class OrthologAnnotationDirFmt(model.DirectoryFormat):
+    pathspec = r'.+\.annotations'
+    annotations = model.FileCollection(pathspec, format=OrthologFileFmt)
+
+    @annotations.set_path_maker
+    def annotations_path_maker(self, file_name):
+        return file_name.split(sep="_")[0]
+
+    def annotation_dict(self, relative=False) -> dict:
+        ids = {}
+        for path in self.path.iterdir():
+            if re.compile(self.pathspec).match(path.name):
+                _id = re.sub('.emapper$', '', path.stem)
+                absolute_path = path.absolute()
+                if relative:
+                    ids[_id] = str(
+                        absolute_path.relative_to(self.path.absolute())
+                    )
+                else:
+                    ids[_id] = str(absolute_path)
+
+        return dict(sorted(ids.items()))
+
+
+plugin.register_formats(
+    GenesDirectoryFormat, ProteinsDirectoryFormat, LociDirectoryFormat,
+    GenomeSequencesDirectoryFormat, OrthologFileFmt, SeedOrthologDirFmt,
+    OrthologAnnotationDirFmt
+)
