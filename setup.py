@@ -70,6 +70,10 @@ setup(
              'data/loci-invalid/*',
              'data/loci/*',
              'data/ortholog/*',
+             'data/ortholog_annotation_extra/*',
+             'data/ortholog_annotation_mags/*',
+             'data/ortholog_annotation_samples/*',
+             'data/good_ortholog_annotation/*',
              'data/proteins/*',
              ],
         'q2_types.kraken2.tests': [
