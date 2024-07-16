@@ -78,7 +78,7 @@ class TestFormats(TestPluginBase):
 
         fmt.validate()
 
-    def test_genome_sequences_dirfmt_with_suffix(self):
+    def test_genome_sequences_dirfmt(self):
         dirpath = self.get_data_path('genome-sequences')
         fmt = GenomeSequencesDirectoryFormat(dirpath, mode='r')
 
