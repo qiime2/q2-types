@@ -125,7 +125,7 @@ class TestTransformers(TestPluginBase):
 
     def test_annotations_to_dataframe_samples(self):
         annotations = OrthologAnnotationDirFmt(
-            self.get_data_path('ortholog_annotation_samples'),
+            self.get_data_path('ortholog-annotation-samples'),
             mode='r'
         )
         obs = _annotations_to_dataframe(annotations)
@@ -136,7 +136,7 @@ class TestTransformers(TestPluginBase):
 
     def test_annotations_to_dataframe_mags(self):
         annotations = OrthologAnnotationDirFmt(
-            self.get_data_path('ortholog_annotation_mags'),
+            self.get_data_path('ortholog-annotation-mags'),
             mode='r'
         )
         obs = _annotations_to_dataframe(annotations)
@@ -147,7 +147,7 @@ class TestTransformers(TestPluginBase):
 
     def test_annotations_to_df_transformer(self):
         annotations = OrthologAnnotationDirFmt(
-            self.get_data_path('ortholog_annotation_mags'),
+            self.get_data_path('ortholog-annotation-mags'),
             mode='r'
         )
         transformer = self.get_transformer(
@@ -163,7 +163,7 @@ class TestTransformers(TestPluginBase):
 
     def test_annotations_to_metadata_transformer(self):
         annotations = OrthologAnnotationDirFmt(
-            self.get_data_path('ortholog_annotation_mags'),
+            self.get_data_path('ortholog-annotation-mags'),
             mode='r'
         )
         transformer = self.get_transformer(

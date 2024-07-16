@@ -14,7 +14,7 @@ from qiime2.plugin.testing import TestPluginBase
 from .._format import (
     GenesDirectoryFormat, ProteinsDirectoryFormat, GFF3Format,
     LociDirectoryFormat, SeedOrthologDirFmt, OrthologFileFmt,
-    OrthologAnnotationDirFmt,
+    OrthologAnnotationDirFmt, GenomeSequencesDirectoryFormat,
 )
 
 
@@ -75,6 +75,12 @@ class TestFormats(TestPluginBase):
     def test_loci_dirfmt_with_suffix(self):
         dirpath = self.get_data_path('loci')
         fmt = LociDirectoryFormat(dirpath, mode='r')
+
+        fmt.validate()
+
+    def test_genome_sequences_dirfmt_with_suffix(self):
+        dirpath = self.get_data_path('genome-sequences')
+        fmt = GenomeSequencesDirectoryFormat(dirpath, mode='r')
 
         fmt.validate()
 
@@ -141,12 +147,12 @@ class TestFormats(TestPluginBase):
             GFF3Format(filepath, mode='r').validate()
 
     def test_ortholog_annotation_dir_fmt_passing(self):
-        dirpath = self.get_data_path('good_ortholog_annotation')
+        dirpath = self.get_data_path('ortholog-annotation')
         fmt_obj = OrthologAnnotationDirFmt(dirpath, mode='r')
         fmt_obj.validate()
 
     def test_ortholog_annotation_dir_fmt_fails_extra_file(self):
-        dirpath = self.get_data_path('ortholog_annotation_extra')
+        dirpath = self.get_data_path('ortholog-annotation-extra')
         fmt_obj = OrthologAnnotationDirFmt(dirpath, mode='r')
 
         with self.assertRaisesRegex(ValidationError, "Unrecognized file"):
@@ -154,7 +160,7 @@ class TestFormats(TestPluginBase):
 
     def test_ortholog_annotations_annot_dict(self):
         annotations = OrthologAnnotationDirFmt(
-            self.get_data_path('ortholog_annotation_samples'), mode='r'
+            self.get_data_path('ortholog-annotation-samples'), mode='r'
         )
 
         obs = annotations.annotation_dict()
