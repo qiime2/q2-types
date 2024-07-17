@@ -65,11 +65,16 @@ setup(
             ['data/*', 'data/*/*',
              'data/mags-fa/*', 'data/mags-fasta/*'],
         'q2_types.genome_data.tests':
-            ['data/*/',
+            ['data/*',
              'data/genes/*',
              'data/loci-invalid/*',
              'data/loci/*',
+             'data/genome-sequences/*',
              'data/ortholog/*',
+             'data/ortholog-annotation-extra/*',
+             'data/ortholog-annotation-mags/*',
+             'data/ortholog-annotation-samples/*',
+             'data/ortholog-annotation/*',
              'data/proteins/*',
              ],
         'q2_types.kraken2.tests': [

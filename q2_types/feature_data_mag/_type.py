@@ -8,9 +8,7 @@
 
 from q2_types.feature_data import FeatureData
 
-from q2_types.feature_data_mag._format import (
-        MAGSequencesDirFmt, OrthologAnnotationDirFmt
-        )
+from q2_types.feature_data_mag._format import MAGSequencesDirFmt
 from qiime2.core.type import SemanticType
 
 from ..bowtie2 import Bowtie2IndexDirFmt
@@ -33,29 +31,6 @@ plugin.register_semantic_type_to_format(
     FeatureData[Contig],
     artifact_format=ContigSequencesDirFmt
 )
-
-NOG = SemanticType('NOG', variant_of=FeatureData.field['type'])
-
-plugin.register_semantic_types(NOG)
-plugin.register_artifact_class(
-        FeatureData[NOG],
-        directory_format=OrthologAnnotationDirFmt)
-
-
-OG = SemanticType('OG', variant_of=FeatureData.field['type'])
-
-plugin.register_semantic_types(OG)
-plugin.register_artifact_class(
-        FeatureData[OG],
-        directory_format=OrthologAnnotationDirFmt)
-
-
-KEGG = SemanticType('KEGG', variant_of=FeatureData.field['type'])
-
-plugin.register_semantic_types(KEGG)
-plugin.register_artifact_class(
-        FeatureData[KEGG],
-        directory_format=OrthologAnnotationDirFmt)
 
 plugin.register_semantic_type_to_format(
     FeatureData[SingleBowtie2Index],

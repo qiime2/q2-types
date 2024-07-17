@@ -8,19 +8,12 @@
 
 import importlib
 
-from ._format import (
-        MAGSequencesDirFmt,
-        OrthologAnnotationDirFmt,
-        OrthologFileFmt
-        )
+from ._format import MAGSequencesDirFmt
 
-from ._type import MAG, NOG, OG, KEGG, Contig
+from ._type import MAG, Contig
 from ._transformer import MAGIterator
 
-__all__ = [
-        'MAG', 'MAGSequencesDirFmt', 'MAGIterator', 'NOG', 'OG', 'KEGG',
-        'OrthologAnnotationDirFmt', 'OrthologFileFmt', 'Contig'
-        ]
+__all__ = ['MAG', 'MAGSequencesDirFmt', 'MAGIterator', 'Contig']
 
 importlib.import_module('q2_types.feature_data_mag._format')
 importlib.import_module('q2_types.feature_data_mag._transformer')
