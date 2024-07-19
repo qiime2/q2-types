@@ -12,11 +12,11 @@ from ._format import (BIOMV100Format, BIOMV210Format, BIOMV100DirFmt,
                       BIOMV210DirFmt)
 from ._type import (FeatureTable, Frequency, RelativeFrequency,
                     PresenceAbsence, Composition, Balance,
-                    PercentileNormalized, Design)
+                    PercentileNormalized, Design, Normalized)
 
 __all__ = ['BIOMV100Format', 'BIOMV100DirFmt', 'FeatureTable', 'Frequency',
            'RelativeFrequency', 'PresenceAbsence', 'BIOMV210Format',
            'BIOMV210DirFmt', 'Composition', 'Balance', 'PercentileNormalized',
-           'Design']
+           'Design', "Normalized"]
 
 importlib.import_module('q2_types.feature_table._transformer')

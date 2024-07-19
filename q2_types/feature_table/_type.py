@@ -35,9 +35,11 @@ PercentileNormalized = SemanticType('PercentileNormalized',
 # been transformed/coded.
 Design = SemanticType('Design', variant_of=FeatureTable.field['content'])
 
+Normalized = SemanticType('Normalized', variant_of=FeatureTable.field['content'])
+
 plugin.register_semantic_types(FeatureTable, Frequency, RelativeFrequency,
                                PresenceAbsence, Balance, Composition,
-                               PercentileNormalized, Design)
+                               PercentileNormalized, Design, Normalized)
 
 plugin.register_artifact_class(
     FeatureTable[Frequency],
@@ -85,4 +87,9 @@ plugin.register_artifact_class(
 plugin.register_artifact_class(
     FeatureTable[Design],
     directory_format=BIOMV210DirFmt
+)
+plugin.register_artifact_class(
+    FeatureTable[Normalized],
+    directory_format=BIOMV210DirFmt,
+    description="A feature table that was normalized."
 )
