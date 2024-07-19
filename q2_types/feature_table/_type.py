@@ -35,7 +35,8 @@ PercentileNormalized = SemanticType('PercentileNormalized',
 # been transformed/coded.
 Design = SemanticType('Design', variant_of=FeatureTable.field['content'])
 
-Normalized = SemanticType('Normalized', variant_of=FeatureTable.field['content'])
+Normalized = SemanticType('Normalized',
+                          variant_of=FeatureTable.field['content'])
 
 plugin.register_semantic_types(FeatureTable, Frequency, RelativeFrequency,
                                PresenceAbsence, Balance, Composition,

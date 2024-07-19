@@ -11,7 +11,8 @@ import unittest
 from q2_types.feature_table import (FeatureTable, Frequency,
                                     RelativeFrequency, PercentileNormalized,
                                     Composition, Balance,
-                                    PresenceAbsence, BIOMV210DirFmt, Design, Normalized)
+                                    PresenceAbsence, BIOMV210DirFmt, Design,
+                                    Normalized)
 from qiime2.plugin.testing import TestPluginBase
 
 
@@ -64,6 +65,7 @@ class TestTypes(TestPluginBase):
         self.assertSemanticTypeRegisteredToFormat(
             FeatureTable[Normalized],
             BIOMV210DirFmt)
+
 
 if __name__ == "__main__":
     unittest.main()
