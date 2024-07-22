@@ -6,7 +6,7 @@
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
 
-from ._formats import LSMatFormat, DistanceMatrixDirectoryFormat
-from ._types import DistanceMatrix
+from qiime2.plugin import SemanticType
 
-__all__ = ['LSMatFormat', 'DistanceMatrixDirectoryFormat', 'DistanceMatrix']
+
+DistanceMatrix = SemanticType('DistanceMatrix')
