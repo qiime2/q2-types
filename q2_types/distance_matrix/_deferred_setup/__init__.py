@@ -6,17 +6,21 @@
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
 
-from qiime2.plugin import SemanticType
+import importlib
 
-from ..plugin_setup import plugin
-from . import DistanceMatrixDirectoryFormat
+from .. import LSMatFormat, DistanceMatrixDirectoryFormat
+from .. import DistanceMatrix
 
+from ...plugin_setup import plugin
 
-DistanceMatrix = SemanticType('DistanceMatrix')
+plugin.register_formats(LSMatFormat, DistanceMatrixDirectoryFormat)
 
 plugin.register_semantic_types(DistanceMatrix)
+
 plugin.register_artifact_class(
     DistanceMatrix,
     directory_format=DistanceMatrixDirectoryFormat,
     description="A symmetric matrix representing distances between entities."
 )
+
+importlib.import_module('._transformers', __name__)
