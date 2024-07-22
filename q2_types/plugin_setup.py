@@ -6,7 +6,10 @@
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
 
+import importlib
+
 import pandas as pd
+
 import qiime2.plugin
 import qiime2.sdk
 
@@ -26,4 +29,4 @@ plugin = qiime2.plugin.Plugin(
 plugin.register_views(pd.Series, pd.DataFrame,
                       citations=[citations['mckinney-proc-scipy-2010']])
 
-# __init__.py loads first and imports all of the subpackages.
+importlib.import_module('q2_types.bowtie2._deferred_setup')
