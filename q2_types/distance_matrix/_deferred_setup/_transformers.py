@@ -8,8 +8,9 @@
 
 import skbio
 
-from ..plugin_setup import plugin
-from . import LSMatFormat
+from .. import LSMatFormat
+
+from ...plugin_setup import plugin
 
 
 @plugin.register_transformer

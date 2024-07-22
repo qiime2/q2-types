@@ -9,8 +9,6 @@
 import skbio.io
 import qiime2.plugin.model as model
 
-from ..plugin_setup import plugin
-
 
 class LSMatFormat(model.TextFileFormat):
     def sniff(self):
@@ -20,6 +18,3 @@ class LSMatFormat(model.TextFileFormat):
 
 DistanceMatrixDirectoryFormat = model.SingleFileDirectoryFormat(
     'DistanceMatrixDirectoryFormat', 'distance-matrix.tsv', LSMatFormat)
-
-
-plugin.register_formats(LSMatFormat, DistanceMatrixDirectoryFormat)

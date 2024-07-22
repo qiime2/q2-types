@@ -30,3 +30,4 @@ plugin.register_views(pd.Series, pd.DataFrame,
                       citations=[citations['mckinney-proc-scipy-2010']])
 
 importlib.import_module('q2_types.bowtie2._deferred_setup')
+importlib.import_module('q2_types.distance_matrix._deferred_setup')
