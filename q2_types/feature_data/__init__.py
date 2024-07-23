@@ -6,9 +6,7 @@
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
 
-import importlib
-
-from ._format import (
+from ._formats import (
     TaxonomyFormat, TaxonomyDirectoryFormat, HeaderlessTSVTaxonomyFormat,
     HeaderlessTSVTaxonomyDirectoryFormat, TSVTaxonomyFormat,
     TSVTaxonomyDirectoryFormat, DNAFASTAFormat, DNASequencesDirectoryFormat,
@@ -30,17 +28,14 @@ from ._format import (
     MixedCaseAlignedRNASequencesDirectoryFormat,
     SequenceCharacteristicsDirectoryFormat,
     SequenceCharacteristicsFormat)
-from ._type import (
+from ._types import (
     FeatureData, Taxonomy, Sequence, PairedEndSequence, AlignedSequence,
     Differential, ProteinSequence, AlignedProteinSequence, RNASequence,
     AlignedRNASequence, PairedEndRNASequence, BLAST6, SequenceCharacteristics)
-
-# TODO remove these imports when tests are rewritten. Remove from __all__ too
-from ._transformer import (
+from ._objects import (
     NucleicAcidIterator, DNAIterator, PairedDNAIterator, AlignedDNAIterator,
     ProteinIterator, AlignedProteinIterator, RNAIterator, AlignedRNAIterator,
-    PairedRNAIterator, BarcodePairedSequenceFastqIterator,
-    BarcodeSequenceFastqIterator)
+    PairedRNAIterator)
 
 __all__ = [
     'TaxonomyFormat', 'TaxonomyDirectoryFormat', 'HeaderlessTSVTaxonomyFormat',
@@ -73,7 +68,5 @@ __all__ = [
     'MixedCaseProteinSequencesDirectoryFormat',
     'MixedCaseAlignedProteinSequencesDirectoryFormat',
     'SequenceCharacteristics', 'SequenceCharacteristicsDirectoryFormat',
-    'SequenceCharacteristicsFormat'
-    ]
-
-importlib.import_module('q2_types.feature_data._transformer')
+    'SequenceCharacteristicsFormat',
+]

@@ -6,31 +6,32 @@
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
 
-import collections.abc
 from itertools import zip_longest
-
-import itertools
-from ._util import _read_fastq_seqs
-from q2_types.per_sample_sequences import FastqGzFormat
-from q2_types.multiplexed_sequences import (EMPMultiplexedDirFmt,
-                                            EMPSingleEndDirFmt,
-                                            EMPPairedEndDirFmt)
 
 import pandas as pd
 import biom
 import skbio
+
 import qiime2
 
-from ..plugin_setup import plugin
-from ..feature_table import BIOMV210Format
-from . import (TaxonomyFormat, HeaderlessTSVTaxonomyFormat, TSVTaxonomyFormat,
-               DNAFASTAFormat, PairedDNASequencesDirectoryFormat,
-               AlignedDNAFASTAFormat, DifferentialFormat, ProteinFASTAFormat,
-               AlignedProteinFASTAFormat, RNAFASTAFormat,
-               AlignedRNAFASTAFormat, PairedRNASequencesDirectoryFormat,
-               BLAST6Format, MixedCaseDNAFASTAFormat, MixedCaseRNAFASTAFormat,
-               MixedCaseAlignedDNAFASTAFormat, MixedCaseAlignedRNAFASTAFormat,
-               SequenceCharacteristicsFormat)
+from q2_types.feature_table import BIOMV210Format
+from q2_types._util import fasta_to_series, read_from_fasta
+
+from .. import (
+    TaxonomyFormat, HeaderlessTSVTaxonomyFormat, TSVTaxonomyFormat,
+    DNAFASTAFormat, PairedDNASequencesDirectoryFormat,
+    AlignedDNAFASTAFormat, DifferentialFormat, ProteinFASTAFormat,
+    AlignedProteinFASTAFormat, RNAFASTAFormat,
+    AlignedRNAFASTAFormat, PairedRNASequencesDirectoryFormat,
+    BLAST6Format, MixedCaseDNAFASTAFormat, MixedCaseRNAFASTAFormat,
+    MixedCaseAlignedDNAFASTAFormat, MixedCaseAlignedRNAFASTAFormat,
+    SequenceCharacteristicsFormat,
+    DNAIterator, PairedDNAIterator, AlignedDNAIterator,
+    ProteinIterator, AlignedProteinIterator, RNAIterator, AlignedRNAIterator,
+    PairedRNAIterator
+)
+
+from ...plugin_setup import plugin
 
 
 # Taxonomy format transformers
@@ -274,32 +275,9 @@ def _30(ff: BIOMV210Format) -> DNAFASTAFormat:
 
 # common to all FASTA transformers
 
-
-def _read_from_fasta(path, constructor=skbio.DNA, lowercase=False):
-    return skbio.read(path, format='fasta', constructor=constructor,
-                      lowercase=lowercase)
-
-
-def _fastaformats_to_series(ff, constructor=skbio.DNA, lowercase=False):
-    data = {}
-    for sequence in _read_from_fasta(str(ff), constructor,
-                                     lowercase=lowercase):
-        id_ = sequence.metadata['id']
-        # this may no longer do anything b/c of format validation, but leaving
-        # here as a safeguard & we may want to examine/address later
-        # relevant PR associated with this change:
-        # https://github.com/qiime2/q2-types/pull/335
-        if id_ in data:
-            raise ValueError("FASTA format sequence IDs must be unique. The "
-                             "following ID was found more than once: %s."
-                             % id_)
-        data[id_] = sequence
-    return pd.Series(data)
-
-
 def _fastaformats_to_metadata(ff, constructor=skbio.DNA, lowercase=False):
-    df = _fastaformats_to_series(ff, constructor,
-                                 lowercase=lowercase).to_frame()
+    df = fasta_to_series(ff, constructor,
+                         lowercase=lowercase).to_frame()
     df = df.astype(str)
     df.index.name, df.columns = 'Feature ID', ['Sequence']
     return qiime2.Metadata(df)
@@ -324,42 +302,10 @@ def _series_to_fasta_format(ff, data, sequence_type="DNA", lowercase=False):
             skbio.io.write(sequence, format='fasta', into=f)
 
 
-class NucleicAcidIterator(collections.abc.Iterable):
-    def __init__(self, generator):
-        self.generator = generator
-
-    def __iter__(self):
-        yield from self.generator
-
-
-class DNAIterator(NucleicAcidIterator):
-    pass
-
-
-class PairedDNAIterator(NucleicAcidIterator):
-    pass
-
-
-class AlignedDNAIterator(NucleicAcidIterator):
-    pass
-
-
-class RNAIterator(NucleicAcidIterator):
-    pass
-
-
-class PairedRNAIterator(NucleicAcidIterator):
-    pass
-
-
-class AlignedRNAIterator(NucleicAcidIterator):
-    pass
-
-
 # DNA Transformers
 @plugin.register_transformer
 def _9(ff: DNAFASTAFormat) -> DNAIterator:
-    generator = _read_from_fasta(str(ff), skbio.DNA)
+    generator = read_from_fasta(str(ff), skbio.DNA)
     return DNAIterator(generator)
 
 
@@ -423,7 +369,7 @@ def _14(data: skbio.TabularMSA) -> AlignedDNAFASTAFormat:
 
 @plugin.register_transformer
 def _15(ff: DNAFASTAFormat) -> pd.Series:
-    return _fastaformats_to_series(ff, skbio.DNA)
+    return fasta_to_series(ff, skbio.DNA)
 
 
 @plugin.register_transformer
@@ -440,7 +386,7 @@ def _16(data: pd.Series) -> DNAFASTAFormat:
 
 @plugin.register_transformer
 def _18(ff: AlignedDNAFASTAFormat) -> AlignedDNAIterator:
-    generator = _read_from_fasta(str(ff), skbio.DNA)
+    generator = read_from_fasta(str(ff), skbio.DNA)
     return AlignedDNAIterator(generator)
 
 
@@ -458,7 +404,7 @@ def _33(ff: AlignedDNAFASTAFormat) -> qiime2.Metadata:
 
 @plugin.register_transformer
 def _34(ff: AlignedDNAFASTAFormat) -> pd.Series:
-    return _fastaformats_to_series(ff, skbio.DNA)
+    return fasta_to_series(ff, skbio.DNA)
 
 
 @plugin.register_transformer
@@ -470,27 +416,14 @@ def _35(data: pd.Series) -> AlignedDNAFASTAFormat:
 
 @plugin.register_transformer
 def _36(fmt: AlignedDNAFASTAFormat) -> DNAIterator:
-    generator = _read_from_fasta(str(fmt), skbio.DNA)
+    generator = read_from_fasta(str(fmt), skbio.DNA)
     return DNAIterator(generator)
 
 
 # Protein FASTA transformers
-
-class ProteinIterator(collections.abc.Iterable):
-    def __init__(self, generator):
-        self.generator = generator
-
-    def __iter__(self):
-        yield from self.generator
-
-
-class AlignedProteinIterator(ProteinIterator):
-    pass
-
-
 @plugin.register_transformer
 def _37(ff: ProteinFASTAFormat) -> ProteinIterator:
-    generator = _read_from_fasta(str(ff), skbio.Protein)
+    generator = read_from_fasta(str(ff), skbio.Protein)
     return ProteinIterator(generator)
 
 
@@ -516,7 +449,7 @@ def _40(data: skbio.TabularMSA) -> AlignedProteinFASTAFormat:
 
 @plugin.register_transformer
 def _41(ff: ProteinFASTAFormat) -> pd.Series:
-    return _fastaformats_to_series(ff, skbio.Protein)
+    return fasta_to_series(ff, skbio.Protein)
 
 
 @plugin.register_transformer
@@ -533,7 +466,7 @@ def _43(data: pd.Series) -> ProteinFASTAFormat:
 
 @plugin.register_transformer
 def _44(ff: AlignedProteinFASTAFormat) -> AlignedProteinIterator:
-    generator = _read_from_fasta(str(ff), skbio.Protein)
+    generator = read_from_fasta(str(ff), skbio.Protein)
     return AlignedProteinIterator(generator)
 
 
@@ -551,7 +484,7 @@ def _46(ff: AlignedProteinFASTAFormat) -> qiime2.Metadata:
 
 @plugin.register_transformer
 def _47(ff: AlignedProteinFASTAFormat) -> pd.Series:
-    return _fastaformats_to_series(ff, skbio.Protein)
+    return fasta_to_series(ff, skbio.Protein)
 
 
 @plugin.register_transformer
@@ -563,14 +496,14 @@ def _48(data: pd.Series) -> AlignedProteinFASTAFormat:
 
 @plugin.register_transformer
 def _49(fmt: AlignedProteinFASTAFormat) -> ProteinIterator:
-    generator = _read_from_fasta(str(fmt), skbio.Protein)
+    generator = read_from_fasta(str(fmt), skbio.Protein)
     return ProteinIterator(generator)
 
 
 # RNA Transformers
 @plugin.register_transformer
 def _50(ff: RNAFASTAFormat) -> RNAIterator:
-    generator = _read_from_fasta(str(ff), constructor=skbio.RNA)
+    generator = read_from_fasta(str(ff), constructor=skbio.RNA)
     return RNAIterator(generator)
 
 
@@ -596,7 +529,7 @@ def _53(data: skbio.TabularMSA) -> AlignedRNAFASTAFormat:
 
 @plugin.register_transformer
 def _54(ff: RNAFASTAFormat) -> pd.Series:
-    return _fastaformats_to_series(ff, constructor=skbio.RNA)
+    return fasta_to_series(ff, constructor=skbio.RNA)
 
 
 @plugin.register_transformer
@@ -613,7 +546,7 @@ def _56(data: pd.Series) -> RNAFASTAFormat:
 
 @plugin.register_transformer
 def _57(ff: AlignedRNAFASTAFormat) -> AlignedRNAIterator:
-    generator = _read_from_fasta(str(ff), constructor=skbio.RNA)
+    generator = read_from_fasta(str(ff), constructor=skbio.RNA)
     return AlignedRNAIterator(generator)
 
 
@@ -631,7 +564,7 @@ def _59(ff: AlignedRNAFASTAFormat) -> qiime2.Metadata:
 
 @plugin.register_transformer
 def _60(ff: AlignedRNAFASTAFormat) -> pd.Series:
-    return _fastaformats_to_series(ff, constructor=skbio.RNA)
+    return fasta_to_series(ff, constructor=skbio.RNA)
 
 
 @plugin.register_transformer
@@ -643,7 +576,7 @@ def _61(data: pd.Series) -> AlignedRNAFASTAFormat:
 
 @plugin.register_transformer
 def _62(fmt: AlignedRNAFASTAFormat) -> RNAIterator:
-    generator = _read_from_fasta(str(fmt), constructor=skbio.RNA)
+    generator = read_from_fasta(str(fmt), constructor=skbio.RNA)
     return RNAIterator(generator)
 
 
@@ -685,206 +618,6 @@ def _64(data: PairedRNAIterator) -> PairedRNASequencesDirectoryFormat:
     return df
 
 
-# Barcode Sequence Fastq Iterators
-
-FastqHeader = collections.namedtuple('FastqHeader', ['id', 'description'])
-
-
-def _trim_id(id):
-    return id.rsplit('/', 1)[0]
-
-
-def _trim_description(desc):
-    # The first number of ':' seperated description is the read number
-    if ':' in desc:
-        desc = desc.split(':', 1)[1]
-    return desc.rsplit('/', 1)[0]
-
-
-def _record_to_fastq_header(record):
-    tokens = record[0][1:].split(' ', maxsplit=1)
-    if len(tokens) == 1:
-        id, = tokens
-        description = None
-    else:
-        id, description = tokens
-
-    return FastqHeader(id=id, description=description)
-
-
-class BarcodeSequenceFastqIterator(collections.abc.Iterable):
-    def __init__(self, barcode_generator, sequence_generator,
-                 ignore_description_mismatch=False):
-        self.barcode_generator = barcode_generator
-        self.sequence_generator = sequence_generator
-        self.ignore_description_mismatch = ignore_description_mismatch
-
-    def __iter__(self):
-        # Adapted from q2-types
-        for barcode_record, sequence_record in itertools.zip_longest(
-                self.barcode_generator, self.sequence_generator):
-            if barcode_record is None:
-                raise ValueError('More sequences were provided than barcodes.')
-            if sequence_record is None:
-                raise ValueError('More barcodes were provided than sequences.')
-            # The id or description fields may end with "/read-number", which
-            # will differ between the sequence and barcode reads. Confirm that
-            # they are identical up until the last /
-            barcode_header = _record_to_fastq_header(barcode_record)
-            sequence_header = _record_to_fastq_header(sequence_record)
-
-            # confirm that the id fields are equal
-            if _trim_id(barcode_header.id) != \
-               _trim_id(sequence_header.id):
-                raise ValueError(
-                    'Mismatched sequence ids: %s and %s' %
-                    (_trim_id(barcode_header.id),
-                     _trim_id(sequence_header.id)))
-
-            if not self.ignore_description_mismatch:
-                # if a description field is present, confirm that they're equal
-                if barcode_header.description is None and \
-                   sequence_header.description is None:
-                    pass
-                elif barcode_header.description is None:
-                    raise ValueError(
-                        'Barcode header lines do not contain description '
-                        'fields but sequence header lines do.')
-                elif sequence_header.description is None:
-                    raise ValueError(
-                        'Sequence header lines do not contain description '
-                        'fields but barcode header lines do.')
-                elif _trim_description(barcode_header.description) != \
-                        _trim_description(sequence_header.description):
-                    raise ValueError(
-                        'Mismatched sequence descriptions: %s and %s' %
-                        (_trim_description(barcode_header.description),
-                         _trim_description(sequence_header.description)))
-
-            yield barcode_record, sequence_record
-# Barcode Sequence Fastq Transformers
-
-
-@plugin.register_transformer
-def _65(dirfmt: EMPSingleEndDirFmt) -> BarcodeSequenceFastqIterator:
-    barcode_generator = _read_fastq_seqs(
-        str(dirfmt.barcodes.view(FastqGzFormat)))
-    sequence_generator = _read_fastq_seqs(
-        str(dirfmt.sequences.view(FastqGzFormat)))
-    result = BarcodeSequenceFastqIterator(barcode_generator,
-                                          sequence_generator)
-    # ensure that dirfmt stays in scope as long as result does so these
-    # generators will work.
-    result.__dirfmt = dirfmt
-    return result
-
-
-# TODO: remove this when names are aliased
-@plugin.register_transformer
-def _65_legacy(dirfmt: EMPMultiplexedDirFmt) -> BarcodeSequenceFastqIterator:
-    return _65(dirfmt)
-
-
-@plugin.register_transformer
-def _67(dirfmt: EMPPairedEndDirFmt) -> BarcodeSequenceFastqIterator:
-    barcode_generator = _read_fastq_seqs(
-        str(dirfmt.barcodes.view(FastqGzFormat)))
-    sequence_generator = _read_fastq_seqs(
-        str(dirfmt.forward.view(FastqGzFormat)))
-    result = BarcodeSequenceFastqIterator(barcode_generator,
-                                          sequence_generator)
-    # ensure that dirfmt stays in scope as long as result does so these
-    # generators will work.
-    result.__dirfmt = dirfmt
-    return result
-
-
-class BarcodePairedSequenceFastqIterator(collections.abc.Iterable):
-    def __init__(self, barcode_generator, forward_generator,
-                 reverse_generator, ignore_description_mismatch=False):
-        self.barcode_generator = barcode_generator
-        self.forward_generator = forward_generator
-        self.reverse_generator = reverse_generator
-        self.ignore_description_mismatch = ignore_description_mismatch
-
-    def __iter__(self):
-        # Adapted from q2-types
-        for barcode_record, forward_record, reverse_record \
-                in itertools.zip_longest(self.barcode_generator,
-                                         self.forward_generator,
-                                         self.reverse_generator):
-            if barcode_record is None:
-                raise ValueError('More sequences were provided than barcodes.')
-            if forward_record is None:
-                raise ValueError('More barcodes were provided than '
-                                 'forward-sequences.')
-            elif reverse_record is None:
-                raise ValueError('More barcodes were provided than '
-                                 'reverse-sequences.')
-            # The id or description fields may end with "/read-number", which
-            # will differ between the sequence and barcode reads. Confirm that
-            # they are identical up until the last /
-            barcode_header = _record_to_fastq_header(barcode_record)
-            forward_header = _record_to_fastq_header(forward_record)
-            reverse_header = _record_to_fastq_header(reverse_record)
-
-            # confirm that the id fields are equal
-            if not (_trim_id(barcode_header.id) ==
-                    _trim_id(forward_header.id) ==
-                    _trim_id(reverse_header.id)):
-                raise ValueError(
-                    'Mismatched sequence ids: %s, %s, and %s' %
-                    (_trim_id(barcode_header.id),
-                     _trim_id(forward_header.id),
-                     _trim_id(reverse_header.id)))
-
-            if not self.ignore_description_mismatch:
-                # if a description field is present, confirm that they're equal
-                if barcode_header.description is None and \
-                   forward_header.description is None and \
-                   reverse_header.description is None:
-                    pass
-                elif barcode_header.description is None:
-                    raise ValueError(
-                        'Barcode header lines do not contain description '
-                        'fields but sequence header lines do.')
-                elif forward_header.description is None:
-                    raise ValueError(
-                        'Forward-read header lines do not contain description '
-                        'fields but barcode header lines do.')
-                elif reverse_header.description is None:
-                    raise ValueError(
-                        'Reverse-read header lines do not contain description '
-                        'fields but barcode header lines do.')
-                elif not (_trim_description(barcode_header.description) ==
-                          _trim_description(forward_header.description) ==
-                          _trim_description(reverse_header.description)):
-                    raise ValueError(
-                        'Mismatched sequence descriptions: %s, %s, and %s' %
-                        (_trim_description(barcode_header.description),
-                         _trim_description(forward_header.description),
-                         _trim_description(reverse_header.description)))
-
-            yield barcode_record, forward_record, reverse_record
-
-
-@plugin.register_transformer
-def _68(dirfmt: EMPPairedEndDirFmt) -> BarcodePairedSequenceFastqIterator:
-    barcode_generator = _read_fastq_seqs(
-        str(dirfmt.barcodes.view(FastqGzFormat)))
-    forward_generator = _read_fastq_seqs(
-        str(dirfmt.forward.view(FastqGzFormat)))
-    reverse_generator = _read_fastq_seqs(
-        str(dirfmt.reverse.view(FastqGzFormat)))
-    result = BarcodePairedSequenceFastqIterator(barcode_generator,
-                                                forward_generator,
-                                                reverse_generator)
-    # ensure that dirfmt stays in scope as long as result does so these
-    # generators will work.
-    result.__dirfmt = dirfmt
-    return result
-
-
 # Mixed Case Transformers
 # NOTE:
 # These are mainly for reading in mixed case data and converting to another
@@ -895,15 +628,15 @@ def _68(dirfmt: EMPPairedEndDirFmt) -> BarcodePairedSequenceFastqIterator:
 
 @plugin.register_transformer
 def _69(fmt: MixedCaseDNAFASTAFormat) -> DNAIterator:
-    generator = _read_from_fasta(str(fmt), constructor=skbio.DNA,
-                                 lowercase=True)
+    generator = read_from_fasta(str(fmt), constructor=skbio.DNA,
+                                lowercase=True)
     return DNAIterator(generator)
 
 
 @plugin.register_transformer
 def _70(ff: MixedCaseDNAFASTAFormat) -> pd.Series:
-    return _fastaformats_to_series(ff, constructor=skbio.DNA,
-                                   lowercase=True)
+    return fasta_to_series(ff, constructor=skbio.DNA,
+                           lowercase=True)
 
 
 @plugin.register_transformer
@@ -914,8 +647,8 @@ def _71(ff: MixedCaseDNAFASTAFormat) -> qiime2.Metadata:
 
 @plugin.register_transformer
 def _72(ff: MixedCaseDNAFASTAFormat) -> DNAFASTAFormat:
-    generator = _read_from_fasta(str(ff), constructor=skbio.DNA,
-                                 lowercase=True)
+    generator = read_from_fasta(str(ff), constructor=skbio.DNA,
+                                lowercase=True)
     data = DNAIterator(generator)
     dff = DNAFASTAFormat()
     skbio.io.write(iter(data), format='fasta', into=str(dff))
@@ -924,15 +657,15 @@ def _72(ff: MixedCaseDNAFASTAFormat) -> DNAFASTAFormat:
 
 @plugin.register_transformer
 def _73(fmt: MixedCaseRNAFASTAFormat) -> RNAIterator:
-    generator = _read_from_fasta(str(fmt), constructor=skbio.RNA,
-                                 lowercase=True)
+    generator = read_from_fasta(str(fmt), constructor=skbio.RNA,
+                                lowercase=True)
     return RNAIterator(generator)
 
 
 @plugin.register_transformer
 def _74(ff: MixedCaseRNAFASTAFormat) -> pd.Series:
-    return _fastaformats_to_series(ff, constructor=skbio.RNA,
-                                   lowercase=True)
+    return fasta_to_series(ff, constructor=skbio.RNA,
+                           lowercase=True)
 
 
 @plugin.register_transformer
@@ -943,8 +676,8 @@ def _75(ff: MixedCaseRNAFASTAFormat) -> qiime2.Metadata:
 
 @plugin.register_transformer
 def _76(ff: MixedCaseRNAFASTAFormat) -> RNAFASTAFormat:
-    generator = _read_from_fasta(str(ff), constructor=skbio.RNA,
-                                 lowercase=True)
+    generator = read_from_fasta(str(ff), constructor=skbio.RNA,
+                                lowercase=True)
     data = RNAIterator(generator)
     dff = RNAFASTAFormat()
     skbio.io.write(iter(data), format='fasta', into=str(dff))
@@ -953,15 +686,15 @@ def _76(ff: MixedCaseRNAFASTAFormat) -> RNAFASTAFormat:
 
 @plugin.register_transformer
 def _77(fmt: MixedCaseAlignedDNAFASTAFormat) -> AlignedDNAIterator:
-    generator = _read_from_fasta(str(fmt), constructor=skbio.DNA,
-                                 lowercase=True)
+    generator = read_from_fasta(str(fmt), constructor=skbio.DNA,
+                                lowercase=True)
     return AlignedDNAIterator(generator)
 
 
 @plugin.register_transformer
 def _78(ff: MixedCaseAlignedDNAFASTAFormat) -> pd.Series:
-    return _fastaformats_to_series(ff, constructor=skbio.DNA,
-                                   lowercase=True)
+    return fasta_to_series(ff, constructor=skbio.DNA,
+                           lowercase=True)
 
 
 @plugin.register_transformer
@@ -972,8 +705,8 @@ def _79(ff: MixedCaseAlignedDNAFASTAFormat) -> qiime2.Metadata:
 
 @plugin.register_transformer
 def _80(ff: MixedCaseAlignedDNAFASTAFormat) -> AlignedDNAFASTAFormat:
-    generator = _read_from_fasta(str(ff), constructor=skbio.DNA,
-                                 lowercase=True)
+    generator = read_from_fasta(str(ff), constructor=skbio.DNA,
+                                lowercase=True)
     data = AlignedDNAIterator(generator)
     dff = AlignedDNAFASTAFormat()
     skbio.io.write(iter(data), format='fasta', into=str(dff))
@@ -982,15 +715,15 @@ def _80(ff: MixedCaseAlignedDNAFASTAFormat) -> AlignedDNAFASTAFormat:
 
 @plugin.register_transformer
 def _81(fmt: MixedCaseAlignedRNAFASTAFormat) -> AlignedRNAIterator:
-    generator = _read_from_fasta(str(fmt), constructor=skbio.RNA,
-                                 lowercase=True)
+    generator = read_from_fasta(str(fmt), constructor=skbio.RNA,
+                                lowercase=True)
     return AlignedRNAIterator(generator)
 
 
 @plugin.register_transformer
 def _82(ff: MixedCaseAlignedRNAFASTAFormat) -> pd.Series:
-    return _fastaformats_to_series(ff, constructor=skbio.RNA,
-                                   lowercase=True)
+    return fasta_to_series(ff, constructor=skbio.RNA,
+                           lowercase=True)
 
 
 @plugin.register_transformer
@@ -1001,8 +734,8 @@ def _83(ff: MixedCaseAlignedRNAFASTAFormat) -> qiime2.Metadata:
 
 @plugin.register_transformer
 def _84(ff: MixedCaseAlignedRNAFASTAFormat) -> AlignedRNAFASTAFormat:
-    generator = _read_from_fasta(str(ff), constructor=skbio.RNA,
-                                 lowercase=True)
+    generator = read_from_fasta(str(ff), constructor=skbio.RNA,
+                                lowercase=True)
     data = AlignedRNAIterator(generator)
     dff = AlignedRNAFASTAFormat()
     skbio.io.write(iter(data), format='fasta', into=str(dff))

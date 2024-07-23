@@ -9,7 +9,9 @@
 import qiime2.plugin.model as model
 from qiime2.plugin import ValidationError
 
-from .._util import FASTAFormat, DNAFASTAFormat, FastqGzFormat
+from q2_types.feature_data import FASTAFormat, DNAFASTAFormat
+from q2_types.per_sample_sequences import FastqGzFormat
+
 from ..plugin_setup import plugin
 
 

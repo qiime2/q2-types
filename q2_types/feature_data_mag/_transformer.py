@@ -13,7 +13,7 @@ from itertools import repeat
 
 import pandas as pd
 import skbio
-from q2_types.feature_data._transformer import _fastaformats_to_series
+from q2_types._util import fasta_to_series
 
 from . import MAGSequencesDirFmt
 from ..plugin_setup import plugin
@@ -42,7 +42,7 @@ def _fastafiles_to_dataframe(ff):
     data = {}
     for fp in sorted(glob.glob(os.path.join(str(ff), '*.fa*'))):
         fname = _get_filename(fp)
-        data[fname] = _fastaformats_to_series(fp, constructor=skbio.DNA)
+        data[fname] = fasta_to_series(fp, constructor=skbio.DNA)
     df = pd.DataFrame.from_dict(data, orient='index')
     df.index.name = 'Feature ID'
     df = df.astype(str).replace({'nan': None})

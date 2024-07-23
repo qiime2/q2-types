@@ -8,11 +8,16 @@
 
 from qiime2.plugin import SemanticType
 
+
+from q2_types.feature_data import BLAST6
+
 from ..plugin_setup import plugin
 from . import AlphaDiversityDirectoryFormat
 
 
-SampleData = SemanticType('SampleData', field_names='type')
+SampleData = SemanticType('SampleData', field_names='type', field_members={
+    'type': BLAST6
+})
 
 AlphaDiversity = SemanticType('AlphaDiversity',
                               variant_of=SampleData.field['type'])
