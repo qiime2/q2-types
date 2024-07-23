@@ -24,6 +24,8 @@ from ._type import (MultiplexedSingleEndBarcodeInSequence,
                     EMPSingleEndSequences,
                     EMPPairedEndSequences,
                     ErrorCorrectionDetails)
+from ._objects import (BarcodePairedSequenceFastqIterator,
+                       BarcodeSequenceFastqIterator)
 
 __all__ = [
     'MultiplexedSingleEndBarcodeInSequence',
@@ -36,7 +38,9 @@ __all__ = [
     'ErrorCorrectionDetails', 'ErrorCorrectionDetailsFmt',
     'ErrorCorrectionDetailsDirFmt', 'EMPSingleEndDirFmt',
     'EMPSingleEndCasavaDirFmt', 'EMPPairedEndDirFmt',
-    'EMPPairedEndCasavaDirFmt'
+    'EMPPairedEndCasavaDirFmt',
+    'BarcodePairedSequenceFastqIterator',
+    'BarcodeSequenceFastqIterator'
 ]
 
 importlib.import_module('q2_types.multiplexed_sequences._transformer')

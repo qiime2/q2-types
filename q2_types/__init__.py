@@ -13,9 +13,6 @@ from ._version import get_versions
 __version__ = get_versions()['version']
 del get_versions
 
-# feature_data needs to be imported before feature_table to avoid circular
-# import.
-importlib.import_module('q2_types.feature_data')
 importlib.import_module('q2_types.per_sample_sequences')
 importlib.import_module('q2_types.feature_map')
 importlib.import_module('q2_types.feature_table')
