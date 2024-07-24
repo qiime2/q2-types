@@ -5,11 +5,11 @@
 #
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
-
 import qiime2
 
-from ..plugin_setup import plugin
-from . import ImmutableMetadataFormat
+from .. import ImmutableMetadataFormat
+
+from ...plugin_setup import plugin
 
 
 @plugin.register_transformer

@@ -8,10 +8,11 @@
 
 import shutil
 
-from q2_types.metadata import (ImmutableMetadataDirectoryFormat,
-                               ImmutableMetadataFormat)
 from qiime2.plugin.testing import TestPluginBase
 from qiime2.plugin import ValidationError
+
+from q2_types.metadata import (ImmutableMetadataDirectoryFormat,
+                               ImmutableMetadataFormat)
 
 
 class TestFormats(TestPluginBase):

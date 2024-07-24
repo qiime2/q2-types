@@ -6,9 +6,10 @@
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
 
+from qiime2.plugin.testing import TestPluginBase
+
 from q2_types.metadata import (ImmutableMetadataDirectoryFormat,
                                ImmutableMetadata)
-from qiime2.plugin.testing import TestPluginBase
 
 
 class TestTypes(TestPluginBase):
