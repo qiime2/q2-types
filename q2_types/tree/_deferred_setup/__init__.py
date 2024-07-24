@@ -6,23 +6,19 @@
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
 
+import importlib
 from io import StringIO
 
 from skbio import TreeNode
 
-from qiime2.plugin import SemanticType
 from qiime2.plugin.util import transform
 
-from ..plugin_setup import plugin
-from . import NewickDirectoryFormat
+from .. import (NewickFormat, NewickDirectoryFormat,
+                Phylogeny, Rooted, Unrooted, Hierarchy)
 
-Phylogeny = SemanticType('Phylogeny', field_names=['type'])
+from ...plugin_setup import plugin
 
-Rooted = SemanticType('Rooted', variant_of=Phylogeny.field['type'])
-
-Unrooted = SemanticType('Unrooted', variant_of=Phylogeny.field['type'])
-
-Hierarchy = SemanticType('Hierarchy')
+plugin.register_formats(NewickFormat, NewickDirectoryFormat)
 
 plugin.register_semantic_types(Phylogeny, Rooted, Unrooted, Hierarchy)
 
@@ -57,3 +53,5 @@ plugin.register_artifact_class(
 
 plugin.register_artifact_class(Hierarchy,
                                directory_format=NewickDirectoryFormat)
+
+importlib.import_module('._transformers', __name__)
