@@ -8,10 +8,7 @@
 
 import qiime2.plugin.model as model
 from qiime2.plugin import ValidationError
-from qiime2 import Metadata
-from qiime2.metadata import MetadataFileError
-
-from ..plugin_setup import plugin
+from qiime2.metadata import MetadataFileError, Metadata
 
 
 class ImmutableMetadataFormat(model.TextFileFormat):
@@ -25,7 +22,3 @@ class ImmutableMetadataFormat(model.TextFileFormat):
 ImmutableMetadataDirectoryFormat = model.SingleFileDirectoryFormat(
     'ImmutableMetadataDirectoryFormat', 'metadata.tsv',
     ImmutableMetadataFormat)
-
-
-plugin.register_formats(ImmutableMetadataFormat,
-                        ImmutableMetadataDirectoryFormat)

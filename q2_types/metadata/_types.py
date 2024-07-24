@@ -6,9 +6,7 @@
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
 
-from ._formats import ImmutableMetadataFormat, ImmutableMetadataDirectoryFormat
-from ._types import ImmutableMetadata
+from qiime2.plugin import SemanticType
 
-__all__ = ['ImmutableMetadataFormat',
-           'ImmutableMetadataDirectoryFormat',
-           'ImmutableMetadata']
+
+ImmutableMetadata = SemanticType('ImmutableMetadata')

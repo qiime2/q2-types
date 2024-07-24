@@ -7,9 +7,10 @@
 # ----------------------------------------------------------------------------
 
 import qiime2
-from q2_types.metadata import ImmutableMetadataFormat
 from qiime2.plugin.testing import TestPluginBase
 from qiime2.metadata import MetadataFileError
+
+from q2_types.metadata import ImmutableMetadataFormat
 
 
 class TestTransformers(TestPluginBase):

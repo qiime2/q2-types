@@ -5,14 +5,15 @@
 #
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
+import importlib
 
-from qiime2.plugin import SemanticType
+from .. import (ImmutableMetadataFormat, ImmutableMetadataDirectoryFormat,
+                ImmutableMetadata)
 
-from ..plugin_setup import plugin
-from . import ImmutableMetadataDirectoryFormat
+from ...plugin_setup import plugin
 
-
-ImmutableMetadata = SemanticType('ImmutableMetadata')
+plugin.register_formats(ImmutableMetadataFormat,
+                        ImmutableMetadataDirectoryFormat)
 
 plugin.register_semantic_types(ImmutableMetadata)
 
@@ -21,3 +22,5 @@ plugin.register_artifact_class(
     directory_format=ImmutableMetadataDirectoryFormat,
     description=("Immutable sample or feature metadata.")
 )
+
+importlib.import_module('._transformers', __name__)
