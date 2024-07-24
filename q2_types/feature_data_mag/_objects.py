@@ -6,9 +6,12 @@
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
 
-from ._formats import MAGSequencesDirFmt
+import collections.abc
 
-from ._types import MAG, Contig
-from ._objects import MAGIterator
 
-__all__ = ['MAG', 'MAGSequencesDirFmt', 'MAGIterator', 'Contig']
+class MAGIterator(collections.abc.Iterable):
+    def __init__(self, generator):
+        self.generator = generator
+
+    def __iter__(self):
+        yield from self.generator

@@ -11,8 +11,6 @@ import re
 from q2_types.feature_data import DNAFASTAFormat
 from qiime2.plugin import model
 
-from ..plugin_setup import plugin
-
 
 class MAGSequencesDirFmt(model.DirectoryFormat):
     pathspec = (
@@ -58,6 +56,3 @@ class MAGSequencesDirFmt(model.DirectoryFormat):
                 ids[_id] = str(absolute_path)
 
         return dict(sorted(ids.items()))
-
-
-plugin.register_formats(MAGSequencesDirFmt)
