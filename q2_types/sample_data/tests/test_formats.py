@@ -9,10 +9,11 @@
 import shutil
 import unittest
 
-from q2_types.sample_data import (AlphaDiversityDirectoryFormat,
-                                  AlphaDiversityFormat)
 from qiime2.plugin.testing import TestPluginBase
 from qiime2.plugin import ValidationError
+
+from q2_types.sample_data import (AlphaDiversityDirectoryFormat,
+                                  AlphaDiversityFormat)
 
 
 class TestFormats(TestPluginBase):

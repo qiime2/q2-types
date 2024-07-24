@@ -9,11 +9,12 @@
 import unittest
 
 import pandas as pd
+from pandas.testing import assert_series_equal
 
 import qiime2
-from pandas.testing import assert_series_equal
-from q2_types.sample_data import AlphaDiversityFormat
 from qiime2.plugin.testing import TestPluginBase
+
+from q2_types.sample_data import AlphaDiversityFormat
 
 
 class TestTransformers(TestPluginBase):

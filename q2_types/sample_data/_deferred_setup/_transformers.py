@@ -11,8 +11,9 @@ import numpy as np
 
 import qiime2
 
-from ..plugin_setup import plugin
-from . import AlphaDiversityFormat
+from .. import AlphaDiversityFormat
+
+from ...plugin_setup import plugin
 
 
 def _read_alpha_diversity(fh):

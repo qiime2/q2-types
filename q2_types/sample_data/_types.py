@@ -6,8 +6,10 @@
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
 
-from ._formats import AlphaDiversityFormat, AlphaDiversityDirectoryFormat
-from ._types import SampleData, AlphaDiversity
+from qiime2.plugin import SemanticType
 
-__all__ = ['AlphaDiversityFormat', 'AlphaDiversityDirectoryFormat',
-           'SampleData', 'AlphaDiversity']
+
+SampleData = SemanticType('SampleData', field_names='type')
+
+AlphaDiversity = SemanticType('AlphaDiversity',
+                              variant_of=SampleData.field['type'])

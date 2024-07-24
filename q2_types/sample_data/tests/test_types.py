@@ -8,9 +8,10 @@
 
 import unittest
 
+from qiime2.plugin.testing import TestPluginBase
+
 from q2_types.sample_data import (AlphaDiversityDirectoryFormat,
                                   SampleData, AlphaDiversity)
-from qiime2.plugin.testing import TestPluginBase
 
 
 class TestTypes(TestPluginBase):

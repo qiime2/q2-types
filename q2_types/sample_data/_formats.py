@@ -11,8 +11,6 @@ import csv
 import qiime2.plugin.model as model
 from qiime2.plugin import ValidationError
 
-from ..plugin_setup import plugin
-
 
 class AlphaDiversityFormat(model.TextFileFormat):
     def _validate_(self, level):
@@ -51,6 +49,3 @@ class AlphaDiversityFormat(model.TextFileFormat):
 AlphaDiversityDirectoryFormat = model.SingleFileDirectoryFormat(
     'AlphaDiversityDirectoryFormat', 'alpha-diversity.tsv',
     AlphaDiversityFormat)
-
-
-plugin.register_formats(AlphaDiversityFormat, AlphaDiversityDirectoryFormat)
