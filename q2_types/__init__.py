@@ -15,4 +15,3 @@ del get_versions
 
 importlib.import_module('q2_types.tree')
 importlib.import_module('q2_types.sample_data')
-importlib.import_module('q2_types.reference_db')

@@ -5,17 +5,11 @@
 #
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
-
-
 import gzip
 import re
-from qiime2.plugin import model
-from qiime2.core.exceptions import ValidationError
-from q2_types.plugin_setup import plugin
-from q2_types.reference_db._type import (
-    ReferenceDB, Eggnog, Diamond, NCBITaxonomy,
-    EggnogProteinSequences
-)
+
+from qiime2.plugin import model, ValidationError
+
 from q2_types.feature_data import MixedCaseProteinFASTAFormat
 
 
@@ -91,9 +85,6 @@ class EggnogRefBinFileFmt(model.BinaryFileFormat):
         pass
 
 
-plugin.register_formats(EggnogRefTextFileFmt, EggnogRefBinFileFmt)
-
-
 class EggnogRefDirFmt(model.DirectoryFormat):
     eggnog = model.FileCollection(r'eggnog.*db.*',
                                   format=EggnogRefBinFileFmt)
@@ -101,13 +92,6 @@ class EggnogRefDirFmt(model.DirectoryFormat):
     @eggnog.set_path_maker
     def eggnog_path_maker(self, name):
         return str(name)
-
-
-plugin.register_formats(EggnogRefDirFmt)
-
-plugin.register_semantic_type_to_format(
-        ReferenceDB[Eggnog],
-        EggnogRefDirFmt)
 
 
 class DiamondDatabaseFileFmt(model.BinaryFileFormat):
@@ -118,10 +102,6 @@ class DiamondDatabaseFileFmt(model.BinaryFileFormat):
 
 DiamondDatabaseDirFmt = model.SingleFileDirectoryFormat(
     'DiamondDatabaseDirFmt', 'ref_db.dmnd', DiamondDatabaseFileFmt)
-
-plugin.register_formats(DiamondDatabaseFileFmt, DiamondDatabaseDirFmt)
-plugin.register_semantic_type_to_format(ReferenceDB[Diamond],
-                                        DiamondDatabaseDirFmt)
 
 
 class NCBITaxonomyNodesFormat(model.TextFileFormat):
@@ -263,11 +243,6 @@ class NCBITaxonomyBinaryFileFmt(model.BinaryFileFormat):
                     line_no += 1
 
 
-plugin.register_formats(
-    NCBITaxonomyNodesFormat, NCBITaxonomyNamesFormat, NCBITaxonomyBinaryFileFmt
-    )
-
-
 class NCBITaxonomyDirFmt(model.DirectoryFormat):
     node = model.File('nodes.dmp', format=NCBITaxonomyNodesFormat)
     names = model.File('names.dmp', format=NCBITaxonomyNamesFormat)
@@ -277,20 +252,8 @@ class NCBITaxonomyDirFmt(model.DirectoryFormat):
         )
 
 
-plugin.register_formats(NCBITaxonomyDirFmt)
-
-plugin.register_semantic_type_to_format(
-        ReferenceDB[NCBITaxonomy],
-        NCBITaxonomyDirFmt)
-
-
 class EggnogProteinSequencesDirFmt(model.DirectoryFormat):
     taxid_info = model.File("e5.taxid_info.tsv", format=EggnogRefTextFileFmt)
     proteins = model.File(
         "e5.proteomes.faa", format=MixedCaseProteinFASTAFormat
     )
-
-
-plugin.register_formats(EggnogProteinSequencesDirFmt)
-plugin.register_semantic_type_to_format(ReferenceDB[EggnogProteinSequences],
-                                        EggnogProteinSequencesDirFmt)
