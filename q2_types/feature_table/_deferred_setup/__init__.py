@@ -6,34 +6,24 @@
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
 
-from qiime2.plugin import SemanticType
+import importlib
 
-from ..plugin_setup import plugin
-from . import BIOMV210DirFmt
+import biom
 
+from qiime2.plugin import Citations
 
-FeatureTable = SemanticType('FeatureTable', field_names='content')
+from .. import (BIOMV100Format, BIOMV210Format, BIOMV100DirFmt,
+                BIOMV210DirFmt, FeatureTable, Frequency, RelativeFrequency,
+                PresenceAbsence, Composition, Balance,
+                PercentileNormalized, Design)
 
-Frequency = SemanticType('Frequency', variant_of=FeatureTable.field['content'])
+from ...plugin_setup import plugin
 
-RelativeFrequency = SemanticType('RelativeFrequency',
-                                 variant_of=FeatureTable.field['content'])
+citations = Citations.load('citations.bib', package='q2_types.feature_table')
 
-PresenceAbsence = SemanticType('PresenceAbsence',
-                               variant_of=FeatureTable.field['content'])
-
-Composition = SemanticType('Composition',
-                           variant_of=FeatureTable.field['content'])
-
-Balance = SemanticType('Balance',
-                       variant_of=FeatureTable.field['content'])
-
-PercentileNormalized = SemanticType('PercentileNormalized',
-                                    variant_of=FeatureTable.field['content'])
-
-# Design is the type of design matrices for linear regressions that have
-# been transformed/coded.
-Design = SemanticType('Design', variant_of=FeatureTable.field['content'])
+plugin.register_views(BIOMV100Format, BIOMV210Format, BIOMV100DirFmt,
+                      BIOMV210DirFmt, biom.Table,
+                      citations=[citations['mcdonald2012biological']])
 
 plugin.register_semantic_types(FeatureTable, Frequency, RelativeFrequency,
                                PresenceAbsence, Balance, Composition,
@@ -86,3 +76,5 @@ plugin.register_artifact_class(
     FeatureTable[Design],
     directory_format=BIOMV210DirFmt
 )
+
+importlib.import_module('._transformers', __name__)

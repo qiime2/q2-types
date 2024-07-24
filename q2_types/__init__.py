@@ -13,7 +13,6 @@ from ._version import get_versions
 __version__ = get_versions()['version']
 del get_versions
 
-importlib.import_module('q2_types.feature_table')
 importlib.import_module('q2_types.tree')
 importlib.import_module('q2_types.ordination')
 importlib.import_module('q2_types.sample_data')
