@@ -34,6 +34,7 @@ setup(
                                         'data/emp_multiplexed/*',
                                         'data/emp_multiplexed_single_end/*'],
         'q2_types.feature_map.tests': ['data/*'],
+        'q2_types.feature_table': ['citations.bib'],
         'q2_types.feature_table.tests': ['data/*'],
         'q2_types.metadata.tests': ['data/*'],
         'q2_types.multiplexed_sequences.tests': [

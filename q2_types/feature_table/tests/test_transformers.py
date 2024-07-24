@@ -10,16 +10,16 @@ import unittest
 
 import biom
 import pandas as pd
-import qiime2
-
 from numpy.testing import assert_array_equal
 from pandas.testing import assert_frame_equal
-from q2_types.feature_table import BIOMV100Format, BIOMV210Format
+
+import qiime2
 from qiime2.plugin.testing import TestPluginBase
-from q2_types.feature_table._transformer import (_parse_biom_table_v100,
-                                                 _parse_biom_table_v210,
-                                                 _table_to_dataframe,
-                                                 _table_to_metadata)
+
+from q2_types.feature_table import BIOMV100Format, BIOMV210Format
+from q2_types.feature_table._deferred_setup._transformers import (
+    _parse_biom_table_v100, _parse_biom_table_v210, _table_to_dataframe,
+    _table_to_metadata)
 
 
 class TestTransformers(TestPluginBase):

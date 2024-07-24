@@ -12,8 +12,8 @@ import biom
 import pandas as pd
 import qiime2
 
-from . import BIOMV100Format, BIOMV210Format
-from ..plugin_setup import plugin
+from .. import BIOMV100Format, BIOMV210Format
+from ...plugin_setup import plugin
 
 # NOTE: In the readers and writers for BIOM v1 and v2 below, metadata must be
 # ignored on both axes because BIOM v1 and v2 are incompatible with certain
