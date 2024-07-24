@@ -5,13 +5,12 @@
 #
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
-from qiime2.plugin import SemanticType
 
-from . import KaijuDBDirectoryFormat
-from ..plugin_setup import plugin
+from .. import KaijuIndexFormat, KaijuDBDirectoryFormat, KaijuDB
 
+from ...plugin_setup import plugin
 
-KaijuDB = SemanticType("KaijuDB")
+plugin.register_formats(KaijuDBDirectoryFormat, KaijuIndexFormat)
 
 plugin.register_semantic_types(KaijuDB)
 
