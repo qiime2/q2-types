@@ -6,7 +6,8 @@
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
 from qiime2.plugin.testing import TestPluginBase
-from q2_types.profile_hmms._type import (
+
+from q2_types.profile_hmms import (
     ProfileHMM,
     SingleProtein, SingleDNA, SingleRNA,
     MultipleProtein, MultipleDNA, MultipleRNA,

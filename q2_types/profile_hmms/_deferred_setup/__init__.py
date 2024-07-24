@@ -5,46 +5,42 @@
 #
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
-from qiime2.plugin import SemanticType
-from q2_types.plugin_setup import plugin
-from q2_types.profile_hmms._format import (
+from .. import (
+    ProteinMultipleProfileHmmFileFmt,
+    ProteinSingleProfileHmmFileFmt,
+    RNAMultipleProfileHmmFileFmt,
+    RNASingleProfileHmmFileFmt,
+    DNAMultipleProfileHmmFileFmt,
+    DNASingleProfileHmmFileFmt,
     PressedProfileHmmsDirectoryFmt,
+    ProteinSingleProfileHmmDirectoryFmt,
+    ProteinMultipleProfileHmmDirectoryFmt,
     DNASingleProfileHmmDirectoryFmt,
     DNAMultipleProfileHmmDirectoryFmt,
     RNASingleProfileHmmDirectoryFmt,
     RNAMultipleProfileHmmDirectoryFmt,
+    ProfileHMM,
+    SingleProtein, SingleDNA, SingleRNA,
+    MultipleProtein, MultipleDNA, MultipleRNA,
+    PressedRNA, PressedDNA, PressedProtein
+)
+
+from ...plugin_setup import plugin
+
+plugin.register_formats(
+    ProteinMultipleProfileHmmFileFmt,
+    ProteinSingleProfileHmmFileFmt,
+    RNAMultipleProfileHmmFileFmt,
+    RNASingleProfileHmmFileFmt,
+    DNAMultipleProfileHmmFileFmt,
+    DNASingleProfileHmmFileFmt,
+    PressedProfileHmmsDirectoryFmt,
     ProteinSingleProfileHmmDirectoryFmt,
-    ProteinMultipleProfileHmmDirectoryFmt
-)
-
-
-ProfileHMM = SemanticType('ProfileHMM', field_names='type')
-SingleProtein = SemanticType(
-    'SingleProtein', variant_of=ProfileHMM.field['type']
-)
-SingleDNA = SemanticType(
-    'SingleDNA', variant_of=ProfileHMM.field['type']
-)
-SingleRNA = SemanticType(
-    'SingleRNA', variant_of=ProfileHMM.field['type']
-)
-MultipleProtein = SemanticType(
-    'MultipleProtein', variant_of=ProfileHMM.field['type']
-)
-MultipleDNA = SemanticType(
-    'MultipleDNA', variant_of=ProfileHMM.field['type']
-)
-MultipleRNA = SemanticType(
-    'MultipleRNA', variant_of=ProfileHMM.field['type']
-)
-PressedProtein = SemanticType(
-    'PressedProtein', variant_of=ProfileHMM.field['type']
-)
-PressedDNA = SemanticType(
-    'PressedDNA', variant_of=ProfileHMM.field['type']
-)
-PressedRNA = SemanticType(
-    'PressedRNA', variant_of=ProfileHMM.field['type']
+    ProteinMultipleProfileHmmDirectoryFmt,
+    DNASingleProfileHmmDirectoryFmt,
+    DNAMultipleProfileHmmDirectoryFmt,
+    RNASingleProfileHmmDirectoryFmt,
+    RNAMultipleProfileHmmDirectoryFmt
 )
 
 plugin.register_semantic_types(
