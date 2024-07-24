@@ -6,20 +6,19 @@
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
 
-import importlib
-
-from q2_types.reference_db._type import (
+from ._types import (
     ReferenceDB, Diamond, Eggnog, NCBITaxonomy,
     EggnogProteinSequences
 )
 
-from q2_types.reference_db._format import (
+from ._formats import (
     EggnogRefDirFmt,
     EggnogRefTextFileFmt,
     EggnogRefBinFileFmt,
     DiamondDatabaseFileFmt,
     DiamondDatabaseDirFmt,
     NCBITaxonomyDirFmt,
+    NCBITaxonomyBinaryFileFmt,
     NCBITaxonomyNamesFormat,
     NCBITaxonomyNodesFormat,
     EggnogProteinSequencesDirFmt
@@ -28,8 +27,6 @@ from q2_types.reference_db._format import (
 __all__ = ['ReferenceDB', 'Diamond', 'Eggnog', 'DiamondDatabaseFileFmt',
            'DiamondDatabaseDirFmt', 'EggnogRefDirFmt', 'EggnogRefTextFileFmt',
            'EggnogRefBinFileFmt', 'NCBITaxonomyDirFmt', 'NCBITaxonomy',
+           'NCBITaxonomyBinaryFileFmt',
            'NCBITaxonomyNamesFormat', 'NCBITaxonomyNodesFormat',
            'EggnogProteinSequencesDirFmt', 'EggnogProteinSequences']
-
-importlib.import_module('q2_types.reference_db._format')
-importlib.import_module('q2_types.reference_db._type')

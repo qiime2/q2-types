@@ -6,13 +6,14 @@
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
 from qiime2.plugin.testing import TestPluginBase
-from q2_types.reference_db._format import (
+from qiime2.plugin import ValidationError
+
+from q2_types.reference_db import (
     DiamondDatabaseFileFmt, DiamondDatabaseDirFmt, EggnogRefBinFileFmt,
     EggnogRefDirFmt, NCBITaxonomyNamesFormat, NCBITaxonomyNodesFormat,
     NCBITaxonomyDirFmt, NCBITaxonomyBinaryFileFmt,
     EggnogProteinSequencesDirFmt, EggnogRefTextFileFmt
 )
-from qiime2.plugin import ValidationError
 
 
 class TestRefFormats(TestPluginBase):

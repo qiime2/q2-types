@@ -8,11 +8,9 @@
 
 from qiime2.plugin.testing import TestPluginBase
 
-from q2_types.reference_db._format import (
+from q2_types.reference_db import (
     DiamondDatabaseDirFmt, EggnogRefDirFmt, NCBITaxonomyDirFmt,
-    EggnogProteinSequencesDirFmt
-)
-from q2_types.reference_db._type import (
+    EggnogProteinSequencesDirFmt,
     ReferenceDB, Diamond, Eggnog, NCBITaxonomy, EggnogProteinSequences
 )
 
