@@ -9,10 +9,7 @@
 import json
 from uuid import UUID
 
-from qiime2.core.exceptions import ValidationError
-from qiime2.plugin import model
-
-from ..plugin_setup import plugin
+from qiime2.plugin import model, ValidationError
 
 
 class MAGtoContigsFormat(model.TextFileFormat):
@@ -50,5 +47,3 @@ class MAGtoContigsFormat(model.TextFileFormat):
 MAGtoContigsDirFmt = model.SingleFileDirectoryFormat(
     "MAGtoContigsDirFmt", "mag-to-contigs.json", MAGtoContigsFormat
 )
-
-plugin.register_formats(MAGtoContigsFormat, MAGtoContigsDirFmt)

@@ -8,9 +8,9 @@
 
 import json
 
-from . import MAGtoContigsFormat
+from .. import MAGtoContigsFormat
 
-from ..plugin_setup import plugin
+from ...plugin_setup import plugin
 
 
 @plugin.register_transformer
