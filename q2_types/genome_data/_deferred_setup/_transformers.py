@@ -6,7 +6,6 @@
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
 
-import collections.abc
 import os
 import uuid
 from io import StringIO
@@ -16,11 +15,11 @@ import qiime2
 import skbio
 from skbio.io import read
 
-from . import (
+from .. import (
     GenesDirectoryFormat, ProteinsDirectoryFormat, GFF3Format,
-    OrthologFileFmt, OrthologAnnotationDirFmt
+    OrthologFileFmt, OrthologAnnotationDirFmt, IntervalMetadataIterator
 )
-from ..plugin_setup import plugin
+from ...plugin_setup import plugin
 
 CONSTRUCTORS = {
     'DNA': skbio.DNA,
@@ -71,14 +70,6 @@ def _4(df: pd.DataFrame) -> ProteinsDirectoryFormat:
     result = ProteinsDirectoryFormat()
     df.apply(_series_to_fasta, axis=1, ff=result, seq_type='protein')
     return result
-
-
-class IntervalMetadataIterator(collections.abc.Iterable):
-    def __init__(self, generator):
-        self.generator = generator
-
-    def __iter__(self):
-        yield from self.generator
 
 
 @plugin.register_transformer
