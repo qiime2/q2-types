@@ -8,7 +8,7 @@
 import unittest
 from qiime2.plugin.testing import TestPluginBase
 
-from q2_types.kaiju._format import KaijuDBDirectoryFormat
+from q2_types.kaiju import KaijuDBDirectoryFormat
 
 
 class TestFormats(TestPluginBase):

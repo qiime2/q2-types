@@ -6,10 +6,9 @@
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
 from qiime2.plugin import model
-from q2_types.reference_db._format import (
+from q2_types.reference_db import (
     NCBITaxonomyNamesFormat, NCBITaxonomyNodesFormat
 )
-from ..plugin_setup import plugin
 
 
 class KaijuIndexFormat(model.BinaryFileFormat):
@@ -24,6 +23,3 @@ class KaijuDBDirectoryFormat(model.DirectoryFormat):
     nodes = model.File(r"nodes.dmp", format=NCBITaxonomyNodesFormat)
     names = model.File(r"names.dmp", format=NCBITaxonomyNamesFormat)
     index = model.File(r"kaiju_db.+\.fmi", format=KaijuIndexFormat)
-
-
-plugin.register_formats(KaijuDBDirectoryFormat)
