@@ -14,11 +14,12 @@ import warnings
 import skbio
 import yaml
 import pandas as pd
+
 import qiime2.util
+
 from q2_types.feature_data import DNAFASTAFormat
 
-from ..plugin_setup import plugin
-from . import (
+from .. import (
     SingleLanePerSampleSingleEndFastqDirFmt,
     FastqAbsolutePathManifestFormat,
     FastqManifestFormat,
@@ -41,7 +42,7 @@ from . import (
     MultiMAGSequencesDirFmt,
     MultiFASTADirectoryFormat
 )
-from ._util import (
+from .._util import (
     _single_lane_per_sample_fastq_helper,
     _dirfmt_to_casava,
     _parse_and_validate_manifest,
@@ -54,6 +55,7 @@ from ._util import (
     _mag_manifest_helper
 )
 
+from ...plugin_setup import plugin
 
 # Partially apply the helpers here, to cut down on boilerplate.
 

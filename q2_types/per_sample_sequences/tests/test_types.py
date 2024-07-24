@@ -19,10 +19,8 @@ from q2_types.per_sample_sequences import (
     MAGs, MultiMAGSequencesDirFmt,
     Contigs, ContigSequencesDirFmt,
     SingleBowtie2Index, MultiBowtie2Index, MultiBowtie2IndexDirFmt, BAMDirFmt,
-    MultiBAMDirFmt
+    MultiBAMDirFmt, AlignmentMap, MultiAlignmentMap
 )
-from q2_types.per_sample_sequences._type import (AlignmentMap,
-                                                 MultiAlignmentMap)
 from qiime2.plugin.testing import TestPluginBase
 
 

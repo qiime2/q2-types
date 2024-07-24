@@ -6,41 +6,55 @@
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
 
-from q2_types.bowtie2 import Bowtie2IndexDirFmt
+import importlib
+
+from q2_types.sample_data import SampleData
 from q2_types.feature_data import FeatureData
-from qiime2.plugin import SemanticType
+from q2_types.bowtie2 import Bowtie2IndexDirFmt
 
-from ..plugin_setup import plugin
-from ..sample_data import SampleData
-from . import (QIIME1DemuxDirFmt, SingleLanePerSampleSingleEndFastqDirFmt,
-               SingleLanePerSamplePairedEndFastqDirFmt,
-               MultiMAGSequencesDirFmt, ContigSequencesDirFmt,
-               MultiBowtie2IndexDirFmt, BAMDirFmt, MultiBAMDirFmt)
+from .. import (CasavaOneEightSingleLanePerSampleDirFmt,
+                CasavaOneEightLanelessPerSampleDirFmt,
+                FastqGzFormat, YamlFormat,
+                FastqManifestFormat, FastqAbsolutePathManifestFormat,
+                SingleLanePerSampleSingleEndFastqDirFmt,
+                SingleLanePerSamplePairedEndFastqDirFmt,
+                SingleEndFastqManifestPhred33,
+                SingleEndFastqManifestPhred64,
+                PairedEndFastqManifestPhred33,
+                PairedEndFastqManifestPhred64,
+                SingleEndFastqManifestPhred33V2,
+                SingleEndFastqManifestPhred64V2,
+                PairedEndFastqManifestPhred33V2,
+                PairedEndFastqManifestPhred64V2,
+                QIIME1DemuxFormat, QIIME1DemuxDirFmt,
+                SampleIdIndexedSingleEndPerSampleDirFmt,
+                MultiMAGSequencesDirFmt, MultiMAGManifestFormat,
+                ContigSequencesDirFmt, MultiBowtie2IndexDirFmt,
+                BAMFormat, BAMDirFmt, MultiBAMDirFmt,
+                MultiFASTADirectoryFormat,
+                Sequences, SequencesWithQuality,
+                PairedEndSequencesWithQuality,
+                JoinedSequencesWithQuality, MAGs, Contigs,
+                SingleBowtie2Index, MultiBowtie2Index,
+                AlignmentMap, MultiAlignmentMap)
+
+from ...plugin_setup import plugin
 
 
-Sequences = SemanticType('Sequences', variant_of=SampleData.field['type'])
-SequencesWithQuality = SemanticType(
-    'SequencesWithQuality', variant_of=SampleData.field['type'])
-PairedEndSequencesWithQuality = SemanticType(
-    'PairedEndSequencesWithQuality', variant_of=SampleData.field['type'])
-JoinedSequencesWithQuality = SemanticType(
-    'JoinedSequencesWithQuality', variant_of=SampleData.field['type'])
-MAGs = SemanticType(
-    'MAGs', variant_of=SampleData.field['type'])
-Contigs = SemanticType(
-    'Contigs', variant_of=SampleData.field['type'])
-SingleBowtie2Index = SemanticType(
-    'SingleBowtie2Index',
-    variant_of=[SampleData.field['type'], FeatureData.field['type']]
+plugin.register_formats(
+    FastqManifestFormat, FastqAbsolutePathManifestFormat, YamlFormat,
+    FastqGzFormat, CasavaOneEightSingleLanePerSampleDirFmt,
+    CasavaOneEightLanelessPerSampleDirFmt,
+    SingleLanePerSampleSingleEndFastqDirFmt,
+    SingleLanePerSamplePairedEndFastqDirFmt, SingleEndFastqManifestPhred33,
+    SingleEndFastqManifestPhred64, PairedEndFastqManifestPhred33,
+    PairedEndFastqManifestPhred64, SingleEndFastqManifestPhred33V2,
+    SingleEndFastqManifestPhred64V2, PairedEndFastqManifestPhred33V2,
+    PairedEndFastqManifestPhred64V2, QIIME1DemuxFormat, QIIME1DemuxDirFmt,
+    SampleIdIndexedSingleEndPerSampleDirFmt, MultiFASTADirectoryFormat,
+    MultiMAGSequencesDirFmt, ContigSequencesDirFmt, MultiBowtie2IndexDirFmt,
+    BAMFormat, BAMDirFmt, MultiBAMDirFmt, MultiMAGManifestFormat
 )
-MultiBowtie2Index = SemanticType(
-    'MultiBowtie2Index', variant_of=SampleData.field['type'])
-AlignmentMap = SemanticType(
-    'AlignmentMap',
-    variant_of=[SampleData.field['type'], FeatureData.field['type']]
-)
-MultiAlignmentMap = SemanticType(
-    'MultiAlignmentMap', variant_of=SampleData.field['type'])
 
 plugin.register_semantic_types(
     Sequences, SequencesWithQuality, PairedEndSequencesWithQuality,
@@ -101,3 +115,5 @@ plugin.register_semantic_type_to_format(
     SampleData[MultiAlignmentMap],
     artifact_format=MultiBAMDirFmt
 )
+
+importlib.import_module('._transformers', __name__)
