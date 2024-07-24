@@ -6,17 +6,19 @@
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
 
-from qiime2.core.type import SemanticType
+import importlib
 
-from ._format import MAGtoContigsDirFmt
-from ..plugin_setup import plugin
+from .. import MAGtoContigs, FeatureMap, MAGtoContigsDirFmt, MAGtoContigsFormat
 
-FeatureMap = SemanticType("FeatureMap", field_names="type")
-MAGtoContigs = SemanticType(
-    "MAGtoContigs", variant_of=FeatureMap.field["type"]
-)
+from ...plugin_setup import plugin
+
+plugin.register_formats(MAGtoContigsFormat, MAGtoContigsDirFmt)
 
 plugin.register_semantic_types(FeatureMap, MAGtoContigs)
-plugin.register_semantic_type_to_format(
-    FeatureMap[MAGtoContigs], artifact_format=MAGtoContigsDirFmt
+
+plugin.register_artifact_class(
+    FeatureMap[MAGtoContigs],
+    directory_format=MAGtoContigsDirFmt
 )
+
+importlib.import_module('._transformers', __name__)

@@ -6,10 +6,9 @@
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
 
-from ._formats import MAGtoContigsFormat, MAGtoContigsDirFmt
+from qiime2.core.type import SemanticType
 
-from ._types import FeatureMap, MAGtoContigs
-
-__all__ = [
-    "FeatureMap", "MAGtoContigs", "MAGtoContigsFormat", "MAGtoContigsDirFmt"
-]
+FeatureMap = SemanticType("FeatureMap", field_names="type")
+MAGtoContigs = SemanticType(
+    "MAGtoContigs", variant_of=FeatureMap.field["type"]
+)
