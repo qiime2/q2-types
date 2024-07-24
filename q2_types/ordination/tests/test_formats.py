@@ -10,11 +10,12 @@ import os
 import shutil
 import unittest
 
+from qiime2.plugin.testing import TestPluginBase
+from qiime2.plugin import ValidationError
+
 from q2_types.ordination import (
     OrdinationFormat, OrdinationDirectoryFormat,
     ProcrustesStatisticsFmt, ProcrustesStatisticsDirFmt)
-from qiime2.plugin.testing import TestPluginBase
-from qiime2.plugin import ValidationError
 
 
 class TestFormats(TestPluginBase):

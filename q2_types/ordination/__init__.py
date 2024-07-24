@@ -6,18 +6,13 @@
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
 
-import importlib
-
-from ._format import (
+from ._formats import (
     OrdinationFormat, OrdinationDirectoryFormat,
     ProcrustesStatisticsFmt, ProcrustesStatisticsDirFmt,
 )
-from ._type import PCoAResults, ProcrustesStatistics
+from ._types import PCoAResults, ProcrustesStatistics
 
 
 __all__ = ['OrdinationFormat', 'OrdinationDirectoryFormat',
            'ProcrustesStatisticsFmt', 'ProcrustesStatisticsDirFmt',
            'PCoAResults', 'ProcrustesStatistics']
-
-
-importlib.import_module('q2_types.ordination._transformer')

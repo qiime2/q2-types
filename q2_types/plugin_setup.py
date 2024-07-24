@@ -39,5 +39,5 @@ importlib.import_module('q2_types.kaiju._deferred_setup')
 importlib.import_module('q2_types.kraken2._deferred_setup')
 importlib.import_module('q2_types.metadata._deferred_setup')
 importlib.import_module('q2_types.multiplexed_sequences._deferred_setup')
-
+importlib.import_module('q2_types.ordination._deferred_setup')
 importlib.import_module('q2_types.per_sample_sequences._deferred_setup')
