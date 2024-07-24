@@ -8,10 +8,7 @@
 
 import pandas as pd
 from pandas.core.dtypes.common import is_string_dtype
-from qiime2.core.exceptions import ValidationError
-from qiime2.plugin import model
-
-from ..plugin_setup import plugin
+from qiime2.plugin import model, ValidationError
 
 
 class Kraken2ReportFormat(model.TextFileFormat):
@@ -190,10 +187,3 @@ class BrackenDBDirectoryFormat(model.DirectoryFormat):
     @kmers.set_path_maker
     def kmers_path_maker(self, read_len):
         return f'database{read_len}mers.kmer_distrib'
-
-
-plugin.register_formats(
-    Kraken2ReportDirectoryFormat, Kraken2OutputDirectoryFormat,
-    Kraken2DBDirectoryFormat, Kraken2DBReportDirectoryFormat,
-    BrackenDBDirectoryFormat
-)

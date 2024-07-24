@@ -11,7 +11,7 @@ import unittest
 from qiime2.core.exceptions import ValidationError
 from qiime2.plugin.testing import TestPluginBase
 
-from q2_types.kraken2._format import (
+from q2_types.kraken2 import (
     Kraken2ReportFormat, Kraken2ReportDirectoryFormat,
     Kraken2OutputFormat, Kraken2OutputDirectoryFormat,
     Kraken2DBReportFormat, Kraken2DBReportDirectoryFormat,

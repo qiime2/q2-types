@@ -12,12 +12,12 @@ from q2_types.feature_data import FeatureData
 from q2_types.sample_data import SampleData
 from qiime2.plugin.testing import TestPluginBase
 
-from q2_types.kraken2._format import (
+from q2_types.kraken2 import (
     Kraken2ReportDirectoryFormat, Kraken2OutputDirectoryFormat,
     Kraken2DBDirectoryFormat, Kraken2DBReportDirectoryFormat,
     BrackenDBDirectoryFormat
 )
-from q2_types.kraken2._type import (
+from q2_types.kraken2 import (
     Kraken2Reports, Kraken2Outputs, Kraken2DB, Kraken2DBReport, BrackenDB
 )
 

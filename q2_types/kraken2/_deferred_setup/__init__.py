@@ -5,29 +5,29 @@
 #
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
-from q2_types.feature_data import FeatureData
-from q2_types.sample_data import SampleData
-from qiime2.plugin import SemanticType
 
-from . import (
+import importlib
+
+from q2_types.sample_data import SampleData
+from q2_types.feature_data import FeatureData
+
+from .. import (
+    Kraken2ReportFormat, Kraken2ReportDirectoryFormat,
+    Kraken2OutputFormat, Kraken2OutputDirectoryFormat,
+    Kraken2DBFormat, Kraken2DBReportFormat, Kraken2DBReportDirectoryFormat,
+    Kraken2DBDirectoryFormat, BrackenDBFormat, BrackenDBDirectoryFormat,
+    Kraken2Reports, Kraken2Outputs, Kraken2DB, Kraken2DBReport, BrackenDB)
+
+from ...plugin_setup import plugin
+
+
+plugin.register_formats(
+    Kraken2ReportFormat, Kraken2OutputFormat,
+    Kraken2DBFormat, Kraken2DBReportFormat,
     Kraken2ReportDirectoryFormat, Kraken2OutputDirectoryFormat,
     Kraken2DBDirectoryFormat, Kraken2DBReportDirectoryFormat,
-    BrackenDBDirectoryFormat
+    BrackenDBFormat, BrackenDBDirectoryFormat
 )
-from ..plugin_setup import plugin
-
-
-Kraken2Reports = SemanticType(
-    'Kraken2Report',
-    variant_of=[SampleData.field['type'], FeatureData.field['type']]
-)
-Kraken2Outputs = SemanticType(
-    'Kraken2Output',
-    variant_of=[SampleData.field['type'], FeatureData.field['type']]
-)
-Kraken2DB = SemanticType('Kraken2DB')
-Kraken2DBReport = SemanticType('Kraken2DBReport')
-BrackenDB = SemanticType('BrackenDB')
 
 plugin.register_semantic_types(
     Kraken2Reports, Kraken2Outputs, Kraken2DB, Kraken2DBReport, BrackenDB
@@ -61,3 +61,5 @@ plugin.register_semantic_type_to_format(
     BrackenDB,
     artifact_format=BrackenDBDirectoryFormat
 )
+
+importlib.import_module('._transformers', __name__)
