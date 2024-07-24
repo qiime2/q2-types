@@ -17,7 +17,8 @@ from q2_types.genome_data import (
     GenesDirectoryFormat, ProteinsDirectoryFormat, GFF3Format,
     IntervalMetadataIterator, OrthologAnnotationDirFmt, NOG
 )
-from q2_types.genome_data._transformer import _annotations_to_dataframe
+from q2_types.genome_data._deferred_setup._transformers import (
+    _annotations_to_dataframe)
 from q2_types.sample_data import SampleData
 
 

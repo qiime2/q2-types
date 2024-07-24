@@ -11,7 +11,7 @@ import unittest
 from qiime2.core.exceptions import ValidationError
 from qiime2.plugin.testing import TestPluginBase
 
-from .._format import (
+from q2_types.genome_data import (
     GenesDirectoryFormat, ProteinsDirectoryFormat, GFF3Format,
     LociDirectoryFormat, SeedOrthologDirFmt, OrthologFileFmt,
     OrthologAnnotationDirFmt, GenomeSequencesDirectoryFormat,

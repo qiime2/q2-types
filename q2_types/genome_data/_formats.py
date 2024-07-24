@@ -8,10 +8,9 @@
 import re
 
 import qiime2.plugin.model as model
-from q2_types.feature_data import DNAFASTAFormat, ProteinFASTAFormat
-from qiime2.core.exceptions import ValidationError
+from qiime2.plugin import ValidationError
 
-from ..plugin_setup import plugin
+from q2_types.feature_data import DNAFASTAFormat, ProteinFASTAFormat
 
 
 class OrthologFileFmt(model.TextFileFormat):
@@ -209,10 +208,3 @@ class OrthologAnnotationDirFmt(model.DirectoryFormat):
                     ids[_id] = str(absolute_path)
 
         return dict(sorted(ids.items()))
-
-
-plugin.register_formats(
-    GenesDirectoryFormat, ProteinsDirectoryFormat, LociDirectoryFormat,
-    GenomeSequencesDirectoryFormat, OrthologFileFmt, SeedOrthologDirFmt,
-    OrthologAnnotationDirFmt
-)
