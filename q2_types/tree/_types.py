@@ -5,9 +5,13 @@
 #
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
-from ._formats import NewickFormat, NewickDirectoryFormat
-from ._types import Phylogeny, Rooted, Unrooted, Hierarchy
+from qiime2.plugin import SemanticType
 
-__all__ = [
-    'NewickFormat', 'NewickDirectoryFormat', 'Phylogeny',
-    'Rooted', 'Unrooted', 'Hierarchy']
+
+Phylogeny = SemanticType('Phylogeny', field_names=['type'])
+
+Rooted = SemanticType('Rooted', variant_of=Phylogeny.field['type'])
+
+Unrooted = SemanticType('Unrooted', variant_of=Phylogeny.field['type'])
+
+Hierarchy = SemanticType('Hierarchy')

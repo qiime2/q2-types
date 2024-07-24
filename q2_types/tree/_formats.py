@@ -5,11 +5,8 @@
 #
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
-
 import skbio.io
 import qiime2.plugin.model as model
-
-from ..plugin_setup import plugin
 
 
 class NewickFormat(model.TextFileFormat):
@@ -20,6 +17,3 @@ class NewickFormat(model.TextFileFormat):
 
 NewickDirectoryFormat = model.SingleFileDirectoryFormat(
     'NewickDirectoryFormat', 'tree.nwk', NewickFormat)
-
-
-plugin.register_formats(NewickFormat, NewickDirectoryFormat)
