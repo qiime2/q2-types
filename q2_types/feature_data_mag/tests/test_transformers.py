@@ -18,7 +18,8 @@ from skbio import DNA
 from q2_types.feature_data_mag import (
     MAGSequencesDirFmt, MAGIterator
 )
-from q2_types.feature_data_mag._transformer import _get_filename
+from q2_types.feature_data_mag._deferred_setup._transformers import (
+    _get_filename)
 
 
 class TestTransformers(TestPluginBase):

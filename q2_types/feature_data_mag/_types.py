@@ -6,9 +6,10 @@
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
 
-from ._formats import MAGSequencesDirFmt
+from qiime2.core.type import SemanticType
 
-from ._types import MAG, Contig
-from ._objects import MAGIterator
+from q2_types.feature_data import FeatureData
 
-__all__ = ['MAG', 'MAGSequencesDirFmt', 'MAGIterator', 'Contig']
+
+MAG = SemanticType('MAG', variant_of=FeatureData.field['type'])
+Contig = SemanticType('Contig', variant_of=FeatureData.field['type'])

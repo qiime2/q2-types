@@ -31,3 +31,4 @@ plugin.register_views(pd.Series, pd.DataFrame,
 importlib.import_module('q2_types.bowtie2._deferred_setup')
 importlib.import_module('q2_types.distance_matrix._deferred_setup')
 importlib.import_module('q2_types.feature_data._deferred_setup')
+importlib.import_module('q2_types.feature_data_mag._deferred_setup')

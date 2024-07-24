@@ -12,7 +12,7 @@ import unittest
 
 from qiime2.plugin.testing import TestPluginBase
 
-from q2_types.feature_data_mag._format import MAGSequencesDirFmt
+from q2_types.feature_data_mag import MAGSequencesDirFmt
 
 
 class TestFormats(TestPluginBase):

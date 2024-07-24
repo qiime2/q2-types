@@ -5,7 +5,6 @@
 #
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
-import collections.abc
 import glob
 import os.path
 
@@ -15,8 +14,8 @@ import pandas as pd
 import skbio
 from q2_types._util import fasta_to_series
 
-from . import MAGSequencesDirFmt
-from ..plugin_setup import plugin
+from .. import MAGSequencesDirFmt, MAGIterator
+from ...plugin_setup import plugin
 
 CONSTRUCTORS = {
     'DNA': skbio.DNA,
@@ -59,14 +58,6 @@ def _3(df: pd.DataFrame) -> MAGSequencesDirFmt:
     result = MAGSequencesDirFmt()
     df.apply(_series_to_fasta, axis=1, ff=result, seq_type='DNA')
     return result
-
-
-class MAGIterator(collections.abc.Iterable):
-    def __init__(self, generator):
-        self.generator = generator
-
-    def __iter__(self):
-        yield from self.generator
 
 
 @plugin.register_transformer

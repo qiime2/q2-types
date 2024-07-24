@@ -6,25 +6,22 @@
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
 
+import importlib
+
 from q2_types.feature_data import FeatureData
+from q2_types.per_sample_sequences import ContigSequencesDirFmt
+from q2_types.bowtie2 import Bowtie2IndexDirFmt
+from q2_types.per_sample_sequences import SingleBowtie2Index
 
-from q2_types.feature_data_mag._format import MAGSequencesDirFmt
-from qiime2.core.type import SemanticType
+from .. import MAGSequencesDirFmt, MAG, Contig
 
-from ..bowtie2 import Bowtie2IndexDirFmt
-from ..per_sample_sequences import ContigSequencesDirFmt, SingleBowtie2Index
-from ..plugin_setup import plugin
-
-
-MAG = SemanticType('MAG', variant_of=FeatureData.field['type'])
+from ...plugin_setup import plugin
 
 plugin.register_semantic_types(MAG)
 plugin.register_semantic_type_to_format(
     FeatureData[MAG],
     artifact_format=MAGSequencesDirFmt
 )
-
-Contig = SemanticType('Contig', variant_of=FeatureData.field['type'])
 
 plugin.register_semantic_types(Contig)
 plugin.register_semantic_type_to_format(
@@ -36,3 +33,6 @@ plugin.register_semantic_type_to_format(
     FeatureData[SingleBowtie2Index],
     artifact_format=Bowtie2IndexDirFmt
 )
+plugin.register_formats(MAGSequencesDirFmt)
+
+importlib.import_module('._transformers', __name__)
