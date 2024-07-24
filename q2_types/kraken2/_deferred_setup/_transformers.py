@@ -8,8 +8,9 @@
 
 import pandas as pd
 
-from . import Kraken2ReportFormat, Kraken2OutputFormat, Kraken2DBReportFormat
-from ..plugin_setup import plugin
+from .. import Kraken2ReportFormat, Kraken2OutputFormat, Kraken2DBReportFormat
+
+from ...plugin_setup import plugin
 
 
 @plugin.register_transformer
