@@ -13,8 +13,9 @@ import pandas as pd
 import pandas.testing as pdt
 
 import qiime2
-from q2_types.ordination import OrdinationFormat, ProcrustesStatisticsFmt
 from qiime2.plugin.testing import TestPluginBase
+
+from q2_types.ordination import OrdinationFormat, ProcrustesStatisticsFmt
 
 
 class TestTransformers(TestPluginBase):

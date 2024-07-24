@@ -11,8 +11,6 @@ import skbio.io
 import qiime2.plugin.model as model
 from qiime2.plugin import ValidationError
 
-from ..plugin_setup import plugin
-
 
 class OrdinationFormat(model.TextFileFormat):
     def sniff(self):
@@ -47,7 +45,3 @@ class ProcrustesStatisticsFmt(model.TextFileFormat):
 ProcrustesStatisticsDirFmt = model.SingleFileDirectoryFormat(
     'ProcrustesStatisticsDirFmt', 'ProcrustesStatistics.tsv',
     ProcrustesStatisticsFmt)
-
-
-plugin.register_formats(OrdinationFormat, OrdinationDirectoryFormat,
-                        ProcrustesStatisticsFmt, ProcrustesStatisticsDirFmt)

@@ -8,10 +8,12 @@
 
 import pandas as pd
 import skbio
+
 import qiime2
 
-from ..plugin_setup import plugin
-from . import OrdinationFormat, ProcrustesStatisticsFmt
+from .. import OrdinationFormat, ProcrustesStatisticsFmt
+
+from ...plugin_setup import plugin
 
 
 def _ordination_format_to_ordination_results(ff):
