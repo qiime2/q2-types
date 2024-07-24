@@ -12,8 +12,6 @@ from qiime2.plugin import ValidationError
 from q2_types.feature_data import FASTAFormat, DNAFASTAFormat
 from q2_types.per_sample_sequences import FastqGzFormat
 
-from ..plugin_setup import plugin
-
 
 # MultiplexedSingleEndBarcodeInSequenceDirFmt &
 # MultiplexedPairedEndBarcodeInSequenceDirFmt represent multiplexed sequences
@@ -116,12 +114,3 @@ class ErrorCorrectionDetailsFmt(model.TextFileFormat):
 
 ErrorCorrectionDetailsDirFmt = model.SingleFileDirectoryFormat(
     'ErrorCorrectionDetailsDirFmt', 'details.tsv', ErrorCorrectionDetailsFmt)
-
-plugin.register_formats(
-    MultiplexedSingleEndBarcodeInSequenceDirFmt,
-    MultiplexedPairedEndBarcodeInSequenceDirFmt,
-    MultiplexedFastaQualDirFmt, EMPMultiplexedDirFmt,
-    ErrorCorrectionDetailsDirFmt, ErrorCorrectionDetailsFmt,
-    EMPSingleEndDirFmt, EMPSingleEndCasavaDirFmt,
-    EMPPairedEndDirFmt, EMPPairedEndCasavaDirFmt
-)

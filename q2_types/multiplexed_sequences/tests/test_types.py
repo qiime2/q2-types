@@ -8,6 +8,8 @@
 
 import unittest
 
+from qiime2.plugin.testing import TestPluginBase
+
 from q2_types.multiplexed_sequences import (
     MultiplexedSingleEndBarcodeInSequence,
     MultiplexedPairedEndBarcodeInSequence,
@@ -18,8 +20,6 @@ from q2_types.multiplexed_sequences import (
     EMPSingleEndSequences, EMPPairedEndSequences,
     ErrorCorrectionDetails
 )
-# from q2_types.sample_data import SampleData
-from qiime2.plugin.testing import TestPluginBase
 
 
 class TestMultiplexedBarcodeInSequenceTypes(TestPluginBase):
@@ -44,9 +44,6 @@ class TestMultiplexedBarcodeInSequenceTypes(TestPluginBase):
             MultiplexedPairedEndBarcodeInSequence,
             MultiplexedPairedEndBarcodeInSequenceDirFmt,
         )
-
-# Tests below added to match tests in place in q2-types for types migrated
-# from q2-demux
 
     def test_raw_sequences_semantic_type_registration(self):
         self.assertRegisteredSemanticType(RawSequences)

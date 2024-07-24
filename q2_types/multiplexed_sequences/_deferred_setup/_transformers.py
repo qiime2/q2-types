@@ -15,7 +15,9 @@ import skbio.io
 
 from qiime2 import Metadata
 
-from . import (
+from q2_types._util import FastqGzFormat
+
+from .. import (
     MultiplexedFastaQualDirFmt,
     MultiplexedSingleEndBarcodeInSequenceDirFmt,
     EMPMultiplexedDirFmt,
@@ -23,12 +25,11 @@ from . import (
     EMPSingleEndDirFmt,
     EMPSingleEndCasavaDirFmt,
     EMPPairedEndDirFmt,
-    EMPPairedEndCasavaDirFmt
+    EMPPairedEndCasavaDirFmt,
+    BarcodePairedSequenceFastqIterator,
+    BarcodeSequenceFastqIterator
 )
-from ..plugin_setup import plugin
-from .._util import FastqGzFormat
-from ._objects import (BarcodePairedSequenceFastqIterator,
-                       BarcodeSequenceFastqIterator)
+from ...plugin_setup import plugin
 
 
 def _read_fastq_seqs(filepath):

@@ -5,27 +5,37 @@
 #
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
+import importlib
 
-from qiime2.plugin import SemanticType
+from .. import (MultiplexedSingleEndBarcodeInSequenceDirFmt,
+                MultiplexedPairedEndBarcodeInSequenceDirFmt,
+                MultiplexedFastaQualDirFmt,
+                EMPMultiplexedDirFmt,
+                ErrorCorrectionDetailsFmt,
+                ErrorCorrectionDetailsDirFmt,
+                EMPSingleEndDirFmt,
+                EMPSingleEndCasavaDirFmt,
+                EMPPairedEndDirFmt,
+                EMPPairedEndCasavaDirFmt,
+                MultiplexedSingleEndBarcodeInSequence,
+                MultiplexedPairedEndBarcodeInSequence,
+                RawSequences,
+                EMPSingleEndSequences,
+                EMPPairedEndSequences,
+                ErrorCorrectionDetails)
 
-from ..plugin_setup import plugin
-from . import (
+from ...plugin_setup import plugin
+
+
+plugin.register_formats(
     MultiplexedSingleEndBarcodeInSequenceDirFmt,
     MultiplexedPairedEndBarcodeInSequenceDirFmt,
-    EMPSingleEndDirFmt,
-    EMPPairedEndDirFmt,
-    ErrorCorrectionDetailsDirFmt
+    MultiplexedFastaQualDirFmt, EMPMultiplexedDirFmt,
+    ErrorCorrectionDetailsDirFmt, ErrorCorrectionDetailsFmt,
+    EMPSingleEndDirFmt, EMPSingleEndCasavaDirFmt,
+    EMPPairedEndDirFmt, EMPPairedEndCasavaDirFmt
 )
 
-
-MultiplexedSingleEndBarcodeInSequence = \
-    SemanticType('MultiplexedSingleEndBarcodeInSequence')
-MultiplexedPairedEndBarcodeInSequence = \
-    SemanticType('MultiplexedPairedEndBarcodeInSequence')
-RawSequences = SemanticType('RawSequences')
-EMPSingleEndSequences = SemanticType('EMPSingleEndSequences')
-EMPPairedEndSequences = SemanticType('EMPPairedEndSequences')
-ErrorCorrectionDetails = SemanticType('ErrorCorrectionDetails')
 plugin.register_semantic_types(MultiplexedSingleEndBarcodeInSequence,
                                MultiplexedPairedEndBarcodeInSequence,
                                RawSequences, EMPSingleEndSequences,
@@ -68,3 +78,5 @@ plugin.register_semantic_type_to_format(
     ErrorCorrectionDetails,
     artifact_format=ErrorCorrectionDetailsDirFmt
 )
+
+importlib.import_module('._transformers', __name__)
