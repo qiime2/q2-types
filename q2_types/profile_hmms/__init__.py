@@ -5,7 +5,13 @@
 #
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
-from ._format import (
+from ._formats import (
+    ProteinMultipleProfileHmmFileFmt,
+    ProteinSingleProfileHmmFileFmt,
+    RNAMultipleProfileHmmFileFmt,
+    RNASingleProfileHmmFileFmt,
+    DNAMultipleProfileHmmFileFmt,
+    DNASingleProfileHmmFileFmt,
     PressedProfileHmmsDirectoryFmt,
     ProteinSingleProfileHmmDirectoryFmt,
     ProteinMultipleProfileHmmDirectoryFmt,
@@ -14,7 +20,7 @@ from ._format import (
     RNASingleProfileHmmDirectoryFmt,
     RNAMultipleProfileHmmDirectoryFmt
 )
-from ._type import (
+from ._types import (
     ProfileHMM,
     SingleProtein, SingleDNA, SingleRNA,
     MultipleProtein, MultipleDNA, MultipleRNA,
@@ -22,6 +28,12 @@ from ._type import (
 )
 
 __all__ = [
+    "ProteinMultipleProfileHmmFileFmt",
+    "ProteinSingleProfileHmmFileFmt",
+    "RNAMultipleProfileHmmFileFmt",
+    "RNASingleProfileHmmFileFmt",
+    "DNAMultipleProfileHmmFileFmt",
+    "DNASingleProfileHmmFileFmt",
     "ProfileHmmBinaryFileFmt",
     "PressedProfileHmmsDirectoryFmt",
     "ProfileHmmFileFmt",

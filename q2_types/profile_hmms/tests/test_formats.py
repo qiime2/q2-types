@@ -6,7 +6,9 @@
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
 from qiime2.plugin.testing import TestPluginBase
-from q2_types.profile_hmms._format import (
+from qiime2.plugin import ValidationError
+
+from q2_types.profile_hmms import (
     PressedProfileHmmsDirectoryFmt,
     ProteinMultipleProfileHmmFileFmt,
     ProteinSingleProfileHmmFileFmt,
@@ -15,7 +17,6 @@ from q2_types.profile_hmms._format import (
     DNAMultipleProfileHmmFileFmt,
     DNASingleProfileHmmFileFmt
 )
-from qiime2.plugin import ValidationError
 
 
 class TestHmmFormats(TestPluginBase):

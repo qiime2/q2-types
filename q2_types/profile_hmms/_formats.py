@@ -7,9 +7,7 @@
 # ----------------------------------------------------------------------------
 from pyhmmer.plan7 import HMMFile
 from pyhmmer.errors import AlphabetMismatch
-from qiime2.plugin import model
-from qiime2.core.exceptions import ValidationError
-from q2_types.plugin_setup import plugin
+from qiime2.plugin import model, ValidationError
 
 
 class ProfileHmmBinaryFileFmt(model.BinaryFileFormat):
@@ -125,14 +123,3 @@ class RNASingleProfileHmmDirectoryFmt(model.DirectoryFormat):
 
 class RNAMultipleProfileHmmDirectoryFmt(model.DirectoryFormat):
     profiles = model.File(r'.*\.hmm', format=RNAMultipleProfileHmmFileFmt)
-
-
-plugin.register_formats(
-    PressedProfileHmmsDirectoryFmt,
-    ProteinSingleProfileHmmDirectoryFmt,
-    ProteinMultipleProfileHmmDirectoryFmt,
-    DNASingleProfileHmmDirectoryFmt,
-    DNAMultipleProfileHmmDirectoryFmt,
-    RNASingleProfileHmmDirectoryFmt,
-    RNAMultipleProfileHmmDirectoryFmt
-)
