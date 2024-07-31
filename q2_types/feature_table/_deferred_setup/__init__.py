@@ -15,7 +15,7 @@ from qiime2.plugin import Citations
 from .. import (BIOMV100Format, BIOMV210Format, BIOMV100DirFmt,
                 BIOMV210DirFmt, FeatureTable, Frequency, RelativeFrequency,
                 PresenceAbsence, Composition, Balance,
-                PercentileNormalized, Design)
+                PercentileNormalized, Design, Normalized)
 
 from ...plugin_setup import plugin
 
@@ -27,7 +27,7 @@ plugin.register_views(BIOMV100Format, BIOMV210Format, BIOMV100DirFmt,
 
 plugin.register_semantic_types(FeatureTable, Frequency, RelativeFrequency,
                                PresenceAbsence, Balance, Composition,
-                               PercentileNormalized, Design)
+                               PercentileNormalized, Design, Normalized)
 
 plugin.register_artifact_class(
     FeatureTable[Frequency],
@@ -75,6 +75,11 @@ plugin.register_artifact_class(
 plugin.register_artifact_class(
     FeatureTable[Design],
     directory_format=BIOMV210DirFmt
+)
+plugin.register_artifact_class(
+    FeatureTable[Normalized],
+    directory_format=BIOMV210DirFmt,
+    description="A feature table that was normalized."
 )
 
 importlib.import_module('._transformers', __name__)

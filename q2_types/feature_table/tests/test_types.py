@@ -13,7 +13,8 @@ from qiime2.plugin.testing import TestPluginBase
 from q2_types.feature_table import (FeatureTable, Frequency,
                                     RelativeFrequency, PercentileNormalized,
                                     Composition, Balance,
-                                    PresenceAbsence, BIOMV210DirFmt, Design)
+                                    PresenceAbsence, BIOMV210DirFmt, Design,
+                                    Normalized)
 
 
 class TestTypes(TestPluginBase):
@@ -37,6 +38,9 @@ class TestTypes(TestPluginBase):
     def test_balance_semantic_type_registration(self):
         self.assertRegisteredSemanticType(Balance)
 
+    def test_normalized_semantic_type_registration(self):
+        self.assertRegisteredSemanticType(Normalized)
+
     def test_feature_table_semantic_type_to_v210_format_registration(self):
         self.assertSemanticTypeRegisteredToFormat(
             FeatureTable[Frequency],
@@ -58,6 +62,9 @@ class TestTypes(TestPluginBase):
             BIOMV210DirFmt)
         self.assertSemanticTypeRegisteredToFormat(
             FeatureTable[Design],
+            BIOMV210DirFmt)
+        self.assertSemanticTypeRegisteredToFormat(
+            FeatureTable[Normalized],
             BIOMV210DirFmt)
 
 

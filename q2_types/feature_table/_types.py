@@ -31,3 +31,6 @@ PercentileNormalized = SemanticType('PercentileNormalized',
 # Design is the type of design matrices for linear regressions that have
 # been transformed/coded.
 Design = SemanticType('Design', variant_of=FeatureTable.field['content'])
+
+Normalized = SemanticType('Normalized',
+                          variant_of=FeatureTable.field['content'])
