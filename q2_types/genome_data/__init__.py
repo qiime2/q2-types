@@ -6,25 +6,23 @@
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
 
-import importlib
 
-from ._format import (
-    GenesDirectoryFormat, ProteinsDirectoryFormat,
-    GFF3Format, LociDirectoryFormat, OrthologFileFmt, SeedOrthologDirFmt,
+from ._formats import (
+    GenesDirectoryFormat, ProteinsDirectoryFormat, LociDirectoryFormat,
+    GFF3Format, OrthologFileFmt, SeedOrthologDirFmt,
+    GenomeSequencesDirectoryFormat, OrthologAnnotationDirFmt,
+)
+from ._objects import IntervalMetadataIterator
+from ._types import (
+    GenomeData, Genes, Proteins, Loci, Orthologs, DNASequence, NOG
 )
 from ._methods import collate_orthologs, partition_orthologs
-from ._transformer import IntervalMetadataIterator
-from ._type import (
-    GenomeData, Genes, Proteins, Loci, Ortholog, BLAST6
-)
 
 __all__ = [
     'GenomeData', 'Genes', 'Proteins', 'Loci', 'GFF3Format',
     'GenesDirectoryFormat', 'ProteinsDirectoryFormat', 'LociDirectoryFormat',
-    'IntervalMetadataIterator', 'OrthologFileFmt', 'Ortholog',
-    'SeedOrthologDirFmt', 'BLAST6', 'collate_orthologs', 'partition_orthologs',
+    'IntervalMetadataIterator', 'OrthologFileFmt', 'Orthologs',
+    'SeedOrthologDirFmt', 'GenomeSequencesDirectoryFormat', 'DNASequence',
+    'OrthologAnnotationDirFmt', 'NOG',
+    'collate_orthologs', 'partition_orthologs',
     ]
-
-importlib.import_module('q2_types.genome_data._format')
-importlib.import_module('q2_types.genome_data._transformer')
-importlib.import_module('q2_types.genome_data._type')

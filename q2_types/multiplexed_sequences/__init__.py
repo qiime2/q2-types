@@ -6,24 +6,24 @@
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
 
-import importlib
-
-from ._format import (MultiplexedSingleEndBarcodeInSequenceDirFmt,
-                      MultiplexedPairedEndBarcodeInSequenceDirFmt,
-                      MultiplexedFastaQualDirFmt,
-                      EMPMultiplexedDirFmt,
-                      ErrorCorrectionDetailsFmt,
-                      ErrorCorrectionDetailsDirFmt,
-                      EMPSingleEndDirFmt,
-                      EMPSingleEndCasavaDirFmt,
-                      EMPPairedEndDirFmt,
-                      EMPPairedEndCasavaDirFmt)
-from ._type import (MultiplexedSingleEndBarcodeInSequence,
-                    MultiplexedPairedEndBarcodeInSequence,
-                    RawSequences,
-                    EMPSingleEndSequences,
-                    EMPPairedEndSequences,
-                    ErrorCorrectionDetails)
+from ._formats import (MultiplexedSingleEndBarcodeInSequenceDirFmt,
+                       MultiplexedPairedEndBarcodeInSequenceDirFmt,
+                       MultiplexedFastaQualDirFmt,
+                       EMPMultiplexedDirFmt,
+                       ErrorCorrectionDetailsFmt,
+                       ErrorCorrectionDetailsDirFmt,
+                       EMPSingleEndDirFmt,
+                       EMPSingleEndCasavaDirFmt,
+                       EMPPairedEndDirFmt,
+                       EMPPairedEndCasavaDirFmt)
+from ._types import (MultiplexedSingleEndBarcodeInSequence,
+                     MultiplexedPairedEndBarcodeInSequence,
+                     RawSequences,
+                     EMPSingleEndSequences,
+                     EMPPairedEndSequences,
+                     ErrorCorrectionDetails)
+from ._objects import (BarcodePairedSequenceFastqIterator,
+                       BarcodeSequenceFastqIterator)
 
 __all__ = [
     'MultiplexedSingleEndBarcodeInSequence',
@@ -36,7 +36,7 @@ __all__ = [
     'ErrorCorrectionDetails', 'ErrorCorrectionDetailsFmt',
     'ErrorCorrectionDetailsDirFmt', 'EMPSingleEndDirFmt',
     'EMPSingleEndCasavaDirFmt', 'EMPPairedEndDirFmt',
-    'EMPPairedEndCasavaDirFmt'
+    'EMPPairedEndCasavaDirFmt',
+    'BarcodePairedSequenceFastqIterator',
+    'BarcodeSequenceFastqIterator'
 ]
-
-importlib.import_module('q2_types.multiplexed_sequences._transformer')

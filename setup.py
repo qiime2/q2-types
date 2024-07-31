@@ -27,12 +27,14 @@ setup(
     package_data={
         'q2_types': ['citations.bib'],
         'q2_types.tests': ['data/*'],
+        'q2_types.bowtie2': ['citations.bib'],
         'q2_types.distance_matrix.tests': ['data/*'],
         'q2_types.feature_data.tests': ['data/*',
                                         'data/taxonomy/*',
                                         'data/emp_multiplexed/*',
                                         'data/emp_multiplexed_single_end/*'],
         'q2_types.feature_map.tests': ['data/*'],
+        'q2_types.feature_table': ['citations.bib'],
         'q2_types.feature_table.tests': ['data/*'],
         'q2_types.metadata.tests': ['data/*'],
         'q2_types.multiplexed_sequences.tests': [
@@ -65,11 +67,16 @@ setup(
             ['data/*', 'data/*/*',
              'data/mags-fa/*', 'data/mags-fasta/*'],
         'q2_types.genome_data.tests':
-            ['data/*/',
+            ['data/*',
              'data/genes/*',
              'data/loci-invalid/*',
              'data/loci/*',
+             'data/genome-sequences/*',
              'data/ortholog/*',
+             'data/ortholog-annotation-extra/*',
+             'data/ortholog-annotation-mags/*',
+             'data/ortholog-annotation-samples/*',
+             'data/ortholog-annotation/*',
              'data/proteins/*',
              ],
         'q2_types.kraken2.tests': [
@@ -89,6 +96,8 @@ setup(
             ['data/*', 'data/db-valid/*'],
         'q2_types.reference_db.tests':
             ['data/*', 'data/*/*', 'data/*/*/*'],
+        'q2_types.profile_hmms.tests':
+            ['data/*', 'data/*/*']
     },
     zip_safe=False,
 )

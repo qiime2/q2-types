@@ -6,12 +6,7 @@
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
 
-import importlib
-
-from ._format import KaijuIndexFormat, KaijuDBDirectoryFormat
-from ._type import KaijuDB
+from ._formats import KaijuIndexFormat, KaijuDBDirectoryFormat
+from ._types import KaijuDB
 
 __all__ = ["KaijuIndexFormat", "KaijuDBDirectoryFormat", "KaijuDB"]
-
-importlib.import_module('q2_types.kaiju._format')
-importlib.import_module('q2_types.kaiju._type')

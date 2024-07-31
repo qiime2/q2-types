@@ -10,7 +10,7 @@ import unittest
 from qiime2.core.exceptions import ValidationError
 from qiime2.plugin.testing import TestPluginBase
 
-from .._format import MAGtoContigsFormat
+from q2_types.feature_map import MAGtoContigsFormat
 
 
 class TestFormats(TestPluginBase):

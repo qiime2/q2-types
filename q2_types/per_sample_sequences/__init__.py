@@ -6,35 +6,33 @@
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
 
-import importlib
-
-from ._format import (CasavaOneEightSingleLanePerSampleDirFmt,
-                      CasavaOneEightLanelessPerSampleDirFmt,
-                      FastqGzFormat, YamlFormat,
-                      FastqManifestFormat, FastqAbsolutePathManifestFormat,
-                      SingleLanePerSampleSingleEndFastqDirFmt,
-                      SingleLanePerSamplePairedEndFastqDirFmt,
-                      SingleEndFastqManifestPhred33,
-                      SingleEndFastqManifestPhred64,
-                      PairedEndFastqManifestPhred33,
-                      PairedEndFastqManifestPhred64,
-                      SingleEndFastqManifestPhred33V2,
-                      SingleEndFastqManifestPhred64V2,
-                      PairedEndFastqManifestPhred33V2,
-                      PairedEndFastqManifestPhred64V2,
-                      QIIME1DemuxFormat, QIIME1DemuxDirFmt,
-                      SampleIdIndexedSingleEndPerSampleDirFmt,
-                      MultiMAGSequencesDirFmt, MultiMAGManifestFormat,
-                      ContigSequencesDirFmt, MultiBowtie2IndexDirFmt,
-                      BAMFormat, BAMDirFmt, MultiBAMDirFmt,
-                      MultiFASTADirectoryFormat)
-
+from ._formats import (CasavaOneEightSingleLanePerSampleDirFmt,
+                       CasavaOneEightLanelessPerSampleDirFmt,
+                       FastqGzFormat, YamlFormat,
+                       FastqManifestFormat, FastqAbsolutePathManifestFormat,
+                       SingleLanePerSampleSingleEndFastqDirFmt,
+                       SingleLanePerSamplePairedEndFastqDirFmt,
+                       SingleEndFastqManifestPhred33,
+                       SingleEndFastqManifestPhred64,
+                       PairedEndFastqManifestPhred33,
+                       PairedEndFastqManifestPhred64,
+                       SingleEndFastqManifestPhred33V2,
+                       SingleEndFastqManifestPhred64V2,
+                       PairedEndFastqManifestPhred33V2,
+                       PairedEndFastqManifestPhred64V2,
+                       QIIME1DemuxFormat, QIIME1DemuxDirFmt,
+                       SampleIdIndexedSingleEndPerSampleDirFmt,
+                       MultiMAGSequencesDirFmt, MultiMAGManifestFormat,
+                       ContigSequencesDirFmt, MultiBowtie2IndexDirFmt,
+                       BAMFormat, BAMDirFmt, MultiBAMDirFmt,
+                       MultiFASTADirectoryFormat)
+from ._types import (Sequences, SequencesWithQuality,
+                     PairedEndSequencesWithQuality,
+                     JoinedSequencesWithQuality, MAGs, Contigs,
+                     SingleBowtie2Index, MultiBowtie2Index,
+                     AlignmentMap, MultiAlignmentMap)
 from ._methods import partition_sample_data_mags, collate_sample_data_mags
 
-from ._type import (Sequences, SequencesWithQuality,
-                    PairedEndSequencesWithQuality,
-                    JoinedSequencesWithQuality, MAGs, Contigs,
-                    SingleBowtie2Index, MultiBowtie2Index)
 
 __all__ = ['CasavaOneEightSingleLanePerSampleDirFmt',
            'CasavaOneEightLanelessPerSampleDirFmt',
@@ -54,8 +52,7 @@ __all__ = ['CasavaOneEightSingleLanePerSampleDirFmt',
            'ContigSequencesDirFmt', 'Contigs', 'SingleBowtie2Index',
            'MultiBowtie2Index', 'MultiBowtie2IndexDirFmt',
            'BAMFormat', 'BAMDirFmt', 'MultiBAMDirFmt',
-           'MultiFASTADirectoryFormat', 'partition_sample_data_mags',
-           'collate_sample_data_mags'
+           'MultiFASTADirectoryFormat', 'AlignmentMap', 'MultiAlignmentMap',
+           'partition_sample_data_mags', 'collate_sample_data_mags'
            ]
 
-importlib.import_module('q2_types.per_sample_sequences._transformer')

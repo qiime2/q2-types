@@ -6,9 +6,11 @@
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
 
+import importlib
+
 import pandas as pd
+
 import qiime2.plugin
-import qiime2.sdk
 from qiime2.core.type import Int, Range, Collection, List
 
 import q2_types
@@ -35,7 +37,6 @@ plugin = qiime2.plugin.Plugin(
 plugin.register_views(pd.Series, pd.DataFrame,
                       citations=[citations['mckinney-proc-scipy-2010']])
 
-# __init__.py loads first and imports all of the subpackages.
 
 plugin.methods.register_function(
     function=q2_types.per_sample_sequences.partition_sample_data_mags,
@@ -135,3 +136,21 @@ plugin.methods.register_function(
                 "and collates them into a single artifact.",
 )
 
+
+importlib.import_module('q2_types.bowtie2._deferred_setup')
+importlib.import_module('q2_types.distance_matrix._deferred_setup')
+importlib.import_module('q2_types.feature_data._deferred_setup')
+importlib.import_module('q2_types.feature_data_mag._deferred_setup')
+importlib.import_module('q2_types.feature_map._deferred_setup')
+importlib.import_module('q2_types.feature_table._deferred_setup')
+importlib.import_module('q2_types.genome_data._deferred_setup')
+importlib.import_module('q2_types.kaiju._deferred_setup')
+importlib.import_module('q2_types.kraken2._deferred_setup')
+importlib.import_module('q2_types.metadata._deferred_setup')
+importlib.import_module('q2_types.multiplexed_sequences._deferred_setup')
+importlib.import_module('q2_types.ordination._deferred_setup')
+importlib.import_module('q2_types.per_sample_sequences._deferred_setup')
+importlib.import_module('q2_types.profile_hmms._deferred_setup')
+importlib.import_module('q2_types.reference_db._deferred_setup')
+importlib.import_module('q2_types.sample_data._deferred_setup')
+importlib.import_module('q2_types.tree._deferred_setup')

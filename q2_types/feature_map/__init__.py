@@ -6,14 +6,10 @@
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
 
-import importlib
+from ._formats import MAGtoContigsFormat, MAGtoContigsDirFmt
 
-from ._format import MAGtoContigsFormat, MAGtoContigsDirFmt
-
-from ._type import FeatureMap, MAGtoContigs
+from ._types import FeatureMap, MAGtoContigs
 
 __all__ = [
     "FeatureMap", "MAGtoContigs", "MAGtoContigsFormat", "MAGtoContigsDirFmt"
 ]
-
-importlib.import_module("q2_types.feature_map._transformer")

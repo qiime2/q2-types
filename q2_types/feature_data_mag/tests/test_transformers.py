@@ -7,7 +7,6 @@
 # ----------------------------------------------------------------------------
 
 import glob
-import qiime2
 import unittest
 from itertools import repeat
 
@@ -17,11 +16,10 @@ from qiime2.plugin.testing import TestPluginBase
 from skbio import DNA
 
 from q2_types.feature_data_mag import (
-    MAGSequencesDirFmt, MAGIterator, OrthologAnnotationDirFmt
+    MAGSequencesDirFmt, MAGIterator
 )
-from q2_types.feature_data_mag._transformer import (
-    _get_filename, _annotations_to_dataframe
-)
+from q2_types.feature_data_mag._deferred_setup._transformers import (
+    _get_filename)
 
 
 class TestTransformers(TestPluginBase):
@@ -131,56 +129,6 @@ class TestTransformers(TestPluginBase):
 
         obs_seqs = self.read_seqs_into_dict(str(obs))
         self.assertDictEqual(self.mags_fa, obs_seqs)
-
-    def test_annotations_to_dataframe_samples(self):
-        annotations = OrthologAnnotationDirFmt(
-            self.get_data_path('ortholog_annotation_samples'),
-            mode='r'
-        )
-        obs = _annotations_to_dataframe(annotations)
-        self.assertEqual((11, 22), obs.shape)
-        self.assertTrue(obs.columns[0] == "Sample")
-        self.assertTrue(obs.index.is_unique)
-        self.assertEqual("id", obs.index.name)
-
-    def test_annotations_to_dataframe_mags(self):
-        annotations = OrthologAnnotationDirFmt(
-            self.get_data_path('ortholog_annotation_mags'),
-            mode='r'
-        )
-        obs = _annotations_to_dataframe(annotations)
-        self.assertEqual((11, 22), obs.shape)
-        self.assertTrue(obs.columns[0] == "MAG")
-        self.assertTrue(obs.index.is_unique)
-        self.assertEqual("id", obs.index.name)
-
-    def test_annotations_to_df_transformer(self):
-        annotations = OrthologAnnotationDirFmt(
-            self.get_data_path('ortholog_annotation_mags'),
-            mode='r'
-        )
-        transformer = self.get_transformer(
-            OrthologAnnotationDirFmt, pd.DataFrame
-        )
-
-        obs = transformer(annotations)
-        self.assertIsInstance(obs, pd.DataFrame)
-        self.assertEqual((11, 22), obs.shape)
-        self.assertTrue(obs.columns[0] == "MAG")
-        self.assertTrue(obs.index.is_unique)
-        self.assertEqual("id", obs.index.name)
-
-    def test_annotations_to_metadata_transformer(self):
-        annotations = OrthologAnnotationDirFmt(
-            self.get_data_path('ortholog_annotation_mags'),
-            mode='r'
-        )
-        transformer = self.get_transformer(
-            OrthologAnnotationDirFmt, qiime2.Metadata
-        )
-
-        obs = transformer(annotations)
-        self.assertIsInstance(obs, qiime2.Metadata)
 
 
 if __name__ == '__main__':

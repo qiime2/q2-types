@@ -9,7 +9,6 @@
 import filecmp
 import os.path
 import unittest
-import tempfile
 
 import pandas as pd
 import pandas.errors
@@ -18,27 +17,23 @@ import biom
 import skbio
 
 import qiime2
-from qiime2.plugin import ValidationError
 from qiime2.plugin.testing import TestPluginBase
 
 from q2_types.feature_table import BIOMV210Format
 from q2_types.feature_data import (
     TaxonomyFormat, HeaderlessTSVTaxonomyFormat, TSVTaxonomyFormat,
     DNAFASTAFormat, DNAIterator, PairedDNAIterator,
+    ProteinIterator, AlignedProteinIterator,
     PairedDNASequencesDirectoryFormat, AlignedDNAFASTAFormat,
     DifferentialFormat, AlignedDNAIterator, ProteinFASTAFormat,
     AlignedProteinFASTAFormat, RNAFASTAFormat, AlignedRNAFASTAFormat,
     RNAIterator, AlignedRNAIterator, BLAST6Format, MixedCaseDNAFASTAFormat,
     MixedCaseRNAFASTAFormat, MixedCaseAlignedDNAFASTAFormat,
-    MixedCaseAlignedRNAFASTAFormat, BarcodeSequenceFastqIterator,
+    MixedCaseAlignedRNAFASTAFormat,
     SequenceCharacteristicsFormat
 )
-from q2_types.feature_data._transformer import (
+from q2_types.feature_data._deferred_setup._transformers import (
     _taxonomy_formats_to_dataframe, _dataframe_to_tsv_taxonomy_format,
-    ProteinIterator, AlignedProteinIterator
-)
-from q2_types.multiplexed_sequences import (
-    EMPSingleEndDirFmt, EMPSingleEndCasavaDirFmt
 )
 
 
@@ -679,8 +674,10 @@ class TestDNAFASTAFormatTransformers(TestPluginBase):
 
     def test_dnafasta_format_with_duplicate_ids_to_series(self):
         with self.assertRaisesRegex(ValueError, 'unique.*SEQUENCE1'):
-            self.transform_format(DNAFASTAFormat, pd.Series,
-                                  'dna-sequences-with-duplicate-ids.fasta')
+            transformer = self.get_transformer(DNAFASTAFormat, pd.Series)
+            input = self.get_data_path(
+                'dna-sequences-with-duplicate-ids.fasta')
+            transformer(input)
 
     def test_dnafasta_format_to_metadata(self):
         _, obs = self.transform_format(DNAFASTAFormat, qiime2.Metadata,
@@ -756,6 +753,47 @@ class TestDNAFASTAFormatTransformers(TestPluginBase):
 
         for observed, expected in zip(obs, exp):
             self.assertEqual(observed, expected)
+
+    def test_biom_table_to_dna_fasta_format(self):
+        table_fn = 'feature-table-with-sequence-metadata.biom'
+        input, obs = self.transform_format(
+            BIOMV210Format, DNAFASTAFormat, table_fn
+        )
+
+        self.assertIsInstance(obs, DNAFASTAFormat)
+
+        table_fp = self.get_data_path(table_fn)
+        table = biom.load_table(table_fp)
+
+        with open(str(obs)) as fh:
+            lines = fh.readlines()
+            fasta_header = lines[0].strip()
+            fasta_sequence = lines[1].strip()
+            num_lines = len(lines)
+
+        ids = table.ids(axis='observation')
+        # two lines (header & sequence) per feature
+        self.assertEqual(len(ids), num_lines / 2)
+
+        first_id = ids[0]
+        first_seq = table.metadata(axis='observation')[0]['Sequence']
+        self.assertEqual(fasta_header, f'>{first_id}')
+        self.assertEqual(fasta_sequence, first_seq)
+
+    def test_biom_table_to_dna_fasta_format_no_md(self):
+        table_fp = os.path.join('taxonomy', 'feature-table_v210.biom')
+        with self.assertRaisesRegex(TypeError, 'observation metadata'):
+            self.transform_format(BIOMV210Format, DNAFASTAFormat, table_fp)
+
+    def test_biom_table_to_dna_fasta_format_no_md_sequence_key(self):
+        table_fp = os.path.join(
+            'taxonomy', 'feature-table-with-taxonomy-metadata_v210.biom'
+        )
+
+        with self.assertRaisesRegex(
+            ValueError, 'Observation .* does not have a sequence key.*'
+        ):
+            self.transform_format(BIOMV210Format, DNAFASTAFormat, table_fp)
 
 
 class TestRNAFASTAFormatTransformers(TestPluginBase):
@@ -860,8 +898,10 @@ class TestRNAFASTAFormatTransformers(TestPluginBase):
 
     def test_rnafasta_format_with_duplicate_ids_to_series(self):
         with self.assertRaisesRegex(ValueError, 'unique.*RNASEQUENCE1'):
-            self.transform_format(RNAFASTAFormat, pd.Series,
-                                  'rna-sequences-with-duplicate-ids.fasta')
+            transformer = self.get_transformer(RNAFASTAFormat, pd.Series)
+            input = self.get_data_path(
+                'rna-sequences-with-duplicate-ids.fasta')
+            transformer(input)
 
     def test_rnafasta_format_to_metadata(self):
         _, obs = self.transform_format(RNAFASTAFormat, qiime2.Metadata,
@@ -970,9 +1010,11 @@ class TestMixedCaseDNAFASTAFormatTransformers(TestPluginBase):
 
     def test_mixed_case_dna_fasta_format_with_duplicate_ids_to_series(self):
         with self.assertRaisesRegex(ValueError, 'unique.*SEQUENCE1'):
-            self.transform_format(
-                        MixedCaseDNAFASTAFormat, pd.Series,
-                        'dna-sequences-mixed-case-with-duplicate-ids.fasta')
+            transformer = self.get_transformer(
+                        MixedCaseDNAFASTAFormat, pd.Series)
+            input = self.get_data_path(
+                'dna-sequences-mixed-case-with-duplicate-ids.fasta')
+            transformer(input)
 
     def test_mixed_case_dna_fasta_format_to_metadata(self):
         _, obs = self.transform_format(MixedCaseDNAFASTAFormat,
@@ -1036,9 +1078,11 @@ class TestMixedCaseRNAFASTAFormatTransformers(TestPluginBase):
 
     def test_mixed_case_rna_fasta_format_with_duplicate_ids_to_series(self):
         with self.assertRaisesRegex(ValueError, 'unique.*SEQUENCE1'):
-            self.transform_format(
-                        MixedCaseRNAFASTAFormat, pd.Series,
-                        'rna-sequences-mixed-case-with-duplicate-ids.fasta')
+            transformer = self.get_transformer(
+                        MixedCaseRNAFASTAFormat, pd.Series)
+            input = self.get_data_path(
+                'rna-sequences-mixed-case-with-duplicate-ids.fasta')
+            transformer(input)
 
     def test_mixed_case_rna_fasta_format_to_metadata(self):
         _, obs = self.transform_format(MixedCaseRNAFASTAFormat,
@@ -1104,9 +1148,11 @@ class TestMixedCaseAlignedDNAFASTAFormatTransformers(TestPluginBase):
 
     def test_mixed_case_aln_dna_fasta_format_w_duplicate_ids_to_series(self):
         with self.assertRaisesRegex(ValueError, 'unique.*SEQUENCE1'):
-            self.transform_format(
-                        MixedCaseAlignedDNAFASTAFormat, pd.Series,
-                        'dna-sequences-mixed-case-with-duplicate-ids.fasta')
+            transformer = self.get_transformer(
+                        MixedCaseAlignedDNAFASTAFormat, pd.Series)
+            input = self.get_data_path(
+                'dna-sequences-mixed-case-with-duplicate-ids.fasta')
+            transformer(input)
 
     def test_mixed_case_aln_dna_fasta_format_to_metadata(self):
         _, obs = self.transform_format(
@@ -1174,9 +1220,11 @@ class TestMixedCaseAlignedRNAFASTAFormatTransformers(TestPluginBase):
 
     def test_mixed_case_aln_rna_fasta_format_w_duplicate_ids_to_series(self):
         with self.assertRaisesRegex(ValueError, 'unique.*SEQUENCE1'):
-            self.transform_format(
-                        MixedCaseAlignedRNAFASTAFormat, pd.Series,
-                        'rna-sequences-mixed-case-with-duplicate-ids.fasta')
+            transformer = self.get_transformer(
+                MixedCaseAlignedRNAFASTAFormat, pd.Series)
+            input = self.get_data_path(
+                'rna-sequences-mixed-case-with-duplicate-ids.fasta')
+            transformer(input)
 
     def test_mixed_case_aln_rna_fasta_format_to_metadata(self):
         _, obs = self.transform_format(
@@ -1361,10 +1409,9 @@ class TestProteinFASTAFormatTransformers(TestPluginBase):
 
     def test_proteinfasta_format_with_duplicate_ids_to_series(self):
         with self.assertRaisesRegex(ValueError, 'unique.*sequence1'):
-            self.transform_format(
-                ProteinFASTAFormat,
-                pd.Series,
-                'protein-sequences-duplicate-ids.fasta')
+            transformer = self.get_transformer(ProteinFASTAFormat, pd.Series)
+            input = self.get_data_path('protein-sequences-duplicate-ids.fasta')
+            transformer(input)
 
     def test_proteinfasta_format_to_metadata(self):
         _, obs = self.transform_format(ProteinFASTAFormat, qiime2.Metadata,
@@ -1514,247 +1561,6 @@ class TestBLAST6Transformer(TestPluginBase):
                                        filename='blast6.tsv')
         exp.index = pd.Index(exp.index.astype(str), name='id')
         assert_frame_equal(obs.to_dataframe(), exp)
-
-
-class TestTransformers(TestPluginBase):
-    package = 'q2_types.feature_data.tests'
-
-    def setUp(self):
-        # TODO generalize plugin lookup when ported to framework. This code
-        # is adapted from the base class.
-        try:
-            from q2_types.plugin_setup import plugin
-        except ImportError:
-            self.fail("Could not import plugin object.")
-
-        self.plugin = plugin
-
-        # TODO use qiime temp dir when ported to framework, and when the
-        # configurable temp dir exists
-        self.temp_dir = tempfile.TemporaryDirectory(
-            prefix='q2-types-test-temp-')
-
-    def test_emp_multiplexed_format_barcode_sequence_iterator(self):
-        transformer = self.get_transformer(EMPSingleEndDirFmt,
-                                           BarcodeSequenceFastqIterator)
-        dirname = 'emp_multiplexed'
-        dirpath = self.get_data_path(dirname)
-        bsi = transformer(EMPSingleEndDirFmt(dirpath, mode='r'))
-        bsi = list(bsi)
-        self.assertEqual(len(bsi), 250)
-        self.assertEqual(
-            bsi[0][0],
-            ('@M00176:17:000000000-A0CNA:1:1:15487:1773 1:N:0:0',
-             'TTAGGCATCTCG',
-             '+',
-             'B@@FFFFFHHHH'))
-        self.assertEqual(
-            bsi[0][1],
-            ('@M00176:17:000000000-A0CNA:1:1:15487:1773 1:N:0:0',
-             'GCTTAGGGATTTTATTGTTATCAGGGTTAATCGTGCCAAGAAAAGCGGCATGGTCAATATAAC'
-             'CAGTAGTGTTAACAGTCGGGAGAGGAGTGGCATTAACACCATCCTTCATGAACTTAATCCACT'
-             'GTTCACCATAAACGTGACGATGAGG',
-             '+',
-             'C@CFFFFFHHFHHGIJJ?FFHEIIIIHGEIIFHGIIJHGIGBGB?DHIIJJJJCFCHIEGIGG'
-             'HGFAEDCEDBCCEEA.;>?BB=288A?AB709@:3:A:C88CCD@CC444@>>34>>ACC:?C'
-             'CD<CDCA>A@A>:<?B@?<((2(>?'))
-
-    def test_emp_se_multiplexed_format_barcode_sequence_iterator(self):
-        transformer1 = self.get_transformer(EMPSingleEndCasavaDirFmt,
-                                            EMPSingleEndDirFmt)
-        transformer2 = self.get_transformer(EMPSingleEndDirFmt,
-                                            BarcodeSequenceFastqIterator)
-        dirname = 'emp_multiplexed_single_end'
-        dirpath = self.get_data_path(dirname)
-        emp_demultiplexed = \
-            transformer1(EMPSingleEndCasavaDirFmt(dirpath, mode='r'))
-        bsi = transformer2(EMPSingleEndDirFmt(emp_demultiplexed, mode='r'))
-        bsi = list(bsi)
-        self.assertEqual(len(bsi), 250)
-        self.assertEqual(
-            bsi[0][0],
-            ('@M00176:17:000000000-A0CNA:1:1:15487:1773 1:N:0:0',
-             'TTAGGCATCTCG',
-             '+',
-             'B@@FFFFFHHHH'))
-        self.assertEqual(
-            bsi[0][1],
-            ('@M00176:17:000000000-A0CNA:1:1:15487:1773 1:N:0:0',
-             'GCTTAGGGATTTTATTGTTATCAGGGTTAATCGTGCCAAGAAAAGCGGCATGGTCAATATAAC'
-             'CAGTAGTGTTAACAGTCGGGAGAGGAGTGGCATTAACACCATCCTTCATGAACTTAATCCACT'
-             'GTTCACCATAAACGTGACGATGAGG',
-             '+',
-             'C@CFFFFFHHFHHGIJJ?FFHEIIIIHGEIIFHGIIJHGIGBGB?DHIIJJJJCFCHIEGIGG'
-             'HGFAEDCEDBCCEEA.;>?BB=288A?AB709@:3:A:C88CCD@CC444@>>34>>ACC:?C'
-             'CD<CDCA>A@A>:<?B@?<((2(>?'))
-
-    def test_invalid(self):
-        dirname = 'bad'
-        dirpath = self.get_data_path(dirname)
-        transformer = self.get_transformer(EMPSingleEndDirFmt,
-                                           BarcodeSequenceFastqIterator)
-        with self.assertRaises(ValidationError):
-            transformer(EMPSingleEndDirFmt(dirpath, mode='r'))
-
-        transformer = self.get_transformer(EMPSingleEndCasavaDirFmt,
-                                           EMPSingleEndDirFmt)
-        with self.assertRaises(ValidationError):
-            transformer(EMPSingleEndCasavaDirFmt(dirpath, 'r'))
-
-
-class BarcodeSequenceFastqIteratorTests(unittest.TestCase):
-
-    def test_valid(self):
-        barcodes = [('@s1/2 abc/2', 'AAAA', '+', 'YYYY'),
-                    ('@s2/2 abc/2', 'AAAA', '+', 'PPPP'),
-                    ('@s3/2 abc/2', 'AACC', '+', 'PPPP'),
-                    ('@s4/2 abc/2', 'AACC', '+', 'PPPP')]
-
-        sequences = [('@s1/1 abc/1', 'GGG', '+', 'YYY'),
-                     ('@s2/1 abc/1', 'CCC', '+', 'PPP'),
-                     ('@s3/1 abc/1', 'AAA', '+', 'PPP'),
-                     ('@s4/1 abc/1', 'TTT', '+', 'PPP')]
-
-        bsi = BarcodeSequenceFastqIterator(barcodes, sequences)
-        for i, (barcode, sequence) in enumerate(bsi):
-            self.assertEqual(barcode, barcodes[i])
-            self.assertEqual(sequence, sequences[i])
-
-    def test_too_few_barcodes(self):
-        barcodes = [('@s1/2 abc/2', 'AAAA', '+', 'YYYY'),
-                    ('@s2/2 abc/2', 'AAAA', '+', 'PPPP'),
-                    ('@s3/2 abc/2', 'AACC', '+', 'PPPP')]
-
-        sequences = [('@s1/1 abc/1', 'GGG', '+', 'YYY'),
-                     ('@s2/1 abc/1', 'CCC', '+', 'PPP'),
-                     ('@s3/1 abc/1', 'AAA', '+', 'PPP'),
-                     ('@s4/1 abc/1', 'TTT', '+', 'PPP')]
-
-        bsi = BarcodeSequenceFastqIterator(barcodes, sequences)
-        with self.assertRaises(ValueError):
-            list(bsi)
-
-    def test_too_few_sequences(self):
-        barcodes = [('@s1/2 abc/2', 'AAAA', '+', 'YYYY'),
-                    ('@s2/2 abc/2', 'AAAA', '+', 'PPPP'),
-                    ('@s3/2 abc/2', 'AACC', '+', 'PPPP'),
-                    ('@s4/2 abc/2', 'AACC', '+', 'PPPP')]
-
-        sequences = [('@s1/1 abc/1', 'GGG', '+', 'YYY')]
-
-        bsi = BarcodeSequenceFastqIterator(barcodes, sequences)
-        with self.assertRaises(ValueError):
-            list(bsi)
-
-    def test_mismatched_id(self):
-        barcodes = [('@s1/2 abc/2', 'AAAA', '+', 'YYYY'),
-                    ('@s2/2 abc/2', 'AAAA', '+', 'PPPP'),
-                    ('@s3/2 abc/2', 'AACC', '+', 'PPPP'),
-                    ('@s4/2 abc/2', 'AACC', '+', 'PPPP')]
-
-        sequences = [('@s1/1 abc/1', 'GGG', '+', 'YYY'),
-                     ('@s2/1 abc/1', 'CCC', '+', 'PPP'),
-                     ('@s3/1 abc/1', 'AAA', '+', 'PPP'),
-                     ('@s5/1 abc/1', 'TTT', '+', 'PPP')]
-
-        bsi = BarcodeSequenceFastqIterator(barcodes, sequences)
-        with self.assertRaises(ValueError):
-            list(bsi)
-
-    def test_mismatched_description(self):
-        barcodes = [('@s1/2 abc/2', 'AAAA', '+', 'YYYY'),
-                    ('@s2/2 abc/2', 'AAAA', '+', 'PPPP'),
-                    ('@s3/2 abc/2', 'AACC', '+', 'PPPP'),
-                    ('@s4/2 abc/2', 'AACC', '+', 'PPPP')]
-
-        sequences = [('@s1/1 abc/1', 'GGG', '+', 'YYY'),
-                     ('@s2/1 abc/1', 'CCC', '+', 'PPP'),
-                     ('@s3/1 abc/1', 'AAA', '+', 'PPP'),
-                     ('@s4/1 abd/1', 'TTT', '+', 'PPP')]
-
-        bsi = BarcodeSequenceFastqIterator(barcodes, sequences)
-        with self.assertRaises(ValueError):
-            list(bsi)
-
-    def test_mismatch_description_override(self):
-        barcodes = [('@s1/2 abc/2', 'AAAA', '+', 'YYYY'),
-                    ('@s2/2 abc/2', 'AAAA', '+', 'PPPP'),
-                    ('@s3/2 abc/2', 'AACC', '+', 'PPPP'),
-                    ('@s4/2 abc/2', 'AACC', '+', 'PPPP')]
-
-        sequences = [('@s1/1 abc/1', 'GGG', '+', 'YYY'),
-                     ('@s2/1 abc/1', 'CCC', '+', 'PPP'),
-                     ('@s3/1 abc/1', 'AAA', '+', 'PPP'),
-                     ('@s4/1 abd/1', 'TTT', '+', 'PPP')]
-
-        bsi = BarcodeSequenceFastqIterator(barcodes, sequences,
-                                           ignore_description_mismatch=True)
-        self.assertEqual(len(list(bsi)), 4)
-
-    def test_mismatched_handles_slashes_in_id(self):
-        # mismatch is detected as being before the last slash, even if there
-        # is more than one slash
-        barcodes = [('@s1/2/2 abc/2', 'AAAA', '+', 'YYYY')]
-        sequences = [('@s1/1/1 abc/1', 'GGG', '+', 'YYY')]
-
-        bsi = BarcodeSequenceFastqIterator(barcodes, sequences)
-        with self.assertRaises(ValueError):
-            list(bsi)
-
-    def test_mismatched_handles_slashes_in_description(self):
-        # mismatch is detected as being before the last slash, even if there
-        # is more than one slash
-        barcodes = [('@s1/2 a/2/2', 'AAAA', '+', 'YYYY')]
-        sequences = [('@s1/1 a/1/1', 'GGG', '+', 'YYY')]
-
-        bsi = BarcodeSequenceFastqIterator(barcodes, sequences)
-        with self.assertRaises(ValueError):
-            list(bsi)
-
-    def test_no_description(self):
-        barcodes = [('@s1/2', 'AAAA', '+', 'YYYY'),
-                    ('@s2/2', 'AAAA', '+', 'PPPP'),
-                    ('@s3/2', 'AACC', '+', 'PPPP'),
-                    ('@s4/2', 'AACC', '+', 'PPPP')]
-
-        sequences = [('@s1/1', 'GGG', '+', 'YYY'),
-                     ('@s2/1', 'CCC', '+', 'PPP'),
-                     ('@s3/1', 'AAA', '+', 'PPP'),
-                     ('@s4/1', 'TTT', '+', 'PPP')]
-
-        bsi = BarcodeSequenceFastqIterator(barcodes, sequences)
-        for i, (barcode, sequence) in enumerate(bsi):
-            self.assertEqual(barcode, barcodes[i])
-            self.assertEqual(sequence, sequences[i])
-
-    def test_only_one_description(self):
-        barcodes = [('@s1/2 abc', 'AAAA', '+', 'YYYY'),
-                    ('@s2/2 abc', 'AAAA', '+', 'PPPP'),
-                    ('@s3/2 abc', 'AACC', '+', 'PPPP'),
-                    ('@s4/2 abc', 'AACC', '+', 'PPPP')]
-
-        sequences = [('@s1/1', 'GGG', '+', 'YYY'),
-                     ('@s2/1', 'CCC', '+', 'PPP'),
-                     ('@s3/1', 'AAA', '+', 'PPP'),
-                     ('@s4/1', 'TTT', '+', 'PPP')]
-
-        bsi = BarcodeSequenceFastqIterator(barcodes, sequences)
-        with self.assertRaises(ValueError):
-            list(bsi)
-
-        barcodes = [('@s1/2', 'AAAA', '+', 'YYYY'),
-                    ('@s2/2', 'AAAA', '+', 'PPPP'),
-                    ('@s3/2', 'AACC', '+', 'PPPP'),
-                    ('@s4/2', 'AACC', '+', 'PPPP')]
-
-        sequences = [('@s1/1 abc', 'GGG', '+', 'YYY'),
-                     ('@s2/1 abc', 'CCC', '+', 'PPP'),
-                     ('@s3/1 abc', 'AAA', '+', 'PPP'),
-                     ('@s4/1 abc', 'TTT', '+', 'PPP')]
-
-        bsi = BarcodeSequenceFastqIterator(barcodes, sequences)
-        with self.assertRaises(ValueError):
-            list(bsi)
 
 
 class TestSequenceCharacteristicsTransformer(TestPluginBase):
