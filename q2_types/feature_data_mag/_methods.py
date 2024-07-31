@@ -11,8 +11,7 @@ import numpy as np
 from qiime2.util import duplicate
 
 from q2_types._util import _validate_num_partitions, _validate_mag_ids
-from q2_types.feature_data_mag import MAGSequencesDirFmt, \
-    OrthologAnnotationDirFmt
+from q2_types.feature_data_mag import MAGSequencesDirFmt
 
 
 def partition_feature_data_mags(
@@ -62,17 +61,3 @@ def collate_feature_data_mags(mags: MAGSequencesDirFmt) -> MAGSequencesDirFmt:
             duplicate(fp, collated_mags.path / fp.name)
 
     return collated_mags
-
-
-def collate_ortholog_annotations(
-    ortholog_annotations: OrthologAnnotationDirFmt
-) -> OrthologAnnotationDirFmt:
-    # Init output
-    collated_ortholog_annotations = OrthologAnnotationDirFmt()
-
-    # Copy annotations into output
-    for anno in ortholog_annotations:
-        for fp in anno.path.iterdir():
-            duplicate(fp, collated_ortholog_annotations.path / fp.name)
-
-    return collated_ortholog_annotations

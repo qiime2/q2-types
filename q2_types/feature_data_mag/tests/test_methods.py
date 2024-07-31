@@ -10,10 +10,9 @@ from unittest.mock import patch
 
 from qiime2.plugin.testing import TestPluginBase
 
-from q2_types.feature_data_mag import MAGSequencesDirFmt, \
-    OrthologAnnotationDirFmt
+from q2_types.feature_data_mag import MAGSequencesDirFmt
 from q2_types.feature_data_mag._methods import partition_feature_data_mags, \
-    collate_feature_data_mags, collate_ortholog_annotations
+    collate_feature_data_mags
 
 
 class TestFeatureDataMAGsPartitionCollating(TestPluginBase):
@@ -64,22 +63,4 @@ class TestFeatureDataMAGsPartitionCollating(TestPluginBase):
                 "fb0bc871-04f6-486b-a10e-8e0cb66f8de3.fasta"
             ],
             dircmp.common
-        )
-
-    def test_collate_ortholog_annotations(self):
-        p = self.get_data_path("partitioned_ortholog_annotations")
-        annotations = [
-          OrthologAnnotationDirFmt(f"{p}/{letter}", mode="r")
-          for letter in ["a", "b", "c"]
-        ]
-        collated_annotations = collate_ortholog_annotations(annotations)
-
-        # assert that all files are there
-        compare = filecmp.dircmp(
-            collated_annotations.path,
-            self.get_data_path("collated_ortholog_annotations")
-        )
-        self.assertListEqual(
-            compare.common,
-            [f"{letter}.annotations" for letter in ["a", "b", "c"]]
         )

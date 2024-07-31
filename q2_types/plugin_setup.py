@@ -16,10 +16,10 @@ from qiime2.core.type import Int, Range, Collection, List
 import q2_types
 from q2_types import __version__
 
-from q2_types.feature_data_mag import MAG, NOG
+from q2_types.feature_data_mag import MAG
 from q2_types.per_sample_sequences import MAGs
 from q2_types.feature_data import FeatureData
-from q2_types.genome_data import BLAST6
+from q2_types.genome_data import Orthologs, NOG
 from q2_types.sample_data import SampleData
 
 
@@ -56,9 +56,9 @@ plugin.methods.register_function(
 
 plugin.methods.register_function(
     function=q2_types.genome_data.partition_orthologs,
-    inputs={"orthologs": SampleData[BLAST6]},
+    inputs={"orthologs": SampleData[Orthologs]},
     parameters={"num_partitions": Int % Range(1, None)},
-    outputs={"partitioned_orthologs": Collection[SampleData[BLAST6]]},
+    outputs={"partitioned_orthologs": Collection[SampleData[Orthologs]]},
     input_descriptions={"orthologs": "The orthologs to partition."},
     parameter_descriptions={
         "num_partitions": "The number of partitions to split the MAGs"
@@ -110,29 +110,13 @@ plugin.methods.register_function(
 
 plugin.methods.register_function(
     function=q2_types.genome_data.collate_orthologs,
-    inputs={"orthologs": List[SampleData[BLAST6]]},
+    inputs={"orthologs": List[SampleData[Orthologs]]},
     parameters={},
-    outputs={"collated_orthologs": SampleData[BLAST6]},
+    outputs={"collated_orthologs": SampleData[Orthologs]},
     input_descriptions={"orthologs": "Orthologs to collate"},
     parameter_descriptions={},
     name="Collate Orthologs",
     description="Takes a collection SampleData[BLAST6] artifacts "
-                "and collates them into a single artifact.",
-)
-
-plugin.methods.register_function(
-    function=q2_types.feature_data_mag.collate_ortholog_annotations,
-    inputs={'ortholog_annotations': List[FeatureData[NOG]]},
-    parameters={},
-    outputs=[('collated_ortholog_annotations', FeatureData[NOG])],
-    input_descriptions={
-        'ortholog_annotations': "Collection of ortholog annotations."
-    },
-    output_descriptions={
-        'collated_ortholog_annotations': "Collated ortholog annotations."
-    },
-    name='Collate ortholog annotations.',
-    description="Takes a collection of FeatureData[NOG]'s "
                 "and collates them into a single artifact.",
 )
 

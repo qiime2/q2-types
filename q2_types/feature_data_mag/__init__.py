@@ -10,9 +10,7 @@ from ._formats import MAGSequencesDirFmt
 
 from ._types import MAG, Contig
 from ._objects import MAGIterator
-from ._methods import partition_feature_data_mags, collate_feature_data_mags, \
-        collate_ortholog_annotations
+from ._methods import partition_feature_data_mags, collate_feature_data_mags
 
 __all__ = ['MAG', 'MAGSequencesDirFmt', 'MAGIterator', 'Contig',
-           'partition_feature_data_mags', 'collate_feature_data_mags',
-           'collate_ortholog_annotations']
+           'partition_feature_data_mags', 'collate_feature_data_mags']
