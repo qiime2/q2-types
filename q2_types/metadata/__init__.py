@@ -6,13 +6,9 @@
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
 
-import importlib
-
-from ._format import ImmutableMetadataFormat, ImmutableMetadataDirectoryFormat
-from ._type import ImmutableMetadata
+from ._formats import ImmutableMetadataFormat, ImmutableMetadataDirectoryFormat
+from ._types import ImmutableMetadata
 
 __all__ = ['ImmutableMetadataFormat',
            'ImmutableMetadataDirectoryFormat',
            'ImmutableMetadata']
-
-importlib.import_module('q2_types.metadata._transformer')

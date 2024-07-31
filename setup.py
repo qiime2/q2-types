@@ -27,12 +27,14 @@ setup(
     package_data={
         'q2_types': ['citations.bib'],
         'q2_types.tests': ['data/*'],
+        'q2_types.bowtie2': ['citations.bib'],
         'q2_types.distance_matrix.tests': ['data/*'],
         'q2_types.feature_data.tests': ['data/*',
                                         'data/taxonomy/*',
                                         'data/emp_multiplexed/*',
                                         'data/emp_multiplexed_single_end/*'],
         'q2_types.feature_map.tests': ['data/*'],
+        'q2_types.feature_table': ['citations.bib'],
         'q2_types.feature_table.tests': ['data/*'],
         'q2_types.metadata.tests': ['data/*'],
         'q2_types.multiplexed_sequences.tests': [

@@ -9,8 +9,7 @@ import unittest
 
 from qiime2.plugin.testing import TestPluginBase
 
-from .._type import (FeatureMap, MAGtoContigs)
-from .._format import MAGtoContigsDirFmt
+from q2_types.feature_map import (FeatureMap, MAGtoContigs, MAGtoContigsDirFmt)
 
 
 class TestTypes(TestPluginBase):

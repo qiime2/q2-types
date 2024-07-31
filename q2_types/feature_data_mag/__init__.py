@@ -6,15 +6,9 @@
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
 
-import importlib
+from ._formats import MAGSequencesDirFmt
 
-from ._format import MAGSequencesDirFmt
-
-from ._type import MAG, Contig
-from ._transformer import MAGIterator
+from ._types import MAG, Contig
+from ._objects import MAGIterator
 
 __all__ = ['MAG', 'MAGSequencesDirFmt', 'MAGIterator', 'Contig']
-
-importlib.import_module('q2_types.feature_data_mag._format')
-importlib.import_module('q2_types.feature_data_mag._transformer')
-importlib.import_module('q2_types.feature_data_mag._type')

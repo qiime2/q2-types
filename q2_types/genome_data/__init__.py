@@ -6,15 +6,14 @@
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
 
-import importlib
 
-from ._format import (
+from ._formats import (
     GenesDirectoryFormat, ProteinsDirectoryFormat, LociDirectoryFormat,
     GFF3Format, OrthologFileFmt, SeedOrthologDirFmt,
     GenomeSequencesDirectoryFormat, OrthologAnnotationDirFmt,
 )
-from ._transformer import IntervalMetadataIterator
-from ._type import (
+from ._objects import IntervalMetadataIterator
+from ._types import (
     GenomeData, Genes, Proteins, Loci, Orthologs, DNASequence, NOG
 )
 
@@ -25,7 +24,3 @@ __all__ = [
     'SeedOrthologDirFmt', 'GenomeSequencesDirectoryFormat', 'DNASequence',
     'OrthologAnnotationDirFmt', 'NOG'
     ]
-
-importlib.import_module('q2_types.genome_data._format')
-importlib.import_module('q2_types.genome_data._transformer')
-importlib.import_module('q2_types.genome_data._type')

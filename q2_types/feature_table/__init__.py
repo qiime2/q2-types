@@ -6,17 +6,13 @@
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
 
-import importlib
-
-from ._format import (BIOMV100Format, BIOMV210Format, BIOMV100DirFmt,
-                      BIOMV210DirFmt)
-from ._type import (FeatureTable, Frequency, RelativeFrequency,
-                    PresenceAbsence, Composition, Balance,
-                    PercentileNormalized, Design, Normalized)
+from ._formats import (BIOMV100Format, BIOMV210Format, BIOMV100DirFmt,
+                       BIOMV210DirFmt)
+from ._types import (FeatureTable, Frequency, RelativeFrequency,
+                     PresenceAbsence, Composition, Balance,
+                     PercentileNormalized, Design, Normalized)
 
 __all__ = ['BIOMV100Format', 'BIOMV100DirFmt', 'FeatureTable', 'Frequency',
            'RelativeFrequency', 'PresenceAbsence', 'BIOMV210Format',
            'BIOMV210DirFmt', 'Composition', 'Balance', 'PercentileNormalized',
-           'Design', "Normalized"]
-
-importlib.import_module('q2_types.feature_table._transformer')
+           'Design', 'Normalized']

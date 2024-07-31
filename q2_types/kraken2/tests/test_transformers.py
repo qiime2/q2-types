@@ -9,7 +9,7 @@ import os
 import unittest
 
 import pandas as pd
-from pandas._testing import assert_frame_equal
+from pandas.testing import assert_frame_equal
 from qiime2.plugin.testing import TestPluginBase
 
 from q2_types.kraken2 import (
