@@ -87,4 +87,3 @@ def collate_sample_data_mags(
                 shutil.copy(manifest, collated_mags.path / manifest.name)
 
     return collated_mags
-

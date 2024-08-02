@@ -19,7 +19,7 @@ from q2_types import __version__
 from q2_types.feature_data_mag import MAG
 from q2_types.per_sample_sequences import MAGs
 from q2_types.feature_data import FeatureData
-from q2_types.genome_data import Orthologs, NOG
+from q2_types.genome_data import Orthologs
 from q2_types.sample_data import SampleData
 
 

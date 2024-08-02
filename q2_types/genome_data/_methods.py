@@ -7,7 +7,6 @@
 # ----------------------------------------------------------------------------
 import glob
 import os
-import shutil
 import warnings
 
 import numpy as np

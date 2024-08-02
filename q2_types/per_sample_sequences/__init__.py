@@ -55,4 +55,3 @@ __all__ = ['CasavaOneEightSingleLanePerSampleDirFmt',
            'MultiFASTADirectoryFormat', 'AlignmentMap', 'MultiAlignmentMap',
            'partition_sample_data_mags', 'collate_sample_data_mags'
            ]
-
