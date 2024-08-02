@@ -76,7 +76,7 @@ plugin.methods.register_function(
     parameters={},
     outputs={"collated_mags": SampleData[MAGs]},
     input_descriptions={"mags": "A collection of MAGs to be collated."},
-    name="Collate mags",
+    name="Collate MAGs",
     description="Takes a collection of SampleData[MAGs]'s "
                 "and collates them into a single artifact.",
 )
@@ -103,7 +103,7 @@ plugin.methods.register_function(
     parameters={},
     outputs={"collated_mags": FeatureData[MAG]},
     input_descriptions={"mags": "A collection of MAGs to be collated."},
-    name="Collate mags",
+    name="Collate MAGs",
     description="Takes a collection of FeatureData[MAG]'s "
                 "and collates them into a single artifact.",
 )
@@ -115,7 +115,7 @@ plugin.methods.register_function(
     outputs={"collated_orthologs": SampleData[Orthologs]},
     input_descriptions={"orthologs": "Orthologs to collate"},
     parameter_descriptions={},
-    name="Collate Orthologs",
+    name="Collate orthologs",
     description="Takes a collection SampleData[BLAST6] artifacts "
                 "and collates them into a single artifact.",
 )
