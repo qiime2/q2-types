@@ -19,7 +19,7 @@ from q2_types import __version__
 from q2_types.feature_data_mag import MAG
 from q2_types.per_sample_sequences import MAGs
 from q2_types.feature_data import FeatureData
-from q2_types.genome_data import Orthologs
+from q2_types.genome_data import Orthologs, GenomeData, NOG
 from q2_types.sample_data import SampleData
 
 
@@ -120,6 +120,21 @@ plugin.methods.register_function(
                 "and collates them into a single artifact.",
 )
 
+plugin.methods.register_function(
+    function=q2_types.genome_data.collate_ortholog_annotations,
+    inputs={'ortholog_annotations': List[GenomeData[NOG]]},
+    parameters={},
+    outputs=[('collated_annotations', GenomeData[NOG])],
+    input_descriptions={
+        'ortholog_annotations': "Collection of ortholog annotations."
+    },
+    output_descriptions={
+        'collated_annotations': "Collated ortholog annotations."
+    },
+    name='Collate ortholog annotations.',
+    description="Takes a collection of GenomeData[NOG]'s "
+                "and collates them into a single artifact.",
+)
 
 importlib.import_module('q2_types.bowtie2._deferred_setup')
 importlib.import_module('q2_types.distance_matrix._deferred_setup')
