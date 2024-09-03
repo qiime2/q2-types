@@ -95,7 +95,10 @@ setup(
              'data/collated_orthologs/*',
              'data/partitioned_orthologs/ortholog_1/*',
              'data/partitioned_orthologs/ortholog_2/*',
-
+             'data/ortholog-annotations-collating/a/*',
+             'data/ortholog-annotations-collating/b/*',
+             'data/ortholog-annotations-collating/c/*',
+             'data/ortholog-annotations-collating/collated/*',
              ],
         'q2_types.kraken2.tests': [
             'data/*',
