@@ -16,7 +16,8 @@ from ._objects import IntervalMetadataIterator
 from ._types import (
     GenomeData, Genes, Proteins, Loci, Orthologs, DNASequence, NOG
 )
-from ._methods import collate_orthologs, partition_orthologs
+from ._methods import collate_orthologs, partition_orthologs, \
+    collate_ortholog_annotations
 
 __all__ = [
     'GenomeData', 'Genes', 'Proteins', 'Loci', 'GFF3Format',
@@ -24,5 +25,5 @@ __all__ = [
     'IntervalMetadataIterator', 'OrthologFileFmt', 'Orthologs',
     'SeedOrthologDirFmt', 'GenomeSequencesDirectoryFormat', 'DNASequence',
     'OrthologAnnotationDirFmt', 'NOG',
-    'collate_orthologs', 'partition_orthologs',
+    'collate_orthologs', 'partition_orthologs', "collate_ortholog_annotations"
     ]

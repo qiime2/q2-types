@@ -5,12 +5,13 @@
 #
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
+import filecmp
 import os
 
 from qiime2.plugin.testing import TestPluginBase
 
 from q2_types.genome_data import SeedOrthologDirFmt, collate_orthologs, \
-    partition_orthologs
+    partition_orthologs, OrthologAnnotationDirFmt, collate_ortholog_annotations
 
 
 class TestOrthologsPartitionCollating(TestPluginBase):
@@ -52,3 +53,21 @@ class TestOrthologsPartitionCollating(TestPluginBase):
             UserWarning, "You have requested a number of.*5.*2.*2"
         ):
             partition_orthologs(orthologs, 5)
+
+    def test_collate_ortholog_annotations(self):
+        p = self.get_data_path("ortholog-annotations-collating")
+        annotations = [
+          OrthologAnnotationDirFmt(f"{p}/{letter}", mode="r")
+          for letter in ["a", "b", "c"]
+        ]
+        collated_annotations = collate_ortholog_annotations(annotations)
+
+        # assert that all files are there
+        compare = filecmp.dircmp(
+            collated_annotations.path,
+            self.get_data_path("ortholog-annotations-collating/collated")
+        )
+        self.assertListEqual(
+            compare.common,
+            [f"{letter}.annotations" for letter in ["a", "b", "c"]]
+        )

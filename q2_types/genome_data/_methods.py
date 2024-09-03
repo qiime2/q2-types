@@ -12,7 +12,7 @@ import warnings
 import numpy as np
 from qiime2.util import duplicate
 
-from q2_types.genome_data import SeedOrthologDirFmt
+from q2_types.genome_data import SeedOrthologDirFmt, OrthologAnnotationDirFmt
 
 
 def collate_orthologs(orthologs: SeedOrthologDirFmt) -> SeedOrthologDirFmt:
@@ -72,3 +72,17 @@ def partition_orthologs(
             partitioned_orthologs[i] = result
 
     return partitioned_orthologs
+
+
+def collate_ortholog_annotations(
+    ortholog_annotations: OrthologAnnotationDirFmt
+) -> OrthologAnnotationDirFmt:
+    # Init output
+    collated_annotations = OrthologAnnotationDirFmt()
+
+    # Copy annotations into output
+    for anno in ortholog_annotations:
+        for fp in anno.path.iterdir():
+            duplicate(fp, collated_annotations.path / fp.name)
+
+    return collated_annotations
