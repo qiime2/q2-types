@@ -23,31 +23,31 @@ class TestFormats(TestPluginBase):
 
     def test_ortholog_file_fmt(self):
         dirpath = self.get_data_path(
-                'ortholog/test_sample.emapper.seed_orthologs')
+                'partitioned_orthologs/ortholog_1/1.emapper.seed_orthologs')
         fmt_obj = OrthologFileFmt(dirpath, mode='r')
 
         fmt_obj.validate()
 
     def test_seed_ortholog_dir_fmt_collection_file_name(self):
-        dirpath = self.get_data_path('ortholog')
+        dirpath = self.get_data_path('partitioned_orthologs/ortholog_1')
         fmt_obj = SeedOrthologDirFmt(dirpath, mode='r')
 
         for relpath, obj in fmt_obj.seed_orthologs.iter_views(OrthologFileFmt):
             obs = str(obj).split("/")[-1].split("/")[-1]
 
-        exp = "test_sample.emapper.seed_orthologs"
+        exp = "1.emapper.seed_orthologs"
 
         self.assertEqual(obs, exp)
 
     def test_seed_ortholog_dir_fmt_good_validate(self):
-        dirpath = self.get_data_path('ortholog')
+        dirpath = self.get_data_path('partitioned_orthologs/ortholog_1')
 
         fmt_obj = SeedOrthologDirFmt(dirpath, mode='r')
 
         fmt_obj.validate()
 
     def test_seed_ortholog_dir_fmt_collection(self):
-        dirpath = self.get_data_path('ortholog/')
+        dirpath = self.get_data_path('partitioned_orthologs/ortholog_1')
         fmt = SeedOrthologDirFmt(dirpath, mode='r')
 
         for relpath, obj in fmt.seed_orthologs.iter_views(OrthologFileFmt):

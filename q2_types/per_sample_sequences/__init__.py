@@ -31,6 +31,8 @@ from ._types import (Sequences, SequencesWithQuality,
                      JoinedSequencesWithQuality, MAGs, Contigs,
                      SingleBowtie2Index, MultiBowtie2Index,
                      AlignmentMap, MultiAlignmentMap)
+from ._methods import partition_sample_data_mags, collate_sample_data_mags
+
 
 __all__ = ['CasavaOneEightSingleLanePerSampleDirFmt',
            'CasavaOneEightLanelessPerSampleDirFmt',
@@ -50,4 +52,6 @@ __all__ = ['CasavaOneEightSingleLanePerSampleDirFmt',
            'ContigSequencesDirFmt', 'Contigs', 'SingleBowtie2Index',
            'MultiBowtie2Index', 'MultiBowtie2IndexDirFmt',
            'BAMFormat', 'BAMDirFmt', 'MultiBAMDirFmt',
-           'MultiFASTADirectoryFormat', 'AlignmentMap', 'MultiAlignmentMap']
+           'MultiFASTADirectoryFormat', 'AlignmentMap', 'MultiAlignmentMap',
+           'partition_sample_data_mags', 'collate_sample_data_mags'
+           ]
