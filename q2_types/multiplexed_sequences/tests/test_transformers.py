@@ -298,8 +298,7 @@ class TestTransformers(TestPluginBase):
              'CD<CDCA>A@A>:<?B@?<((2(>?'))
 
     def test_invalid(self):
-        dirname = 'bad'
-        dirpath = self.get_data_path(dirname)
+        dirpath = '/'.join([self.get_data_path('.'), 'bad'])
         transformer = self.get_transformer(EMPSingleEndDirFmt,
                                            BarcodeSequenceFastqIterator)
         with self.assertRaises(ValidationError):
