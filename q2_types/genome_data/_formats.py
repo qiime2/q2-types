@@ -7,6 +7,7 @@
 # ----------------------------------------------------------------------------
 import os
 import re
+from collections import defaultdict
 
 import qiime2.plugin.model as model
 from qiime2.plugin import ValidationError
@@ -40,34 +41,25 @@ def genome_dict(self, relative=False):
         described above.
         Both levels of the dictionary are sorted alphabetically by key.
     """
-    ids = {}
-    for d in self.path.iterdir():
-        if d.is_dir():
-
-            sample_id = d.name.rsplit('/', 1)[0]
-            if sample_id not in ids:
-                ids[sample_id] = {}
-
-            for path in d.iterdir():
-                mag_id = os.path.splitext(os.path.basename(path.name))[0]
-                absolute_path = path.absolute()
-                if relative:
-                    ids[sample_id][mag_id] = str(
-                        absolute_path.relative_to(self.path.absolute())
-                    )
-                else:
-                    ids[sample_id][mag_id] = str(absolute_path)
-
+    ids = defaultdict(dict)
+    for entry in self.path.iterdir():
+        if entry.is_dir():
+            sample_id = entry.name
+            for path in entry.iterdir():
+                file_name = path.stem
+                file_path = (
+                    path.absolute().relative_to(self.path.absolute())
+                    if relative else path.absolute()
+                )
+                ids[sample_id][file_name] = str(file_path)
             ids[sample_id] = dict(sorted(ids[sample_id].items()))
         else:
-            _id = d.stem
-            absolute_path = d.absolute()
-            if relative:
-                ids[_id] = str(
-                    absolute_path.relative_to(self.path.absolute())
-                )
-            else:
-                ids[_id] = str(absolute_path)
+            file_name = entry.stem
+            file_path = (
+                entry.absolute().relative_to(self.path.absolute())
+                if relative else entry.absolute()
+            )
+            ids[file_name] = str(file_path)
 
     return dict(sorted(ids.items()))
 
