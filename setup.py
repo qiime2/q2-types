@@ -83,6 +83,7 @@ setup(
         'q2_types.genome_data.tests':
             ['data/*',
              'data/genes/*',
+             'data/genes_samples/*',
              'data/loci-invalid/*',
              'data/loci/*',
              'data/genome-sequences/*',
@@ -92,6 +93,7 @@ setup(
              'data/ortholog-annotation-samples/*',
              'data/ortholog-annotation/*',
              'data/proteins/*',
+             'data/proteins_samples/*',
              'data/collated_orthologs/*',
              'data/partitioned_orthologs/ortholog_1/*',
              'data/partitioned_orthologs/ortholog_2/*',

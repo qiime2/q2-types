@@ -5,7 +5,6 @@
 #
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
-import shutil
 import unittest
 from pathlib import Path
 
@@ -181,7 +180,8 @@ class TestFormats(TestPluginBase):
         self.assertDictEqual(obs, exp)
 
     def test_genes_dirfmt_samples_genome_dict(self):
-        genes = GenesDirectoryFormat(self.get_data_path('genes_samples'), mode='r')
+        genes = GenesDirectoryFormat(
+            self.get_data_path('genes_samples'), mode='r')
 
         obs = genes.genome_dict()
         exp = {
