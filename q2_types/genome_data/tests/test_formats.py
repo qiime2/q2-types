@@ -5,8 +5,9 @@
 #
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
-
+import shutil
 import unittest
+from pathlib import Path
 
 from qiime2.core.exceptions import ValidationError
 from qiime2.plugin.testing import TestPluginBase
@@ -176,6 +177,96 @@ class TestFormats(TestPluginBase):
         exp = {
             'test_output1': 'test_output1.emapper.annotations',
             'test_output2': 'test_output2.emapper.annotations'
+        }
+        self.assertDictEqual(obs, exp)
+
+    def test_genes_dirfmt_samples_genome_dict(self):
+        genes = GenesDirectoryFormat(self.get_data_path('genes_samples'), mode='r')
+
+        obs = genes.genome_dict()
+        exp = {
+            'sample1': {
+                'genes1': str(Path(genes.path / 'sample1/genes1.fa')),
+            },
+            'sample2': {
+                'genes2': str(Path(genes.path / 'sample2/genes2.fa')),
+            },
+        }
+        self.assertDictEqual(obs, exp)
+
+        obs = genes.genome_dict(relative=True)
+        exp = {
+            'sample1': {
+                'genes1': 'sample1/genes1.fa',
+            },
+            'sample2': {
+                'genes2': 'sample2/genes2.fa',
+            },
+        }
+        self.assertDictEqual(obs, exp)
+
+    def test_genes_dirfmt_genome_dict(self):
+        genes = GenesDirectoryFormat(self.get_data_path('genes'), mode='r')
+
+        obs = genes.genome_dict()
+        exp = {
+            'genes1': str(Path(genes.path / 'genes1.fa')),
+            'genes2': str(Path(genes.path / 'genes2.fa'))
+        }
+        self.assertDictEqual(obs, exp)
+
+        obs = genes.genome_dict(relative=True)
+        exp = {
+            'genes1': 'genes1.fa',
+            'genes2': 'genes2.fa'
+        }
+        self.assertDictEqual(obs, exp)
+
+    def test_proteins_dirfmt_samples_genome_dict(self):
+        proteins = ProteinsDirectoryFormat(
+            self.get_data_path('proteins_samples'), mode='r'
+        )
+
+        obs = proteins.genome_dict()
+        exp = {
+            'sample1': {
+                'proteins1':
+                    str(Path(proteins.path / 'sample1/proteins1.faa')),
+            },
+            'sample2': {
+                'proteins2':
+                    str(Path(proteins.path / 'sample2/proteins2.faa')),
+            },
+        }
+        self.assertDictEqual(obs, exp)
+
+        obs = proteins.genome_dict(relative=True)
+        exp = {
+            'sample1': {
+                'proteins1': 'sample1/proteins1.faa',
+            },
+            'sample2': {
+                'proteins2': 'sample2/proteins2.faa',
+            },
+        }
+        self.assertDictEqual(obs, exp)
+
+    def test_proteins_dirfmt_genome_dict(self):
+        proteins = ProteinsDirectoryFormat(
+            self.get_data_path('proteins'), mode='r'
+        )
+
+        obs = proteins.genome_dict()
+        exp = {
+            'proteins1': str(Path(proteins.path / 'proteins1.faa')),
+            'proteins2': str(Path(proteins.path / 'proteins2.faa'))
+        }
+        self.assertDictEqual(obs, exp)
+
+        obs = proteins.genome_dict(relative=True)
+        exp = {
+            'proteins1': 'proteins1.faa',
+            'proteins2': 'proteins2.faa'
         }
         self.assertDictEqual(obs, exp)
 

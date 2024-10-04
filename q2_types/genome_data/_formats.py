@@ -5,6 +5,7 @@
 #
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
+import os
 import re
 
 import qiime2.plugin.model as model
@@ -18,6 +19,59 @@ class OrthologFileFmt(model.TextFileFormat):
         pass
 
 
+def genome_dict(self, relative=False):
+    """
+    For per sample directories it returns a mapping of sample id to
+    another dictionary where keys represent the file name and values
+    correspond to the filepath for each file.
+    For files, it returns a mapping of file name to filepath for each file.
+
+    Parameters
+    ---------
+    relative : bool
+        Whether to return filepaths relative to the directory's location.
+        Returns absolute filepaths by default.
+
+    Returns
+    -------
+    dict
+        Mapping of filename -> filepath as described above.
+        Or mapping of sample id -> dict {filename: filepath} as
+        described above.
+        Both levels of the dictionary are sorted alphabetically by key.
+    """
+    ids = {}
+    for d in self.path.iterdir():
+        if d.is_dir():
+
+            sample_id = d.name.rsplit('/', 1)[0]
+            if sample_id not in ids:
+                ids[sample_id] = {}
+
+            for path in d.iterdir():
+                mag_id = os.path.splitext(os.path.basename(path.name))[0]
+                absolute_path = path.absolute()
+                if relative:
+                    ids[sample_id][mag_id] = str(
+                        absolute_path.relative_to(self.path.absolute())
+                    )
+                else:
+                    ids[sample_id][mag_id] = str(absolute_path)
+
+            ids[sample_id] = dict(sorted(ids[sample_id].items()))
+        else:
+            _id = d.stem
+            absolute_path = d.absolute()
+            if relative:
+                ids[_id] = str(
+                    absolute_path.relative_to(self.path.absolute())
+                )
+            else:
+                ids[_id] = str(absolute_path)
+
+    return dict(sorted(ids.items()))
+
+
 class GenesDirectoryFormat(model.DirectoryFormat):
     genes = model.FileCollection(r'.+\.(fa|fna|fasta)$',
                                  format=DNAFASTAFormat)
@@ -27,6 +81,9 @@ class GenesDirectoryFormat(model.DirectoryFormat):
         return '%s.fasta' % genome_id
 
 
+GenesDirectoryFormat.genome_dict = genome_dict
+
+
 class ProteinsDirectoryFormat(model.DirectoryFormat):
     proteins = model.FileCollection(r'.+\.(fa|faa|fasta)$',
                                     format=ProteinFASTAFormat)
@@ -34,6 +91,9 @@ class ProteinsDirectoryFormat(model.DirectoryFormat):
     @proteins.set_path_maker
     def proteins_path_maker(self, genome_id):
         return '%s.fasta' % genome_id
+
+
+ProteinsDirectoryFormat.genome_dict = genome_dict
 
 
 class GFF3Format(model.TextFileFormat):
