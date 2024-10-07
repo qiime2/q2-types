@@ -16,6 +16,7 @@ from q2_types.genome_data import (
     LociDirectoryFormat, SeedOrthologDirFmt, OrthologFileFmt,
     OrthologAnnotationDirFmt, GenomeSequencesDirectoryFormat,
 )
+from q2_types.genome_data._formats import GenomeDataDirectoryFormat
 
 
 class TestFormats(TestPluginBase):
@@ -179,8 +180,8 @@ class TestFormats(TestPluginBase):
         }
         self.assertDictEqual(obs, exp)
 
-    def test_genes_dirfmt_samples_genome_dict(self):
-        genes = GenesDirectoryFormat(
+    def test_genome_data_dirfmt_samples_genome_dict(self):
+        genes = GenomeDataDirectoryFormat(
             self.get_data_path('genes_samples'), mode='r')
 
         obs = genes.genome_dict()
@@ -206,7 +207,9 @@ class TestFormats(TestPluginBase):
         self.assertDictEqual(obs, exp)
 
     def test_genes_dirfmt_genome_dict(self):
-        genes = GenesDirectoryFormat(self.get_data_path('genes'), mode='r')
+        genes = (
+            GenomeDataDirectoryFormat(self.get_data_path('genes'), mode='r')
+        )
 
         obs = genes.genome_dict()
         exp = {
@@ -219,54 +222,6 @@ class TestFormats(TestPluginBase):
         exp = {
             'genes1': 'genes1.fa',
             'genes2': 'genes2.fa'
-        }
-        self.assertDictEqual(obs, exp)
-
-    def test_proteins_dirfmt_samples_genome_dict(self):
-        proteins = ProteinsDirectoryFormat(
-            self.get_data_path('proteins_samples'), mode='r'
-        )
-
-        obs = proteins.genome_dict()
-        exp = {
-            'sample1': {
-                'proteins1':
-                    str(Path(proteins.path / 'sample1/proteins1.faa')),
-            },
-            'sample2': {
-                'proteins2':
-                    str(Path(proteins.path / 'sample2/proteins2.faa')),
-            },
-        }
-        self.assertDictEqual(obs, exp)
-
-        obs = proteins.genome_dict(relative=True)
-        exp = {
-            'sample1': {
-                'proteins1': 'sample1/proteins1.faa',
-            },
-            'sample2': {
-                'proteins2': 'sample2/proteins2.faa',
-            },
-        }
-        self.assertDictEqual(obs, exp)
-
-    def test_proteins_dirfmt_genome_dict(self):
-        proteins = ProteinsDirectoryFormat(
-            self.get_data_path('proteins'), mode='r'
-        )
-
-        obs = proteins.genome_dict()
-        exp = {
-            'proteins1': str(Path(proteins.path / 'proteins1.faa')),
-            'proteins2': str(Path(proteins.path / 'proteins2.faa'))
-        }
-        self.assertDictEqual(obs, exp)
-
-        obs = proteins.genome_dict(relative=True)
-        exp = {
-            'proteins1': 'proteins1.faa',
-            'proteins2': 'proteins2.faa'
         }
         self.assertDictEqual(obs, exp)
 

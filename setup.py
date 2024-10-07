@@ -94,8 +94,6 @@ setup(
              'data/ortholog-annotation-samples/*',
              'data/ortholog-annotation/*',
              'data/proteins/*',
-             'data/proteins_samples/sample1/*',
-             'data/proteins_samples/sample2/*',
              'data/collated_orthologs/*',
              'data/partitioned_orthologs/ortholog_1/*',
              'data/partitioned_orthologs/ortholog_2/*',
