@@ -15,8 +15,8 @@ from q2_types.genome_data import (
     GenesDirectoryFormat, ProteinsDirectoryFormat, GFF3Format,
     LociDirectoryFormat, SeedOrthologDirFmt, OrthologFileFmt,
     OrthologAnnotationDirFmt, GenomeSequencesDirectoryFormat,
+    GenomeDataDirectoryFormat
 )
-from q2_types.genome_data._formats import GenomeDataDirectoryFormat
 
 
 class TestFormats(TestPluginBase):

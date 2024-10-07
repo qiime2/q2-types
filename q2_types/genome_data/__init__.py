@@ -11,6 +11,7 @@ from ._formats import (
     GenesDirectoryFormat, ProteinsDirectoryFormat, LociDirectoryFormat,
     GFF3Format, OrthologFileFmt, SeedOrthologDirFmt,
     GenomeSequencesDirectoryFormat, OrthologAnnotationDirFmt,
+    GenomeDataDirectoryFormat,
 )
 from ._objects import IntervalMetadataIterator
 from ._types import (
@@ -24,6 +25,6 @@ __all__ = [
     'GenesDirectoryFormat', 'ProteinsDirectoryFormat', 'LociDirectoryFormat',
     'IntervalMetadataIterator', 'OrthologFileFmt', 'Orthologs',
     'SeedOrthologDirFmt', 'GenomeSequencesDirectoryFormat', 'DNASequence',
-    'OrthologAnnotationDirFmt', 'NOG',
+    'OrthologAnnotationDirFmt', 'NOG', 'GenomeDataDirectoryFormat',
     'collate_orthologs', 'partition_orthologs', "collate_ortholog_annotations"
     ]
