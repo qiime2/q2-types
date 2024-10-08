@@ -83,6 +83,8 @@ setup(
         'q2_types.genome_data.tests':
             ['data/*',
              'data/genes/*',
+             'data/genes_samples/sample1/*',
+             'data/genes_samples/sample2/*',
              'data/loci-invalid/*',
              'data/loci/*',
              'data/genome-sequences/*',
