@@ -26,7 +26,7 @@ setup(
     },
     package_data={
         'q2_types': ['citations.bib'],
-        'q2_types.tests': ['data/*'],
+        'q2_types.tests': ['data/*', 'data/*/*', 'data/*/*/*'],
         'q2_types.bowtie2': ['citations.bib'],
         'q2_types.distance_matrix.tests': ['data/*'],
         'q2_types.feature_data.tests': ['data/*',
