@@ -172,7 +172,7 @@ class FileDictMixin:
             if entry.is_dir():
                 outer_id = entry.name
                 for path in entry.iterdir():
-                    file_path, inner_id = _create_path(
+                    file_path, inner_id = _process_path(
                         path=path,
                         relative=relative,
                         dir_format=self,
@@ -182,7 +182,7 @@ class FileDictMixin:
                     ids[outer_id][inner_id] = str(file_path)
                 ids[outer_id] = dict(sorted(ids[outer_id].items()))
             else:
-                file_path, inner_id = _create_path(
+                file_path, inner_id = _process_path(
                     path=entry,
                     relative=relative,
                     dir_format=self,
@@ -195,7 +195,7 @@ class FileDictMixin:
         return dict(sorted(ids.items()))
 
 
-def _create_path(path, relative, dir_format, suffixes):
+def _process_path(path, relative, dir_format, suffixes):
     """
     This function processes the input file path to generate an absolute or
     relative path string and the ID derived from the file name. The ID is
