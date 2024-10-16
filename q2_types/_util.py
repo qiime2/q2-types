@@ -142,7 +142,7 @@ def _validate_mag_ids(
 
 
 class FileDictMixin:
-    def file_dict(self, relative=False, suffixes=None):
+    def file_dict(self, relative=False, suffixes=None, separator=None):
         """
         For per sample directories it returns a mapping of sample id to
         another dictionary where keys represent the file name and values
@@ -176,7 +176,8 @@ class FileDictMixin:
                         path=path,
                         relative=relative,
                         dir_format=self,
-                        suffixes=suffixes
+                        suffixes=suffixes,
+                        separator=separator
                     )
 
                     ids[outer_id][inner_id] = str(file_path)
@@ -186,8 +187,8 @@ class FileDictMixin:
                     path=entry,
                     relative=relative,
                     dir_format=self,
-                    suffixes=suffixes
-
+                    suffixes=suffixes,
+                    separator=separator
                 )
 
                 ids[inner_id] = str(file_path)
@@ -195,7 +196,7 @@ class FileDictMixin:
         return dict(sorted(ids.items()))
 
 
-def _process_path(path, relative, dir_format, suffixes):
+def _process_path(path, relative, dir_format, suffixes, separator):
     """
     This function processes the input file path to generate an absolute or
     relative path string and the ID derived from the file name. The ID is
@@ -226,8 +227,8 @@ def _process_path(path, relative, dir_format, suffixes):
 
     if suffixes:
         for suffix in suffixes:
-            if file_name.endswith(suffix[1:]):
-                _id = file_name[:-len(suffix)]
+            if file_name.endswith(suffix):
+                _id = file_name[:-len(suffix)+len(separator)]
                 break
 
     path_dict = (
