@@ -147,7 +147,7 @@ class Kraken2OutputFormat(model.TextFileFormat):
             )
 
 
-class Kraken2OutputDirectoryFormat(model.DirectoryFormat):
+class Kraken2OutputDirectoryFormat(model.DirectoryFormat, FileDictMixin):
     reports = model.FileCollection(
         r'.+output\.(txt|tsv)$', format=Kraken2OutputFormat
     )
