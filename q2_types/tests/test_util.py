@@ -52,6 +52,10 @@ class TestUtil(TestPluginBase):
                 [(0, "a"), (0, "a"), (0, "c"), (0, "d"), (0, "e"), (0, "f")]
             )
 
+
+class TestFileDictMixing(TestPluginBase):
+    package = "q2_types.tests"
+
     def test_file_dict_mixin(self):
         TestClass = type(
             f"{model.DirectoryFormat.__name__}With{FileDictMixin.__name__}",
@@ -66,7 +70,7 @@ class TestUtil(TestPluginBase):
                 "id1": os.path.join(str(fmt), "sample1", "id1_suffix.txt"),
             },
             "sample2": {
-                "": os.path.join(str(fmt), "sample2", "suffix.txt"),
+                "id2": os.path.join(str(fmt), "sample2", "id2_suffix.txt"),
             },
         }
         self.assertDictEqual(obs, exp)
@@ -77,7 +81,7 @@ class TestUtil(TestPluginBase):
                 "id1": "sample1/id1_suffix.txt",
             },
             "sample2": {
-                "": "sample2/suffix.txt",
+                "id2": "sample2/id2_suffix.txt",
             },
         }
         self.assertDictEqual(obs, exp)
@@ -159,18 +163,3 @@ class TestProcessPath(TestPluginBase):
 
         self.assertEqual(result_id, "sample_id")
         self.assertEqual(result_path, str(path.absolute()))
-
-    def test_process_path_only_suffix(self):
-        # Test when the file name consists only of the suffix
-        path = Path(self.dir_fmt.path / "suffix1.txt")
-        suffixes = ["_suffix1", "_suffix2"]
-
-        result_path, result_id = _process_path(
-            path,
-            relative=True,
-            dir_format=self.dir_fmt,
-            suffixes=suffixes
-        )
-
-        self.assertEqual(result_id, "")
-        self.assertEqual(result_path, "suffix1.txt")
