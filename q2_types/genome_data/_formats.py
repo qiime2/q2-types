@@ -6,7 +6,6 @@
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
 import re
-from collections import defaultdict
 
 import qiime2.plugin.model as model
 from qiime2.plugin import ValidationError
