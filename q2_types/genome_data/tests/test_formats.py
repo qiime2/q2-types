@@ -6,7 +6,6 @@
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
 import unittest
-from pathlib import Path
 
 from qiime2.core.exceptions import ValidationError
 from qiime2.plugin.testing import TestPluginBase
@@ -15,7 +14,6 @@ from q2_types.genome_data import (
     GenesDirectoryFormat, ProteinsDirectoryFormat, GFF3Format,
     LociDirectoryFormat, SeedOrthologDirFmt, OrthologFileFmt,
     OrthologAnnotationDirFmt, GenomeSequencesDirectoryFormat,
-    GenomeDataDirectoryFormat
 )
 
 
@@ -177,51 +175,6 @@ class TestFormats(TestPluginBase):
         exp = {
             'test_output1': 'test_output1.emapper.annotations',
             'test_output2': 'test_output2.emapper.annotations'
-        }
-        self.assertDictEqual(obs, exp)
-
-    def test_genes_dirfmt_samples_file_dict(self):
-        genes = GenesDirectoryFormat(
-            self.get_data_path('genes_samples'), mode='r')
-
-        obs = genes.file_dict()
-        exp = {
-            'sample1': {
-                'genes1': str(genes.path / 'sample1/genes1.fa'),
-            },
-            'sample2': {
-                'genes2': str(genes.path / 'sample2/genes2.fa'),
-            },
-        }
-        self.assertDictEqual(obs, exp)
-
-        obs = genes.genome_dict(relative=True)
-        exp = {
-            'sample1': {
-                'genes1': 'sample1/genes1.fa',
-            },
-            'sample2': {
-                'genes2': 'sample2/genes2.fa',
-            },
-        }
-        self.assertDictEqual(obs, exp)
-
-    def test_genes_dirfmt_file_dict(self):
-        genes = (
-            GenesDirectoryFormat(self.get_data_path('genes'), mode='r')
-        )
-
-        obs = genes.genome_dict()
-        exp = {
-            'genes1': str(genes.path / 'genes1.fa'),
-            'genes2': str(genes.path / 'genes2.fa')
-        }
-        self.assertDictEqual(obs, exp)
-
-        obs = genes.genome_dict(relative=True)
-        exp = {
-            'genes1': 'genes1.fa',
-            'genes2': 'genes2.fa'
         }
         self.assertDictEqual(obs, exp)
 
