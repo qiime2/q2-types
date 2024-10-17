@@ -536,8 +536,7 @@ class MultiDirValidationMixin:
 
 
 class MultiFASTADirectoryFormat(MultiDirValidationMixin,
-                                model.DirectoryFormat,
-                                FileDictMixin):
+                                model.DirectoryFormat):
     pathspec = r'.+\.(fa|fasta)$'
     sequences = model.FileCollection(pathspec, format=DNAFASTAFormat)
 
