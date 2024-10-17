@@ -69,9 +69,8 @@ class Kraken2ReportFormat(model.TextFileFormat):
 
 
 class Kraken2ReportDirectoryFormat(model.DirectoryFormat, FileDictMixin):
-    reports = model.FileCollection(
-        r'.+report\.(txt|tsv)$', format=Kraken2ReportFormat
-    )
+    pathspec = r'.+report\.(txt|tsv)$'
+    reports = model.FileCollection(pathspec, format=Kraken2ReportFormat)
 
     @reports.set_path_maker
     def reports_path_maker(self, sample_id, mag_id=None):
@@ -148,9 +147,8 @@ class Kraken2OutputFormat(model.TextFileFormat):
 
 
 class Kraken2OutputDirectoryFormat(model.DirectoryFormat, FileDictMixin):
-    reports = model.FileCollection(
-        r'.+output\.(txt|tsv)$', format=Kraken2OutputFormat
-    )
+    pathspec = r'.+output\.(txt|tsv)$'
+    reports = model.FileCollection(pathspec, format=Kraken2OutputFormat)
 
     @reports.set_path_maker
     def reports_path_maker(self, sample_id, mag_id=None):
