@@ -56,13 +56,18 @@ class TestUtil(TestPluginBase):
 class TestFileDictMixing(TestPluginBase):
     package = "q2_types.tests"
 
-    def test_file_dict_mixin(self):
-        TestClass = type(
+    def setUp(self):
+        super().setUp()
+
+        self.TestClass = type(
             f"{model.DirectoryFormat.__name__}With{FileDictMixin.__name__}",
             (FileDictMixin, model.DirectoryFormat),
             {}
         )
-        fmt = TestClass(self.get_data_path("per_sample"), mode='r')
+        self.TestClass.pathspec = r'.+\.(txt|tsv)$'
+
+    def test_file_dict_mixin(self):
+        fmt = self.TestClass(self.get_data_path("per_sample"), mode='r')
 
         obs = fmt.file_dict(suffixes=["_suffix"])
         exp = {
@@ -87,12 +92,7 @@ class TestFileDictMixing(TestPluginBase):
         self.assertDictEqual(obs, exp)
 
     def test_genes_dirfmt_genome_dict(self):
-        TestClass = type(
-            f"{model.DirectoryFormat.__name__}With{FileDictMixin.__name__}",
-            (FileDictMixin, model.DirectoryFormat),
-            {}
-        )
-        fmt = TestClass(self.get_data_path("not_per_sample"), mode='r')
+        fmt = self.TestClass(self.get_data_path("not_per_sample"), mode='r')
 
         obs = fmt.file_dict(suffixes=["_suffix1", "_suffix2"])
         exp = {

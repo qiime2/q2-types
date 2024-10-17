@@ -7,6 +7,7 @@
 # ----------------------------------------------------------------------------
 import gzip
 import itertools
+import re
 import warnings
 from collections import defaultdict
 from typing import List
@@ -146,9 +147,10 @@ class FileDictMixin:
         """
         For per sample directories it returns a mapping of sample id to
         another dictionary where keys represent the file name and values
-        correspond to the filepath for each file.
+        correspond to the filepath for each file matching the pathspec.
         For files, it returns a mapping of file name to filepath for each
-        file. The specified suffixes are removed from filenames.
+        file matching the pathspec. The specified suffixes are removed
+        from filenames.
 
         Parameters
         ---------
@@ -167,29 +169,34 @@ class FileDictMixin:
             described above.
             Both levels of the dictionary are sorted alphabetically by key.
         """
+        file_pattern = re.compile(self.pathspec)
         ids = defaultdict(dict)
         for entry in self.path.iterdir():
             if entry.is_dir():
                 outer_id = entry.name
                 for path in entry.iterdir():
+                    if file_pattern.match(path.name):
+
+                        file_path, inner_id = _process_path(
+                            path=path,
+                            relative=relative,
+                            dir_format=self,
+                            suffixes=suffixes,
+                        )
+
+                        ids[outer_id][inner_id] = str(file_path)
+                ids[outer_id] = dict(sorted(ids[outer_id].items()))
+            else:
+                if file_pattern.match(entry.name):
+
                     file_path, inner_id = _process_path(
-                        path=path,
+                        path=entry,
                         relative=relative,
                         dir_format=self,
                         suffixes=suffixes,
                     )
 
-                    ids[outer_id][inner_id] = str(file_path)
-                ids[outer_id] = dict(sorted(ids[outer_id].items()))
-            else:
-                file_path, inner_id = _process_path(
-                    path=entry,
-                    relative=relative,
-                    dir_format=self,
-                    suffixes=suffixes,
-                )
-
-                ids[inner_id] = str(file_path)
+                    ids[inner_id] = str(file_path)
 
         return dict(sorted(ids.items()))
 
@@ -198,7 +205,7 @@ def _process_path(path, relative, dir_format, suffixes):
     """
     This function processes the input file path to generate an absolute or
     relative path string and the ID derived from the file name. The ID is
-    extracted by removing the one of the specified suffixes  from the file
+    extracted by removing the one of the specified suffixes from the file
     name. If no suffixes are specified the ID is defined to be the filename.
 
     Parameters:
@@ -208,12 +215,12 @@ def _process_path(path, relative, dir_format, suffixes):
         relative : bool
             A flag indicating whether the returned path should be relative
             to the directory formats path or absolute.
-        dir_format : DirectoryFormat.
-            Any object of class DirectoryFormat.
+        dir_format : model.DirectoryFormat.
+            Any object of class model.DirectoryFormat.
 
     Returns:
     -------
-        path_dict : str
+        processed_path : str
             The full relative or absolut path to the file.
         _id : str
             The ID derived from the file name. ID will be "" if the filename
@@ -229,9 +236,9 @@ def _process_path(path, relative, dir_format, suffixes):
                 _id = file_name[:-len(suffix)]
                 break
 
-    path_dict = (
+    processed_path = (
         path.absolute().relative_to(dir_format.path.absolute())
         if relative
         else path.absolute()
     )
-    return str(path_dict), _id
+    return str(processed_path), _id
