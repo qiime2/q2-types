@@ -228,7 +228,7 @@ def _process_path(path, relative, dir_format, suffixes, separator):
     if suffixes:
         for suffix in suffixes:
             if file_name.endswith(suffix):
-                _id = file_name[:-len(suffix)+len(separator)]
+                _id = file_name[:-(len(suffix)+len(separator))]
                 break
 
     path_dict = (
