@@ -1,0 +1,41 @@
+package:
+  name: q2-types
+  version: {{ PLUGIN_VERSION }}
+source:
+  path: ..
+build:
+  script: make install
+requirements:
+  host:
+  - python {{ python }}
+  - setuptools
+  - versioningit
+  - wheel
+  run:
+  - python {{ python }}
+  - scikit-bio {{ scikit_bio }}
+  - scipy {{ scipy }}
+  - numpy
+  - pandas {{ pandas }}
+  - biom-format {{ biom_format }}
+  - ijson
+  - h5py
+  - qiime2 {{ qiime2_epoch }}.*
+  - samtools
+  - pyhmmer
+  build:
+  - setuptools
+  - versioningit
+test:
+  commands:
+  - py.test --pyargs q2_types
+  requires:
+  - pytest
+  - qiime2 >={{ qiime2 }}
+  imports:
+  - q2_types
+  - qiime2.plugins.types
+about:
+  home: https://qiime2.org
+  license: BSD-3-Clause
+  license_family: BSD
