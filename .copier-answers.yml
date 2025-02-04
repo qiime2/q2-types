@@ -1,0 +1,12 @@
+# Changes here will be overwritten by Copier; NEVER EDIT MANUALLY
+_commit: dfb0404
+_src_path: https://github.com/qiime2/q2-setup-template.git
+module_name: types
+plugin_name: q2_types
+plugin_scripts: null
+project_author_email: gregcaporaso@gmail.com
+project_author_name: Greg Caporaso
+project_description: Common QIIME 2 semantic types.
+project_name: q2-types
+project_urls_homepage: https://qiime2.org
+project_urls_repository: https://github.com/qiime2/q2-types

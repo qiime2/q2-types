@@ -77,13 +77,24 @@ def collate_sample_data_mags(
 
                 # For every mag in the sample
                 for mag in sample.iterdir():
-                    duplicate(mag, collated_mags.path / sample.name / mag.name)
+                    duplicate(
+                        mag, collated_mags.path / sample.name / mag.name
+                    )
 
-            # If its a file, it should be the manifest
-            # Since its present many times it will be overwritten, but that ok
+            # If it's a file, it should be the manifest
             else:
                 manifest = file_or_dir
-                # Overwrite is necessary
-                shutil.copy(manifest, collated_mags.path / manifest.name)
+                # If it's the first manifest, copy it over
+                if not (collated_mags.path / manifest.name).exists():
+                    shutil.copy(manifest, collated_mags.path / manifest.name)
+                else:
+                    # Append entries (except header) to the existing manifest
+                    with (
+                        open(manifest, 'r') as src,
+                        open(collated_mags.path / manifest.name, 'a') as dest
+                    ):
+                        next(src)  # Skip header
+                        for line in src:
+                            dest.write(line)
 
     return collated_mags
