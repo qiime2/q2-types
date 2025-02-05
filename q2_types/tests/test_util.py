@@ -67,9 +67,10 @@ class TestFileDictMixing(TestPluginBase):
         self.TestClass.pathspec = r'.+\.(txt|tsv)$'
 
     def test_file_dict_mixin(self):
+        self.TestClass.suffixes = ["_suffix"]
         fmt = self.TestClass(self.get_data_path("per_sample"), mode='r')
 
-        obs = fmt.file_dict(suffixes=["_suffix"])
+        obs = fmt.file_dict()
         exp = {
             "sample1": {
                 "id1": os.path.join(str(fmt), "sample1", "id1_suffix.txt"),
@@ -92,9 +93,10 @@ class TestFileDictMixing(TestPluginBase):
         self.assertDictEqual(obs, exp)
 
     def test_genes_dirfmt_genome_dict(self):
+        self.TestClass.suffixes = ["_suffix1", "_suffix2"]
         fmt = self.TestClass(self.get_data_path("not_per_sample"), mode='r')
 
-        obs = fmt.file_dict(suffixes=["_suffix1", "_suffix2"])
+        obs = fmt.file_dict()
         exp = {
             "id1": os.path.join(str(fmt), "id1_suffix1.txt"),
             "id2": os.path.join(str(fmt), "id2_suffix2.txt"),

@@ -143,34 +143,33 @@ def _validate_mag_ids(
 
 
 class FileDictMixin:
-    def file_dict(self, relative=False, suffixes=None):
+    def file_dict(self, relative=False):
         """
         For per sample directories it returns a mapping of sample id to
         another dictionary where keys represent the file name and values
         correspond to the filepath for each file matching the pathspec.
         For files, it returns a mapping of file name to filepath for each
-        file matching the pathspec. The specified suffixes are removed
-        from filenames.
+        file matching the pathspec. If the dir format has the attribute
+        'suffixes', then these are removed from filenames.
 
         Parameters
         ---------
         relative : bool
             Whether to return filepaths relative to the directory's location.
             Returns absolute filepaths by default.
-        suffixes : List
-            A list of suffixes that should be removed from the filenames to
-            generate the ID.
 
         Returns
         -------
         dict
-            Mapping of filename -> filepath as described above.
+            Mapping of sample id -> filepath as described above.
             Or mapping of sample id -> dict {filename: filepath} as
             described above.
             Both levels of the dictionary are sorted alphabetically by key.
         """
+        suffixes = getattr(self, "suffixes", [])
         file_pattern = re.compile(self.pathspec)
         ids = defaultdict(dict)
+
         for entry in self.path.iterdir():
             if entry.is_dir():
                 outer_id = entry.name
@@ -184,7 +183,7 @@ class FileDictMixin:
                             suffixes=suffixes,
                         )
 
-                        ids[outer_id][inner_id] = str(file_path)
+                        ids[outer_id][inner_id] = file_path
                 ids[outer_id] = dict(sorted(ids[outer_id].items()))
             else:
                 if file_pattern.match(entry.name):
@@ -196,7 +195,7 @@ class FileDictMixin:
                         suffixes=suffixes,
                     )
 
-                    ids[inner_id] = str(file_path)
+                    ids[inner_id] = file_path
 
         return dict(sorted(ids.items()))
 
@@ -217,17 +216,19 @@ def _process_path(path, relative, dir_format, suffixes):
             to the directory formats path or absolute.
         dir_format : model.DirectoryFormat.
             Any object of class model.DirectoryFormat.
+        suffixes : List
+            A list of suffixes that should be removed from the filenames to
+            generate the ID.
 
     Returns:
     -------
         processed_path : str
-            The full relative or absolut path to the file.
+            The full relative or absolute path to the file.
         _id : str
             The ID derived from the file name. ID will be "" if the filename
             consists only of the suffix.
     """
     file_name = path.stem
-
     _id = file_name
 
     if suffixes:
