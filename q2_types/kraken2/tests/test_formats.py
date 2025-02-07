@@ -85,6 +85,7 @@ class TestFormats(TestPluginBase):
     def test_report_dirfmt_from_reads(self):
         dirpath = self.get_data_path('reports-reads')
         fmt = Kraken2ReportDirectoryFormat(dirpath, mode='r')
+        a = fmt.file_dict()
         fmt.validate()
 
     def test_report_dirfmt_from_mags(self):

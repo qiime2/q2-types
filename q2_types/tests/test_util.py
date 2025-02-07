@@ -81,7 +81,7 @@ class TestFileDictMixing(TestPluginBase):
         }
         self.assertDictEqual(obs, exp)
 
-        obs = fmt.file_dict(suffixes=["_suffix"], relative=True)
+        obs = fmt.file_dict(relative=True)
         exp = {
             "sample1": {
                 "id1": "sample1/id1_suffix.txt",
@@ -103,10 +103,7 @@ class TestFileDictMixing(TestPluginBase):
         }
         self.assertDictEqual(obs, exp)
 
-        obs = fmt.file_dict(
-            suffixes=["_suffix1", "_suffix2"],
-            relative=True
-        )
+        obs = fmt.file_dict(relative=True)
         exp = {
             "id1": "id1_suffix1.txt",
             "id2": "id2_suffix2.txt",
