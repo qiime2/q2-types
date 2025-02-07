@@ -8,6 +8,7 @@
 import os
 from pathlib import Path
 
+from q2_types.kraken2 import Kraken2OutputDirectoryFormat
 from qiime2.plugin import model
 from qiime2.plugin.testing import TestPluginBase
 
@@ -66,7 +67,7 @@ class TestFileDictMixing(TestPluginBase):
         )
         self.TestClass.pathspec = r'.+\.(txt|tsv)$'
 
-    def test_file_dict_mixin(self):
+    def test_file_dict_mixin_per_sample(self):
         self.TestClass.suffixes = ["_suffix"]
         fmt = self.TestClass(self.get_data_path("per_sample"), mode='r')
 
@@ -92,7 +93,7 @@ class TestFileDictMixing(TestPluginBase):
         }
         self.assertDictEqual(obs, exp)
 
-    def test_genes_dirfmt_genome_dict(self):
+    def test_file_dict_mixin_per_sample_not_per_sample(self):
         self.TestClass.suffixes = ["_suffix1", "_suffix2"]
         fmt = self.TestClass(self.get_data_path("not_per_sample"), mode='r')
 
@@ -107,6 +108,35 @@ class TestFileDictMixing(TestPluginBase):
         exp = {
             "id1": "id1_suffix1.txt",
             "id2": "id2_suffix2.txt",
+        }
+        self.assertDictEqual(obs, exp)
+
+    def test_file_dict_mixin_kraken_outputs(self):
+        fmt = Kraken2OutputDirectoryFormat(
+            self.get_data_path("kraken-outputs-mags"), mode='r'
+        )
+
+        obs = fmt.file_dict()
+        exp = {
+            "sample1": {
+                "bin1": os.path.join(str(fmt), "sample1", "bin1.output.txt"),
+                "bin2": os.path.join(str(fmt), "sample1", "bin2.output.txt"),
+            },
+            "sample2": {
+                "bin3": os.path.join(str(fmt), "sample2", "bin3.output.txt"),
+            },
+        }
+        self.assertDictEqual(obs, exp)
+
+        obs = fmt.file_dict(relative=True)
+        exp = {
+            "sample1": {
+                "bin1": "sample1/bin1.output.txt",
+                "bin2": "sample1/bin2.output.txt",
+            },
+            "sample2": {
+                "bin3": "sample2/bin3.output.txt",
+            },
         }
         self.assertDictEqual(obs, exp)
 
