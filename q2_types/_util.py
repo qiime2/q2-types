@@ -166,7 +166,6 @@ class FileDictMixin:
             described above.
             Both levels of the dictionary are sorted alphabetically by key.
         """
-        suffixes = getattr(self, "suffixes", [])
         file_pattern = re.compile(self.pathspec)
         ids = defaultdict(dict)
 
@@ -176,11 +175,9 @@ class FileDictMixin:
                 for path in entry.iterdir():
                     if file_pattern.match(path.name):
 
-                        file_path, inner_id = _process_path(
+                        file_path, inner_id = self._process_path(
                             path=path,
                             relative=relative,
-                            dir_format=self,
-                            suffixes=suffixes,
                         )
 
                         ids[outer_id][inner_id] = file_path
@@ -188,11 +185,9 @@ class FileDictMixin:
             else:
                 if file_pattern.match(entry.name):
 
-                    file_path, inner_id = _process_path(
+                    file_path, inner_id = self._process_path(
                         path=entry,
                         relative=relative,
-                        dir_format=self,
-                        suffixes=suffixes,
                     )
 
                     ids[inner_id] = file_path
@@ -200,46 +195,45 @@ class FileDictMixin:
         return dict(sorted(ids.items()))
 
 
-def _process_path(path, relative, dir_format, suffixes):
-    """
-    This function processes the input file path to generate an absolute or
-    relative path string and the ID derived from the file name. The ID is
-    extracted by removing the one of the specified suffixes from the file
-    name. If no suffixes are specified the ID is defined to be the filename.
+    def _process_path(self, path, relative=False):
+        """
+        This function processes the input file path to generate an absolute or
+        relative path string and the ID derived from the file name. The ID is
+        extracted by removing the one of the specified suffixes from the file
+        name. If the class does not have a suffixes attribute, then the ID is
+        defined to be the filename.
 
-    Parameters:
-    ---------
-        path : Path
-            A Path object representing the file path to process.
-        relative : bool
-            A flag indicating whether the returned path should be relative
-            to the directory formats path or absolute.
-        dir_format : model.DirectoryFormat.
-            Any object of class model.DirectoryFormat.
-        suffixes : List
-            A list of suffixes that should be removed from the filenames to
-            generate the ID.
+        Parameters:
+        ---------
+            path : Path
+                A Path object representing the file path to process.
+            relative : bool
+                A flag indicating whether the returned path should be relative
+                to the directory formats path or absolute.
+            dir_format : model.DirectoryFormat.
+                Any object of class model.DirectoryFormat.
 
-    Returns:
-    -------
-        processed_path : str
-            The full relative or absolute path to the file.
-        _id : str
-            The ID derived from the file name. ID will be "" if the filename
-            consists only of the suffix.
-    """
-    file_name = path.stem
-    _id = file_name
+        Returns:
+        -------
+            processed_path : str
+                The full relative or absolute path to the file.
+            _id : str
+                The ID derived from the file name. ID will be "" if the filename
+                consists only of the suffix.
+        """
+        file_name = path.stem
+        _id = file_name
+        suffixes = getattr(self, "suffixes", [])
 
-    if suffixes:
-        for suffix in suffixes:
-            if file_name.endswith(suffix):
-                _id = file_name[:-len(suffix)]
-                break
+        if suffixes:
+            for suffix in suffixes:
+                if file_name.endswith(suffix):
+                    _id = file_name[:-len(suffix)]
+                    break
 
-    processed_path = (
-        path.absolute().relative_to(dir_format.path.absolute())
-        if relative
-        else path.absolute()
-    )
-    return str(processed_path), _id
+        processed_path = (
+            path.absolute().relative_to(self.path.absolute())
+            if relative
+            else path.absolute()
+        )
+        return str(processed_path), _id

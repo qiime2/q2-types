@@ -13,7 +13,7 @@ from qiime2.plugin import model
 from qiime2.plugin.testing import TestPluginBase
 
 from q2_types._util import _validate_num_partitions, _validate_mag_ids, \
-    FileDictMixin, _process_path
+    FileDictMixin
 
 
 class TestUtil(TestPluginBase):
@@ -54,7 +54,7 @@ class TestUtil(TestPluginBase):
             )
 
 
-class TestFileDictMixing(TestPluginBase):
+class TestFileDictMixin(TestPluginBase):
     package = "q2_types.tests"
 
     def setUp(self):
@@ -66,18 +66,18 @@ class TestFileDictMixing(TestPluginBase):
             {}
         )
         self.TestClass.pathspec = r'.+\.(txt|tsv)$'
+        self.TestClass.suffixes = ["_suffix1", "_suffix2"]
 
     def test_file_dict_mixin_per_sample(self):
-        self.TestClass.suffixes = ["_suffix"]
         fmt = self.TestClass(self.get_data_path("per_sample"), mode='r')
 
         obs = fmt.file_dict()
         exp = {
             "sample1": {
-                "id1": os.path.join(str(fmt), "sample1", "id1_suffix.txt"),
+                "id1": os.path.join(str(fmt), "sample1", "id1_suffix1.txt"),
             },
             "sample2": {
-                "id2": os.path.join(str(fmt), "sample2", "id2_suffix.txt"),
+                "id2": os.path.join(str(fmt), "sample2", "id2_suffix1.txt"),
             },
         }
         self.assertDictEqual(obs, exp)
@@ -85,16 +85,15 @@ class TestFileDictMixing(TestPluginBase):
         obs = fmt.file_dict(relative=True)
         exp = {
             "sample1": {
-                "id1": "sample1/id1_suffix.txt",
+                "id1": "sample1/id1_suffix1.txt",
             },
             "sample2": {
-                "id2": "sample2/id2_suffix.txt",
+                "id2": "sample2/id2_suffix1.txt",
             },
         }
         self.assertDictEqual(obs, exp)
 
-    def test_file_dict_mixin_per_sample_not_per_sample(self):
-        self.TestClass.suffixes = ["_suffix1", "_suffix2"]
+    def test_file_dict_mixin_not_per_sample(self):
         fmt = self.TestClass(self.get_data_path("not_per_sample"), mode='r')
 
         obs = fmt.file_dict()
@@ -141,54 +140,38 @@ class TestFileDictMixing(TestPluginBase):
         self.assertDictEqual(obs, exp)
 
 
-class TestProcessPath(TestPluginBase):
-    package = "q2_types.tests"
-
-    def setUp(self):
-        super().setUp()
-        self.dir_fmt = model.DirectoryFormat()
-
     def test_process_path_with_suffix(self):
-        # Test when the file name ends with a given suffix
-        path = Path(self.dir_fmt.path / "sample_id_suffix1.txt")
-        suffixes = ["_suffix1", "_suffix2"]
+        # Test when class does have suffixes attribute
+        test_class = self.TestClass()
+        path = Path(test_class.path / "sample_id_suffix1.txt")
 
-        result_path, result_id = _process_path(
+        result_path, result_id = test_class._process_path(
             path,
             relative=True,
-            dir_format=self.dir_fmt,
-            suffixes=suffixes
         )
 
         self.assertEqual(result_id, "sample_id")
         self.assertEqual(result_path, "sample_id_suffix1.txt")
 
     def test_process_path_without_suffix(self):
-        # Test when no suffix matches the file name
-        path = Path(self.dir_fmt.path / "sample_id.txt")
-        suffixes = ["_suffix1", "_suffix2"]
+        # Test when class does not have suffixes attribute
+        test_class = self.TestClass()
+        delattr(self.TestClass, "suffixes")
+        path = Path(test_class.path / "sample_id.txt")
 
-        result_path, result_id = _process_path(
+        result_path, result_id = test_class._process_path(
             path,
             relative=True,
-            dir_format=self.dir_fmt,
-            suffixes=suffixes
         )
 
         self.assertEqual(result_id, "sample_id")
         self.assertEqual(result_path, "sample_id.txt")
 
     def test_process_path_absolute(self):
-        # Test when the relative flag is False (absolute path is returned)
-        path = Path(self.dir_fmt.path / "sample_id_suffix2.txt")
-        suffixes = ["_suffix1", "_suffix2"]
+        test_class = self.TestClass()
+        path = Path(test_class.path / "sample_id_suffix1.txt")
 
-        result_path, result_id = _process_path(
-            path,
-            relative=False,
-            dir_format=self.dir_fmt,
-            suffixes=suffixes
-        )
+        result_path, result_id = test_class._process_path(path)
 
         self.assertEqual(result_id, "sample_id")
         self.assertEqual(result_path, str(path.absolute()))
