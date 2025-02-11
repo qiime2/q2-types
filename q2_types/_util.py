@@ -194,14 +194,13 @@ class FileDictMixin:
 
         return dict(sorted(ids.items()))
 
-
     def _process_path(self, path, relative=False):
         """
         This function processes the input file path to generate an absolute or
         relative path string and the ID derived from the file name. The ID is
-        extracted by removing the one of the specified suffixes from the file
-        name. If the class does not have a suffixes attribute, then the ID is
-        defined to be the filename.
+        extracted by removing one of the suffixes from the file name. If the
+        class does not have a suffixes attribute, then the ID is defined to
+        be the filename.
 
         Parameters:
         ---------
@@ -210,16 +209,13 @@ class FileDictMixin:
             relative : bool
                 A flag indicating whether the returned path should be relative
                 to the directory formats path or absolute.
-            dir_format : model.DirectoryFormat.
-                Any object of class model.DirectoryFormat.
 
         Returns:
         -------
             processed_path : str
-                The full relative or absolute path to the file.
+                The relative or absolute path to the file.
             _id : str
-                The ID derived from the file name. ID will be "" if the filename
-                consists only of the suffix.
+                The ID derived from the file name.
         """
         file_name = path.stem
         _id = file_name

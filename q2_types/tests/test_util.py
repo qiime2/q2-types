@@ -139,7 +139,6 @@ class TestFileDictMixin(TestPluginBase):
         }
         self.assertDictEqual(obs, exp)
 
-
     def test_process_path_with_suffix(self):
         # Test when class does have suffixes attribute
         test_class = self.TestClass()
