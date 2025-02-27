@@ -184,6 +184,11 @@ class FastqManifestFormat(_FastqManifestBase):
         self._check_n_records(root=str(self.path.parent),
                               n={'min': 10, 'max': None}[level])
 
+    def _write_metadata_yaml(self):
+        metadata = YamlFormat()
+        metadata.path.write_text(yaml.dump({'phred-offset': 33}))
+        self.metadata.write_data(metadata, YamlFormat)
+
 
 class FastqAbsolutePathManifestFormat(_FastqManifestBase):
     """
