@@ -31,13 +31,13 @@ def _2(ff: LSMatFormat) -> skbio.DistanceMatrix:
 def _3(ff: LSMatFormat) -> pd.Series:
     dm = skbio.DistanceMatrix.read(str(ff), format='lsmat', verify=False)
     series = dm.to_series()
-    assert series.size != 0, ("Distance Matrix must contain more"
+    assert series.size != 0, ("Distance Matrix must contain more "
                               "than one sample")
     return series
 
 
 @plugin.register_transformer
-def _4(data: pd.Series) -> skbio.DistanceMatrix:
+def _4(data: pd.Series) -> LSMatFormat:
     ids = data.index.get_level_values(0).unique().union(
          data.index.get_level_values(1).unique(), sort=False).values
     dm_df = pd.DataFrame(data=[], index=ids, columns=ids)

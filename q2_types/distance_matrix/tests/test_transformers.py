@@ -59,7 +59,7 @@ class TestTransformers(TestPluginBase):
                                   filename=filename)
 
     def test_pd_series_to_skbio_distance_matrix(self):
-        transformer = self.get_transformer(pd.Series, skbio.DistanceMatrix)
+        transformer = self.get_transformer(pd.Series, LSMatFormat)
 
         filenames = ('distance-matrix-NxN.tsv', 'distance-matrix-2x2.tsv')
         for filename in filenames:
