@@ -7,6 +7,7 @@
 # ----------------------------------------------------------------------------
 import pandas as pd
 import numpy as np
+import yaml
 
 import warnings
 import os
@@ -14,7 +15,8 @@ import os
 from q2_types.per_sample_sequences import (
     SingleLanePerSampleSingleEndFastqDirFmt,
     SingleLanePerSamplePairedEndFastqDirFmt,
-    FastqManifestFormat)
+    FastqManifestFormat, YamlFormat)
+
 
 from qiime2.util import duplicate
 
@@ -71,7 +73,7 @@ def _partition_helper(demux, num_partitions, paired):
 
         manifest = _partition_write_manifest(manifest_string, paired)
         result.manifest.write_data(manifest, FastqManifestFormat)
-        result._write_metadata_yaml()
+        _write_metadata_yaml(result)
 
         # If we have one sample per partition we name the partitions after the
         # samples. Otherwise we number them
@@ -113,3 +115,9 @@ def _partition_write_manifest(manifest_string, paired):
         manifest_fh.write(manifest_string)
 
     return manifest
+
+
+def _write_metadata_yaml(dir_fmt):
+    metadata = YamlFormat()
+    metadata.path.write_text(yaml.dump({'phred-offset': 33}))
+    dir_fmt.metadata.write_data(metadata, YamlFormat)

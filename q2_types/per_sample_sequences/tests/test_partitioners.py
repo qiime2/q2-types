@@ -13,8 +13,10 @@ import qiime2
 from q2_types.multiplexed_sequences import (
     BarcodePairedSequenceFastqIterator, BarcodeSequenceFastqIterator)
 
-from q2_demux import (emp_paired, emp_single,
-                      partition_samples_paired, partition_samples_single)
+from q2_demux import (emp_paired, emp_single)
+from q2_types.per_sample_sequences._deferred_setup._partitioners import (
+    partition_samples_paired, partition_samples_single
+)
 
 from q2_types.per_sample_sequences import (
     FastqGzFormat, FastqManifestFormat)
