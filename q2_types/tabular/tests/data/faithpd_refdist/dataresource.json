@@ -1,0 +1,27 @@
+{
+  "schema": {
+    "fields": [
+      {
+        "title": "id",
+        "description": "...",
+        "name": "id",
+        "type": "string"
+      },
+      {
+        "title": "faith_pd",
+        "description": "faith_pd",
+        "name": "measure",
+        "type": "number"
+      },
+      {
+        "title": "InitialDonorSampleID",
+        "description": "...",
+        "name": "group",
+        "type": "string"
+      }
+    ]
+  },
+  "format": "ndjson",
+  "path": "data.ndjson",
+  "name": "data"
+}

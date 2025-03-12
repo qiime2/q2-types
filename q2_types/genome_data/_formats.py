@@ -6,11 +6,11 @@
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
 import re
-from collections import defaultdict
 
 import qiime2.plugin.model as model
 from qiime2.plugin import ValidationError
 
+from q2_types._util import FileDictMixin
 from q2_types.feature_data import DNAFASTAFormat, ProteinFASTAFormat
 
 
@@ -19,63 +19,18 @@ class OrthologFileFmt(model.TextFileFormat):
         pass
 
 
-class GenomeDataDirectoryFormat(model.DirectoryFormat):
-    def genome_dict(self, relative=False):
-        """
-        For per sample directories it returns a mapping of sample id to
-        another dictionary where keys represent the file name and values
-        correspond to the filepath for each file.
-        For files, it returns a mapping of file name to filepath for each file.
-
-        Parameters
-        ---------
-        relative : bool
-            Whether to return filepaths relative to the directory's location.
-            Returns absolute filepaths by default.
-
-        Returns
-        -------
-        dict
-            Mapping of filename -> filepath as described above.
-            Or mapping of sample id -> dict {filename: filepath} as
-            described above.
-            Both levels of the dictionary are sorted alphabetically by key.
-        """
-        ids = defaultdict(dict)
-        for entry in self.path.iterdir():
-            if entry.is_dir():
-                sample_id = entry.name
-                for path in entry.iterdir():
-                    file_name = path.stem
-                    file_path = (
-                        path.absolute().relative_to(self.path.absolute())
-                        if relative else path.absolute()
-                    )
-                    ids[sample_id][file_name] = str(file_path)
-                ids[sample_id] = dict(sorted(ids[sample_id].items()))
-            else:
-                file_name = entry.stem
-                file_path = (
-                    entry.absolute().relative_to(self.path.absolute())
-                    if relative else entry.absolute()
-                )
-                ids[file_name] = str(file_path)
-
-        return dict(sorted(ids.items()))
-
-
-class GenesDirectoryFormat(GenomeDataDirectoryFormat):
-    genes = model.FileCollection(r'.+\.(fa|fna|fasta)$',
-                                 format=DNAFASTAFormat)
+class GenesDirectoryFormat(model.DirectoryFormat, FileDictMixin):
+    pathspec = r'.+\.(fa|fna|fasta)$'
+    genes = model.FileCollection(pathspec, format=DNAFASTAFormat)
 
     @genes.set_path_maker
     def genes_path_maker(self, genome_id):
         return '%s.fasta' % genome_id
 
 
-class ProteinsDirectoryFormat(GenomeDataDirectoryFormat):
-    proteins = model.FileCollection(r'.+\.(fa|faa|fasta)$',
-                                    format=ProteinFASTAFormat)
+class ProteinsDirectoryFormat(model.DirectoryFormat, FileDictMixin):
+    pathspec = r'.+\.(fa|faa|fasta)$'
+    proteins = model.FileCollection(pathspec, format=ProteinFASTAFormat)
 
     @proteins.set_path_maker
     def proteins_path_maker(self, genome_id):
@@ -205,17 +160,18 @@ class GFF3Format(model.TextFileFormat):
                                       f'{line_number}') from e
 
 
-class LociDirectoryFormat(GenomeDataDirectoryFormat):
-    loci = model.FileCollection(r'.+\.gff$',
-                                format=GFF3Format)
+class LociDirectoryFormat(model.DirectoryFormat, FileDictMixin):
+    pathspec = r'.+\.gff$'
+    loci = model.FileCollection(pathspec, format=GFF3Format)
 
     @loci.set_path_maker
     def loci_path_maker(self, genome_id):
         return '%s.gff' % genome_id
 
 
-class GenomeSequencesDirectoryFormat(GenomeDataDirectoryFormat):
-    genomes = model.FileCollection(r'.+\.(fasta|fa)$', format=DNAFASTAFormat)
+class GenomeSequencesDirectoryFormat(model.DirectoryFormat, FileDictMixin):
+    pathspec = r'.+\.(fasta|fa)$'
+    genomes = model.FileCollection(pathspec, format=DNAFASTAFormat)
 
     @genomes.set_path_maker
     def genomes_path_maker(self, genome_id):

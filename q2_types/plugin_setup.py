@@ -1,5 +1,5 @@
 # ----------------------------------------------------------------------------
-# Copyright (c) 2016-2023, QIIME 2 development team.
+# Copyright (c) 2016-2025, QIIME 2 development team.
 #
 # Distributed under the terms of the Modified BSD License.
 #
@@ -165,3 +165,4 @@ importlib.import_module('q2_types.profile_hmms._deferred_setup')
 importlib.import_module('q2_types.reference_db._deferred_setup')
 importlib.import_module('q2_types.sample_data._deferred_setup')
 importlib.import_module('q2_types.tree._deferred_setup')
+importlib.import_module('q2_types.tabular._deferred_setup')

@@ -5,10 +5,11 @@
 #
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
-
 import pandas as pd
 from pandas.core.dtypes.common import is_string_dtype
 from qiime2.plugin import model, ValidationError
+
+from q2_types._util import FileDictMixin
 
 
 class Kraken2ReportFormat(model.TextFileFormat):
@@ -67,10 +68,10 @@ class Kraken2ReportFormat(model.TextFileFormat):
             )
 
 
-class Kraken2ReportDirectoryFormat(model.DirectoryFormat):
-    reports = model.FileCollection(
-        r'.+report\.(txt|tsv)$', format=Kraken2ReportFormat
-    )
+class Kraken2ReportDirectoryFormat(model.DirectoryFormat, FileDictMixin):
+    pathspec = r'.+report\.(txt|tsv)$'
+    suffixes = ['.report']
+    reports = model.FileCollection(pathspec, format=Kraken2ReportFormat)
 
     @reports.set_path_maker
     def reports_path_maker(self, sample_id, mag_id=None):
@@ -146,10 +147,10 @@ class Kraken2OutputFormat(model.TextFileFormat):
             )
 
 
-class Kraken2OutputDirectoryFormat(model.DirectoryFormat):
-    reports = model.FileCollection(
-        r'.+output\.(txt|tsv)$', format=Kraken2OutputFormat
-    )
+class Kraken2OutputDirectoryFormat(model.DirectoryFormat, FileDictMixin):
+    pathspec = r'.+output\.(txt|tsv)$'
+    suffixes = ['.output']
+    reports = model.FileCollection(pathspec, format=Kraken2OutputFormat)
 
     @reports.set_path_maker
     def reports_path_maker(self, sample_id, mag_id=None):

@@ -1,5 +1,5 @@
 # ----------------------------------------------------------------------------
-# Copyright (c) 2016-2023, QIIME 2 development team.
+# Copyright (c) 2016-2025, QIIME 2 development team.
 #
 # Distributed under the terms of the Modified BSD License.
 #
@@ -7,7 +7,9 @@
 # ----------------------------------------------------------------------------
 import gzip
 import itertools
+import re
 import warnings
+from collections import defaultdict
 from typing import List
 
 import skbio
@@ -138,3 +140,96 @@ def _validate_mag_ids(
                 "correctly. Printing duplicate MAG IDs: "
                 f"{set(duplicates)}"
             )
+
+
+class FileDictMixin:
+    def file_dict(self, relative=False):
+        """
+        For per sample directories it returns a mapping of sample id to
+        another dictionary where keys represent the file name and values
+        correspond to the filepath for each file matching the pathspec.
+        For files, it returns a mapping of file name to filepath for each
+        file matching the pathspec. If the dir format has the attribute
+        'suffixes', then these are removed from filenames.
+
+        Parameters
+        ---------
+        relative : bool
+            Whether to return filepaths relative to the directory's location.
+            Returns absolute filepaths by default.
+
+        Returns
+        -------
+        dict
+            Mapping of sample id -> filepath as described above.
+            Or mapping of sample id -> dict {filename: filepath} as
+            described above.
+            Both levels of the dictionary are sorted alphabetically by key.
+        """
+        file_pattern = re.compile(self.pathspec)
+        ids = defaultdict(dict)
+
+        for entry in self.path.iterdir():
+            if entry.is_dir():
+                outer_id = entry.name
+                for path in entry.iterdir():
+                    if file_pattern.match(path.name):
+
+                        file_path, inner_id = self._process_path(
+                            path=path,
+                            relative=relative,
+                        )
+
+                        ids[outer_id][inner_id] = file_path
+                ids[outer_id] = dict(sorted(ids[outer_id].items()))
+            else:
+                if file_pattern.match(entry.name):
+
+                    file_path, inner_id = self._process_path(
+                        path=entry,
+                        relative=relative,
+                    )
+
+                    ids[inner_id] = file_path
+
+        return dict(sorted(ids.items()))
+
+    def _process_path(self, path, relative=False):
+        """
+        This function processes the input file path to generate an absolute or
+        relative path string and the ID derived from the file name. The ID is
+        extracted by removing one of the suffixes from the file name. If the
+        class does not have a suffixes attribute, then the ID is defined to
+        be the filename.
+
+        Parameters:
+        ---------
+            path : Path
+                A Path object representing the file path to process.
+            relative : bool
+                A flag indicating whether the returned path should be relative
+                to the directory formats path or absolute.
+
+        Returns:
+        -------
+            processed_path : str
+                The relative or absolute path to the file.
+            _id : str
+                The ID derived from the file name.
+        """
+        file_name = path.stem
+        _id = file_name
+        suffixes = getattr(self, "suffixes", [])
+
+        if suffixes:
+            for suffix in suffixes:
+                if file_name.endswith(suffix):
+                    _id = file_name[:-len(suffix)]
+                    break
+
+        processed_path = (
+            path.absolute().relative_to(self.path.absolute())
+            if relative
+            else path.absolute()
+        )
+        return str(processed_path), _id

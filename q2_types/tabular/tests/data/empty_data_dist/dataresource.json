@@ -1,0 +1,33 @@
+{
+  "schema": {
+    "fields": [
+      {
+        "title": "id",
+        "description": "...",
+        "name": "id",
+        "type": "string"
+      },
+      {
+        "title": "faith_pd",
+        "description": "...",
+        "name": "measure",
+        "type": "number"
+      },
+      {
+        "title": "week",
+        "description": "...",
+        "name": "group",
+        "type": "integer"
+      },
+      {
+        "title": "SubjectID",
+        "description": "...",
+        "name": "subject",
+        "type": "string"
+      }
+    ]
+  },
+  "format": "ndjson",
+  "path": "data.ndjson",
+  "name": "data"
+}

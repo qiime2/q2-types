@@ -101,3 +101,11 @@ class TestSampleDataMAGsPartitionCollating(TestPluginBase):
             ["d65a71fa-4279-4588-b937-0747ed5d604d.fasta"],
             dircmp.common
         )
+
+        # compare MANIFEST
+        self.assertTrue(
+            filecmp.cmp(
+                f"{collated_mags.path}/MANIFEST",
+                f"{expected}/MANIFEST"
+            )
+        )
