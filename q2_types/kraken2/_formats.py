@@ -153,7 +153,7 @@ class Kraken2OutputDirectoryFormat(model.DirectoryFormat, FileDictMixin):
     reports = model.FileCollection(pathspec, format=Kraken2OutputFormat)
 
     @reports.set_path_maker
-    def reports_path_maker(self, sample_id, mag_id=None):
+    def outputs_path_maker(self, sample_id, mag_id=None):
         prefix = f'{sample_id}/{mag_id}' if mag_id else sample_id
         return f'{prefix}.output.txt'
 
