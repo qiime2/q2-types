@@ -1,0 +1,6 @@
+# Produced by Super Duper Sequencing Machine (TM)
+
+sample-id,filename,direction
+sample1,sample1_S1_L001_R1_001.fastq.gz,forward
+sample2,sample2_S1_L001_R1_001.fastq.gz,forward
+sample3,sample3_S1_L001_R1_001.fastq.gz,forward
