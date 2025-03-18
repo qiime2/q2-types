@@ -75,8 +75,8 @@ class Kraken2ReportDirectoryFormat(model.DirectoryFormat, FileDictMixin):
 
     @reports.set_path_maker
     def reports_path_maker(self, sample_id, mag_id=None):
-        prefix = f'{sample_id}/{mag_id}_' if mag_id else f'{sample_id}/'
-        return f'{prefix}report.txt'
+        prefix = f'{sample_id}/{mag_id}' if mag_id else sample_id
+        return f'{prefix}.report.txt'
 
 
 class Kraken2DBReportFormat(Kraken2ReportFormat):
@@ -154,8 +154,8 @@ class Kraken2OutputDirectoryFormat(model.DirectoryFormat, FileDictMixin):
 
     @reports.set_path_maker
     def reports_path_maker(self, sample_id, mag_id=None):
-        prefix = f'{sample_id}/{mag_id}_' if mag_id else f'{sample_id}/'
-        return f'{prefix}output.txt'
+        prefix = f'{sample_id}/{mag_id}' if mag_id else sample_id
+        return f'{prefix}.output.txt'
 
 
 class Kraken2DBFormat(model.TextFileFormat):
