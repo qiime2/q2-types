@@ -83,7 +83,6 @@ class pairedPartitionersTests(TestPluginBase, EmpTestingUtils):
                 ['sample-id,filename,direction\n',
                  f'sample{idx + 1},{exp_samples_fwd[idx]},forward\n',
                  f'sample{idx + 1},{exp_samples_rev[idx]},reverse\n']
-            print(exp_manifest)
             self._compare_manifests(act_manifest, exp_manifest)
 
             forward_fastq = [
@@ -204,7 +203,7 @@ class pairedPartitionersTests(TestPluginBase, EmpTestingUtils):
                 ['sample-id,filename,direction\n',
                  f'sample{idx + 1},{exp_samples_fwd[idx]},forward\n',
                  f'sample{idx + 1},{exp_samples_rev[idx]},reverse\n']
-            print(exp_manifest)
+
             self._compare_manifests(act_manifest, exp_manifest)
 
             forward_fastq = [
