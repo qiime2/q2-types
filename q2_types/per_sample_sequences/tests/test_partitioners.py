@@ -25,21 +25,19 @@ from q2_types.per_sample_sequences import (
 from qiime2.plugin.testing import TestPluginBase
 
 
-class EmpTestingUtils:
+class PartitionTestingUtils:
     def _compare_fastqs(self, obs_file, exp_file):
         with gzip.open(obs_file) as obs_fh:
             with gzip.open(exp_file) as exp_fh:
                 self.assertEqual(exp_fh.read(), obs_fh.read())
 
-    # Sorry this is duplicated code from demux because we can't import
-    # from demux
     def _compare_manifests(self, act_manifest, exp_manifest):
         # strip comment lines before comparing
         act_manifest = [x for x in act_manifest if not x.startswith('#')]
         self.assertEqual(act_manifest, exp_manifest)
 
 
-class pairedPartitionersTests(TestPluginBase, EmpTestingUtils):
+class PairedPartitionersTests(TestPluginBase, PartitionTestingUtils):
     package = "q2_types.per_sample_sequences.tests"
 
     def setUp(self):
@@ -62,7 +60,7 @@ class pairedPartitionersTests(TestPluginBase, EmpTestingUtils):
 
     def tearDown(self):
         self.tempdir.cleanup()
-        return super().tearDown()
+        super().tearDown()
 
     def test_partition(self):
         partition = partition_samples_paired(self.demux)
@@ -73,6 +71,18 @@ class pairedPartitionersTests(TestPluginBase, EmpTestingUtils):
         exp_samples_rev = ('sample1_S1_L001_R2_001.fastq.gz',
                            'sample2_S1_L001_R2_001.fastq.gz',
                            'sample3_S1_L001_R2_001.fastq.gz')
+
+        exp_foward_fastq = [
+            view for path, view in
+            self.demux.sequences.iter_views(FastqGzFormat)
+            if 'R1_001.fastq' in path.name
+        ]
+
+        exp_reverse_fastq = [
+            view for path, view in
+            self.demux.sequences.iter_views(FastqGzFormat)
+            if 'R2_001.fastq' in path.name
+        ]
 
         for idx, (id, sample) in enumerate(partition.items()):
             self.assertEqual(id, f'sample{idx + 1}')
@@ -97,16 +107,6 @@ class pairedPartitionersTests(TestPluginBase, EmpTestingUtils):
                 if 'R2_001.fastq' in path.name]
             self.assertEqual(len(reverse_fastq), 1)
 
-            exp_foward_fastq = [
-                view for path, view in
-                self.demux.sequences.iter_views(FastqGzFormat)
-                if 'R1_001.fastq' in path.name]
-
-            exp_reverse_fastq = [
-                view for path, view in
-                self.demux.sequences.iter_views(FastqGzFormat)
-                if 'R2_001.fastq' in path.name]
-
             self._compare_fastqs(
                 str(forward_fastq[0]), str(exp_foward_fastq[idx]))
             self._compare_fastqs(
@@ -114,9 +114,8 @@ class pairedPartitionersTests(TestPluginBase, EmpTestingUtils):
 
     def test_partition_num_specified(self):
         partition = partition_samples_paired(self.demux, 2)
-
-        sample = partition[1]
-        act_manifest = list(sample.manifest.view(FastqManifestFormat).open())
+        samples = partition[1]
+        act_manifest = list(samples.manifest.view(FastqManifestFormat).open())
 
         exp_manifest = ['sample-id,filename,direction\n',
                         'sample1,sample1_S1_L001_R1_001.fastq.gz,forward\n',
@@ -127,7 +126,7 @@ class pairedPartitionersTests(TestPluginBase, EmpTestingUtils):
 
         forward_fastq = [
             view for path, view in
-            sample.sequences.iter_views(FastqGzFormat)
+            samples.sequences.iter_views(FastqGzFormat)
             if 'R1_001.fastq' in path.name]
         self.assertEqual(len(forward_fastq), 2)
 
@@ -143,7 +142,7 @@ class pairedPartitionersTests(TestPluginBase, EmpTestingUtils):
 
         reverse_fastq = [
             view for path, view in
-            sample.sequences.iter_views(FastqGzFormat)
+            samples.sequences.iter_views(FastqGzFormat)
             if 'R2_001.fastq' in path.name]
         self.assertEqual(len(reverse_fastq), 2)
         exp_reverse_fastq = [
@@ -156,8 +155,8 @@ class pairedPartitionersTests(TestPluginBase, EmpTestingUtils):
         self._compare_fastqs(
             str(reverse_fastq[1]), str(exp_reverse_fastq[1]))
 
-        sample = partition[2]
-        act_manifest = list(sample.manifest.view(FastqManifestFormat).open())
+        samples = partition[2]
+        act_manifest = list(samples.manifest.view(FastqManifestFormat).open())
 
         exp_manifest = ['sample-id,filename,direction\n',
                         'sample3,sample3_S1_L001_R1_001.fastq.gz,forward\n',
@@ -166,7 +165,7 @@ class pairedPartitionersTests(TestPluginBase, EmpTestingUtils):
 
         forward_fastq = [
             view for path, view in
-            sample.sequences.iter_views(FastqGzFormat)
+            samples.sequences.iter_views(FastqGzFormat)
             if 'R1_001.fastq' in path.name]
         self.assertEqual(len(forward_fastq), 1)
 
@@ -175,7 +174,7 @@ class pairedPartitionersTests(TestPluginBase, EmpTestingUtils):
 
         reverse_fastq = [
             view for path, view in
-            sample.sequences.iter_views(FastqGzFormat)
+            samples.sequences.iter_views(FastqGzFormat)
             if 'R2_001.fastq' in path.name]
         self.assertEqual(len(reverse_fastq), 1)
 
@@ -194,6 +193,16 @@ class pairedPartitionersTests(TestPluginBase, EmpTestingUtils):
                            'sample2_S1_L001_R2_001.fastq.gz',
                            'sample3_S1_L001_R2_001.fastq.gz')
 
+        exp_foward_fastq = [
+            view for path, view in
+            self.demux.sequences.iter_views(FastqGzFormat)
+            if 'R1_001.fastq' in path.name]
+
+        exp_reverse_fastq = [
+            view for path, view in
+            self.demux.sequences.iter_views(FastqGzFormat)
+            if 'R2_001.fastq' in path.name]
+
         for idx, (id, sample) in enumerate(partition.items()):
             self.assertEqual(id, f'sample{idx + 1}')
 
@@ -218,23 +227,13 @@ class pairedPartitionersTests(TestPluginBase, EmpTestingUtils):
                 if 'R2_001.fastq' in path.name]
             self.assertEqual(len(reverse_fastq), 1)
 
-            exp_foward_fastq = [
-                view for path, view in
-                self.demux.sequences.iter_views(FastqGzFormat)
-                if 'R1_001.fastq' in path.name]
-
-            exp_reverse_fastq = [
-                view for path, view in
-                self.demux.sequences.iter_views(FastqGzFormat)
-                if 'R2_001.fastq' in path.name]
-
             self._compare_fastqs(
                 str(forward_fastq[0]), str(exp_foward_fastq[idx]))
             self._compare_fastqs(
                 str(reverse_fastq[0]), str(exp_reverse_fastq[idx]))
 
 
-class singlePartitionerTests(TestPluginBase, EmpTestingUtils):
+class SinglePartitionerTests(TestPluginBase, PartitionTestingUtils):
     package = "q2_types.per_sample_sequences.tests"
 
     def setUp(self):
@@ -287,29 +286,29 @@ class singlePartitionerTests(TestPluginBase, EmpTestingUtils):
 
         exp_fastqs = list(self.demux.sequences.iter_views(FastqGzFormat))
 
-        sample = partition[1]
-        act_manifest = list(sample.manifest.view(FastqManifestFormat).open())
+        samples = partition[1]
+        act_manifest = list(samples.manifest.view(FastqManifestFormat).open())
 
         exp_manifest = ['sample-id,filename,direction\n',
                         'sample1,sample1_S1_L001_R1_001.fastq.gz,forward\n',
                         'sample2,sample2_S1_L001_R1_001.fastq.gz,forward\n']
         self._compare_manifests(act_manifest, exp_manifest)
 
-        output_fastq = list(sample.sequences.iter_views(FastqGzFormat))
+        output_fastq = list(samples.sequences.iter_views(FastqGzFormat))
         self.assertEqual(len(output_fastq), 2)
         self._compare_fastqs(
             str(output_fastq[0][1]), str(exp_fastqs[0][1]))
         self._compare_fastqs(
             str(output_fastq[1][1]), str(exp_fastqs[1][1]))
 
-        sample = partition[2]
-        act_manifest = list(sample.manifest.view(FastqManifestFormat).open())
+        samples = partition[2]
+        act_manifest = list(samples.manifest.view(FastqManifestFormat).open())
 
         exp_manifest = ['sample-id,filename,direction\n',
                         'sample3,sample3_S1_L001_R1_001.fastq.gz,forward\n']
         self._compare_manifests(act_manifest, exp_manifest)
 
-        output_fastq = list(sample.sequences.iter_views(FastqGzFormat))
+        output_fastq = list(samples.sequences.iter_views(FastqGzFormat))
         self.assertEqual(len(output_fastq), 1)
         self._compare_fastqs(
             str(output_fastq[0][1]), str(exp_fastqs[2][1]))

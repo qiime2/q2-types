@@ -15,7 +15,7 @@ from q2_types.kraken2 import (Kraken2ReportDirectoryFormat,
                               )
 
 from q2_types.kraken2._deferred_setup._partitioners import (
-    _partition_kraken2_reports, _partition_kraken2_outputs)
+    _partition_kraken2_results)
 
 
 class Kraken2PartitionersTests(TestPluginBase):
@@ -31,128 +31,92 @@ class Kraken2PartitionersTests(TestPluginBase):
             self.get_data_path("outputs-reads"), "r"
         )
 
-    def test_partition_report_by_sample(self):
-        num_samples = 2
-        partitioned_reports = _partition_kraken2_reports(self.report_reads,
-                                                         num_partitions=None)
-        exp_dict = self.report_reads.file_dict()
+    def _partition_result_by_sample(self, directoryfmt):
+        if isinstance(directoryfmt, Kraken2ReportDirectoryFormat):
+            result_format = Kraken2ReportFormat
+        elif isinstance(directoryfmt, Kraken2OutputDirectoryFormat):
+            result_format = Kraken2OutputFormat
 
-        self.assertEqual(len(partitioned_reports.items()), num_samples)
+        num_samples = 2
+        partitioned_reports = _partition_kraken2_results(directoryfmt,
+                                                         num_partitions=None)
+        exp_dict = directoryfmt.file_dict()
+
+        self.assertEqual(len(partitioned_reports), num_samples)
         for idx, (id, sample) in enumerate(partitioned_reports.items()):
-            exp_df = Kraken2ReportFormat(
-             exp_dict[id], mode="r"
-             ).view(pd.DataFrame)
+            exp_df = result_format(
+                exp_dict[id], mode="r"
+            ).view(pd.DataFrame)
 
             obs_dict = sample.file_dict()
             self.assertEqual(len(obs_dict), 1)
-            obs_df = Kraken2ReportFormat(
+            obs_df = result_format(
                 obs_dict[id], mode="r"
             ).view(pd.DataFrame)
 
             pd.testing.assert_frame_equal(obs_df, exp_df)
 
-    def test_partition_report_by_specified_n(self):
+    def _partition_result_by_specified_n(self, directoryfmt):
+        if isinstance(directoryfmt, Kraken2ReportDirectoryFormat):
+            result_format = Kraken2ReportFormat
+        elif isinstance(directoryfmt, Kraken2OutputDirectoryFormat):
+            result_format = Kraken2OutputFormat
+
         num_partitions = 1
-        partitioned_reports = _partition_kraken2_reports(self.report_reads,
+        partitioned_reports = _partition_kraken2_results(directoryfmt,
                                                          num_partitions)
-        exp_dict = self.report_reads.file_dict()
-        self.assertEqual(len(partitioned_reports.items()), num_partitions)
+        exp_dict = directoryfmt.file_dict()
+        self.assertEqual(len(partitioned_reports), num_partitions)
         for idx, (id, sample) in enumerate(partitioned_reports.items()):
             # iterate through samples in Kraken2 partition
             for exp_key in exp_dict:
 
-                exp_df = Kraken2ReportFormat(
+                exp_df = result_format(
                     exp_dict[exp_key], mode="r"
                 ).view(pd.DataFrame)
 
                 obs_dict = sample.file_dict()
                 self.assertEqual(len(obs_dict), 2)
-                obs_df = Kraken2ReportFormat(
+                obs_df = result_format(
                     obs_dict[exp_key], mode="r"
                 ).view(pd.DataFrame)
 
                 pd.testing.assert_frame_equal(obs_df, exp_df)
 
-    def test_partition_report_more_than_samples(self):
+    def _partition_result_more_than_samples(self, directoryfmt):
+        if isinstance(directoryfmt, Kraken2ReportDirectoryFormat):
+            result_format = Kraken2ReportFormat
+        elif isinstance(directoryfmt, Kraken2OutputDirectoryFormat):
+            result_format = Kraken2OutputFormat
+
         num_samples = 2
-        exp_dict = self.report_reads.file_dict()
+
+        exp_dict = directoryfmt.file_dict()
 
         with self.assertWarnsRegex(
                 UserWarning, "You have requested a number of.*100.*2.*2"):
-            partitioned_reports = _partition_kraken2_reports(self.report_reads,
+            partitioned_reports = _partition_kraken2_results(directoryfmt,
                                                              100)
-            self.assertEqual(len(partitioned_reports.items()), num_samples)
+            self.assertEqual(len(partitioned_reports), num_samples)
             for idx, (id, sample) in enumerate(partitioned_reports.items()):
-                exp_df = Kraken2ReportFormat(
+                exp_df = result_format(
                     exp_dict[id], mode="r"
                 ).view(pd.DataFrame)
 
                 obs_dict = sample.file_dict()
                 self.assertEqual(len(obs_dict), 1)
-                obs_df = Kraken2ReportFormat(
+                obs_df = result_format(
                     obs_dict[id], mode="r"
                 ).view(pd.DataFrame)
 
                 pd.testing.assert_frame_equal(obs_df, exp_df)
 
-    def test_partition_output_by_sample(self):
-        num_samples = 2
-        partitioned_output = _partition_kraken2_outputs(self.output_reads,
-                                                        num_partitions=None)
+    def test_output_partitions(self):
+        self._partition_result_by_sample(self.output_reads)
+        self._partition_result_by_specified_n(self.output_reads)
+        self._partition_result_more_than_samples(self.output_reads)
 
-        exp_dict = self.output_reads.file_dict()
-        self.assertEqual(len(partitioned_output.items()), num_samples)
-        for idx, (id, sample) in enumerate(partitioned_output.items()):
-            exp_df = Kraken2OutputFormat(
-                    exp_dict[id], mode="r"
-            ).view(pd.DataFrame)
-
-            obs_dict = sample.file_dict()
-            self.assertEqual(len(obs_dict), 1)
-            obs_df = Kraken2OutputFormat(
-                    obs_dict[id], mode="r"
-            ).view(pd.DataFrame)
-
-            pd.testing.assert_frame_equal(obs_df, exp_df)
-
-    def test_partition_output_by_specified_n(self):
-        num_partitions = 1
-        partitioned_output = _partition_kraken2_outputs(self.output_reads,
-                                                        num_partitions)
-        self.assertEqual(len(partitioned_output.items()), num_partitions)
-        exp_dict = self.output_reads.file_dict()
-        for idx, (id, sample) in enumerate(partitioned_output.items()):
-            for exp_key in exp_dict:
-
-                exp_df = Kraken2OutputFormat(
-                    exp_dict[exp_key], mode="r"
-                ).view(pd.DataFrame)
-
-                obs_dict = sample.file_dict()
-                self.assertEqual(len(obs_dict), 2)
-                obs_df = Kraken2OutputFormat(
-                    obs_dict[exp_key], mode="r"
-                ).view(pd.DataFrame)
-
-                pd.testing.assert_frame_equal(obs_df, exp_df)
-
-    def test_partition_output_more_than_samples(self):
-        num_samples = 2
-        exp_dict = self.output_reads.file_dict()
-        with self.assertWarnsRegex(
-                UserWarning, "You have requested a number of.*100.*2.*2"):
-            partitioned_output = _partition_kraken2_reports(self.output_reads,
-                                                            100)
-            self.assertEqual(len(partitioned_output.items()), num_samples)
-            for idx, (id, sample) in enumerate(partitioned_output.items()):
-                exp_df = Kraken2OutputFormat(
-                        exp_dict[id], mode="r"
-                ).view(pd.DataFrame)
-
-                obs_dict = sample.file_dict()
-                self.assertEqual(len(obs_dict), 1)
-                obs_df = Kraken2OutputFormat(
-                        obs_dict[id], mode="r"
-                ).view(pd.DataFrame)
-
-                pd.testing.assert_frame_equal(obs_df, exp_df)
+    def test_report_partitions(self):
+        self._partition_result_by_sample(self.report_reads)
+        self._partition_result_by_specified_n(self.report_reads)
+        self._partition_result_more_than_samples(self.report_reads)
