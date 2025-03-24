@@ -19,7 +19,7 @@ from q2_types.kraken2 import (Kraken2ReportDirectoryFormat,
 
 def partition_kraken2_results(
     result: Kraken2ReportDirectoryFormat | Kraken2OutputDirectoryFormat,
-    num_partitions: int | None
+    num_partitions: int | None = None
 ) -> dict[
     str | int, Kraken2ReportDirectoryFormat | Kraken2OutputDirectoryFormat
 ]:
