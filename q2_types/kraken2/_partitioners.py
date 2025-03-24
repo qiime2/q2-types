@@ -17,7 +17,7 @@ from q2_types.kraken2 import (Kraken2ReportDirectoryFormat,
                               Kraken2OutputDirectoryFormat)
 
 
-def _partition_kraken2_results(
+def partition_kraken2_results(
     result: Kraken2ReportDirectoryFormat | Kraken2OutputDirectoryFormat,
     num_partitions: int
 ) -> dict[
