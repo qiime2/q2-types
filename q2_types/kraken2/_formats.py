@@ -150,9 +150,9 @@ class Kraken2OutputFormat(model.TextFileFormat):
 class Kraken2OutputDirectoryFormat(model.DirectoryFormat, FileDictMixin):
     pathspec = r'.+output\.(txt|tsv)$'
     suffixes = ['.output']
-    reports = model.FileCollection(pathspec, format=Kraken2OutputFormat)
+    outputs = model.FileCollection(pathspec, format=Kraken2OutputFormat)
 
-    @reports.set_path_maker
+    @outputs.set_path_maker
     def outputs_path_maker(self, sample_id, mag_id=None):
         prefix = f'{sample_id}/{mag_id}' if mag_id else sample_id
         return f'{prefix}.output.txt'
