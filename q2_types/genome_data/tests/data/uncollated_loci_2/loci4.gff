@@ -1,0 +1,10 @@
+##gff-version 3
+#!gff-spec-version 1.21
+#!processor NCBI annotwriter
+#!genome-build ASM19595v2
+#!genome-build-accession NCBI_Assembly:GCA_000195955.2
+##sequence-region AL123456.3 1 4411532
+##species https://www.ncbi.nlm.nih.gov/Taxonomy/Browser/wwwtax.cgi?id=83332
+AL123456.3	EMBL	region	1	4411532	.	+	.	ID=AL123456.3:1..4411532;Dbxref=taxon:83332;gbkey=Src;mol_type=genomic DNA;strain=H37Rv;type-material=type strain of Mycobacterium tuberculosis
+AL123456.3	EMBL	gene	1	1524	.	+	.	ID=gene-Rv0001;Name=dnaA;gbkey=Gene;gene=dnaA;gene_biotype=protein_coding;locus_tag=Rv0001
+AL123456.3	EMBL	CDS	1	1524	.	+	0	ID=cds-CCP42723.1;Parent=gene-Rv0001;Dbxref=EnsemblGenomes-Gn:Rv0001,EnsemblGenomes-Tr:CCP42723,GOA:P9WNW3,InterPro:IPR001957,InterPro:IPR003593,InterPro:IPR010921,InterPro:IPR013159,InterPro:IPR013317,InterPro:IPR018312,InterPro:IPR020591,InterPro:IPR027417,NCBI_GP:CCP42723.1;Name=CCP42723.1;Note=Rv0001%2C (MT0001%2C MTV029.01%2C P49993)%2C len: 507 aa. dnaA%2C chromosomal replication initiator protein (see citations below)%2C equivalent to other Mycobacterial chromosomal replication initiator proteins. Also highly similar to others except in N-terminus e.g. Q9ZH75|DNAA_STRCH chromosomal replication initiator protein from Streptomyces chrysomallus (624 aa). Contains PS00017 ATP/GTP-binding site motif A (P-loop) and PS01008 DnaA protein signature. Belongs to the DnaA family. Note that the first base of this gene has been taken as base 1 of the Mycobacterium tuberculosis H37Rv genomic sequence.;experiment=EXISTENCE: identified in proteomics study;gbkey=CDS;gene=dnaA;inference=protein motif:PROSITE:PS01008;locus_tag=Rv0001;product=Chromosomal replication initiator protein DnaA;protein_id=CCP42723.1;transl_table=11

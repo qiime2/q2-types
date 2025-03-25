@@ -12,7 +12,33 @@ import warnings
 import numpy as np
 from qiime2.util import duplicate
 
-from q2_types.genome_data import SeedOrthologDirFmt, OrthologAnnotationDirFmt
+from q2_types.genome_data import (SeedOrthologDirFmt, OrthologAnnotationDirFmt,
+                                  LociDirectoryFormat)
+
+
+def collate_loci(loci: LociDirectoryFormat) -> LociDirectoryFormat:
+    """
+    Collate the individual loci directories from the partitions.
+    Parameters:
+    - loci: A list of LociDirectoryFormat containing the gff files.
+    Returns:
+    - collated_loci: A LociDirectoryFormat object containing the
+    collated gff files.
+    """
+    collated_loci = LociDirectoryFormat()
+    for loci_dir in loci:
+        for fp in loci_dir.path.iterdir():
+            try:
+                duplicate(
+                    fp,
+                    collated_loci.path / os.path.basename(fp)
+                )
+            except FileExistsError:
+                warnings.warn(
+                    f"Skipping {fp}. File already exists "
+                    f"in the destination directory."
+                )
+    return collated_loci
 
 
 def collate_orthologs(orthologs: SeedOrthologDirFmt) -> SeedOrthologDirFmt:

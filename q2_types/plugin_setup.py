@@ -19,7 +19,8 @@ from q2_types import __version__
 from q2_types.feature_data_mag import MAG
 from q2_types.per_sample_sequences import MAGs
 from q2_types.feature_data import FeatureData
-from q2_types.genome_data import Orthologs, GenomeData, NOG
+from q2_types.genome_data import Orthologs, GenomeData, NOG, Loci
+from q2_types.genome_data._methods import collate_loci
 from q2_types.sample_data import SampleData
 
 
@@ -133,6 +134,17 @@ plugin.methods.register_function(
     },
     name='Collate ortholog annotations.',
     description="Takes a collection of GenomeData[NOG]'s "
+                "and collates them into a single artifact.",
+)
+
+plugin.methods.register_function(
+    function=collate_loci,
+    inputs={"loci": List[GenomeData[Loci]]},
+    parameters={},
+    outputs={"collated_loci": GenomeData[Loci]},
+    input_descriptions={"loci": "A collection of loci to be collated."},
+    name="Collate loci",
+    description="Takes a collection of GenomeData[Loci]'s "
                 "and collates them into a single artifact.",
 )
 
