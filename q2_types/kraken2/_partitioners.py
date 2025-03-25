@@ -27,7 +27,7 @@ def partition_kraken2_reports(
 
 
 def partition_kraken2_outputs(
-    outputs: Kraken2ReportDirectoryFormat,
+    outputs: Kraken2OutputDirectoryFormat,
     num_partitions: int | None = None
 ) -> Kraken2OutputDirectoryFormat:
     return _partition_kraken2_results(outputs, num_partitions)
