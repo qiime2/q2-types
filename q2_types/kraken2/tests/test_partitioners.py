@@ -14,7 +14,7 @@ from q2_types.kraken2 import (Kraken2ReportDirectoryFormat,
                               Kraken2ReportFormat, Kraken2OutputFormat,
                               )
 
-from q2_types.kraken2._partitioners import partition_kraken2_results
+from q2_types.kraken2._partitioners import _partition_kraken2_results
 
 
 class Kraken2PartitionersTests(TestPluginBase):
@@ -37,7 +37,7 @@ class Kraken2PartitionersTests(TestPluginBase):
             result_format = Kraken2OutputFormat
 
         num_samples = 2
-        partitioned_reports = partition_kraken2_results(
+        partitioned_reports = _partition_kraken2_results(
             directoryfmt, num_partitions=None
         )
         exp_dict = directoryfmt.file_dict()
@@ -63,7 +63,7 @@ class Kraken2PartitionersTests(TestPluginBase):
             result_format = Kraken2OutputFormat
 
         num_partitions = 1
-        partitioned_reports = partition_kraken2_results(
+        partitioned_reports = _partition_kraken2_results(
             directoryfmt, num_partitions
         )
         exp_dict = directoryfmt.file_dict()
@@ -96,7 +96,7 @@ class Kraken2PartitionersTests(TestPluginBase):
 
         with self.assertWarnsRegex(
                 UserWarning, "You have requested a number of.*100.*2.*2"):
-            partitioned_reports = partition_kraken2_results(directoryfmt, 100)
+            partitioned_reports = _partition_kraken2_results(directoryfmt, 100)
             self.assertEqual(len(partitioned_reports), num_samples)
             for idx, (id, sample) in enumerate(partitioned_reports.items()):
                 exp_df = result_format(

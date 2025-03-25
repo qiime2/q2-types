@@ -203,37 +203,69 @@ plugin.methods.register_function(
     description=""
 )
 
-KRAKEN2_PARTITION = TypeMatch([
+KRAKEN2_REPORTS = TypeMatch([
     SampleData[Kraken2Reports % Properties('reads')],
     SampleData[Kraken2Reports % Properties('contigs')],
     SampleData[Kraken2Reports % Properties('mags')],
     FeatureData[Kraken2Reports % Properties('mags')],
+])
+plugin.methods.register_function(
+    function=q2_types.kraken2.partition_kraken2_reports,
+    inputs={
+        'reports': KRAKEN2_REPORTS,
+    },
+    parameters={
+        'num_partitions': Int % Range(1, None),
+    },
+    outputs={
+        'partitioned_reports': Collection[KRAKEN2_REPORTS]
+    },
+    input_descriptions={
+        'reports': 'The kraken2 reports to partition.'
+    },
+    parameter_descriptions={
+        'num_partitions': (
+            'The desired number of partitions. Defaults to one partition per '
+            'sample.'
+        ),
+    },
+    output_descriptions={
+        'partitioned_reports': 'The partitioned kraken2 reports.'
+    },
+    name="Partition kraken2 reports.",
+    description=""
+)
+
+KRAKEN2_OUTPUTS = TypeMatch([
     SampleData[Kraken2Outputs % Properties('reads')],
     SampleData[Kraken2Outputs % Properties('contigs')],
     SampleData[Kraken2Outputs % Properties('mags')],
     FeatureData[Kraken2Outputs % Properties('mags')],
 ])
 plugin.methods.register_function(
-    function=q2_types.kraken2.partition_kraken2_results,
+    function=q2_types.kraken2.partition_kraken2_outputs,
     inputs={
-        'result': KRAKEN2_PARTITION,
+        'outputs': KRAKEN2_OUTPUTS,
     },
     parameters={
         'num_partitions': Int % Range(1, None),
     },
     outputs={
-        'partitioned_results': Collection[KRAKEN2_PARTITION]
+        'partitioned_outputs': Collection[KRAKEN2_OUTPUTS]
     },
     input_descriptions={
-        'result': 'The kraken2 reports or outputs to partition.'
+        'outputs': 'The kraken2 outputs to partition.'
     },
     parameter_descriptions={
-        'num_partitions': 'The desired number of partitions.'
+        'num_partitions': (
+            'The desired number of partitions. Defaults to one partition per '
+            'sample.'
+        ),
     },
     output_descriptions={
-        'partitioned_results': 'The partitioned kraken2 reports or outputs.'
+        'partitioned_outputs': 'The partitioned kraken2 outputs.'
     },
-    name="Partition kraken2 reports or outputs.",
+    name="Partition kraken2 outputs.",
     description=""
 )
 
