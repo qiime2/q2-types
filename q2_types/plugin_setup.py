@@ -27,7 +27,6 @@ from q2_types.per_sample_sequences import (MAGs,
 from q2_types.feature_data import FeatureData
 from q2_types.genome_data import Orthologs, GenomeData, NOG, Loci
 from q2_types.genome_data._methods import collate_loci
-import q2_types.per_sample_sequences
 from q2_types.sample_data import SampleData
 from q2_types.kraken2 import Kraken2Reports, Kraken2Outputs
 
