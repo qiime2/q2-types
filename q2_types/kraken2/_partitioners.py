@@ -33,7 +33,7 @@ def partition_kraken2_outputs(
     return _partition_kraken2_results(outputs, num_partitions)
 
 
-def partition_kraken2_results(
+def _partition_kraken2_results(
     result: Kraken2ReportDirectoryFormat | Kraken2OutputDirectoryFormat,
     num_partitions: int | None = None
 ) -> dict[
