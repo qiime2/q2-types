@@ -69,7 +69,7 @@ class Kraken2ReportFormat(model.TextFileFormat):
 
 
 class Kraken2ReportDirectoryFormat(model.DirectoryFormat, FileDictMixin):
-    pathspec = r'.+report\.(txt|tsv)$'
+    pathspec = r'.+\.report\.(txt|tsv)$'
     suffixes = ['.report']
     reports = model.FileCollection(pathspec, format=Kraken2ReportFormat)
 
@@ -148,7 +148,7 @@ class Kraken2OutputFormat(model.TextFileFormat):
 
 
 class Kraken2OutputDirectoryFormat(model.DirectoryFormat, FileDictMixin):
-    pathspec = r'.+output\.(txt|tsv)$'
+    pathspec = r'.+\.output\.(txt|tsv)$'
     suffixes = ['.output']
     outputs = model.FileCollection(pathspec, format=Kraken2OutputFormat)
 
