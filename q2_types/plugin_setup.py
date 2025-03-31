@@ -61,12 +61,14 @@ plugin.methods.register_function(
     description="Partition a SampleData[MAGs] artifact into smaller "
                 "artifacts containing subsets of the MAGs",
 )
-
-demux_description = 'The demultiplexed sequences to partition.'
-num_partitions_description = 'The number of partitions to split the' \
-                             ' demultiplexed sequences into. Defaults to' \
-                             ' partitioning into individual samples.'
-partitioned_demux_description = 'The partitioned demultiplexed sequences.'
+demux_param_descriptions = {
+    'demux_description': 'The demultiplexed sequences to partition.',
+    'num_partitions': 'The number of partitions to split the'
+                      ' demultiplexed sequences into. Defaults to'
+                      ' partitioning into individual samples.',
+    'partitioned_demux': 'The partitioned demultiplexed sequences.',
+    'name': 'Split demultiplexed sequence data into partitions.'
+}
 
 T = qiime2.plugin.TypeMatch([SequencesWithQuality, JoinedSequencesWithQuality])
 plugin.methods.register_function(
@@ -77,17 +79,18 @@ plugin.methods.register_function(
         ('partitioned_demux', Collection[SampleData[T]]),
     ],
     input_descriptions={
-        'demux': demux_description
+        'demux': demux_param_descriptions['demux_description']
     },
     parameter_descriptions={
-        'num_partitions': num_partitions_description
+        'num_partitions':  demux_param_descriptions['num_partitions']
     },
     output_descriptions={
-        'partitioned_demux': partitioned_demux_description
+        'partitioned_demux': demux_param_descriptions['partitioned_demux']
     },
-    name='Split demultiplexed sequence data into partitions.',
-    description=('Partition demultiplexed single end sequences into '
-                 'individual samples or the number of partitions specified.'),
+    name=demux_param_descriptions['name'],
+    description=('Partition demultiplexed single end or joined '
+                 'sequences into individual samples or the number of '
+                 'partitions specified.'),
 )
 
 plugin.methods.register_function(
@@ -99,15 +102,15 @@ plugin.methods.register_function(
          Collection[SampleData[PairedEndSequencesWithQuality]]),
     ],
     input_descriptions={
-        'demux': demux_description
+        'demux': demux_param_descriptions['demux_description']
     },
     parameter_descriptions={
-        'num_partitions': num_partitions_description
+        'num_partitions': demux_param_descriptions['num_partitions']
     },
     output_descriptions={
-        'partitioned_demux': partitioned_demux_description
+        'partitioned_demux': demux_param_descriptions['partitioned_demux']
     },
-    name='Split demultiplexed sequence data into partitions.',
+    name=demux_param_descriptions['name'],
     description=('Partition demultiplexed paired end sequences into '
                  'individual samples or the number of partitions specified.'),
 )
