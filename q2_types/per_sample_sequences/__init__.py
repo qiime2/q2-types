@@ -32,6 +32,7 @@ from ._types import (Sequences, SequencesWithQuality,
                      SingleBowtie2Index, MultiBowtie2Index,
                      AlignmentMap, MultiAlignmentMap)
 from ._methods import partition_sample_data_mags, collate_sample_data_mags
+from ._partitioners import partition_samples_paired, partition_samples_single
 
 
 __all__ = ['CasavaOneEightSingleLanePerSampleDirFmt',
@@ -53,5 +54,6 @@ __all__ = ['CasavaOneEightSingleLanePerSampleDirFmt',
            'MultiBowtie2Index', 'MultiBowtie2IndexDirFmt',
            'BAMFormat', 'BAMDirFmt', 'MultiBAMDirFmt',
            'MultiFASTADirectoryFormat', 'AlignmentMap', 'MultiAlignmentMap',
-           'partition_sample_data_mags', 'collate_sample_data_mags'
+           'partition_sample_data_mags', 'collate_sample_data_mags',
+           'partition_samples_single', 'partition_samples_paired'
            ]

@@ -13,15 +13,31 @@ import numpy as np
 
 from qiime2.util import duplicate
 
-from q2_types.kraken2 import (Kraken2ReportDirectoryFormat,
-                              Kraken2OutputDirectoryFormat)
+from q2_types.kraken2 import (
+    Kraken2ReportDirectoryFormat,
+    Kraken2OutputDirectoryFormat,
+)
+
+
+def partition_kraken2_reports(
+    reports: Kraken2ReportDirectoryFormat,
+    num_partitions: int | None = None
+) -> Kraken2ReportDirectoryFormat:
+    return _partition_kraken2_results(reports, num_partitions)
+
+
+def partition_kraken2_outputs(
+    outputs: Kraken2OutputDirectoryFormat,
+    num_partitions: int | None = None
+) -> Kraken2OutputDirectoryFormat:
+    return _partition_kraken2_results(outputs, num_partitions)
 
 
 def _partition_kraken2_results(
     result: Kraken2ReportDirectoryFormat | Kraken2OutputDirectoryFormat,
-    num_partitions: int
+    num_partitions: int | None = None
 ) -> dict[
-    str | int, Kraken2ReportDirectoryFormat | Kraken2OutputDirectoryFormat
+    int | str, Kraken2ReportDirectoryFormat | Kraken2OutputDirectoryFormat
 ]:
     partitioned_result = {}
     result_dict = result.file_dict()

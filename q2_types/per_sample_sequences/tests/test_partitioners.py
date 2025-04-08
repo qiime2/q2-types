@@ -14,7 +14,7 @@ from q2_types.per_sample_sequences._formats import (
     SingleLanePerSamplePairedEndFastqDirFmt,
     SingleLanePerSampleSingleEndFastqDirFmt
     )
-from q2_types.per_sample_sequences._deferred_setup._partitioners import (
+from q2_types.per_sample_sequences._partitioners import (
     partition_samples_paired, partition_samples_single
 )
 

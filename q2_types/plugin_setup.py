@@ -11,17 +11,24 @@ import importlib
 import pandas as pd
 
 import qiime2.plugin
-from qiime2.core.type import Int, Range, Collection, List
+from qiime2.core.type import (
+    Int, Range, Collection, List, TypeMatch, Properties
+)
 
 import q2_types
 from q2_types import __version__
 
 from q2_types.feature_data_mag import MAG
-from q2_types.per_sample_sequences import MAGs
+import q2_types.kraken2
+from q2_types.per_sample_sequences import (MAGs,
+                                           JoinedSequencesWithQuality,
+                                           SequencesWithQuality,
+                                           PairedEndSequencesWithQuality)
 from q2_types.feature_data import FeatureData
 from q2_types.genome_data import Orthologs, GenomeData, NOG, Loci
 from q2_types.genome_data._methods import collate_loci
 from q2_types.sample_data import SampleData
+from q2_types.kraken2 import Kraken2Reports, Kraken2Outputs
 
 
 citations = qiime2.plugin.Citations.load('citations.bib', package='q2_types')
@@ -54,6 +61,60 @@ plugin.methods.register_function(
     description="Partition a SampleData[MAGs] artifact into smaller "
                 "artifacts containing subsets of the MAGs",
 )
+demux_param_descriptions = {
+    'demux_description': 'The demultiplexed sequences to partition.',
+    'num_partitions': 'The number of partitions to split the'
+                      ' demultiplexed sequences into. Defaults to'
+                      ' partitioning into individual samples.',
+    'partitioned_demux': 'The partitioned demultiplexed sequences.',
+    'name': 'Split demultiplexed sequence data into partitions.'
+}
+
+T = qiime2.plugin.TypeMatch([SequencesWithQuality, JoinedSequencesWithQuality])
+plugin.methods.register_function(
+    function=q2_types.per_sample_sequences.partition_samples_single,
+    inputs={'demux': SampleData[T]},
+    parameters={'num_partitions': Int % Range(1, None)},
+    outputs=[
+        ('partitioned_demux', Collection[SampleData[T]]),
+    ],
+    input_descriptions={
+        'demux': demux_param_descriptions['demux_description']
+    },
+    parameter_descriptions={
+        'num_partitions':  demux_param_descriptions['num_partitions']
+    },
+    output_descriptions={
+        'partitioned_demux': demux_param_descriptions['partitioned_demux']
+    },
+    name=demux_param_descriptions['name'],
+    description=('Partition demultiplexed single end or joined '
+                 'sequences into individual samples or the number of '
+                 'partitions specified.'),
+)
+
+plugin.methods.register_function(
+    function=q2_types.per_sample_sequences.partition_samples_paired,
+    inputs={'demux': SampleData[PairedEndSequencesWithQuality]},
+    parameters={'num_partitions': Int % Range(1, None)},
+    outputs=[
+        ('partitioned_demux',
+         Collection[SampleData[PairedEndSequencesWithQuality]]),
+    ],
+    input_descriptions={
+        'demux': demux_param_descriptions['demux_description']
+    },
+    parameter_descriptions={
+        'num_partitions': demux_param_descriptions['num_partitions']
+    },
+    output_descriptions={
+        'partitioned_demux': demux_param_descriptions['partitioned_demux']
+    },
+    name=demux_param_descriptions['name'],
+    description=('Partition demultiplexed paired end sequences into '
+                 'individual samples or the number of partitions specified.'),
+)
+
 
 plugin.methods.register_function(
     function=q2_types.genome_data.partition_orthologs,
@@ -146,6 +207,124 @@ plugin.methods.register_function(
     name="Collate loci",
     description="Takes a collection of GenomeData[Loci]'s "
                 "and collates them into a single artifact.",
+)
+
+KRAKEN2_REPORTS = TypeMatch([
+    SampleData[Kraken2Reports % Properties('reads')],
+    SampleData[Kraken2Reports % Properties('contigs')],
+    SampleData[Kraken2Reports % Properties('mags')],
+    FeatureData[Kraken2Reports % Properties('mags')],
+])
+plugin.methods.register_function(
+    function=q2_types.kraken2.collate_kraken2_reports,
+    inputs={
+        'kraken2_reports': List[KRAKEN2_REPORTS],
+    },
+    parameters={},
+    outputs={
+        'collated_kraken2_reports': KRAKEN2_REPORTS
+    },
+    input_descriptions={
+        'kraken2_reports': 'The kraken2 reports to collate.'
+    },
+    parameter_descriptions={},
+    output_descriptions={
+        'collated_kraken2_reports': 'The collated kraken2 reports.'
+    },
+    name="Collate kraken2 reports.",
+    description=""
+)
+
+KRAKEN2_OUTPUTS = TypeMatch([
+    SampleData[Kraken2Outputs % Properties('reads')],
+    SampleData[Kraken2Outputs % Properties('contigs')],
+    SampleData[Kraken2Outputs % Properties('mags')],
+    FeatureData[Kraken2Outputs % Properties('mags')],
+])
+plugin.methods.register_function(
+    function=q2_types.kraken2.collate_kraken2_outputs,
+    inputs={
+        'kraken2_outputs': List[KRAKEN2_OUTPUTS],
+    },
+    parameters={},
+    outputs={
+        'collated_kraken2_outputs': KRAKEN2_OUTPUTS
+    },
+    input_descriptions={
+        'kraken2_outputs': 'The kraken2 outputs to collate.'
+    },
+    parameter_descriptions={},
+    output_descriptions={
+        'collated_kraken2_outputs': 'The collated kraken2 outputs.'
+    },
+    name="Collate kraken2 outputs.",
+    description=""
+)
+
+KRAKEN2_REPORTS = TypeMatch([
+    SampleData[Kraken2Reports % Properties('reads')],
+    SampleData[Kraken2Reports % Properties('contigs')],
+    SampleData[Kraken2Reports % Properties('mags')],
+    FeatureData[Kraken2Reports % Properties('mags')],
+])
+plugin.methods.register_function(
+    function=q2_types.kraken2.partition_kraken2_reports,
+    inputs={
+        'reports': KRAKEN2_REPORTS,
+    },
+    parameters={
+        'num_partitions': Int % Range(1, None),
+    },
+    outputs={
+        'partitioned_reports': Collection[KRAKEN2_REPORTS]
+    },
+    input_descriptions={
+        'reports': 'The kraken2 reports to partition.'
+    },
+    parameter_descriptions={
+        'num_partitions': (
+            'The desired number of partitions. Defaults to one partition per '
+            'sample.'
+        ),
+    },
+    output_descriptions={
+        'partitioned_reports': 'The partitioned kraken2 reports.'
+    },
+    name="Partition kraken2 reports.",
+    description=""
+)
+
+KRAKEN2_OUTPUTS = TypeMatch([
+    SampleData[Kraken2Outputs % Properties('reads')],
+    SampleData[Kraken2Outputs % Properties('contigs')],
+    SampleData[Kraken2Outputs % Properties('mags')],
+    FeatureData[Kraken2Outputs % Properties('mags')],
+])
+plugin.methods.register_function(
+    function=q2_types.kraken2.partition_kraken2_outputs,
+    inputs={
+        'outputs': KRAKEN2_OUTPUTS,
+    },
+    parameters={
+        'num_partitions': Int % Range(1, None),
+    },
+    outputs={
+        'partitioned_outputs': Collection[KRAKEN2_OUTPUTS]
+    },
+    input_descriptions={
+        'outputs': 'The kraken2 outputs to partition.'
+    },
+    parameter_descriptions={
+        'num_partitions': (
+            'The desired number of partitions. Defaults to one partition per '
+            'sample.'
+        ),
+    },
+    output_descriptions={
+        'partitioned_outputs': 'The partitioned kraken2 outputs.'
+    },
+    name="Partition kraken2 outputs.",
+    description=""
 )
 
 importlib.import_module('q2_types.bowtie2._deferred_setup')
