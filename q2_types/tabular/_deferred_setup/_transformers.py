@@ -10,6 +10,8 @@ import pandas as pd
 import frictionless as fls
 import json
 
+import qiime2.metadata
+
 from ..formats import TableJSONLFileFormat
 
 from .. import (NDJSONFileFormat,
@@ -170,3 +172,52 @@ def _4(obj: pd.DataFrame) -> TabularDataResourceDirFmt:
         fh.write(json.dumps(metadata_dict, indent=4))
 
     return dir_fmt
+
+
+@plugin.register_transformer
+def _5(ff: TableJSONLFileFormat) -> qiime2.Metadata:
+    with ff.open() as fh:
+        header = json.loads(next(fh))
+        df = pd.read_json(fh, lines=True, orient='records')
+        if df.empty:
+            df = pd.DataFrame(columns=[
+                spec['name'] for spec in header['fields']])
+
+    # The order of these steps matters.
+
+    # 1. set order of columns
+    df = df[[spec['name'] for spec in header['fields']]]
+
+    # 2. update types
+    for spec in header['fields']:
+        col = spec['name']
+        if spec['type'] == 'integer':
+            df[col] = df[col].astype('int64')
+        elif spec['type'] == 'number':
+            df[col] = df[col].astype('float64')
+        elif spec['type'] == 'datetime':
+            df[col] = pd.to_datetime(df[col], format='iso8601')
+        elif spec['type'] == 'date':
+            df[col] = pd.to_datetime(df[col], format='iso8601')
+        elif spec['type'] == 'time':
+            df[col] = pd.to_datetime(df[col], format='mixed').dt.time
+        elif spec['type'] == 'duration':
+            df[col] = pd.to_timedelta(df[col])
+
+    # 3. set index
+    if len(header['index']) > 0:
+        df = df.set_index(header['index'], drop=False)
+    else:
+        df = df.set_index('id', drop=False)
+
+    # 4. add metadata to columns
+    for spec in header['fields']:
+        df[spec['name']].attrs.update(spec)
+
+    # 5. add metadata to table
+    attrs = dict(title=header['title'], description=header['description'])
+    df.attrs.update(attrs)
+    if 'id' in df.columns:
+        df.drop('id', axis=1, inplace=True)
+
+    return qiime2.Metadata(df)
