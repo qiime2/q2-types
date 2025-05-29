@@ -40,7 +40,7 @@ def _make_dtype_conversion(
         converted.
     from_type : str
         The datatype of the column in the dataframe. One of 'integer', 'float',
-        'string', 'datetime', 'duration'.
+        'string', 'datetime', 'timedelta'.
     to_type : str
         The datatype that the column should be converted to, if needed. One of
         'integer', 'number', 'string', 'datetime', 'date', 'time', 'duration'.
@@ -49,6 +49,10 @@ def _make_dtype_conversion(
     -------
     None
         Potentially changes the dtype of `column` in `df`.
+
+    Raises
+    ------
+
     '''
     def _unsupported_conversion_error():
         msg = (
@@ -86,7 +90,7 @@ def _make_dtype_conversion(
     elif from_type == 'float':
         if to_type == 'number':
             pass
-        if to_type == 'string':
+        elif to_type == 'string':
             df[column] = df[column].astype(str)
         else:
             _unsupported_conversion_error()
@@ -102,12 +106,12 @@ def _make_dtype_conversion(
                     continue
             else:
                 msg = (
-                    f'The {column} column could not be parsed into any of '
+                    f'The {column} column could not be parsed from any of '
                     'datetime, date, or time representations.'
                 )
                 raise ValueError(msg)
 
-        if to_type == 'duration':
+        elif to_type == 'duration':
             try:
                 # NOTE: need stricter timedelta criteria
                 df[column] = pd.to_timedelta(df[column])
@@ -132,6 +136,41 @@ def _make_dtype_conversion(
             _unsupported_conversion_error()
 
 
+def _get_dataframe_column_type(df: pd.DataFrame, column: str) -> str:
+    '''
+    '''
+    if pd.api.types.is_integer_dtype(df[column]):
+        return 'integer'
+    if pd.api.types.is_float_dtype(df[column]):
+        return 'float'
+    if pd.api.types.is_string_dtype(df[column]):
+        return 'string'
+    if pd.api.types.is_datetime64_dtype(df[column]):
+        return 'datetime'
+    if pd.api.types.is_timedelta64_dtype(df[column]):
+        return 'timedelta'
+
+    msg = (
+        f'The type of the {column} column was not detected as any of the '
+        'following types: integer, float, string, datetime, or timedelta.'
+    )
+    raise ValueError(msg)
+
+
+def _get_matching_jsonl_type(dataframe_column_type: str) -> str:
+    '''
+    '''
+    if dataframe_column_type in ('integer', 'string', 'datetime'):
+        return dataframe_column_type
+    if dataframe_column_type == 'float':
+        return 'number'
+    if dataframe_column_type == 'timedelta':
+        return 'duration'
+
+    msg = f'Unrecognized dataframe column type: {dataframe_column_type}'
+    raise ValueError(msg)
+
+
 def table_jsonl_header(df: pd.DataFrame) -> str:
     header = {}
     header['doctype'] = dict(
@@ -144,13 +183,24 @@ def table_jsonl_header(df: pd.DataFrame) -> str:
         attrs = df[name].attrs.copy()
         title = attrs.pop('title', '')
         description = attrs.pop('description', '')
-        type = attrs.pop('type', None)
         missing = attrs.pop('missing', False)
         extra = attrs.pop('extra', None)
         if extra is None:
             extra = attrs
+
+        attr_type = attrs.pop('type', None)
+        dataframe_type = _get_dataframe_column_type(df, name)
+
+        if attr_type is None:
+            jsonl_type = _get_matching_jsonl_type(dataframe_type)
+        else:
+            _make_dtype_conversion(
+                df, name, from_type=dataframe_type, to_type=attr_type
+            )
+            jsonl_type = attr_type
+
         fields.append(dict(
-            name=name, type=type, missing=missing, title=title,
+            name=name, type=jsonl_type, missing=missing, title=title,
             description=description, extra=extra))
 
     header['fields'] = fields
