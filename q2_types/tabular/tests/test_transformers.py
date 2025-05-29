@@ -70,3 +70,65 @@ class TestTransformers(TestPluginBase):
                                        'faithpd_refdist.table.jsonl')
         exp = exp.set_index('id')
         pd.testing.assert_frame_equal(obs.to_dataframe(), exp)
+
+
+class TestDataframeToJsonlTypes(TestPluginBase):
+    package = 'q2_types.tabular.tests'
+
+    def setUp(self):
+        '''
+        Creates a dataframe with a column for each of the recognized dataframe
+        types for use in the other tests in this class.
+        '''
+        super().setUp()
+
+        self.df = pd.DataFrame({
+            'integer_column': [1, 2, 3],
+            'float_column': [1.0, 2.5, 3.0],
+            'string_column': ['i', 'like', 'strings'],
+            'datetime_column': pd.to_datetime(
+                ['2012-01-01T00:00:00', '17:00:00', '1998-03-14'],
+                format='mixed'
+            ),
+            'timedelta_column': pd.to_timedelta(
+                ['P0D5H', 'P420D', 'P7D24H60M60S']
+            )
+        })
+
+    def test_that_dummy_df_has_intended_types(self):
+        '''
+        Tests that the columns in the pandas dataframe created in the `setUp`
+        have the intended types. (Does not test any plugin behavior.)
+        '''
+        type_assertion_funcs = {
+            'integer': pd.api.types.is_integer_dtype,
+            'float': pd.api.types.is_float_dtype,
+            'string': pd.api.types.is_string_dtype,
+            'datetime': pd.api.types.is_datetime64_dtype,
+            'timedelta': pd.api.types.is_timedelta64_dtype,
+        }
+
+        for column in self.df.columns:
+            column_type = column.removesuffix('_column')
+
+            assert_func = type_assertion_funcs[column_type]
+            self.assertTrue(assert_func(self.df[column]))
+
+            for other_column_type in type_assertion_funcs:
+                if other_column_type != column_type:
+                    assert_not_func = type_assertion_funcs[other_column_type]
+                    self.assertFalse(assert_not_func(self.df[column]))
+
+    def test_attrs_written_to_jsonl_header(self):
+        '''
+
+        '''
+        pass
+
+    def test_missing_attrs_inferred_properly(self):
+        '''
+        '''
+        pass
+
+    def test_type_conversions_from_dataframe_to_jsonl(self):
+        pass
