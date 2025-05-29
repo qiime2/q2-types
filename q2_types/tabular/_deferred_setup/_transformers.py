@@ -21,6 +21,117 @@ from .. import (NDJSONFileFormat,
 from ...plugin_setup import plugin
 
 
+def _make_dtype_conversion(
+    df: pd.DataFrame, column: str, from_type: str, to_type: str
+):
+    '''
+    Converts the datatype of a column in a dataframe from `from_type` to
+    `to_type`. The set of `from_type` options are a set of conceptual types
+    that columns in the pandas dataframe may be, not actual python or pandas
+    or numpy types. The set of `to_type` options are a set of conceptual types
+    that columns in the jsonl format may be, not actual javascript types.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        The dataframe being converted to jsonl.
+    column : str
+        The name of the column in the dataframe that is having its dtype
+        converted.
+    from_type : str
+        The datatype of the column in the dataframe. One of 'integer', 'float',
+        'string', 'datetime', 'duration'.
+    to_type : str
+        The datatype that the column should be converted to, if needed. One of
+        'integer', 'number', 'string', 'datetime', 'date', 'time', 'duration'.
+
+    Returns
+    -------
+    None
+        Potentially changes the dtype of `column` in `df`.
+    '''
+    def _unsupported_conversion_error():
+        msg = (
+            f'The {column} column of type {from_type} can not be converted to '
+            f'the {to_type} type.'
+        )
+        raise ValueError(msg)
+
+    if from_type == 'datetime':
+        if to_type == 'datetime':
+            df[column] = df[column].dt.strftime('%Y-%m-%dT%H:%M:%S')
+        elif to_type == 'date':
+            df[column] = df[column].dt.strftime('%Y-%m-%d')
+        elif to_type == 'time':
+            df[column] = df[column].dt.strftime('T%H:%M:%S')
+        else:
+            _unsupported_conversion_error()
+
+    elif from_type == 'timedelta':
+        if to_type == 'duration':
+            df[column] = df[column].apply(pd.Timedelta.isoformat)
+        else:
+            _unsupported_conversion_error()
+
+    elif from_type == 'integer':
+        if to_type == 'integer':
+            pass
+        elif to_type == 'number':
+            pass
+        elif to_type == 'string':
+            df[column] = df[column].astype(str)
+        else:
+            _unsupported_conversion_error()
+
+    elif from_type == 'float':
+        if to_type == 'number':
+            pass
+        if to_type == 'string':
+            df[column] = df[column].astype(str)
+        else:
+            _unsupported_conversion_error()
+
+    elif from_type == 'string':
+        if to_type in ('datetime', 'date', 'time'):
+            formats = ['%Y-%m-%dT%H:%M:%S', '%Y-%m-%d', '%H:%M:%S']
+            for format in formats:
+                try:
+                    df[column] = pd.to_datetime(df[column], format=format)
+                    break
+                except ValueError:
+                    continue
+            else:
+                msg = (
+                    f'The {column} column could not be parsed into any of '
+                    'datetime, date, or time representations.'
+                )
+                raise ValueError(msg)
+
+        if to_type == 'duration':
+            try:
+                # NOTE: need stricter timedelta criteria
+                df[column] = pd.to_timedelta(df[column])
+            except ValueError:
+                msg = (
+                    f'The {column} column could not be parsed into timedelta '
+                    'representations.'
+                )
+                raise ValueError(msg)
+
+        if to_type == 'string':
+            pass
+        elif to_type == 'datetime':
+            df[column] = df[column].dt.strftime('%Y-%m-%dT%H:%M:%S')
+        elif to_type == 'date':
+            df[column] = df[column].dt.strftime('%Y-%m-%d')
+        elif to_type == 'time':
+            df[column] = df[column].dt.strftime('%H:%M:%S')
+        elif to_type == 'duration':
+            df[column] = df[column].apply(pd.Timedelta.isoformat)
+        else:
+            _unsupported_conversion_error()
+
+
 def table_jsonl_header(df: pd.DataFrame) -> str:
     header = {}
     header['doctype'] = dict(
