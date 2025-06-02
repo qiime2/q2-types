@@ -61,6 +61,11 @@ def _make_dtype_conversion(
         )
         raise ValueError(msg)
 
+    # cache all column attrs
+    column_to_attrs = {}
+    for _column in df.columns:
+        column_to_attrs[_column] = df[_column].attrs
+
     if from_type == 'datetime':
         if to_type == 'datetime':
             df[column] = df[column].dt.strftime('%Y-%m-%dT%H:%M:%S')
@@ -70,13 +75,11 @@ def _make_dtype_conversion(
             df[column] = df[column].dt.strftime('T%H:%M:%S')
         else:
             _unsupported_conversion_error()
-
     elif from_type == 'timedelta':
         if to_type == 'duration':
             df[column] = df[column].apply(pd.Timedelta.isoformat)
         else:
             _unsupported_conversion_error()
-
     elif from_type == 'integer':
         if to_type == 'integer':
             pass
@@ -86,7 +89,6 @@ def _make_dtype_conversion(
             df[column] = df[column].astype(str)
         else:
             _unsupported_conversion_error()
-
     elif from_type == 'float':
         if to_type == 'number':
             pass
@@ -94,7 +96,6 @@ def _make_dtype_conversion(
             df[column] = df[column].astype(str)
         else:
             _unsupported_conversion_error()
-
     elif from_type == 'string':
         if to_type in ('datetime', 'date', 'time'):
             formats = ['%Y-%m-%dT%H:%M:%S', '%Y-%m-%d', '%H:%M:%S']
@@ -110,15 +111,14 @@ def _make_dtype_conversion(
                     'datetime, date, or time representations.'
                 )
                 raise ValueError(msg)
-
         elif to_type == 'duration':
             try:
                 # NOTE: need stricter timedelta criteria
                 df[column] = pd.to_timedelta(df[column])
             except ValueError:
                 msg = (
-                    f'The {column} column could not be parsed into timedelta '
-                    'representations.'
+                    f'The {column} column could not be parsed into the '
+                    'timedelta representation.'
                 )
                 raise ValueError(msg)
 
@@ -134,6 +134,10 @@ def _make_dtype_conversion(
             df[column] = df[column].apply(pd.Timedelta.isoformat)
         else:
             _unsupported_conversion_error()
+
+    # restore cached column attrs
+    for _column in df.columns:
+        df[_column].attrs = column_to_attrs[_column]
 
 
 def _get_dataframe_column_type(df: pd.DataFrame, column: str) -> str:
@@ -160,6 +164,7 @@ def _get_dataframe_column_type(df: pd.DataFrame, column: str) -> str:
 def _get_matching_jsonl_type(dataframe_column_type: str) -> str:
     '''
     '''
+    print('get matching type called', dataframe_column_type)
     if dataframe_column_type in ('integer', 'string', 'datetime'):
         return dataframe_column_type
     if dataframe_column_type == 'float':
@@ -200,8 +205,13 @@ def table_jsonl_header(df: pd.DataFrame) -> str:
             jsonl_type = attr_type
 
         fields.append(dict(
-            name=name, type=jsonl_type, missing=missing, title=title,
-            description=description, extra=extra))
+            name=name,
+            type=jsonl_type,
+            missing=missing,
+            title=title,
+            description=description,
+            extra=extra
+        ))
 
     header['fields'] = fields
     header['index'] = []
@@ -211,6 +221,20 @@ def table_jsonl_header(df: pd.DataFrame) -> str:
 
     # prevent whitespace after comma and colon
     return json.dumps(header, separators=(',', ':'))
+
+
+@plugin.register_transformer
+def df_to_table_jsonl(obj: pd.DataFrame) -> TableJSONLFileFormat:
+    header = table_jsonl_header(obj)
+
+    ff = TableJSONLFileFormat()
+    with ff.open() as fh:
+        fh.write(header)
+        fh.write('\n')
+        if not obj.empty:
+            obj.to_json(fh, orient='records', lines=True, date_format='iso')
+
+    return ff
 
 
 @plugin.register_transformer
@@ -256,20 +280,6 @@ def table_jsonl_to_df(ff: TableJSONLFileFormat) -> pd.DataFrame:
     df.attrs.update(attrs)
 
     return df
-
-
-@plugin.register_transformer
-def df_to_table_jsonl(obj: pd.DataFrame) -> TableJSONLFileFormat:
-    header = table_jsonl_header(obj)
-
-    ff = TableJSONLFileFormat()
-    with ff.open() as fh:
-        fh.write(header)
-        fh.write('\n')
-        if not obj.empty:
-            obj.to_json(fh, orient='records', lines=True, date_format='iso')
-
-    return ff
 
 
 @plugin.register_transformer

@@ -5,6 +5,7 @@
 #
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
+import json
 
 import pandas as pd
 
@@ -72,7 +73,7 @@ class TestTransformers(TestPluginBase):
         pd.testing.assert_frame_equal(obs.to_dataframe(), exp)
 
 
-class TestDataframeToJsonlTypes(TestPluginBase):
+class TestDataframeToJsonlTypeHandling(TestPluginBase):
     package = 'q2_types.tabular.tests'
 
     def setUp(self):
@@ -94,6 +95,13 @@ class TestDataframeToJsonlTypes(TestPluginBase):
                 ['P0D5H', 'P420D', 'P7D24H60M60S']
             )
         })
+
+    def get_header_field(self, header: dict, name: str) -> dict:
+        for field in header['fields']:
+            if field['name'] == name:
+                return field
+
+        raise ValueError(f'The {name} field was not found in the header.')
 
     def test_that_dummy_df_has_intended_types(self):
         '''
@@ -121,14 +129,52 @@ class TestDataframeToJsonlTypes(TestPluginBase):
 
     def test_attrs_written_to_jsonl_header(self):
         '''
+        Tests that dataframe column attrs are written to the jsonl header
+        properly.
+        '''
+        self.df['integer_column'].attrs['type'] = 'integer'
+        self.df['float_column'].attrs['type'] = 'number'
+        self.df['string_column'].attrs['type'] = 'string'
+        self.df['datetime_column'].attrs['type'] = 'datetime'
+        self.df['timedelta_column'].attrs['type'] = 'duration'
 
+        jsonl = transform(self.df, to_type=TableJSONLFileFormat)
+
+        with open(jsonl.path, 'r') as fh:
+            header_line = fh.readline()
+            header_dict = json.loads(header_line)
+
+        for column in self.df.columns:
+            field = self.get_header_field(header_dict, column)
+            self.assertEqual(field['type'], self.df[column].attrs['type'])
+
+    def test_invalid_attr_type_errors(self):
+        '''
         '''
         pass
 
     def test_missing_attrs_inferred_properly(self):
         '''
+        Tests that dataframe columns that do not have attrs have their type
+        properly inferred and written to the jsonl header.
         '''
-        pass
+        column_to_jsonl_type = {
+            'integer_column': 'integer',
+            'float_column': 'number',
+            'string_column': 'string',
+            'datetime_column': 'datetime',
+            'timedelta_column': 'duration',
+        }
+
+        jsonl = transform(self.df, to_type=TableJSONLFileFormat)
+
+        with open(jsonl.path, 'r') as fh:
+            header_line = fh.readline()
+            header_dict = json.loads(header_line)
+
+        for column in self.df.columns:
+            field = self.get_header_field(header_dict, column)
+            self.assertEqual(field['type'], column_to_jsonl_type[column])
 
     def test_type_conversions_from_dataframe_to_jsonl(self):
         pass
