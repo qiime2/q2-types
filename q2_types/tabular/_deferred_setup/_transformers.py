@@ -40,10 +40,11 @@ def _make_dtype_conversion(
         converted.
     from_type : str
         The datatype of the column in the dataframe. One of 'integer', 'float',
-        'string', 'datetime', 'timedelta'.
+        'string', 'boolean', 'datetime', 'timedelta'.
     to_type : str
         The datatype that the column should be converted to, if needed. One of
-        'integer', 'number', 'string', 'datetime', 'date', 'time', 'duration'.
+        'integer', 'number', 'string', 'boolean', 'datetime', 'date', 'time',
+        'duration'.
 
     Returns
     -------
@@ -73,10 +74,9 @@ def _make_dtype_conversion(
 
     if from_type == 'datetime':
         if to_type == 'datetime':
-            df[column] = \
-                df[column].dt.strftime('%Y-%m-%dT%H:%M:%S').astype('string')
+            pass
         elif to_type == 'date':
-            df[column] = df[column].dt.strftime('%Y-%m-%d').astype('string')
+            df[column] = pd.to_datetime(df[column].dt.strftime('%Y-%m-%d'))
         elif to_type == 'time':
             df[column] = df[column].dt.strftime('%H:%M:%S').astype('string')
         else:
@@ -102,6 +102,11 @@ def _make_dtype_conversion(
             df[column] = df[column].astype(str)
         else:
             _unsupported_conversion_error()
+    elif from_type == 'boolean':
+        if to_type == 'boolean':
+            pass
+        else:
+            _unsupported_conversion_error()
     elif from_type == 'string':
         if to_type in ('datetime', 'date', 'time'):
             try:
@@ -114,7 +119,7 @@ def _make_dtype_conversion(
                 raise ValueError(msg)
         elif to_type == 'duration':
             try:
-                # NOTE: need stricter timedelta criteria
+                # NOTE: do we want to only accept iso-format duration strings?
                 df[column] = pd.to_timedelta(df[column])
             except ValueError:
                 msg = (
@@ -126,11 +131,9 @@ def _make_dtype_conversion(
         if to_type == 'string':
             pass
         elif to_type == 'datetime':
-            df[column] = df[column].dt.strftime(
-                '%Y-%m-%dT%H:%M:%S'
-            ).astype('string')
+            df[column] = pd.to_datetime(df[column])
         elif to_type == 'date':
-            df[column] = df[column].dt.strftime('%Y-%m-%d').astype('string')
+            df[column] = pd.to_datetime(df[column].dt.strftime('%Y-%m-%d'))
         elif to_type == 'time':
             df[column] = df[column].dt.strftime('%H:%M:%S').astype('string')
         elif to_type == 'duration':
@@ -158,7 +161,7 @@ def _get_dataframe_column_type(df: pd.DataFrame, column: str) -> str:
     -------
     str
         The determined conceptual datatype. One of 'integer', 'float',
-        'string', 'datetime', or 'timedelta'.
+        'string', 'boolean', 'datetime', or 'timedelta'.
 
     Raises
     ------
@@ -175,6 +178,8 @@ def _get_dataframe_column_type(df: pd.DataFrame, column: str) -> str:
         return 'datetime'
     if pd.api.types.is_timedelta64_dtype(df[column]):
         return 'timedelta'
+    if pd.api.types.is_bool_dtype(df[column]):
+        return 'boolean'
 
     msg = (
         f'The type of the {column} column was not detected as any of the '
@@ -196,7 +201,7 @@ def _get_matching_jsonl_type(dataframe_column_type: str) -> str:
     -------
     str
         The corresponding jsonl type. One of 'integer', 'number', 'string',
-        'datetime', or 'duration'.
+        'boolean', 'datetime', or 'duration'.
 
     Raises
     ------
@@ -204,7 +209,7 @@ def _get_matching_jsonl_type(dataframe_column_type: str) -> str:
         If the input dataframe column type is not in the set of recognized
         conceptual types.
     '''
-    if dataframe_column_type in ('integer', 'string', 'datetime'):
+    if dataframe_column_type in ('integer', 'string', 'boolean', 'datetime'):
         return dataframe_column_type
     if dataframe_column_type == 'float':
         return 'number'

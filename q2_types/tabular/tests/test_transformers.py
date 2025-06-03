@@ -198,11 +198,11 @@ class TestDataframeToJsonlTypeHandling(TestPluginBase):
         Tests that a column of a type that is not in the set of supported
         data types produces an error.
         '''
-        self.df['integer_column'] = self.df['integer_column'].astype(bool)
+        self.df['float_column'] = self.df['float_column'].astype('category')
 
         with self.assertRaisesRegex(
             ValueError,
-            r'.*type of the integer_column column was not detected as any of.*'
+            r'.*type of the float_column column was not detected as any of.*'
         ):
             transform(self.df, to_type=TableJSONLFileFormat)
 
@@ -351,6 +351,25 @@ class TestDataframeToJsonlTypeHandling(TestPluginBase):
             'datetime_column',
             pd.Series(['00:00:00', '17:00:00', '00:00:00'], dtype='string')
         )
+
+    def test_boolean_type_round_trips(self):
+        '''
+        Tests that columns of the dtype bool are successfully round-tripped,
+        whether the type is annotated in the attrs, or inferred. Note that
+        the boolean type is not tested alongside the other types because
+        it is not convertable to any other types and no other types convert to
+        it.
+        '''
+        df = pd.DataFrame({
+            'bool': [True, False],
+            'crip': [False, True],
+        })
+        df['bool'].attrs['type'] = 'boolean'
+
+        jsonl = transform(df, to_type=TableJSONLFileFormat)
+        round_trip_df = transform(jsonl, to_type=pd.DataFrame)
+
+        assert_frame_equal(df, round_trip_df)
 
     def test_copy_dataframe_with_attrs(self):
         '''
