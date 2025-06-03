@@ -73,8 +73,14 @@ class TestTransformers(TestPluginBase):
                                        'faithpd_refdist.table.jsonl')
         _, exp = self.transform_format(TableJSONLFileFormat, pd.DataFrame,
                                        'faithpd_refdist.table.jsonl')
+
         exp = exp.set_index('id')
-        pd.testing.assert_frame_equal(obs.to_dataframe(), exp)
+
+        obs = obs.to_dataframe()
+        obs.index = obs.index.astype('string')
+        obs['group'] = obs['group'].astype('string')
+
+        pd.testing.assert_frame_equal(obs, exp)
 
 
 class TestDataframeToJsonlTypeHandling(TestPluginBase):
@@ -213,8 +219,6 @@ class TestDataframeToJsonlTypeHandling(TestPluginBase):
         jsonl = transform(df, to_type=TableJSONLFileFormat)
         round_trip_df = transform(jsonl, to_type=pd.DataFrame)
 
-        print('round trip col', round_trip_df[column])
-        print('expected col', expected_column)
         expected_column.name = column
         assert_series_equal(round_trip_df[column], expected_column)
 
