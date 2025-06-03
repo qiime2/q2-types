@@ -98,17 +98,12 @@ def _make_dtype_conversion(
             _unsupported_conversion_error()
     elif from_type == 'string':
         if to_type in ('datetime', 'date', 'time'):
-            formats = ['%Y-%m-%dT%H:%M:%S', '%Y-%m-%d', '%H:%M:%S']
-            for format in formats:
-                try:
-                    df[column] = pd.to_datetime(df[column], format=format)
-                    break
-                except ValueError:
-                    continue
-            else:
+            try:
+                df[column] = pd.to_datetime(df[column])
+            except ValueError:
                 msg = (
-                    f'The {column} column could not be parsed from any of '
-                    'datetime, date, or time representations.'
+                    f'The {column} column could not be parsed into the '
+                    'datetime representation.'
                 )
                 raise ValueError(msg)
         elif to_type == 'duration':
@@ -125,13 +120,15 @@ def _make_dtype_conversion(
         if to_type == 'string':
             pass
         elif to_type == 'datetime':
-            df[column] = df[column].dt.strftime('%Y-%m-%dT%H:%M:%S')
+            df[column] = df[column].dt.strftime(
+                '%Y-%m-%dT%H:%M:%S'
+            ).astype('string')
         elif to_type == 'date':
-            df[column] = df[column].dt.strftime('%Y-%m-%d')
+            df[column] = df[column].dt.strftime('%Y-%m-%d').astype('string')
         elif to_type == 'time':
-            df[column] = df[column].dt.strftime('%H:%M:%S')
+            df[column] = df[column].dt.strftime('%H:%M:%S').astype('string')
         elif to_type == 'duration':
-            df[column] = df[column].apply(pd.Timedelta.isoformat)
+            df[column] = pd.to_timedelta(df[column])
         else:
             _unsupported_conversion_error()
 
@@ -164,7 +161,6 @@ def _get_dataframe_column_type(df: pd.DataFrame, column: str) -> str:
 def _get_matching_jsonl_type(dataframe_column_type: str) -> str:
     '''
     '''
-    print('get matching type called', dataframe_column_type)
     if dataframe_column_type in ('integer', 'string', 'datetime'):
         return dataframe_column_type
     if dataframe_column_type == 'float':
@@ -259,13 +255,17 @@ def table_jsonl_to_df(ff: TableJSONLFileFormat) -> pd.DataFrame:
         elif spec['type'] == 'number':
             df[col] = df[col].astype('float64')
         elif spec['type'] == 'datetime':
-            df[col] = pd.to_datetime(df[col], format='iso8601')
+            df[col] = pd.to_datetime(df[col], format='ISO8601')
         elif spec['type'] == 'date':
-            df[col] = pd.to_datetime(df[col], format='iso8601')
+            df[col] = pd.to_datetime(df[col], format='ISO8601')
         elif spec['type'] == 'time':
-            df[col] = pd.to_datetime(df[col], format='mixed').dt.time
+            df[col] = pd.to_datetime(
+                df[col], format='mixed'
+            ).dt.time.astype('string')
         elif spec['type'] == 'duration':
             df[col] = pd.to_timedelta(df[col])
+        elif spec['type'] == 'string':
+            df[col] = df[col].astype('string')
 
     # 3. set index
     if len(header['index']) > 0:

@@ -8,6 +8,7 @@
 import json
 
 import pandas as pd
+from pandas.testing import assert_series_equal
 
 from qiime2.plugin.testing import TestPluginBase
 from qiime2.plugin.util import transform
@@ -150,8 +151,15 @@ class TestDataframeToJsonlTypeHandling(TestPluginBase):
 
     def test_invalid_attr_type_errors(self):
         '''
+        Tests that columns with invalid type attrs produce an error.
         '''
-        pass
+        self.df['integer_column'].attrs['type'] = 'datetime'
+
+        with self.assertRaisesRegex(
+            ValueError,
+            r'.*type integer can not be converted.*datetime.*'
+        ):
+            transform(self.df, to_type=TableJSONLFileFormat)
 
     def test_missing_attrs_inferred_properly(self):
         '''
@@ -176,5 +184,152 @@ class TestDataframeToJsonlTypeHandling(TestPluginBase):
             field = self.get_header_field(header_dict, column)
             self.assertEqual(field['type'], column_to_jsonl_type[column])
 
-    def test_type_conversions_from_dataframe_to_jsonl(self):
+    def test_invalid_dataframe_column_type_errors(self):
+        '''
+        Tests that a column of a type that is not in the set of supported
+        data types produces an error.
+        '''
+        self.df['integer_column'] = self.df['integer_column'].astype(bool)
+
+        with self.assertRaisesRegex(
+            ValueError,
+            r'.*type of the integer_column column was not detected as any of.*'
+        ):
+            transform(self.df, to_type=TableJSONLFileFormat)
+
+    def assert_proper_type_conversion(
+        self,
+        df: pd.DataFrame,
+        column: str,
+        expected_column: pd.Series
+    ):
+        '''
+        Transforms a dataframe to and back from the jsonl format then asserts
+        that a column of interest is stored as expected.
+        '''
+        jsonl = transform(df, to_type=TableJSONLFileFormat)
+        round_trip_df = transform(jsonl, to_type=pd.DataFrame)
+
+        print('round trip col', round_trip_df[column])
+        print('expected col', expected_column)
+        expected_column.name = column
+        assert_series_equal(round_trip_df[column], expected_column)
+
+    def test_integer_type_conversions(self):
+        '''
+        Tests that a column of the integer type can be converted to the number
+        and string types.
+        '''
+        self.df['integer_column'].attrs['type'] = 'number'
+        self.assert_proper_type_conversion(
+            self.df,
+            'integer_column',
+            pd.Series([1.0, 2.0, 3.0], dtype='float64')
+        )
+
+        self.df['integer_column'].attrs['type'] = 'string'
+        self.assert_proper_type_conversion(
+            self.df,
+            'integer_column',
+            pd.Series(['1', '2', '3'], dtype='string')
+        )
+
+    def test_float_type_conversions(self):
+        '''
+        Tests that a column of the float type can be converted to the number
+        type.
+        '''
+        self.df['float_column'].attrs['type'] = 'string'
+        self.assert_proper_type_conversion(
+            self.df,
+            'float_column',
+            pd.Series(['1.0', '2.5', '3.0'], dtype='string')
+        )
+
+    def test_string_type_conversions(self):
+        '''
+        Tests that columns of the string type can be converted to the datetime,
+        date, time, and duration types, whether in the corresponding formats
+        or not.
+        '''
+        df = pd.DataFrame({
+            'datetime': ['2025-06-02T13:00:00'],
+            'date': ['2025-06-02'],
+            'time': ['13:00:00'],
+            'duration': ['P7D7H7M7S'],
+        })
+
+        # immediately corresponding formats
+        df['datetime'].attrs['type'] = 'datetime'
+        self.assert_proper_type_conversion(
+            df,
+            'datetime',
+            pd.Series(
+                [pd.to_datetime('2025-06-02T13:00:00')],
+                dtype='datetime64[ns]'
+            )
+        )
+
+        df['date'].attrs['type'] = 'date'
+        self.assert_proper_type_conversion(
+            df,
+            'date',
+            pd.Series(
+                pd.to_datetime(['2025-06-02T00:00:00']),
+                dtype='datetime64[ns]'
+            )
+        )
+
+        df['time'].attrs['type'] = 'time'
+        self.assert_proper_type_conversion(
+            df,
+            'time',
+            pd.Series(['13:00:00'], dtype='string')
+        )
+
+        df['duration'].attrs['type'] = 'duration'
+        self.assert_proper_type_conversion(
+            df,
+            'duration',
+            pd.Series(pd.to_timedelta(['P7D7H7M7S']), dtype='timedelta64[ns]')
+        )
+
+        # non immediately corresponding formats
+        # NOTE: not all possible conversions are enumerated here
+        df['datetime'].attrs['type'] = 'time'
+        self.assert_proper_type_conversion(
+            df,
+            'datetime',
+            pd.Series(['13:00:00'], dtype='string')
+        )
+
+        df['date'].attrs['type'] = 'datetime'
+        self.assert_proper_type_conversion(
+            df,
+            'date',
+            pd.Series(
+                pd.to_datetime(['2025-06-02T00:00:00']), dtype='datetime64[ns]'
+            )
+        )
+
+        df['time'].attrs['type'] = 'datetime'
+        self.assert_proper_type_conversion(
+            df,
+            'time',
+            pd.Series(
+                pd.to_datetime(['13:00:00']), dtype='datetime64[ns]'
+            )
+        )
+
+    def test_datetime_type_conversions(self):
+        '''
+        '''
         pass
+
+    def test_type_conversions(self):
+        '''
+        '''
+        valid_conversions = {
+            'datetime': ('datetime', 'date', 'time'),
+            'timedelta': ('duration'),
+        }
