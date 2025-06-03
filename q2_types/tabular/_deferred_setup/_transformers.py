@@ -68,11 +68,12 @@ def _make_dtype_conversion(
 
     if from_type == 'datetime':
         if to_type == 'datetime':
-            df[column] = df[column].dt.strftime('%Y-%m-%dT%H:%M:%S')
+            df[column] = \
+                df[column].dt.strftime('%Y-%m-%dT%H:%M:%S').astype('string')
         elif to_type == 'date':
-            df[column] = df[column].dt.strftime('%Y-%m-%d')
+            df[column] = df[column].dt.strftime('%Y-%m-%d').astype('string')
         elif to_type == 'time':
-            df[column] = df[column].dt.strftime('T%H:%M:%S')
+            df[column] = df[column].dt.strftime('%H:%M:%S').astype('string')
         else:
             _unsupported_conversion_error()
     elif from_type == 'timedelta':
@@ -172,12 +173,28 @@ def _get_matching_jsonl_type(dataframe_column_type: str) -> str:
     raise ValueError(msg)
 
 
+def _copy_dataframe_with_attrs(df: pd.DataFrame) -> pd.DataFrame:
+    '''
+    '''
+    column_to_attrs = {}
+    for column in df.columns:
+        column_to_attrs[column] = df[column].attrs
+
+    df_copy = df.copy()
+    for column in df:
+        df[column].attrs = column_to_attrs[column]
+        df_copy[column].attrs = column_to_attrs[column]
+
+    return df_copy
+
+
 def table_jsonl_header(df: pd.DataFrame) -> str:
     header = {}
     header['doctype'] = dict(
         name='table.jsonl', format='application/x-json-lines', version='1.0')
     header['direction'] = 'row'
     header['style'] = 'key:value'
+
 
     fields = []
     for name in df.columns:
@@ -221,6 +238,8 @@ def table_jsonl_header(df: pd.DataFrame) -> str:
 
 @plugin.register_transformer
 def df_to_table_jsonl(obj: pd.DataFrame) -> TableJSONLFileFormat:
+    obj = _copy_dataframe_with_attrs(obj)
+
     header = table_jsonl_header(obj)
 
     ff = TableJSONLFileFormat()

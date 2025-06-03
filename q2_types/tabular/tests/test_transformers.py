@@ -8,7 +8,7 @@
 import json
 
 import pandas as pd
-from pandas.testing import assert_series_equal
+from pandas.testing import assert_series_equal, assert_frame_equal
 
 from qiime2.plugin.testing import TestPluginBase
 from qiime2.plugin.util import transform
@@ -16,6 +16,9 @@ import qiime2.metadata
 
 from q2_types.tabular.formats import (
     TabularDataResourceDirFmt, TableJSONLFileFormat,
+)
+from q2_types.tabular._deferred_setup._transformers import (
+    _copy_dataframe_with_attrs
 )
 
 
@@ -323,13 +326,43 @@ class TestDataframeToJsonlTypeHandling(TestPluginBase):
 
     def test_datetime_type_conversions(self):
         '''
+        Tests that a column of the datetime type can be converted to the
+        date and time types.
         '''
-        pass
+        self.df['datetime_column'].attrs['type'] = 'date'
+        self.assert_proper_type_conversion(
+            self.df,
+            'datetime_column',
+            pd.Series(
+                pd.to_datetime([
+                    '2012-01-01T00:00:00', '00:00:00', '1998-03-14T00:00:00'
+                ], format='mixed'),
+                dtype='datetime64[ns]'
+            )
+        )
 
-    def test_type_conversions(self):
+        self.df['datetime_column'].attrs['type'] = 'time'
+        self.assert_proper_type_conversion(
+            self.df,
+            'datetime_column',
+            pd.Series(['00:00:00', '17:00:00', '00:00:00'], dtype='string')
+        )
+
+    def test_copy_dataframe_with_attrs(self):
         '''
+        Tests that the `_copy_dataframe_with_attrs` function accurately
+        copies a dataframe and its column attributes, and that it preserves
+        the attributes in the copied-from dataframe.
         '''
-        valid_conversions = {
-            'datetime': ('datetime', 'date', 'time'),
-            'timedelta': ('duration'),
-        }
+        self.df['integer_column'].attrs =  {'key': 'value'}
+        self.df['string_column'].attrs =  {'oompa': 'loompa'}
+
+        copied_df = _copy_dataframe_with_attrs(self.df)
+
+        assert_frame_equal(copied_df, self.df)
+
+        self.assertEqual(copied_df['integer_column'].attrs, {'key': 'value'})
+        self.assertEqual(copied_df['string_column'].attrs, {'oompa': 'loompa'})
+
+        self.assertEqual(self.df['integer_column'].attrs, {'key': 'value'})
+        self.assertEqual(self.df['string_column'].attrs, {'oompa': 'loompa'})
