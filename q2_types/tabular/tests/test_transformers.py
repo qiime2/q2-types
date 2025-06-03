@@ -358,8 +358,8 @@ class TestDataframeToJsonlTypeHandling(TestPluginBase):
         copies a dataframe and its column attributes, and that it preserves
         the attributes in the copied-from dataframe.
         '''
-        self.df['integer_column'].attrs =  {'key': 'value'}
-        self.df['string_column'].attrs =  {'oompa': 'loompa'}
+        self.df['integer_column'].attrs = {'key': 'value'}
+        self.df['string_column'].attrs = {'oompa': 'loompa'}
 
         copied_df = _copy_dataframe_with_attrs(self.df)
 

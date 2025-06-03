@@ -52,7 +52,12 @@ def _make_dtype_conversion(
 
     Raises
     ------
-
+    ValueError
+        If the conversion from `from_type` go `to_type` is not supported.
+    ValueError
+        If a string `from_type` can not be parsed into a datetime `to_type`.
+    ValueError
+        If a string `from_type` can not be parsed into a duration `to_type`.
     '''
     def _unsupported_conversion_error():
         msg = (
@@ -140,6 +145,25 @@ def _make_dtype_conversion(
 
 def _get_dataframe_column_type(df: pd.DataFrame, column: str) -> str:
     '''
+    Determines the conceptual datatype of `column` in `df`.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        The dataframe that contains the column of interest.
+    column : str
+        The name of the column of interest.
+
+    Returns
+    -------
+    str
+        The determined conceptual datatype. One of 'integer', 'float',
+        'string', 'datetime', or 'timedelta'.
+
+    Raises
+    ------
+    ValueError
+        If `column` was not detected as any of the conceptual data types.
     '''
     if pd.api.types.is_integer_dtype(df[column]):
         return 'integer'
@@ -161,6 +185,24 @@ def _get_dataframe_column_type(df: pd.DataFrame, column: str) -> str:
 
 def _get_matching_jsonl_type(dataframe_column_type: str) -> str:
     '''
+    Get the corresponding jsonl type for a dataframe type.
+
+    Parameters
+    ----------
+    dataframe_column_type : str
+        The conceptual type of a dataframe column.
+
+    Returns
+    -------
+    str
+        The corresponding jsonl type. One of 'integer', 'number', 'string',
+        'datetime', or 'duration'.
+
+    Raises
+    ------
+    ValueError
+        If the input dataframe column type is not in the set of recognized
+        conceptual types.
     '''
     if dataframe_column_type in ('integer', 'string', 'datetime'):
         return dataframe_column_type
@@ -175,6 +217,18 @@ def _get_matching_jsonl_type(dataframe_column_type: str) -> str:
 
 def _copy_dataframe_with_attrs(df: pd.DataFrame) -> pd.DataFrame:
     '''
+    Creates and returns a copy of dataframe including any column attrs.
+    Preserves the column attrs on the copied-from dataframe.
+
+    Parameters
+    ----------
+    df : pd.DataFrame
+        The dataframe to copy.
+
+    Returns
+    -------
+    df : pd.DataFrame
+        The copied dataframe.
     '''
     column_to_attrs = {}
     for column in df.columns:
@@ -194,7 +248,6 @@ def table_jsonl_header(df: pd.DataFrame) -> str:
         name='table.jsonl', format='application/x-json-lines', version='1.0')
     header['direction'] = 'row'
     header['style'] = 'key:value'
-
 
     fields = []
     for name in df.columns:
