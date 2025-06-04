@@ -374,9 +374,10 @@ class TestDataframeToJsonlTypeHandling(TestPluginBase):
     def test_copy_dataframe_with_attrs(self):
         '''
         Tests that the `_copy_dataframe_with_attrs` function accurately
-        copies a dataframe and its column attributes, and that it preserves
-        the attributes in the copied-from dataframe.
+        copies a dataframe and its column and dataframe-level attributes, and
+        that it preserves these attributes in the copied-from dataframe.
         '''
+        self.df.attrs = {'yay': 'attrs'}
         self.df['integer_column'].attrs = {'key': 'value'}
         self.df['string_column'].attrs = {'oompa': 'loompa'}
 
@@ -384,8 +385,10 @@ class TestDataframeToJsonlTypeHandling(TestPluginBase):
 
         assert_frame_equal(copied_df, self.df)
 
+        self.assertEqual(copied_df.attrs, {'yay': 'attrs'})
         self.assertEqual(copied_df['integer_column'].attrs, {'key': 'value'})
         self.assertEqual(copied_df['string_column'].attrs, {'oompa': 'loompa'})
 
+        self.assertEqual(self.df.attrs, {'yay': 'attrs'})
         self.assertEqual(self.df['integer_column'].attrs, {'key': 'value'})
         self.assertEqual(self.df['string_column'].attrs, {'oompa': 'loompa'})

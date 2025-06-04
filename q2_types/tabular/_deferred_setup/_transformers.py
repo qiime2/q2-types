@@ -222,8 +222,9 @@ def _get_matching_jsonl_type(dataframe_column_type: str) -> str:
 
 def _copy_dataframe_with_attrs(df: pd.DataFrame) -> pd.DataFrame:
     '''
-    Creates and returns a copy of dataframe including any column attrs.
-    Preserves the column attrs on the copied-from dataframe.
+    Creates and returns a copy of dataframe including any column attrs and
+    any dataframe-level attrs.
+    Preserves the column and dataframe attrs on the copied-from dataframe.
 
     Parameters
     ----------
@@ -235,12 +236,18 @@ def _copy_dataframe_with_attrs(df: pd.DataFrame) -> pd.DataFrame:
     df : pd.DataFrame
         The copied dataframe.
     '''
+    df_attrs = df.attrs
+
     column_to_attrs = {}
     for column in df.columns:
         column_to_attrs[column] = df[column].attrs
 
     df_copy = df.copy()
-    for column in df:
+
+    df.attrs = df.attrs
+    df_copy.attrs = df_attrs
+
+    for column in df.columns:
         df[column].attrs = column_to_attrs[column]
         df_copy[column].attrs = column_to_attrs[column]
 
