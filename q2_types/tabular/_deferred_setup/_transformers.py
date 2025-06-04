@@ -244,7 +244,7 @@ def _copy_dataframe_with_attrs(df: pd.DataFrame) -> pd.DataFrame:
 
     df_copy = df.copy()
 
-    df.attrs = df.attrs
+    df.attrs = df_attrs
     df_copy.attrs = df_attrs
 
     for column in df.columns:
