@@ -26,10 +26,8 @@ def _make_dtype_conversion(
 ):
     '''
     Converts the datatype of a column in a dataframe from `from_type` to
-    `to_type`. The set of `from_type` options are a set of conceptual types
-    that columns in the pandas dataframe may be, not actual python or pandas
-    or numpy types. The set of `to_type` options are a set of conceptual types
-    that columns in the jsonl format may be, not actual javascript types.
+    `to_type`. The `from_type` and `to_type` parameters may each be one of
+    'integer', 'number', 'string', 'boolean', 'datetime', or 'duration'.
 
     Parameters
     ----------
@@ -39,12 +37,9 @@ def _make_dtype_conversion(
         The name of the column in the dataframe that is having its dtype
         converted.
     from_type : str
-        The datatype of the column in the dataframe. One of 'integer', 'float',
-        'string', 'boolean', 'datetime', 'timedelta'.
+        The datatype of the column in the dataframe.
     to_type : str
-        The datatype that the column should be converted to, if needed. One of
-        'integer', 'number', 'string', 'boolean', 'datetime', 'date', 'time',
-        'duration'.
+        The datatype that the column should be converted to, if needed.
 
     Returns
     -------
@@ -54,7 +49,7 @@ def _make_dtype_conversion(
     Raises
     ------
     ValueError
-        If the conversion from `from_type` go `to_type` is not supported.
+        If the conversion from `from_type` to `to_type` is not supported.
     ValueError
         If a string `from_type` can not be parsed into a datetime `to_type`.
     ValueError
@@ -67,7 +62,7 @@ def _make_dtype_conversion(
         )
         raise ValueError(msg)
 
-    # cache all column attrs
+    # cache column attrs
     column_to_attrs = {}
     for _column in df.columns:
         column_to_attrs[_column] = df[_column].attrs
@@ -81,7 +76,7 @@ def _make_dtype_conversion(
             df[column] = df[column].dt.strftime('%H:%M:%S').astype('string')
         else:
             _unsupported_conversion_error()
-    elif from_type == 'timedelta':
+    elif from_type == 'duration':
         if to_type == 'duration':
             df[column] = df[column].apply(pd.Timedelta.isoformat)
         else:
@@ -95,7 +90,7 @@ def _make_dtype_conversion(
             df[column] = df[column].astype(str)
         else:
             _unsupported_conversion_error()
-    elif from_type == 'float':
+    elif from_type == 'number':
         if to_type == 'number':
             pass
         elif to_type == 'string':
@@ -148,7 +143,7 @@ def _make_dtype_conversion(
 
 def _get_dataframe_column_type(df: pd.DataFrame, column: str) -> str:
     '''
-    Determines the conceptual datatype of `column` in `df`.
+    Determines the conceptual jsonl datatype of `column` in `df`.
 
     Parameters
     ----------
@@ -160,8 +155,8 @@ def _get_dataframe_column_type(df: pd.DataFrame, column: str) -> str:
     Returns
     -------
     str
-        The determined conceptual datatype. One of 'integer', 'float',
-        'string', 'boolean', 'datetime', or 'timedelta'.
+        The determined conceptual datatype. One of 'integer', 'number',
+        'string', 'boolean', 'datetime', or 'duration'.
 
     Raises
     ------
@@ -171,52 +166,21 @@ def _get_dataframe_column_type(df: pd.DataFrame, column: str) -> str:
     if pd.api.types.is_integer_dtype(df[column]):
         return 'integer'
     if pd.api.types.is_float_dtype(df[column]):
-        return 'float'
+        return 'number'
     if pd.api.types.is_string_dtype(df[column]):
         return 'string'
+    if pd.api.types.is_bool_dtype(df[column]):
+        return 'boolean'
     if pd.api.types.is_datetime64_dtype(df[column]):
         return 'datetime'
     if pd.api.types.is_timedelta64_dtype(df[column]):
-        return 'timedelta'
-    if pd.api.types.is_bool_dtype(df[column]):
-        return 'boolean'
+        return 'duration'
 
     msg = (
         f'The type of the {column} column was not detected as any of the '
-        'following types: integer, float, string, datetime, or timedelta.'
+        'following types: integer, number, string, boolean, datetime, or '
+        'duration.'
     )
-    raise ValueError(msg)
-
-
-def _get_matching_jsonl_type(dataframe_column_type: str) -> str:
-    '''
-    Get the corresponding jsonl type for a dataframe type.
-
-    Parameters
-    ----------
-    dataframe_column_type : str
-        The conceptual type of a dataframe column.
-
-    Returns
-    -------
-    str
-        The corresponding jsonl type. One of 'integer', 'number', 'string',
-        'boolean', 'datetime', or 'duration'.
-
-    Raises
-    ------
-    ValueError
-        If the input dataframe column type is not in the set of recognized
-        conceptual types.
-    '''
-    if dataframe_column_type in ('integer', 'string', 'boolean', 'datetime'):
-        return dataframe_column_type
-    if dataframe_column_type == 'float':
-        return 'number'
-    if dataframe_column_type == 'timedelta':
-        return 'duration'
-
-    msg = f'Unrecognized dataframe column type: {dataframe_column_type}'
     raise ValueError(msg)
 
 
@@ -272,13 +236,13 @@ def table_jsonl_header(df: pd.DataFrame) -> str:
             extra = attrs
 
         attr_type = attrs.pop('type', None)
-        dataframe_type = _get_dataframe_column_type(df, name)
+        df_type = _get_dataframe_column_type(df, name)
 
         if attr_type is None:
-            jsonl_type = _get_matching_jsonl_type(dataframe_type)
+            jsonl_type = df_type
         else:
             _make_dtype_conversion(
-                df, name, from_type=dataframe_type, to_type=attr_type
+                df, name, from_type=df_type, to_type=attr_type
             )
             jsonl_type = attr_type
 
