@@ -218,6 +218,42 @@ def _copy_dataframe_with_attrs(df: pd.DataFrame) -> pd.DataFrame:
     return df_copy
 
 
+def _process_dataframe_types(df: pd.DataFrame) -> pd.DataFrame:
+    '''
+    Processes a dataframe by annotating columns with their inferred data types
+    where no annotation exists, and by converting columns to the annotated type
+    where the annotated and inferred types do not match.
+
+    Parameters
+    ----------
+    pd.DataFrame
+        The dataframe to process. This dataframe is not mutated.
+
+    Returns
+    -------
+    pd.DataFrame
+        A new dataframe with updated annotations and column types as necessary.
+    '''
+    df = _copy_dataframe_with_attrs(df)
+
+    for column in df:
+        try:
+            attr_type = df[column].attrs['type']
+        except KeyError:
+            attr_type = None
+
+        df_type = _get_dataframe_column_type(df, column)
+
+        if attr_type is None:
+            df[column].attrs['type'] = df_type
+        else:
+            _make_dtype_conversion(
+                df, column, from_type=df_type, to_type=attr_type
+            )
+
+    return df
+
+
 def table_jsonl_header(df: pd.DataFrame) -> str:
     header = {}
     header['doctype'] = dict(
@@ -228,6 +264,7 @@ def table_jsonl_header(df: pd.DataFrame) -> str:
     fields = []
     for name in df.columns:
         attrs = df[name].attrs.copy()
+        attr_type = attrs.pop('type', None)
         title = attrs.pop('title', '')
         description = attrs.pop('description', '')
         missing = attrs.pop('missing', False)
@@ -235,20 +272,9 @@ def table_jsonl_header(df: pd.DataFrame) -> str:
         if extra is None:
             extra = attrs
 
-        attr_type = attrs.pop('type', None)
-        df_type = _get_dataframe_column_type(df, name)
-
-        if attr_type is None:
-            jsonl_type = df_type
-        else:
-            _make_dtype_conversion(
-                df, name, from_type=df_type, to_type=attr_type
-            )
-            jsonl_type = attr_type
-
         fields.append(dict(
             name=name,
-            type=jsonl_type,
+            type=attr_type,
             missing=missing,
             title=title,
             description=description,
@@ -266,17 +292,18 @@ def table_jsonl_header(df: pd.DataFrame) -> str:
 
 
 @plugin.register_transformer
-def df_to_table_jsonl(obj: pd.DataFrame) -> TableJSONLFileFormat:
-    obj = _copy_dataframe_with_attrs(obj)
-
-    header = table_jsonl_header(obj)
+def df_to_table_jsonl(df: pd.DataFrame) -> TableJSONLFileFormat:
+    processed_df = _process_dataframe_types(df)
+    header = table_jsonl_header(processed_df)
 
     ff = TableJSONLFileFormat()
     with ff.open() as fh:
         fh.write(header)
         fh.write('\n')
-        if not obj.empty:
-            obj.to_json(fh, orient='records', lines=True, date_format='iso')
+        if not processed_df.empty:
+            processed_df.to_json(
+                fh, orient='records', lines=True, date_format='iso'
+            )
 
     return ff
 
