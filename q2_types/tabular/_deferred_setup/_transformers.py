@@ -71,7 +71,7 @@ def _make_dtype_conversion(
         if to_type == 'datetime':
             pass
         elif to_type == 'date':
-            df[column] = pd.to_datetime(df[column].dt.strftime('%Y-%m-%d'))
+            df[column] = df[column].dt.strftime('%Y-%m-%d').astype('string')
         elif to_type == 'time':
             df[column] = df[column].dt.strftime('%H:%M:%S').astype('string')
         else:
@@ -128,7 +128,7 @@ def _make_dtype_conversion(
         elif to_type == 'datetime':
             df[column] = pd.to_datetime(df[column])
         elif to_type == 'date':
-            df[column] = pd.to_datetime(df[column].dt.strftime('%Y-%m-%d'))
+            df[column] = df[column].dt.strftime('%Y-%m-%d').astype('string')
         elif to_type == 'time':
             df[column] = df[column].dt.strftime('%H:%M:%S').astype('string')
         elif to_type == 'duration':

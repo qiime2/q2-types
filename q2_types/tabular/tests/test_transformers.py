@@ -392,3 +392,42 @@ class TestDataframeToJsonlTypeHandling(TestPluginBase):
         self.assertEqual(self.df.attrs, {'yay': 'attrs'})
         self.assertEqual(self.df['integer_column'].attrs, {'key': 'value'})
         self.assertEqual(self.df['string_column'].attrs, {'oompa': 'loompa'})
+
+    def test_json_representations(self):
+        '''
+        Tests that the json representations of various data types are as
+        they are expected to be.
+        '''
+        self.df['boolean_column'] = [True, False, True]
+
+        jsonl = transform(self.df, to_type=TableJSONLFileFormat)
+        with open(str(jsonl)) as fh:
+            json_content = fh.read()
+
+        self.assertIn('"integer_column":1', json_content)
+        self.assertIn('"float_column":1.0', json_content)
+        self.assertIn('"string_column":"strings"', json_content)
+        self.assertIn('"boolean_column":true', json_content)
+        self.assertIn(
+            '"datetime_column":"2012-01-01T00:00:00.000"', json_content
+        )
+        self.assertIn(
+            '"datetime_column":"1998-03-14T00:00:00.000"', json_content
+        )
+        self.assertIn('"timedelta_column":"P420DT0H0M0S"', json_content)
+
+        # datetime to date
+        self.df['datetime_column'].attrs['type'] = 'date'
+        jsonl = transform(self.df, to_type=TableJSONLFileFormat)
+        with open(str(jsonl)) as fh:
+            json_content = fh.read()
+
+        self.assertIn('"datetime_column":"1998-03-14"', json_content)
+
+        # datetime to time
+        self.df['datetime_column'].attrs['type'] = 'time'
+        jsonl = transform(self.df, to_type=TableJSONLFileFormat)
+        with open(str(jsonl)) as fh:
+            json_content = fh.read()
+
+        self.assertIn('"datetime_column":"17:00:00"', json_content)
