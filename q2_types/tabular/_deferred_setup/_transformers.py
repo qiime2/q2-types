@@ -334,9 +334,7 @@ def table_jsonl_to_df(ff: TableJSONLFileFormat) -> pd.DataFrame:
         elif spec['type'] == 'date':
             df[col] = pd.to_datetime(df[col], format='ISO8601')
         elif spec['type'] == 'time':
-            df[col] = pd.to_datetime(
-                df[col], format='mixed'
-            ).dt.time.astype('string')
+            df[col] = pd.to_datetime(df[col], format='mixed').dt.time
         elif spec['type'] == 'duration':
             df[col] = pd.to_timedelta(df[col])
         elif spec['type'] == 'string':

@@ -291,7 +291,7 @@ class TestDataframeToJsonlTypeHandling(TestPluginBase):
         self.assert_proper_type_conversion(
             df,
             'time',
-            pd.Series(['13:00:00'], dtype='string')
+            pd.to_datetime(pd.Series(['13:00:00'])).dt.time
         )
 
         df['duration'].attrs['type'] = 'duration'
@@ -307,7 +307,7 @@ class TestDataframeToJsonlTypeHandling(TestPluginBase):
         self.assert_proper_type_conversion(
             df,
             'datetime',
-            pd.Series(['13:00:00'], dtype='string')
+            pd.to_datetime(pd.Series(['13:00:00'])).dt.time
         )
 
         df['date'].attrs['type'] = 'datetime'
@@ -349,7 +349,9 @@ class TestDataframeToJsonlTypeHandling(TestPluginBase):
         self.assert_proper_type_conversion(
             self.df,
             'datetime_column',
-            pd.Series(['00:00:00', '17:00:00', '00:00:00'], dtype='string')
+            pd.to_datetime(
+                pd.Series(['00:00:00', '17:00:00', '00:00:00'])
+            ).dt.time
         )
 
     def test_boolean_type_round_trips(self):
