@@ -535,7 +535,9 @@ class MultiMAGManifestFormat(_FastaManifestBase):
 class MultiDirValidationMixin:
     def _validate_(self, level):
         for p in self.path.iterdir():
-            if not p.is_dir() and p.name not in ['MANIFEST']:
+            # this ensures dotfiles like .DS_Store are ignored
+            if (not p.name.startswith('.') and not p.is_dir()
+                    and p.name not in ['MANIFEST']):
                 raise ValidationError(
                     "Files should be organised in per-sample directories")
 

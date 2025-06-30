@@ -734,6 +734,12 @@ class TestMultiFormats(TestPluginBase):
         }
         self.assertDictEqual(obs, exp)
 
+    def test_multifasta_dirfmt_with_dotfile(self):
+        dirpath = self.get_data_path('mags/mags-fasta-with-dotfile')
+        format = MultiFASTADirectoryFormat(dirpath, mode='r')
+
+        format.validate()
+
     def test_multibowtie_index_dirfmt(self):
         dirpath = self.get_data_path('bowtie/index-valid')
         format = MultiBowtie2IndexDirFmt(dirpath, mode='r')
@@ -747,6 +753,12 @@ class TestMultiFormats(TestPluginBase):
         with self.assertRaisesRegex(
                 ValidationError, 'should be .* per-sample directories'):
             format.validate()
+
+    def test_multibowtie_dirfmt_with_dotfile(self):
+        dirpath = self.get_data_path('bowtie/index-valid-with-dotfile')
+        format = MultiBowtie2IndexDirFmt(dirpath, mode='r')
+
+        format.validate()
 
     def test_contig_seqs_dirfmt(self):
         filepath = self.get_data_path('contigs/')
