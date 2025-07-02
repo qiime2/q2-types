@@ -95,6 +95,12 @@ def _make_dtype_conversion(
             pass
         elif to_type == 'string':
             df[column] = df[column].astype(str)
+        elif to_type == 'integer':
+            int_series = df[column].convert_dtypes()
+            if pd.api.types.is_integer_dtype(int_series):
+                df[column] = int_series
+            else:
+                _unsupported_conversion_error()
         else:
             _unsupported_conversion_error()
     elif from_type == 'boolean':
