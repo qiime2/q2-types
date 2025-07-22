@@ -23,7 +23,7 @@ requirements:
   - qiime2 >={{ qiime2 }}
   - samtools
   - pyhmmer
-  - frictionless<=5.5.0
+  - frictionless {{ frictionless }}
   build:
   - python {{ python }}
   - setuptools
