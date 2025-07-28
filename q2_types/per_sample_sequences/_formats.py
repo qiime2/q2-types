@@ -5,7 +5,7 @@
 #
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
-
+import gzip
 import os
 import re
 import itertools
@@ -73,7 +73,7 @@ class FastqAbsolutePathManifestFormatV2(model.TextFileFormat):
                         '"%s" (sample "%s").'
                         % (i, column_name, id_, old_row, old_col_name, old_id))
                 else:
-                    filepaths[fp] = (id_, column_name, i)
+                    filepaths[fp] = (id_, column_name, i)ftv2
 
 
 class _SingleEndFastqManifestV2(FastqAbsolutePathManifestFormatV2):
@@ -91,6 +91,30 @@ class SingleEndFastqManifestPhred64V2(_SingleEndFastqManifestV2):
 class _PairedEndFastqManifestV2(FastqAbsolutePathManifestFormatV2):
     METADATA_COLUMNS = {'forward-absolute-filepath': 'forward',
                         'reverse-absolute-filepath': 'reverse'}
+
+    def _validate_(self, level):
+        paired_samples = pd.read_csv(str(self.path), header=0, comment='#', dtype=str, sep='\t')
+
+        for _, row in paired_samples.iterrows():
+            file_name_rev = row['reverse-absolute-filepath']
+            file_name_fwd = row['forward-absolute-filepath']
+
+            file_path_rev = str(self.path / file_name_rev)
+            file_path_fwd = str(self.path / file_name_fwd)
+
+            reverse_count = 0
+            with gzip.open(file_path_rev, 'rb') as rf:
+                for line in rf:
+                    reverse_count += 1
+
+            forward_count = 0
+            with gzip.open(file_path_fwd, 'rb') as ff:
+                for line in ff:
+                    forward_count += 1
+
+            if forward_count != reverse_count:
+                raise ValidationError('There are not the same number of sequence'
+                                      ' counts forward as reverse')
 
 
 class PairedEndFastqManifestPhred33V2(_PairedEndFastqManifestV2):

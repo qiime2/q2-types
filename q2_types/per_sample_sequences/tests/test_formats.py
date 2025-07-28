@@ -150,6 +150,26 @@ class TestAbsoluteFastqManifestV2Formats(TestPluginBase):
                     'line 1.*absolute-filepath.*Human-Kneecap'):
                 fmt(manifest, mode='r').validate()
 
+    def test_paired_end_sets_matched(self):
+        unmatched_manifest = self.get_data_path('unmatched_paired_end/MANIFEST')
+        file_fwd_unmatch = self.get_data_path(
+            'unmatched_paired_end/sample-name-1.fastq.gz'
+        )
+        file_rev_unmatch = self.get_data_path(
+            'unmatched_paired_end/sample-name-2.fastq.gz'
+        )
+        manifest = self.template_manifest(
+           unmatched_manifest, {'r1': file_fwd_unmatch, 'r2': file_rev_unmatch}
+        )
+
+        for fmt in self.pe_formats:
+            with self.assertRaisesRegex(
+                ValidationError,
+                'There are not the same number of sequence'
+                ' counts forward as reverse'
+            ):
+                fmt(manifest, mode='r').validate()
+
 
 class TestAbsoluteFastqManifestFormats(TestPluginBase):
     package = 'q2_types.per_sample_sequences.tests'
