@@ -151,7 +151,9 @@ class TestAbsoluteFastqManifestV2Formats(TestPluginBase):
                 fmt(manifest, mode='r').validate()
 
     def test_paired_end_sets_matched(self):
-        unmatched_manifest = self.get_data_path('unmatched_paired_end/MANIFEST')
+        unmatched_manifest = self.get_data_path(
+            'unmatched_paired_end/MANIFEST'
+        )
         file_fwd_unmatch = self.get_data_path(
             'unmatched_paired_end/sample-name-1.fastq.gz'
         )
@@ -165,8 +167,8 @@ class TestAbsoluteFastqManifestV2Formats(TestPluginBase):
         for fmt in self.pe_formats:
             with self.assertRaisesRegex(
                 ValidationError,
-                'There are not the same number of sequence'
-                ' counts forward as reverse'
+                'There are not the same number of sequence counts forward as'
+                ' reverse.'
             ):
                 fmt(manifest, mode='r').validate()
 
