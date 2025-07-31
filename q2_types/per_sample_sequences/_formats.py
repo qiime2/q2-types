@@ -5,7 +5,6 @@
 #
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
-import gzip
 import os
 import re
 import itertools
@@ -26,6 +25,7 @@ from q2_types.bowtie2 import Bowtie2IndexDirFmt
 from q2_types.feature_data import DNAFASTAFormat
 from ._util import _parse_sequence_filename, _manifest_to_df
 from .._util import FastqGzFormat
+from ._util import validate_paired_ends_match
 
 
 class FastqAbsolutePathManifestFormatV2(model.TextFileFormat):
@@ -112,18 +112,9 @@ class _PairedEndFastqManifestV2(FastqAbsolutePathManifestFormatV2):
                     os.path.exists(file_path_rev) and
                     os.path.exists(file_path_fwd)
                 ):
-                    reverse_count = 0
-                    with gzip.open(file_path_rev, 'rb') as rf:
-                        for line in rf:
-                            reverse_count += 1
-
-                    forward_count = 0
-
-                    with gzip.open(file_path_fwd, 'rb') as ff:
-                        for line in ff:
-                            forward_count += 1
-
-                    if forward_count != reverse_count:
+                    if not validate_paired_ends_match(
+                            file_path_rev, file_path_fwd
+                    ):
                         raise ValidationError(
                             'There are not the same number of sequence counts '
                             'forward as reverse.'
@@ -354,6 +345,30 @@ class CasavaOneEightSingleLanePerSampleDirFmt(model.DirectoryFormat):
                     "reverse reads: %r" % (set_forwards ^ set_reverse))
         elif self._REQUIRE_PAIRED:
             raise ValidationError("Reads are not paired end.")
+
+        if forwards and reverse:
+            samples = {}
+
+            for file in self.path.iterdir():
+                match = re.match(
+                    r'(.+?)_S\d+_L\d{3}_R([12])_001\.fastq\.gz', file.name
+                )
+                if match:
+                    sample_id, direction = match.groups()
+                    samples.setdefault(sample_id, {})[direction] = file.name
+
+            for key in samples:
+                fwd_name = samples[key].get('1')
+                rev_name = samples[key].get('2')
+
+                fwd_path = self.path / fwd_name
+                rev_path = self.path / rev_name
+
+                if not validate_paired_ends_match(fwd_path, rev_path):
+                    raise ValidationError(
+                        'There are not the same number of sequence counts '
+                        'forward as reverse.'
+                    )
 
 
 class _SingleLanePerSampleFastqDirFmt(CasavaOneEightSingleLanePerSampleDirFmt):

@@ -361,6 +361,22 @@ def _mag_manifest_helper(dirfmt, output_cls, manifest_fmt,
     return result
 
 
+def validate_paired_ends_match(file_fwd, file_rev):
+    def count_lines(file):
+        result = 0
+        with gzip.open(file, 'rb') as f:
+            while block := f.read(1024 * 1024):
+                result = result + block.count(b'\n')
+        return result
+    fwd_count = count_lines(file_fwd)
+    rev_count = count_lines(file_rev)
+
+    if fwd_count != rev_count:
+        return False
+    else:
+        return True
+
+
 # def _bowtie2_fmt_helper(dirfmt, output_cls, bowtie_fmt):
 #     result = output_cls()
 #     for path, view in dirfmt.sequences.iter_views(bowtie_fmt):

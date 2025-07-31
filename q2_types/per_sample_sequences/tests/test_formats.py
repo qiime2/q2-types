@@ -155,10 +155,10 @@ class TestAbsoluteFastqManifestV2Formats(TestPluginBase):
             'unmatched_paired_end/MANIFEST'
         )
         file_fwd_unmatch = self.get_data_path(
-            'unmatched_paired_end/sample-name-1.fastq.gz'
+            'unmatched_paired_end/sample-name-1_S1_L001_R1_001.fastq.gz'
         )
         file_rev_unmatch = self.get_data_path(
-            'unmatched_paired_end/sample-name-2.fastq.gz'
+            'unmatched_paired_end/sample-name-1_S1_L001_R2_001.fastq.gz'
         )
         manifest = self.template_manifest(
            unmatched_manifest, {'r1': file_fwd_unmatch, 'r2': file_rev_unmatch}
@@ -442,6 +442,24 @@ class TestFormats(TestPluginBase):
 
         with self.assertRaisesRegex(ValidationError,
                                     'Duplicate.*Human-Kneecap'):
+            format.validate()
+
+    def test_casava_one_eight_slanepsample_dir_fmt_paired_match(self):
+        file_path_fwd = self.get_data_path(
+            'unmatched_paired_end/sample-name-1_S1_L001_R1_001.fastq.gz'
+        )
+        file_path_rev = self.get_data_path(
+            'unmatched_paired_end/sample-name-1_S1_L001_R2_001.fastq.gz'
+        )
+        shutil.copy(file_path_fwd, self.temp_dir.name)
+        shutil.copy(file_path_rev, self.temp_dir.name)
+        format = CasavaOneEightSingleLanePerSampleDirFmt(
+            self.temp_dir.name, mode='r'
+        )
+        with self.assertRaisesRegex(ValidationError,
+                                    'There are not the same number of sequence'
+                                    ' counts forward as reverse.'
+                                    ):
             format.validate()
 
     def test_miseq_demux_dir_fmt_validate_positive(self):

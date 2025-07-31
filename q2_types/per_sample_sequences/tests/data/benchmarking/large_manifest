@@ -1,0 +1,6 @@
+sample-id	forward-absolute-filepath	reverse-absolute-filepath
+sample-name-0	/Users/macabewood/internship/q2-types/q2_types/per_sample_sequences/tests/data/benchmarking/sample-name-0.fastq.gz	/Users/macabewood/internship/q2-types/q2_types/per_sample_sequences/tests/data/benchmarking/sample-name-1.fastq.gz
+sample-name-1	/Users/macabewood/internship/q2-types/q2_types/per_sample_sequences/tests/data/benchmarking/sample-name-2.fastq.gz	/Users/macabewood/internship/q2-types/q2_types/per_sample_sequences/tests/data/benchmarking/sample-name-3.fastq.gz
+sample-name-2	/Users/macabewood/internship/q2-types/q2_types/per_sample_sequences/tests/data/benchmarking/sample-name-4.fastq.gz	/Users/macabewood/internship/q2-types/q2_types/per_sample_sequences/tests/data/benchmarking/sample-name-5.fastq.gz
+sample-name-3	/Users/macabewood/internship/q2-types/q2_types/per_sample_sequences/tests/data/benchmarking/sample-name-6.fastq.gz	/Users/macabewood/internship/q2-types/q2_types/per_sample_sequences/tests/data/benchmarking/sample-name-7.fastq.gz
+sample-name-4	/Users/macabewood/internship/q2-types/q2_types/per_sample_sequences/tests/data/benchmarking/sample-name-8.fastq.gz	/Users/macabewood/internship/q2-types/q2_types/per_sample_sequences/tests/data/benchmarking/sample-name-9.fastq.gz
