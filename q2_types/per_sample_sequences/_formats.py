@@ -104,21 +104,18 @@ class _PairedEndFastqManifestV2(FastqAbsolutePathManifestFormatV2):
             file_name_rev = row['reverse-absolute-filepath']
             file_name_fwd = row['forward-absolute-filepath']
 
-            if pd.notna(file_name_rev) and pd.notna(file_name_fwd):
-                file_path_rev = str(self.path.parent / file_name_rev)
-                file_path_fwd = str(self.path.parent / file_name_fwd)
+            if not pd.notna(file_name_rev) and pd.notna(file_name_fwd):
+                break
 
-                if (
-                    os.path.exists(file_path_rev) and
-                    os.path.exists(file_path_fwd)
-                ):
-                    if not validate_paired_ends_match(
-                            file_path_rev, file_path_fwd
-                    ):
-                        raise ValidationError(
-                            'There are not the same number of sequence counts '
-                            'forward as reverse.'
-                        )
+            file_path_rev = str(self.path.parent / file_name_rev)
+            file_path_fwd = str(self.path.parent / file_name_fwd)
+
+            if not (
+                os.path.exists(file_path_rev) and
+                os.path.exists(file_path_fwd)
+            ):
+                break
+            validate_paired_ends_match(file_path_fwd, file_path_rev)
 
 
 class PairedEndFastqManifestPhred33V2(_PairedEndFastqManifestV2):
@@ -347,28 +344,24 @@ class CasavaOneEightSingleLanePerSampleDirFmt(model.DirectoryFormat):
             raise ValidationError("Reads are not paired end.")
 
         if forwards and reverse:
-            samples = {}
-
             for file in self.path.iterdir():
-                match = re.match(
-                    r'(.+?)_S\d+_L\d{3}_R([12])_001\.fastq\.gz', file.name
-                )
-                if match:
-                    sample_id, direction = match.groups()
-                    samples.setdefault(sample_id, {})[direction] = file.name
+                validated_files = []
+                if re.match(
+                        r'.+_.+_L[0-9][0-9][0-9]_R[12]_001\.fastq\.gz',
+                        file.name
+                ) and file.name not in validated_files:
+                    if 'R1' in file.name:
+                        file_other = file.name.replace('R1', 'R2')
+                    else:
+                        file_other = file.name.replace('R2', 'R1')
 
-            for key in samples:
-                fwd_name = samples[key].get('1')
-                rev_name = samples[key].get('2')
+                    validated_files.append(file.name)
+                    validated_files.append(file_other)
 
-                fwd_path = self.path / fwd_name
-                rev_path = self.path / rev_name
+                    file_path = self.path / file.name
+                    file_path_other = self.path / file_other
 
-                if not validate_paired_ends_match(fwd_path, rev_path):
-                    raise ValidationError(
-                        'There are not the same number of sequence counts '
-                        'forward as reverse.'
-                    )
+                    validate_paired_ends_match(file_path, file_path_other)
 
 
 class _SingleLanePerSampleFastqDirFmt(CasavaOneEightSingleLanePerSampleDirFmt):

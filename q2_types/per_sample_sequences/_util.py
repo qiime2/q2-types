@@ -17,6 +17,8 @@ import qiime2.util
 import skbio
 import yaml
 
+from qiime2.plugin import ValidationError
+
 
 # Note: we DI all of the formats into these utils so that we don't wind
 # up in circular import mayhem. That is all.
@@ -361,20 +363,29 @@ def _mag_manifest_helper(dirfmt, output_cls, manifest_fmt,
     return result
 
 
-def validate_paired_ends_match(file_fwd, file_rev):
+def validate_paired_ends_match(file_fwd: str, file_rev: str):
+    """
+    This function counts the number of lines in a fastq file using the nested
+    `count_lines` function for the forward and reverse sequences. It then
+    compares it to the complementary count and raises an error if the counts
+    do not match.
+    """
     def count_lines(file):
         result = 0
         with gzip.open(file, 'rb') as f:
             while block := f.read(1024 * 1024):
                 result = result + block.count(b'\n')
         return result
+
     fwd_count = count_lines(file_fwd)
     rev_count = count_lines(file_rev)
-
     if fwd_count != rev_count:
-        return False
-    else:
-        return True
+        raise ValidationError(
+            'A pair of paired-end files were found not to have'
+            ' the same number of records.' + str(file_fwd) + ' has '
+            + str(fwd_count) + ' number of records. ' + str(file_rev) + ' has '
+            + str(rev_count) + ' number of records.'
+        )
 
 
 # def _bowtie2_fmt_helper(dirfmt, output_cls, bowtie_fmt):

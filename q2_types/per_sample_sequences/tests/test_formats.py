@@ -14,6 +14,7 @@ from pathlib import Path
 from unittest.mock import patch, Mock
 
 import pandas as pd
+import re
 
 from qiime2.plugin.testing import TestPluginBase
 from qiime2.plugin import ValidationError
@@ -150,7 +151,7 @@ class TestAbsoluteFastqManifestV2Formats(TestPluginBase):
                     'line 1.*absolute-filepath.*Human-Kneecap'):
                 fmt(manifest, mode='r').validate()
 
-    def test_paired_end_sets_matched(self):
+    def test_paired_end_records_match(self):
         unmatched_manifest = self.get_data_path(
             'unmatched_paired_end/MANIFEST'
         )
@@ -167,8 +168,14 @@ class TestAbsoluteFastqManifestV2Formats(TestPluginBase):
         for fmt in self.pe_formats:
             with self.assertRaisesRegex(
                 ValidationError,
-                'There are not the same number of sequence counts forward as'
-                ' reverse.'
+                re.compile(
+                            r"A pair of paired-end files were found"
+                            r" not to have the same number of "
+                            r"records\..+? has \d+ number of "
+                            r"records\..+? has \d+ number of "
+                            r"records\.",
+                            re.DOTALL
+                )
             ):
                 fmt(manifest, mode='r').validate()
 
@@ -457,8 +464,14 @@ class TestFormats(TestPluginBase):
             self.temp_dir.name, mode='r'
         )
         with self.assertRaisesRegex(ValidationError,
-                                    'There are not the same number of sequence'
-                                    ' counts forward as reverse.'
+                                    re.compile(
+                                        r"A pair of paired-end files were "
+                                        r"found not to have the same number of"
+                                        r" records\..+? has \d+ number of "
+                                        r"records\..+? has \d+ number of "
+                                        r"records\.",
+                                        re.DOTALL
+                                    )
                                     ):
             format.validate()
 
