@@ -381,10 +381,9 @@ def validate_paired_ends_match(file_fwd: str, file_rev: str):
     rev_count = count_lines(file_rev)
     if fwd_count != rev_count:
         raise ValidationError(
-            'A pair of paired-end files were found not to have'
-            ' the same number of records.' + str(file_fwd) + ' has '
-            + str(fwd_count) + ' number of records. ' + str(file_rev) + ' has '
-            + str(rev_count) + ' number of records.'
+            f'A pair of paired-end files were found not to have the same '
+            f'number of records. {file_fwd} has {fwd_count} number of'
+            f' records. {file_rev} has {rev_count} number of records.'
         )
 
 

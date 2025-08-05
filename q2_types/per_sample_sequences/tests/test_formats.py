@@ -169,12 +169,12 @@ class TestAbsoluteFastqManifestV2Formats(TestPluginBase):
             with self.assertRaisesRegex(
                 ValidationError,
                 re.compile(
-                            r"A pair of paired-end files were found"
-                            r" not to have the same number of "
-                            r"records\..+? has \d+ number of "
-                            r"records\..+? has \d+ number of "
-                            r"records\.",
-                            re.DOTALL
+                    r"A pair of paired-end files were found"
+                    r" not to have the same number of "
+                    r"records\..+? has \d+ number of "
+                    r"records\..+? has \d+ number of "
+                    r"records\.",
+                    re.DOTALL
                 )
             ):
                 fmt(manifest, mode='r').validate()
@@ -463,16 +463,17 @@ class TestFormats(TestPluginBase):
         format = CasavaOneEightSingleLanePerSampleDirFmt(
             self.temp_dir.name, mode='r'
         )
-        with self.assertRaisesRegex(ValidationError,
-                                    re.compile(
-                                        r"A pair of paired-end files were "
-                                        r"found not to have the same number of"
-                                        r" records\..+? has \d+ number of "
-                                        r"records\..+? has \d+ number of "
-                                        r"records\.",
-                                        re.DOTALL
-                                    )
-                                    ):
+        with self.assertRaisesRegex(
+                ValidationError,
+                re.compile(
+                    r"A pair of paired-end files were "
+                    r"found not to have the same number of"
+                    r" records\..+? has \d+ number of "
+                    r"records\..+? has \d+ number of "
+                    r"records\.",
+                    re.DOTALL
+                )
+                ):
             format.validate()
 
     def test_miseq_demux_dir_fmt_validate_positive(self):

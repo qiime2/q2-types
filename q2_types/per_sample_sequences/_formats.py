@@ -104,7 +104,7 @@ class _PairedEndFastqManifestV2(FastqAbsolutePathManifestFormatV2):
             file_name_rev = row['reverse-absolute-filepath']
             file_name_fwd = row['forward-absolute-filepath']
 
-            if not pd.notna(file_name_rev) and pd.notna(file_name_fwd):
+            if pd.isna(file_name_rev) and pd.isna(file_name_fwd):
                 break
 
             file_path_rev = str(self.path.parent / file_name_rev)
@@ -115,6 +115,7 @@ class _PairedEndFastqManifestV2(FastqAbsolutePathManifestFormatV2):
                 os.path.exists(file_path_fwd)
             ):
                 break
+
             validate_paired_ends_match(file_path_fwd, file_path_rev)
 
 
@@ -343,6 +344,8 @@ class CasavaOneEightSingleLanePerSampleDirFmt(model.DirectoryFormat):
         elif self._REQUIRE_PAIRED:
             raise ValidationError("Reads are not paired end.")
 
+        # This branch validates that if there are forward and reverse reads
+        # that each has the same number of records
         if forwards and reverse:
             for file in self.path.iterdir():
                 validated_files = []
