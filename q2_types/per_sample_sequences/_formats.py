@@ -104,7 +104,7 @@ class _PairedEndFastqManifestV2(FastqAbsolutePathManifestFormatV2):
             file_name_rev = row['reverse-absolute-filepath']
             file_name_fwd = row['forward-absolute-filepath']
 
-            if pd.isna(file_name_rev) and pd.isna(file_name_fwd):
+            if pd.isna(file_name_rev) or pd.isna(file_name_fwd):
                 break
 
             file_path_rev = str(self.path.parent / file_name_rev)
