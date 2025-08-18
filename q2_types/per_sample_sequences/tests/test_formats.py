@@ -14,7 +14,6 @@ from pathlib import Path
 from unittest.mock import patch, Mock
 
 import pandas as pd
-import re
 
 from qiime2.plugin.testing import TestPluginBase
 from qiime2.plugin import ValidationError
