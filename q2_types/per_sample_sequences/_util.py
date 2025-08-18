@@ -365,25 +365,36 @@ def _mag_manifest_helper(dirfmt, output_cls, manifest_fmt,
 
 def validate_paired_ends_match(file_fwd: str, file_rev: str):
     """
-    This function counts the number of lines in a fastq file using the nested
-    `count_lines` function for the forward and reverse sequences. It then
-    compares it to the complementary count and raises an error if the counts
-    do not match.
+    Ensures that the number of lines in the `file_fwd` and `file_rev` fastq
+    files match.
+
+    Parameters
+    ----------
+    file_fwd : str
+        The absolute path to the forward read file.
+    file_rev : str
+        The absolute path to the reverse read file.
+
+    Raises
+    ------
+    ValidationError
+        If the line counts of the forward and reverse read files are not equal.
     """
     def count_lines(file):
-        result = 0
+        num_lines = 0
         with gzip.open(file, 'rb') as f:
             while block := f.read(1024 * 1024):
-                result = result + block.count(b'\n')
-        return result
+                num_lines = num_lines + block.count(b'\n')
+        return num_lines
 
     fwd_count = count_lines(file_fwd)
     rev_count = count_lines(file_rev)
+
     if fwd_count != rev_count:
         raise ValidationError(
             f'A pair of paired-end files were found not to have the same '
-            f'number of records. {file_fwd} has {fwd_count} number of'
-            f' records. {file_rev} has {rev_count} number of records.'
+            f'number of records. {file_fwd} has {fwd_count} records. '
+            f'{file_rev} has {rev_count} records.'
         )
 
 
