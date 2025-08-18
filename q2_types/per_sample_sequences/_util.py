@@ -363,7 +363,7 @@ def _mag_manifest_helper(dirfmt, output_cls, manifest_fmt,
     return result
 
 
-def validate_paired_ends_match(file_fwd: str, file_rev: str):
+def validate_paired_ends_equal_record_count(file_fwd: str, file_rev: str):
     """
     Ensures that the number of lines in the `file_fwd` and `file_rev` fastq
     files match.

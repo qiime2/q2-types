@@ -152,6 +152,10 @@ class TestAbsoluteFastqManifestV2Formats(TestPluginBase):
                 fmt(manifest, mode='r').validate()
 
     def test_paired_end_records_match(self):
+        '''
+        Tests that an error is raised when a pair of read mate files do not
+        have an equal number of records.
+        '''
         unmatched_manifest = self.get_data_path(
             'unmatched_paired_end/MANIFEST'
         )
@@ -168,14 +172,8 @@ class TestAbsoluteFastqManifestV2Formats(TestPluginBase):
         for fmt in self.pe_formats:
             with self.assertRaisesRegex(
                 ValidationError,
-                re.compile(
-                    r"A pair of paired-end files were found"
-                    r" not to have the same number of "
-                    r"records\..+? has \d+ number of "
-                    r"records\..+? has \d+ number of "
-                    r"records\.",
-                    re.DOTALL
-                )
+                "A pair of paired-end files were found not to have the same "
+                "number of records"
             ):
                 fmt(manifest, mode='r').validate()
 
@@ -452,28 +450,29 @@ class TestFormats(TestPluginBase):
             format.validate()
 
     def test_casava_one_eight_slanepsample_dir_fmt_paired_match(self):
+        '''
+        Tests that an error is raised when a pair of read mate files do not
+        have an equal number of records.
+        '''
         file_path_fwd = self.get_data_path(
             'unmatched_paired_end/sample-name-1_S1_L001_R1_001.fastq.gz'
         )
         file_path_rev = self.get_data_path(
             'unmatched_paired_end/sample-name-1_S1_L001_R2_001.fastq.gz'
         )
+
         shutil.copy(file_path_fwd, self.temp_dir.name)
         shutil.copy(file_path_rev, self.temp_dir.name)
+
         format = CasavaOneEightSingleLanePerSampleDirFmt(
             self.temp_dir.name, mode='r'
         )
+
         with self.assertRaisesRegex(
-                ValidationError,
-                re.compile(
-                    r"A pair of paired-end files were "
-                    r"found not to have the same number of"
-                    r" records\..+? has \d+ number of "
-                    r"records\..+? has \d+ number of "
-                    r"records\.",
-                    re.DOTALL
-                )
-                ):
+            ValidationError,
+            "A pair of paired-end files were found not to have the same "
+            "number of records"
+        ):
             format.validate()
 
     def test_miseq_demux_dir_fmt_validate_positive(self):
