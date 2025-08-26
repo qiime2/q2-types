@@ -5,7 +5,6 @@
 #
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
-
 import os
 import re
 import itertools
@@ -26,6 +25,7 @@ from q2_types.bowtie2 import Bowtie2IndexDirFmt
 from q2_types.feature_data import DNAFASTAFormat
 from ._util import _parse_sequence_filename, _manifest_to_df
 from .._util import FastqGzFormat
+from ._util import validate_paired_ends_equal_record_count
 
 
 class FastqAbsolutePathManifestFormatV2(model.TextFileFormat):
@@ -91,6 +91,34 @@ class SingleEndFastqManifestPhred64V2(_SingleEndFastqManifestV2):
 class _PairedEndFastqManifestV2(FastqAbsolutePathManifestFormatV2):
     METADATA_COLUMNS = {'forward-absolute-filepath': 'forward',
                         'reverse-absolute-filepath': 'reverse'}
+
+    def _validate_(self, level):
+        super()._validate_(level)
+
+        manifest = pd.read_csv(
+            str(self.path), header=0, comment='#', dtype=str, sep='\t'
+        )
+
+        for _, row in manifest.iterrows():
+
+            file_name_rev = row['reverse-absolute-filepath']
+            file_name_fwd = row['forward-absolute-filepath']
+
+            if pd.isna(file_name_rev) or pd.isna(file_name_fwd):
+                break
+
+            file_path_rev = str(self.path.parent / file_name_rev)
+            file_path_fwd = str(self.path.parent / file_name_fwd)
+
+            if not (
+                os.path.exists(file_path_rev) and
+                os.path.exists(file_path_fwd)
+            ):
+                break
+
+            validate_paired_ends_equal_record_count(
+                file_path_fwd, file_path_rev
+            )
 
 
 class PairedEndFastqManifestPhred33V2(_PairedEndFastqManifestV2):
@@ -238,9 +266,10 @@ class CasavaOneEightSingleLanePerSampleDirFmt(model.DirectoryFormat):
     _CHECK_PAIRED = True
     _REQUIRE_PAIRED = False
 
+    casava_one_eight_regex = r'.+_.+_L[0-9][0-9][0-9]_R[12]_001\.fastq\.gz'
     sequences = model.FileCollection(
-        r'.+_.+_L[0-9][0-9][0-9]_R[12]_001\.fastq\.gz',
-        format=FastqGzFormat)
+        casava_one_eight_regex, format=FastqGzFormat
+    )
 
     @sequences.set_path_maker
     def sequences_path_maker(self, sample_id, barcode_id, lane_number,
@@ -317,6 +346,29 @@ class CasavaOneEightSingleLanePerSampleDirFmt(model.DirectoryFormat):
                     "reverse reads: %r" % (set_forwards ^ set_reverse))
         elif self._REQUIRE_PAIRED:
             raise ValidationError("Reads are not paired end.")
+
+        # ensure read pair record counts match
+        if forwards and reverse:
+            validated_files = []
+            for file in self.path.iterdir():
+                if file.name in validated_files:
+                    continue
+
+                if re.match(self.casava_one_eight_regex, file.name):
+                    if 'R1' in file.name:
+                        pair = file.name.replace('R1', 'R2')
+                    else:
+                        pair = file.name.replace('R2', 'R1')
+
+                    validated_files.append(file.name)
+                    validated_files.append(pair)
+
+                    file_path = self.path / file.name
+                    pair_path = self.path / pair
+
+                    validate_paired_ends_equal_record_count(
+                        str(file_path), str(pair_path)
+                    )
 
 
 class _SingleLanePerSampleFastqDirFmt(CasavaOneEightSingleLanePerSampleDirFmt):

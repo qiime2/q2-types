@@ -17,6 +17,8 @@ import qiime2.util
 import skbio
 import yaml
 
+from qiime2.plugin import ValidationError
+
 
 # Note: we DI all of the formats into these utils so that we don't wind
 # up in circular import mayhem. That is all.
@@ -359,6 +361,41 @@ def _mag_manifest_helper(dirfmt, output_cls, manifest_fmt,
     result.manifest.write_data(manifest, manifest_fmt)
 
     return result
+
+
+def validate_paired_ends_equal_record_count(file_fwd: str, file_rev: str):
+    """
+    Ensures that the number of lines in the `file_fwd` and `file_rev` fastq
+    files match.
+
+    Parameters
+    ----------
+    file_fwd : str
+        The absolute path to the forward read file.
+    file_rev : str
+        The absolute path to the reverse read file.
+
+    Raises
+    ------
+    ValidationError
+        If the line counts of the forward and reverse read files are not equal.
+    """
+    def count_lines(file):
+        num_lines = 0
+        with gzip.open(file, 'rb') as f:
+            while block := f.read(1024 * 1024):
+                num_lines = num_lines + block.count(b'\n')
+        return num_lines
+
+    fwd_count = count_lines(file_fwd)
+    rev_count = count_lines(file_rev)
+
+    if fwd_count != rev_count:
+        raise ValidationError(
+            f'A pair of paired-end files were found not to have the same '
+            f'number of records. {file_fwd} has {fwd_count} records. '
+            f'{file_rev} has {rev_count} records.'
+        )
 
 
 # def _bowtie2_fmt_helper(dirfmt, output_cls, bowtie_fmt):
