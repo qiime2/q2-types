@@ -458,8 +458,16 @@ class TestFormats(TestPluginBase):
         file_path_rev = self.get_data_path(
             'unmatched_paired_end/sample-name-1_S1_L001_R2_001.fastq.gz'
         )
+        file_path_fwd_2 = self.get_data_path(
+            'different_file_names/sample_b_S02_L001_R1_001.fastq.gz'
+        )
+        file_path_rev_2 = self.get_data_path(
+            'different_file_names/sample_b_S00_L001_R2_001.fastq.gz'
+        )
         shutil.copy(file_path_fwd, self.temp_dir.name)
         shutil.copy(file_path_rev, self.temp_dir.name)
+        shutil.copy(file_path_fwd_2, self.temp_dir.name)
+        shutil.copy(file_path_rev_2, self.temp_dir.name)
         format = CasavaOneEightSingleLanePerSampleDirFmt(
             self.temp_dir.name, mode='r'
         )

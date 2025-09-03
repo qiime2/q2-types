@@ -264,8 +264,10 @@ class CasavaOneEightSingleLanePerSampleDirFmt(model.DirectoryFormat):
     _CHECK_PAIRED = True
     _REQUIRE_PAIRED = False
 
+    casava_regex = r'.+_.+_L[0-9][0-9][0-9]_R[12]_001\.fastq\.gz'
+
     sequences = model.FileCollection(
-        r'.+_.+_L[0-9][0-9][0-9]_R[12]_001\.fastq\.gz',
+        casava_regex,
         format=FastqGzFormat)
 
     @sequences.set_path_maker
@@ -347,24 +349,31 @@ class CasavaOneEightSingleLanePerSampleDirFmt(model.DirectoryFormat):
         # This branch validates that if there are forward and reverse reads
         # that each has the same number of records
         if forwards and reverse:
+            validated_files = []
             for file in self.path.iterdir():
-                validated_files = []
-                if re.match(
-                        r'.+_.+_L[0-9][0-9][0-9]_R[12]_001\.fastq\.gz',
-                        file.name
-                ) and file.name not in validated_files:
-                    if 'R1' in file.name:
-                        file_other = file.name.replace('R1', 'R2')
-                    else:
-                        file_other = file.name.replace('R2', 'R1')
+                if file.name in validated_files:
+                    continue
+                if not re.match(self.casava_regex, file.name):
+                    continue
 
-                    validated_files.append(file.name)
-                    validated_files.append(file_other)
+                if 'R1' in file.name:
+                    for file2 in self.path.iterdir():
+                        sample_id = re.split('_S[0-9]', file.name)[0]
+                        if sample_id in file2.name:
+                            pair = file2.name
+                else:
+                    for file2 in self.path.iterdir():
+                        sample_id = re.split('_S[0-9]', file.name)[0]
+                        if sample_id in file2.name:
+                            pair = file2.name
 
-                    file_path = self.path / file.name
-                    file_path_other = self.path / file_other
+                validated_files.append(file.name)
+                validated_files.append(pair)
 
-                    validate_paired_ends_match(file_path, file_path_other)
+                file_path = self.path / file.name
+                pair_path = self.path / pair
+
+                validate_paired_ends_match(file_path, pair_path)
 
 
 class _SingleLanePerSampleFastqDirFmt(CasavaOneEightSingleLanePerSampleDirFmt):
