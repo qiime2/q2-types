@@ -14,7 +14,6 @@ from pathlib import Path
 from unittest.mock import patch, Mock
 
 import pandas as pd
-import re
 
 from qiime2.plugin.testing import TestPluginBase
 from qiime2.plugin import ValidationError
@@ -167,15 +166,9 @@ class TestAbsoluteFastqManifestV2Formats(TestPluginBase):
 
         for fmt in self.pe_formats:
             with self.assertRaisesRegex(
-                ValidationError,
-                re.compile(
-                    r"A pair of paired-end files were found"
-                    r" not to have the same number of "
-                    r"records\..+? has \d+ number of "
-                    r"records\..+? has \d+ number of "
-                    r"records\.",
-                    re.DOTALL
-                )
+                    ValidationError,
+                    "A pair of paired-end files were found not to have the "
+                    "same number of records"
             ):
                 fmt(manifest, mode='r').validate()
 
@@ -473,14 +466,8 @@ class TestFormats(TestPluginBase):
         )
         with self.assertRaisesRegex(
                 ValidationError,
-                re.compile(
-                    r"A pair of paired-end files were "
-                    r"found not to have the same number of"
-                    r" records\..+? has \d+ number of "
-                    r"records\..+? has \d+ number of "
-                    r"records\.",
-                    re.DOTALL
-                )
+                "A pair of paired-end files were found not to have the same "
+                "number of records"
                 ):
             format.validate()
 

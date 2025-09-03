@@ -354,21 +354,23 @@ class CasavaOneEightSingleLanePerSampleDirFmt(model.DirectoryFormat):
                 if file.name in validated_files:
                     continue
 
-                if re.match(self.casava_one_eight_regex, file.name):
-                    if 'R1' in file.name:
-                        pair = file.name.replace('R1', 'R2')
-                    else:
-                        pair = file.name.replace('R2', 'R1')
+                if not re.match(self.casava_one_eight_regex, file.name):
+                    continue
 
-                    validated_files.append(file.name)
-                    validated_files.append(pair)
+                sample_id = re.split('_S[0-9]', file.name)[0]
+                for file2 in self.path.iterdir():
+                    if sample_id in file2.name:
+                        pair = file2.name
 
-                    file_path = self.path / file.name
-                    pair_path = self.path / pair
+                validated_files.append(file.name)
+                validated_files.append(pair)
 
-                    validate_paired_ends_equal_record_count(
-                        str(file_path), str(pair_path)
-                    )
+                file_path = self.path / file.name
+                pair_path = self.path / pair
+
+                validate_paired_ends_equal_record_count(
+                    str(file_path), str(pair_path)
+                )
 
 
 class _SingleLanePerSampleFastqDirFmt(CasavaOneEightSingleLanePerSampleDirFmt):
