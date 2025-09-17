@@ -226,7 +226,9 @@ plugin.methods.register_function(
     inputs={"proteins": List[GenomeData[Proteins]]},
     parameters={},
     outputs={"collated_proteins": GenomeData[Proteins]},
-    input_descriptions={"proteins": "A collection of proteins to be collated."},
+    input_descriptions={
+        "proteins": "A collection of proteins to be collated."
+    },
     name="Collate proteins",
     description="Takes a collection of GenomeData[Proteins] "
                 "and collates them into a single artifact.",

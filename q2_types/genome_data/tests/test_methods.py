@@ -11,7 +11,7 @@ import os
 from qiime2.plugin.testing import TestPluginBase
 
 from q2_types.genome_data import SeedOrthologDirFmt, collate_orthologs, \
-    partition_orthologs, OrthologAnnotationDirFmt, \ 
+    partition_orthologs, OrthologAnnotationDirFmt, \
     collate_ortholog_annotations, GenesDirectoryFormat, \
     ProteinsDirectoryFormat, collate_loci, collate_genes
 from q2_types.genome_data import LociDirectoryFormat

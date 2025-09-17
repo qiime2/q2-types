@@ -52,7 +52,7 @@ def collate_helper(dir_fmts, collated):
                 for file in item.iterdir():
                     duplicate(file, target / file.name)
             else:
-                duplicate(item,collated.path / os.path.basename(item))
+                duplicate(item, collated.path / os.path.basename(item))
     return collated
 
 
