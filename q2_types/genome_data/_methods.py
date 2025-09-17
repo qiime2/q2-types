@@ -23,7 +23,9 @@ def collate_loci(loci: LociDirectoryFormat) -> LociDirectoryFormat:
 def collate_ortholog_annotations(
     ortholog_annotations: OrthologAnnotationDirFmt
 ) -> OrthologAnnotationDirFmt:
-    return collate_helper(dir_fmts=ortholog_annotations, collated=OrthologAnnotationDirFmt())
+    return collate_helper(
+        dir_fmts=ortholog_annotations, 
+        collated=OrthologAnnotationDirFmt())
 
 def collate_genes(genes: GenesDirectoryFormat) -> GenesDirectoryFormat:
     return collate_helper(dir_fmts=genes, collated=GenesDirectoryFormat())

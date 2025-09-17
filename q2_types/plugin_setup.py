@@ -25,8 +25,8 @@ from q2_types.per_sample_sequences import (MAGs,
                                            SequencesWithQuality,
                                            PairedEndSequencesWithQuality)
 from q2_types.feature_data import FeatureData
-from q2_types.genome_data import Orthologs, GenomeData, NOG, Loci
-from q2_types.genome_data._methods import collate_loci
+from q2_types.genome_data import Orthologs, GenomeData, NOG, Loci, Genes, Proteins
+from q2_types.genome_data._methods import collate_loci, collate_genes, collate_proteins
 from q2_types.sample_data import SampleData
 from q2_types.kraken2 import Kraken2Reports, Kraken2Outputs
 
@@ -206,6 +206,28 @@ plugin.methods.register_function(
     input_descriptions={"loci": "A collection of loci to be collated."},
     name="Collate loci",
     description="Takes a collection of GenomeData[Loci]'s "
+                "and collates them into a single artifact.",
+)
+
+plugin.methods.register_function(
+    function=collate_genes,
+    inputs={"genes": List[GenomeData[Genes]]},
+    parameters={},
+    outputs={"collated_genes": GenomeData[Genes]},
+    input_descriptions={"genes": "A collection of genes to be collated."},
+    name="Collate genes",
+    description="Takes a collection of GenomeData[Genes]'s "
+                "and collates them into a single artifact.",
+)
+
+plugin.methods.register_function(
+    function=collate_proteins,
+    inputs={"proteins": List[GenomeData[Proteins]]},
+    parameters={},
+    outputs={"collated_proteins": GenomeData[Proteins]},
+    input_descriptions={"proteins": "A collection of proteins to be collated."},
+    name="Collate proteins",
+    description="Takes a collection of GenomeData[Proteins] "
                 "and collates them into a single artifact.",
 )
 
