@@ -20,18 +20,28 @@ from q2_types.genome_data import (SeedOrthologDirFmt, OrthologAnnotationDirFmt,
 def collate_loci(loci: LociDirectoryFormat) -> LociDirectoryFormat:
     return collate_helper(dir_fmts=loci, collated=LociDirectoryFormat())
 
+
 def collate_ortholog_annotations(
     ortholog_annotations: OrthologAnnotationDirFmt
 ) -> OrthologAnnotationDirFmt:
     return collate_helper(
-        dir_fmts=ortholog_annotations, 
+        dir_fmts=ortholog_annotations,
         collated=OrthologAnnotationDirFmt())
 
-def collate_genes(genes: GenesDirectoryFormat) -> GenesDirectoryFormat:
-    return collate_helper(dir_fmts=genes, collated=GenesDirectoryFormat())
 
-def collate_proteins(proteins: ProteinsDirectoryFormat) -> ProteinsDirectoryFormat:
-    return collate_helper(dir_fmts=proteins, collated=ProteinsDirectoryFormat())
+def collate_genes(genes: GenesDirectoryFormat) -> (
+        GenesDirectoryFormat):
+    return collate_helper(
+        dir_fmts=genes,
+        collated=GenesDirectoryFormat())
+
+
+def collate_proteins(proteins: ProteinsDirectoryFormat) -> (
+        ProteinsDirectoryFormat):
+    return collate_helper(
+        dir_fmts=proteins,
+        collated=ProteinsDirectoryFormat())
+
 
 def collate_helper(dir_fmts, collated):
     for dir_fmt in dir_fmts:
@@ -44,6 +54,7 @@ def collate_helper(dir_fmts, collated):
             else:
                 duplicate(item,collated.path / os.path.basename(item))
     return collated
+
 
 def collate_orthologs(orthologs: SeedOrthologDirFmt) -> SeedOrthologDirFmt:
     result = SeedOrthologDirFmt()
@@ -102,4 +113,3 @@ def partition_orthologs(
             partitioned_orthologs[i] = result
 
     return partitioned_orthologs
-

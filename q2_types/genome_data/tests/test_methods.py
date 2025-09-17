@@ -11,10 +11,10 @@ import os
 from qiime2.plugin.testing import TestPluginBase
 
 from q2_types.genome_data import SeedOrthologDirFmt, collate_orthologs, \
-    partition_orthologs, OrthologAnnotationDirFmt, collate_ortholog_annotations, \
-    GenesDirectoryFormat, ProteinsDirectoryFormat, collate_loci, collate_genes
+    partition_orthologs, OrthologAnnotationDirFmt, \ 
+    collate_ortholog_annotations, GenesDirectoryFormat, \
+    ProteinsDirectoryFormat, collate_loci, collate_genes
 from q2_types.genome_data import LociDirectoryFormat
-from q2_types.genome_data._methods import collate_loci, collate_genes
 
 
 class TestPartitionCollating(TestPluginBase):
@@ -35,32 +35,30 @@ class TestPartitionCollating(TestPluginBase):
         self.assertTrue(os.path.exists(
             collated_orthologs.path / "2.emapper.seed_orthologs")
         )
-        
+
     def test_collate_genes(self):
         p1 = self.get_data_path("partitioned_genes/1")
         p2 = self.get_data_path("partitioned_genes/2")
-
-        collated = collate_genes(
-            [
+        genes = [
             GenesDirectoryFormat(p1, mode="r"),
             GenesDirectoryFormat(p2, mode="r")
-        ])
+        ]
+        collated = collate_genes(genes)
         self.assertTrue(os.path.exists(
             collated.path / "genes1.fa")
         )
         self.assertTrue(os.path.exists(
             collated.path / "genes2.fa")
         )
-    
+
     def test_collate_proteins_per_sample(self):
         p1 = self.get_data_path("partitioned_proteins/1")
         p2 = self.get_data_path("partitioned_proteins/2")
-
-        collated = collate_genes(
-            [
+        proteins = [
             ProteinsDirectoryFormat(p1, mode="r"),
             ProteinsDirectoryFormat(p2, mode="r")
-        ])
+        ]
+        collated = collate_genes(proteins)
         self.assertTrue(os.path.exists(
             collated.path / "sample1" / "proteins1.faa")
         )

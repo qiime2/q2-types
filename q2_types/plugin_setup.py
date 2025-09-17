@@ -25,8 +25,9 @@ from q2_types.per_sample_sequences import (MAGs,
                                            SequencesWithQuality,
                                            PairedEndSequencesWithQuality)
 from q2_types.feature_data import FeatureData
-from q2_types.genome_data import Orthologs, GenomeData, NOG, Loci, Genes, Proteins
-from q2_types.genome_data._methods import collate_loci, collate_genes, collate_proteins
+from q2_types.genome_data import (
+    Orthologs, GenomeData, NOG, Loci, Genes, Proteins)
+from q2_types.genome_data import collate_loci, collate_genes, collate_proteins
 from q2_types.sample_data import SampleData
 from q2_types.kraken2 import Kraken2Reports, Kraken2Outputs
 
