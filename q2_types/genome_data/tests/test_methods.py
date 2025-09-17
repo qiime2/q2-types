@@ -7,17 +7,17 @@
 # ----------------------------------------------------------------------------
 import filecmp
 import os
-import warnings
 
 from qiime2.plugin.testing import TestPluginBase
 
 from q2_types.genome_data import SeedOrthologDirFmt, collate_orthologs, \
-    partition_orthologs, OrthologAnnotationDirFmt, collate_ortholog_annotations
+    partition_orthologs, OrthologAnnotationDirFmt, collate_ortholog_annotations, \
+    GenesDirectoryFormat, ProteinsDirectoryFormat, collate_loci, collate_genes
 from q2_types.genome_data import LociDirectoryFormat
-from q2_types.genome_data._methods import collate_loci
+from q2_types.genome_data._methods import collate_loci, collate_genes
 
 
-class TestOrthologsPartitionCollating(TestPluginBase):
+class TestPartitionCollating(TestPluginBase):
     package = "q2_types.genome_data.tests"
 
     def test_collate_orthologs(self):
@@ -35,6 +35,38 @@ class TestOrthologsPartitionCollating(TestPluginBase):
         self.assertTrue(os.path.exists(
             collated_orthologs.path / "2.emapper.seed_orthologs")
         )
+        
+    def test_collate_genes(self):
+        p1 = self.get_data_path("partitioned_genes/1")
+        p2 = self.get_data_path("partitioned_genes/2")
+
+        collated = collate_genes(
+            [
+            GenesDirectoryFormat(p1, mode="r"),
+            GenesDirectoryFormat(p2, mode="r")
+        ])
+        self.assertTrue(os.path.exists(
+            collated.path / "genes1.fa")
+        )
+        self.assertTrue(os.path.exists(
+            collated.path / "genes2.fa")
+        )
+    
+    def test_collate_proteins_per_sample(self):
+        p1 = self.get_data_path("partitioned_proteins/1")
+        p2 = self.get_data_path("partitioned_proteins/2")
+
+        collated = collate_genes(
+            [
+            ProteinsDirectoryFormat(p1, mode="r"),
+            ProteinsDirectoryFormat(p2, mode="r")
+        ])
+        self.assertTrue(os.path.exists(
+            collated.path / "sample1" / "proteins1.faa")
+        )
+        self.assertTrue(os.path.exists(
+            collated.path / "sample1" / "proteins2.faa")
+        )
 
     def test_collate_loci(self):
         p1 = self.get_data_path("uncollated_loci_1")
@@ -47,20 +79,6 @@ class TestOrthologsPartitionCollating(TestPluginBase):
         collated_loci = collate_loci(loci_list)
         self.assertTrue(all(os.path.exists(
             collated_loci.path / f"loci{no}.gff") for no in [1, 2, 3, 4]))
-
-    def test_collate_loci_file_exists(self):
-        p1 = self.get_data_path("uncollated_loci_1")
-        loci_list = [
-            LociDirectoryFormat(p1, mode="r"),
-            LociDirectoryFormat(p1, mode="r")
-        ]
-
-        with warnings.catch_warnings(record=True) as w:
-            collated_loci = collate_loci(loci_list)
-            self.assertIn("File already exists", str(w[-1].message))
-
-            self.assertTrue(all(os.path.exists(
-                    collated_loci.path / f"loci{no}.gff") for no in [1, 2]))
 
     def test_partition_orthologs(self):
         p = self.get_data_path("collated_orthologs")
