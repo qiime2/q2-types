@@ -48,7 +48,8 @@ def _duplicate_warning(src, dst):
         duplicate(src, dst)
     except FileExistsError:
         warnings.warn(
-            f"Skipping {src}. File already exists in the destination directory."
+            f"Skipping {src}. File already "
+            f"exists in the destination directory."
         )
 
 
@@ -61,7 +62,9 @@ def _collate_helper(dir_fmts, collated):
                 for file in item.iterdir():
                     _duplicate_warning(file, target / file.name)
             else:
-                _duplicate_warning(item, collated.path / os.path.basename(item))
+                _duplicate_warning(
+                    item, collated.path / os.path.basename(item)
+                )
     return collated
 
 

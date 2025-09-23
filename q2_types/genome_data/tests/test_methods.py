@@ -80,7 +80,6 @@ class TestPartitionCollating(TestPluginBase):
         self.assertTrue(all(os.path.exists(
             collated_loci.path / f"loci{no}.gff") for no in [1, 2, 3, 4]))
 
-
     def test_duplicate_warning(self):
         tmpdir = self.temp_dir.name
         src = os.path.join(tmpdir, "file.txt")
@@ -93,7 +92,6 @@ class TestPartitionCollating(TestPluginBase):
             _duplicate_warning(src, dst)
 
             self.assertIn("File already exists", str(w[-1].message))
-
 
     def test_partition_orthologs(self):
         p = self.get_data_path("collated_orthologs")
