@@ -18,41 +18,49 @@ from q2_types.genome_data import (SeedOrthologDirFmt, OrthologAnnotationDirFmt,
 
 
 def collate_loci(loci: LociDirectoryFormat) -> LociDirectoryFormat:
-    return collate_helper(dir_fmts=loci, collated=LociDirectoryFormat())
+    return _collate_helper(dir_fmts=loci, collated=LociDirectoryFormat())
 
 
 def collate_ortholog_annotations(
     ortholog_annotations: OrthologAnnotationDirFmt
 ) -> OrthologAnnotationDirFmt:
-    return collate_helper(
+    return _collate_helper(
         dir_fmts=ortholog_annotations,
         collated=OrthologAnnotationDirFmt())
 
 
 def collate_genes(genes: GenesDirectoryFormat) -> (
         GenesDirectoryFormat):
-    return collate_helper(
+    return _collate_helper(
         dir_fmts=genes,
         collated=GenesDirectoryFormat())
 
 
 def collate_proteins(proteins: ProteinsDirectoryFormat) -> (
         ProteinsDirectoryFormat):
-    return collate_helper(
+    return _collate_helper(
         dir_fmts=proteins,
         collated=ProteinsDirectoryFormat())
 
 
-def collate_helper(dir_fmts, collated):
+def _duplicate_warning(src, dst):
+    try:
+        duplicate(src, dst)
+    except FileExistsError:
+        warnings.warn(
+            f"Skipping {src}. File already exists in the destination directory."
+        )
+
+def _collate_helper(dir_fmts, collated):
     for dir_fmt in dir_fmts:
         for item in dir_fmt.path.iterdir():
             target = collated.path / item.name
             if item.is_dir():
                 target.mkdir(exist_ok=True)
                 for file in item.iterdir():
-                    duplicate(file, target / file.name)
+                    _duplicate_warning(file, target / file.name)
             else:
-                duplicate(item, collated.path / os.path.basename(item))
+                _duplicate_warning(item, collated.path / os.path.basename(item))
     return collated
 
 

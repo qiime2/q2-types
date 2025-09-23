@@ -7,6 +7,7 @@
 # ----------------------------------------------------------------------------
 import filecmp
 import os
+import warnings
 
 from qiime2.plugin.testing import TestPluginBase
 
@@ -15,6 +16,7 @@ from q2_types.genome_data import SeedOrthologDirFmt, collate_orthologs, \
     collate_ortholog_annotations, GenesDirectoryFormat, \
     ProteinsDirectoryFormat, collate_loci, collate_genes
 from q2_types.genome_data import LociDirectoryFormat
+from q2_types.genome_data._methods import _duplicate_warning
 
 
 class TestPartitionCollating(TestPluginBase):
@@ -77,6 +79,21 @@ class TestPartitionCollating(TestPluginBase):
         collated_loci = collate_loci(loci_list)
         self.assertTrue(all(os.path.exists(
             collated_loci.path / f"loci{no}.gff") for no in [1, 2, 3, 4]))
+
+
+    def test_duplicate_warning(self):
+        tmpdir = self.temp_dir.name
+        src = os.path.join(tmpdir, "file.txt")
+        dst = os.path.join(tmpdir, "file_copy.txt")
+        with open(src, "w"), open(dst, "w"):
+            pass
+
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            _duplicate_warning(src, dst)
+
+            self.assertIn("File already exists", str(w[-1].message))
+
 
     def test_partition_orthologs(self):
         p = self.get_data_path("collated_orthologs")
