@@ -51,6 +51,7 @@ def _duplicate_warning(src, dst):
             f"Skipping {src}. File already exists in the destination directory."
         )
 
+
 def _collate_helper(dir_fmts, collated):
     for dir_fmt in dir_fmts:
         for item in dir_fmt.path.iterdir():
