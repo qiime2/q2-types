@@ -12,9 +12,11 @@ import warnings
 from qiime2.plugin.testing import TestPluginBase
 
 from q2_types.genome_data import SeedOrthologDirFmt, collate_orthologs, \
-    partition_orthologs, OrthologAnnotationDirFmt, collate_ortholog_annotations
+    partition_orthologs, OrthologAnnotationDirFmt, collate_ortholog_annotations, \
+    GenesDirectoryFormat, ProteinsDirectoryFormat
 from q2_types.genome_data import LociDirectoryFormat
-from q2_types.genome_data._methods import collate_loci
+from q2_types.genome_data._methods import collate_loci, partition_helper, \
+    partition_genes, partition_loci, partition_proteins
 
 
 class TestOrthologsPartitionCollating(TestPluginBase):
@@ -99,4 +101,81 @@ class TestOrthologsPartitionCollating(TestPluginBase):
         self.assertListEqual(
             compare.common,
             [f"{letter}.annotations" for letter in ["a", "b", "c"]]
+        )
+        
+    def test_partition_helper_genes_samples(self):
+        path = self.get_data_path("genes_samples")
+        genes = GenesDirectoryFormat(path=path, mode="r")
+        obs = partition_helper(dir_format=genes)
+        self.assertTrue(os.path.exists(
+            obs["sample1"].path / "sample1" / "genes1.fa")
+        )
+        self.assertTrue(os.path.exists(
+            obs["sample2"].path / "sample2" / "genes2.fa")
+        )
+    
+    def test_partition_helper_genes(self):
+        path = self.get_data_path("genes")
+        genes = GenesDirectoryFormat(path=path, mode="r")
+        obs = partition_helper(dir_format=genes)
+        self.assertTrue(os.path.exists(
+            obs["genes1"].path / "genes1.fa")
+        )
+        self.assertTrue(os.path.exists(
+            obs["genes2"].path / "genes2.fa")
+        )
+
+    def test_partition_helper_genes_samples_1_partition(self):
+        path = self.get_data_path("genes_samples")
+        genes = GenesDirectoryFormat(path=path, mode="r")
+        obs = partition_helper(dir_format=genes, num_partitions=1)
+        self.assertTrue(os.path.exists(
+            obs[1].path / "sample1" / "genes1.fa")
+        )
+        self.assertTrue(os.path.exists(
+            obs[1].path / "sample2" / "genes2.fa")
+        )
+
+    def test_partition_helper_genes_1_partition(self):
+        path = self.get_data_path("genes")
+        genes = GenesDirectoryFormat(path=path, mode="r")
+        obs = partition_helper(dir_format=genes, num_partitions=1)
+        self.assertTrue(os.path.exists(
+            obs[1].path / "genes1.fa")
+        )
+        self.assertTrue(os.path.exists(
+            obs[1].path / "genes2.fa")
+        )
+
+    def test_partition_genes(self):
+        path = self.get_data_path("genes")
+        genes = GenesDirectoryFormat(path=path, mode="r")
+        obs = partition_genes(genes=genes)
+        self.assertTrue(os.path.exists(
+            obs["genes1"].path / "genes1.fa")
+        )
+        self.assertTrue(os.path.exists(
+            obs["genes2"].path / "genes2.fa")
+        )
+        
+    def test_partition_proteins(self):
+        path = self.get_data_path("proteins")
+        proteins = ProteinsDirectoryFormat(path=path, mode="r")
+        obs = partition_proteins(proteins=proteins)
+        self.assertTrue(os.path.exists(
+            obs["proteins1"].path / "proteins1.faa")
+        )
+        self.assertTrue(os.path.exists(
+            obs["proteins2"].path / "proteins2.faa")
+        )
+    
+    def test_partition_loci(self):
+        path = self.get_data_path("loci")
+        loci = LociDirectoryFormat(path=path, mode="r")
+        obs = partition_loci(loci=loci)
+        self.assertTrue(os.path.exists(
+            obs["loci1"].path / "loci1.gff")
+        )
+        self.assertTrue(os.path.exists(
+            obs["loci2"].path / "loci2.gff")
         )

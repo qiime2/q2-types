@@ -25,7 +25,8 @@ from q2_types.per_sample_sequences import (MAGs,
                                            SequencesWithQuality,
                                            PairedEndSequencesWithQuality)
 from q2_types.feature_data import FeatureData
-from q2_types.genome_data import Orthologs, GenomeData, NOG, Loci
+from q2_types.genome_data import Orthologs, GenomeData, NOG, Loci, Genes, \
+    Proteins
 from q2_types.genome_data._methods import collate_loci
 from q2_types.sample_data import SampleData
 from q2_types.kraken2 import Kraken2Reports, Kraken2Outputs
@@ -325,6 +326,54 @@ plugin.methods.register_function(
     },
     name="Partition kraken2 outputs.",
     description=""
+)
+
+plugin.methods.register_function(
+    function=q2_types.genome_data.partition_genes,
+    inputs={"genes": GenomeData[Genes]},
+    parameters={"num_partitions": Int % Range(1, None)},
+    outputs={"partitioned_genes": Collection[GenomeData[Genes]]},
+    input_descriptions={"genes": "The genes to partition."},
+    parameter_descriptions={
+        "num_partitions": "The number of partitions to split the genes"
+        " into. Defaults to partitioning into individual"
+        " genes."
+    },
+    name="Partition genes",
+    description="Partition a GenomeData[Genes] artifact into smaller "
+                "artifacts containing subsets of the genes",
+)
+
+plugin.methods.register_function(
+    function=q2_types.genome_data.partition_proteins,
+    inputs={"proteins": GenomeData[Proteins]},
+    parameters={"num_partitions": Int % Range(1, None)},
+    outputs={"partitioned_proteins": Collection[GenomeData[Proteins]]},
+    input_descriptions={"proteins": "The proteins to partition."},
+    parameter_descriptions={
+        "num_partitions": "The number of partitions to split the proteins"
+        " into. Defaults to partitioning into individual"
+        " proteins."
+    },
+    name="Partition proteins",
+    description="Partition a GenomeData[Proteins] artifact into smaller "
+                "artifacts containing subsets of the proteins",
+)
+
+plugin.methods.register_function(
+    function=q2_types.genome_data.partition_loci,
+    inputs={"loci": GenomeData[Loci]},
+    parameters={"num_partitions": Int % Range(1, None)},
+    outputs={"partitioned_loci": Collection[GenomeData[Loci]]},
+    input_descriptions={"loci": "The loci to partition."},
+    parameter_descriptions={
+        "num_partitions": "The number of partitions to split the loci"
+        " into. Defaults to partitioning into individual"
+        " loci."
+    },
+    name="Partition loci",
+    description="Partition a GenomeData[Loci] artifact into smaller "
+                "artifacts containing subsets of the loci",
 )
 
 importlib.import_module('q2_types.bowtie2._deferred_setup')
