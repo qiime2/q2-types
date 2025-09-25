@@ -106,8 +106,12 @@ class TestOrthologsPartitionCollating(TestPluginBase):
             [f"{letter}.annotations" for letter in ["a", "b", "c"]]
         )
 
+    def test_collate_genomes_dnafastaformat_single(self):
+        self.helper_test_collate_genomes_dnafastaformat("single")
 
-        
+    def test_collate_genomes_dnafastaformat_multiple(self):
+        self.helper_test_collate_genomes_dnafastaformat("multiple")
+
     def helper_test_collate_genomes_dnafastaformat(self, input):
         genomes1 = DNAFASTAFormat(
             self.get_data_path("dna-fasta-format/dna-sequences1.fasta"), "r"
@@ -118,22 +122,22 @@ class TestOrthologsPartitionCollating(TestPluginBase):
         if input == "single":
             genomes = [genomes1]
             content = {
-                "ref1": {"description": "d_Bacteria_1", 
+                "ref1": {"description": "d_Bacteria_1",
                          "sequence": "ACGTACGT"},
-                "ref2": {"description": "d_Bacteria_2", 
+                "ref2": {"description": "d_Bacteria_2",
                          "sequence": "CGTCGTCC"},
             }
             exp_files = ["ref1.fasta", "ref2.fasta"]
         else:
             genomes = [genomes1, genomes2]
             content = {
-                "ref1": {"description": "d_Bacteria_1", 
+                "ref1": {"description": "d_Bacteria_1",
                          "sequence": "ACGTACGT"},
-                "ref2": {"description": "d_Bacteria_2", 
+                "ref2": {"description": "d_Bacteria_2",
                          "sequence": "CGTCGTCC"},
-                "ref5": {"description": "d_Bacteria_3", 
+                "ref5": {"description": "d_Bacteria_3",
                          "sequence": "ACGTACGT"},
-                "ref6": {"description": "d_Bacteria_4", 
+                "ref6": {"description": "d_Bacteria_4",
                          "sequence": "CGTCGTCC"},
             }
             exp_files = [
@@ -158,12 +162,6 @@ class TestOrthologsPartitionCollating(TestPluginBase):
                     self.assertEquals(actual_id, expected_id)
                     self.assertEqual(actual_description, expected_desc)
                     self.assertEqual(actual_sequence, expected_sequence)
-
-    def test_collate_genomes_dnafastaformat_single(self):
-        self.helper_test_collate_genomes_dnafastaformat("single")
-
-    def test_collate_genomes_dnafastaformat_multiple(self):
-        self.helper_test_collate_genomes_dnafastaformat("multiple")
 
     def test_collate_genomes_genome_dir_multiple(self):
         genomes1 = GenomeSequencesDirectoryFormat(
@@ -192,10 +190,10 @@ class TestOrthologsPartitionCollating(TestPluginBase):
 
     def test_collate_genomes_duplicates_warn_genome(self):
         self.helper_test_collate_genomes_duplicates_warn("GenomeData")
-    
+
     def test_collate_genomes_duplicates_warn_dna(self):
         self.helper_test_collate_genomes_duplicates_warn("DNAFASTAFormat")
-    
+
     def helper_test_collate_genomes_duplicates_warn(self, dir_fmt):
         duplicate_ids = (
             ["ref1.fasta", "ref2.fasta"]
@@ -225,9 +223,9 @@ class TestOrthologsPartitionCollating(TestPluginBase):
 
             if dir_fmt == "DNAFASTAFormat":
                 content = {
-                    "ref1": {"description": "d_Bacteria_1", 
+                    "ref1": {"description": "d_Bacteria_1",
                              "sequence": "ACGTACGT"},
-                    "ref2": {"description": "d_Bacteria_2", 
+                    "ref2": {"description": "d_Bacteria_2",
                              "sequence": "CGTCGTCC"},
                 }
 
@@ -264,7 +262,7 @@ class TestOrthologsPartitionCollating(TestPluginBase):
             )
         else:
             genomes1 = DNAFASTAFormat(
-                self.get_data_path("dna-fasta-format/dna-sequences1.fasta"), 
+                self.get_data_path("dna-fasta-format/dna-sequences1.fasta"),
                 "r"
             )
         with self.assertRaisesRegex(ValueError, error_msg):
