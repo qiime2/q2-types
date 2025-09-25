@@ -357,7 +357,9 @@ plugin.methods.register_function(
 
 plugin.methods.register_function(
     function=q2_types.genome_data.collate_genomes,
-    inputs={"genomes": List[FeatureData[Sequence]] | List[GenomeData[DNASequence]]},
+    inputs={
+        "genomes": List[FeatureData[Sequence]] | List[GenomeData[DNASequence]]
+    },
     parameters={"on_duplicates": Str % Choices(["error", "warn"])},
     outputs={"collated_genomes": GenomeData[DNASequence]},
     input_descriptions={"genomes": "A  list of genomes to be collated."},

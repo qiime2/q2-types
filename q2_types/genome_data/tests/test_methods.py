@@ -10,7 +10,6 @@ import os
 import warnings
 
 import skbio
-from parameterized import parameterized
 from qiime2.plugin.testing import TestPluginBase
 from qiime2.plugins import types
 
@@ -107,8 +106,9 @@ class TestOrthologsPartitionCollating(TestPluginBase):
             [f"{letter}.annotations" for letter in ["a", "b", "c"]]
         )
 
-    @parameterized.expand(["single", "multiple"])
-    def test_collate_genomes_dnafastaformat(self, input):
+
+        
+    def helper_test_collate_genomes_dnafastaformat(self, input):
         genomes1 = DNAFASTAFormat(
             self.get_data_path("dna-fasta-format/dna-sequences1.fasta"), "r"
         )
@@ -118,19 +118,27 @@ class TestOrthologsPartitionCollating(TestPluginBase):
         if input == "single":
             genomes = [genomes1]
             content = {
-                "ref1": {"description": "d_Bacteria_1", "sequence": "ACGTACGT"},
-                "ref2": {"description": "d_Bacteria_2", "sequence": "CGTCGTCC"},
+                "ref1": {"description": "d_Bacteria_1", 
+                         "sequence": "ACGTACGT"},
+                "ref2": {"description": "d_Bacteria_2", 
+                         "sequence": "CGTCGTCC"},
             }
             exp_files = ["ref1.fasta", "ref2.fasta"]
         else:
             genomes = [genomes1, genomes2]
             content = {
-                "ref1": {"description": "d_Bacteria_1", "sequence": "ACGTACGT"},
-                "ref2": {"description": "d_Bacteria_2", "sequence": "CGTCGTCC"},
-                "ref5": {"description": "d_Bacteria_3", "sequence": "ACGTACGT"},
-                "ref6": {"description": "d_Bacteria_4", "sequence": "CGTCGTCC"},
+                "ref1": {"description": "d_Bacteria_1", 
+                         "sequence": "ACGTACGT"},
+                "ref2": {"description": "d_Bacteria_2", 
+                         "sequence": "CGTCGTCC"},
+                "ref5": {"description": "d_Bacteria_3", 
+                         "sequence": "ACGTACGT"},
+                "ref6": {"description": "d_Bacteria_4", 
+                         "sequence": "CGTCGTCC"},
             }
-            exp_files = ["ref1.fasta", "ref2.fasta", "ref5.fasta", "ref6.fasta"]
+            exp_files = [
+                "ref1.fasta", "ref2.fasta", "ref5.fasta", "ref6.fasta"
+            ]
 
         collated_genomes = collate_genomes(genomes=genomes)
         actual_files = sorted(os.listdir(collated_genomes.path))
@@ -150,6 +158,12 @@ class TestOrthologsPartitionCollating(TestPluginBase):
                     self.assertEquals(actual_id, expected_id)
                     self.assertEqual(actual_description, expected_desc)
                     self.assertEqual(actual_sequence, expected_sequence)
+
+    def test_collate_genomes_dnafastaformat_single(self):
+        self.helper_test_collate_genomes_dnafastaformat("single")
+
+    def test_collate_genomes_dnafastaformat_multiple(self):
+        self.helper_test_collate_genomes_dnafastaformat("multiple")
 
     def test_collate_genomes_genome_dir_multiple(self):
         genomes1 = GenomeSequencesDirectoryFormat(
@@ -176,8 +190,13 @@ class TestOrthologsPartitionCollating(TestPluginBase):
         with self.assertRaises(TypeError):
             types.methods.collate_genomes(genomes=genomes)
 
-    @parameterized.expand(["GenomeData", "DNAFASTAFormat"])
-    def test_collate_genomes_dnafastaformat_multiple_duplicates_warn(self, dir_fmt):
+    def test_collate_genomes_duplicates_warn_genome(self):
+        self.helper_test_collate_genomes_duplicates_warn("GenomeData")
+    
+    def test_collate_genomes_duplicates_warn_dna(self):
+        self.helper_test_collate_genomes_duplicates_warn("DNAFASTAFormat")
+    
+    def helper_test_collate_genomes_duplicates_warn(self, dir_fmt):
         duplicate_ids = (
             ["ref1.fasta", "ref2.fasta"]
             if dir_fmt == "GenomeData"
@@ -194,7 +213,8 @@ class TestOrthologsPartitionCollating(TestPluginBase):
             )
         else:
             genomes1 = DNAFASTAFormat(
-                self.get_data_path("dna-fasta-format/dna-sequences1.fasta"), "r"
+                self.get_data_path("dna-fasta-format/dna-sequences1.fasta"), 
+                "r"
             )
         with warnings.catch_warnings(record=True) as w:
             collated_genomes = collate_genomes(genomes=[genomes1, genomes1])
@@ -205,8 +225,10 @@ class TestOrthologsPartitionCollating(TestPluginBase):
 
             if dir_fmt == "DNAFASTAFormat":
                 content = {
-                    "ref1": {"description": "d_Bacteria_1", "sequence": "ACGTACGT"},
-                    "ref2": {"description": "d_Bacteria_2", "sequence": "CGTCGTCC"},
+                    "ref1": {"description": "d_Bacteria_1", 
+                             "sequence": "ACGTACGT"},
+                    "ref2": {"description": "d_Bacteria_2", 
+                             "sequence": "CGTCGTCC"},
                 }
 
                 for fn in actual_files:
@@ -218,14 +240,19 @@ class TestOrthologsPartitionCollating(TestPluginBase):
                             actual_sequence = str(seq)
                             expected_id = fn.split(".")[0]
                             expected_desc = content[expected_id]["description"]
-                            expected_sequence = content[expected_id]["sequence"]
+                            exp_sequence = content[expected_id]["sequence"]
 
                             self.assertEquals(actual_id, expected_id)
                             self.assertEqual(actual_description, expected_desc)
-                            self.assertEqual(actual_sequence, expected_sequence)
+                            self.assertEqual(actual_sequence, exp_sequence)
 
-    @parameterized.expand(["GenomeData", "DNAFASTAFormat"])
-    def test_collate_genomes_duplicates_error(self, dir_fmt):
+    def test_collate_genomes_duplicates_error_genome(self):
+        self.helper_test_collate_genomes_duplicates_error("GenomeData")
+
+    def test_collate_genomes_duplicates_error_dna(self):
+        self.helper_test_collate_genomes_duplicates_error("DNAFASTAFormat")
+
+    def helper_test_collate_genomes_duplicates_error(self, dir_fmt):
         duplicate_ids = ["ref3.fasta"] if dir_fmt == "GenomeData" else ["ref1"]
         error_msg = (
             "Duplicate sequence files were found for the "
@@ -237,7 +264,10 @@ class TestOrthologsPartitionCollating(TestPluginBase):
             )
         else:
             genomes1 = DNAFASTAFormat(
-                self.get_data_path("dna-fasta-format/dna-sequences1.fasta"), "r"
+                self.get_data_path("dna-fasta-format/dna-sequences1.fasta"), 
+                "r"
             )
         with self.assertRaisesRegex(ValueError, error_msg):
-            _ = collate_genomes(genomes=[genomes1, genomes1], on_duplicates="error")
+            collate_genomes(
+                genomes=[genomes1, genomes1], on_duplicates="error"
+            )

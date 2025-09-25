@@ -119,6 +119,7 @@ def collate_ortholog_annotations(
 
     return collated_annotations
 
+
 def collate_genomes(
     genomes: Union[DNAFASTAFormat, GenomeSequencesDirectoryFormat],
     on_duplicates: str = "warn",
@@ -133,7 +134,7 @@ def collate_genomes(
             for genome in genome_file.view(DNAIterator):
                 fn = genome.metadata["id"]
                 if fn not in ids:
-                    with open(os.path.join(genomes_dir.path, fn + ".fasta"), 
+                    with open(os.path.join(genomes_dir.path, fn + ".fasta"),
                               "w") as f:
                         skbio.io.write(genome, format="fasta", into=f)
                     ids.add(fn)
