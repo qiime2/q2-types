@@ -12,7 +12,7 @@ import warnings
 from qiime2.plugin.testing import TestPluginBase
 
 from q2_types.genome_data import SeedOrthologDirFmt, collate_orthologs, \
-    partition_orthologs, OrthologAnnotationDirFmt, \ 
+    partition_orthologs, OrthologAnnotationDirFmt, \
     collate_ortholog_annotations, GenesDirectoryFormat, ProteinsDirectoryFormat
 from q2_types.genome_data import LociDirectoryFormat
 from q2_types.genome_data._methods import collate_loci, partition_helper, \
