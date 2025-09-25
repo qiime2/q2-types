@@ -106,7 +106,7 @@ def partition_contigs(
 ) -> ContigSequencesDirFmt:
     partitioned_contigs = {}
     contigs = [
-        (sample_id, sample_fp) for sample_id, sample_fp in 
+        (sample_id, sample_fp) for sample_id, sample_fp in
         contigs.sample_dict().items()
     ]
 

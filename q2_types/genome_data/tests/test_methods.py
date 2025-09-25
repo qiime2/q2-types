@@ -211,7 +211,7 @@ class TestOrthologsPartitionCollating(TestPluginBase):
             )
         else:
             genomes1 = DNAFASTAFormat(
-                self.get_data_path("dna-fasta-format/dna-sequences1.fasta"), 
+                self.get_data_path("dna-fasta-format/dna-sequences1.fasta"),
                 "r"
             )
         with warnings.catch_warnings(record=True) as w:
