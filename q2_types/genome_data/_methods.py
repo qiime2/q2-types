@@ -117,20 +117,20 @@ def collate_ortholog_annotations(
 
 
 def partition_genes(
-        genes: GenesDirectoryFormat, num_partitions: int = None
-    ) -> GenesDirectoryFormat:
+    genes: GenesDirectoryFormat, num_partitions: int = None
+) -> GenesDirectoryFormat:
     return partition_helper(genes, num_partitions)
 
 
 def partition_proteins(
-        proteins: ProteinsDirectoryFormat, num_partitions: int = None
-    ) -> ProteinsDirectoryFormat:
+    proteins: ProteinsDirectoryFormat, num_partitions: int = None
+) -> ProteinsDirectoryFormat:
     return partition_helper(proteins, num_partitions)
 
 
 def partition_loci(
-        loci: LociDirectoryFormat, num_partitions: int = None
-    ) -> LociDirectoryFormat:
+    loci: LociDirectoryFormat, num_partitions: int = None
+) -> LociDirectoryFormat:
     return partition_helper(loci, num_partitions)
 
 
@@ -139,7 +139,7 @@ def partition_helper(dir_format, num_partitions: int = None):
     This function splits the file dictionary of the given directory format into
     a specified number of partitions. For each partition, a new instance of the
     same directory format class is created and populated with the corresponding
-    files. If the values in the file dictionary are nested dictionaries, 
+    files. If the values in the file dictionary are nested dictionaries,
     subdirectories are created in the partition to preserve structure.
 
     Parameters:
@@ -171,7 +171,7 @@ def partition_helper(dir_format, num_partitions: int = None):
         for dict in samples:
             if isinstance(next(iter(dict.values())), str):
                 for _id, fp in dict.items():
-                    duplicate(fp,result.path / os.path.basename(fp))
+                    duplicate(fp, result.path / os.path.basename(fp))
             else:
                 for _id, feature_dict in dict.items():
                     for fp in feature_dict.values():

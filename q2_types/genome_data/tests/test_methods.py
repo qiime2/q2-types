@@ -12,8 +12,8 @@ import warnings
 from qiime2.plugin.testing import TestPluginBase
 
 from q2_types.genome_data import SeedOrthologDirFmt, collate_orthologs, \
-    partition_orthologs, OrthologAnnotationDirFmt, collate_ortholog_annotations, \
-    GenesDirectoryFormat, ProteinsDirectoryFormat
+    partition_orthologs, OrthologAnnotationDirFmt, \ 
+    collate_ortholog_annotations, GenesDirectoryFormat, ProteinsDirectoryFormat
 from q2_types.genome_data import LociDirectoryFormat
 from q2_types.genome_data._methods import collate_loci, partition_helper, \
     partition_genes, partition_loci, partition_proteins
@@ -102,7 +102,7 @@ class TestOrthologsPartitionCollating(TestPluginBase):
             compare.common,
             [f"{letter}.annotations" for letter in ["a", "b", "c"]]
         )
-        
+
     def test_partition_helper_genes_samples(self):
         path = self.get_data_path("genes_samples")
         genes = GenesDirectoryFormat(path=path, mode="r")
@@ -113,7 +113,7 @@ class TestOrthologsPartitionCollating(TestPluginBase):
         self.assertTrue(os.path.exists(
             obs["sample2"].path / "sample2" / "genes2.fa")
         )
-    
+
     def test_partition_helper_genes(self):
         path = self.get_data_path("genes")
         genes = GenesDirectoryFormat(path=path, mode="r")
@@ -157,7 +157,7 @@ class TestOrthologsPartitionCollating(TestPluginBase):
         self.assertTrue(os.path.exists(
             obs["genes2"].path / "genes2.fa")
         )
-        
+
     def test_partition_proteins(self):
         path = self.get_data_path("proteins")
         proteins = ProteinsDirectoryFormat(path=path, mode="r")
@@ -168,7 +168,7 @@ class TestOrthologsPartitionCollating(TestPluginBase):
         self.assertTrue(os.path.exists(
             obs["proteins2"].path / "proteins2.faa")
         )
-    
+
     def test_partition_loci(self):
         path = self.get_data_path("loci")
         loci = LociDirectoryFormat(path=path, mode="r")
