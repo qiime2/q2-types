@@ -109,9 +109,9 @@ def partition_contigs(
         (sample_id, sample_fp) for sample_id, sample_fp in
         contigs.sample_dict().items()
     ]
-
+    num_samples = len(contigs)
     num_partitions = _validate_num_partitions(
-        len(contigs), num_partitions, "sample"
+        num_samples, num_partitions, "sample"
     )
 
     contigs = np.array_split(contigs, num_partitions)
@@ -125,7 +125,7 @@ def partition_contigs(
         # sample in the above loop and will use its id as a key. Otherwise we
         # may have gone through multiple samples in the above loop and will be
         # using indices for keys
-        if num_partitions == len(contigs):
+        if num_partitions == num_samples:
             partitioned_contigs[sample_id] = result
         else:
             partitioned_contigs[i] = result
