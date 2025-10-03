@@ -14,10 +14,9 @@ from qiime2.plugin.testing import TestPluginBase
 from q2_types.genome_data import SeedOrthologDirFmt, collate_orthologs, \
     partition_orthologs, OrthologAnnotationDirFmt, \
     collate_ortholog_annotations, GenesDirectoryFormat, \
-    ProteinsDirectoryFormat, collate_loci, collate_genes
-from q2_types.genome_data import LociDirectoryFormat
-from q2_types.genome_data._methods import _duplicate_warning, collate_proteins, \
-    _collate_helper
+    ProteinsDirectoryFormat, collate_loci, collate_genes, collate_proteins, \
+    LociDirectoryFormat
+from q2_types.genome_data._methods import _duplicate_warning, _collate_helper
 
 
 class TestPartitionCollating(TestPluginBase):
