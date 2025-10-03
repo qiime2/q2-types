@@ -50,11 +50,11 @@ def _duplicate_warning(src, dst):
 def _collate_helper(dir_fmts: list):
     """
     Iterates through a list of directory formats, merging their contents
-    into a single directory. Can be used with per sample directories and 
+    into a single directory. Can be used with per sample directories and
     without. Handles duplicate files by issuing warnings when conflicts occur.
 
     Parameters:
-        dir_fmts (iterable): 
+        dir_fmts (iterable):
             A List of directory format objects to be collated.
 
     Returns:
@@ -64,7 +64,7 @@ def _collate_helper(dir_fmts: list):
     """
     # Initialize the collated directory format with the same class as inputs
     collated = dir_fmts[0].__class__()
-    
+
     for dir_fmt in dir_fmts:
         for item in dir_fmt.path.iterdir():
             target = collated.path / item.name
