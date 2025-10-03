@@ -11,12 +11,9 @@ from unittest.mock import patch
 
 from qiime2.plugin.testing import TestPluginBase
 
-from build.lib.q2_types.per_sample_sequences import ContigSequencesDirFmt
 from q2_types.per_sample_sequences import MultiMAGSequencesDirFmt, \
-    partition_contigs, collate_contigs
-from q2_types.per_sample_sequences._methods import (
-    partition_sample_data_mags, collate_sample_data_mags
-)
+    partition_contigs, collate_contigs, partition_sample_data_mags, \
+    collate_sample_data_mags, ContigSequencesDirFmt
 
 
 class TestSampleDataMAGsPartitionCollating(TestPluginBase):
