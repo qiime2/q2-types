@@ -18,29 +18,23 @@ from q2_types.genome_data import (SeedOrthologDirFmt, OrthologAnnotationDirFmt,
 
 
 def collate_loci(loci: LociDirectoryFormat) -> LociDirectoryFormat:
-    return _collate_helper(dir_fmts=loci, collated=LociDirectoryFormat())
+    return _collate_helper(dir_fmts=loci)
 
 
 def collate_ortholog_annotations(
     ortholog_annotations: OrthologAnnotationDirFmt
 ) -> OrthologAnnotationDirFmt:
-    return _collate_helper(
-        dir_fmts=ortholog_annotations,
-        collated=OrthologAnnotationDirFmt())
+    return _collate_helper(dir_fmts=ortholog_annotations)
 
 
 def collate_genes(genes: GenesDirectoryFormat) -> (
         GenesDirectoryFormat):
-    return _collate_helper(
-        dir_fmts=genes,
-        collated=GenesDirectoryFormat())
+    return _collate_helper(dir_fmts=genes)
 
 
 def collate_proteins(proteins: ProteinsDirectoryFormat) -> (
         ProteinsDirectoryFormat):
-    return _collate_helper(
-        dir_fmts=proteins,
-        collated=ProteinsDirectoryFormat())
+    return _collate_helper(dir_fmts=proteins)
 
 
 def _duplicate_warning(src, dst):
@@ -53,14 +47,33 @@ def _duplicate_warning(src, dst):
         )
 
 
-def _collate_helper(dir_fmts, collated):
+def _collate_helper(dir_fmts: list):
+    """
+    Iterates through a list of directory formats, merging their contents
+    into a single directory. Can be used with per sample directories and 
+    without. Handles duplicate files by issuing warnings when conflicts occur.
+
+    Parameters:
+        dir_fmts (iterable): 
+            A List of directory format objects to be collated.
+
+    Returns:
+        object:
+            The updated `collated` directory format object containing all
+            merged files and subdirectories.
+    """
+    # Initialize the collated directory format with the same class as inputs
+    collated = dir_fmts[0].__class__()
+    
     for dir_fmt in dir_fmts:
         for item in dir_fmt.path.iterdir():
             target = collated.path / item.name
+            # Per sample directories
             if item.is_dir():
                 target.mkdir(exist_ok=True)
                 for file in item.iterdir():
                     _duplicate_warning(file, target / file.name)
+            # Non per sample directories
             else:
                 _duplicate_warning(
                     item, collated.path / os.path.basename(item)

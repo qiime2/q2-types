@@ -16,7 +16,8 @@ from q2_types.genome_data import SeedOrthologDirFmt, collate_orthologs, \
     collate_ortholog_annotations, GenesDirectoryFormat, \
     ProteinsDirectoryFormat, collate_loci, collate_genes
 from q2_types.genome_data import LociDirectoryFormat
-from q2_types.genome_data._methods import _duplicate_warning
+from q2_types.genome_data._methods import _duplicate_warning, collate_proteins, \
+    _collate_helper
 
 
 class TestPartitionCollating(TestPluginBase):
@@ -30,17 +31,50 @@ class TestPartitionCollating(TestPluginBase):
             SeedOrthologDirFmt(p2, mode="r")
         ]
 
-        collated_orthologs = collate_orthologs(orthologs)
+        collated = collate_orthologs(orthologs)
         self.assertTrue(os.path.exists(
-            collated_orthologs.path / "1.emapper.seed_orthologs")
+            collated.path / "1.emapper.seed_orthologs")
         )
         self.assertTrue(os.path.exists(
-            collated_orthologs.path / "2.emapper.seed_orthologs")
+            collated.path / "2.emapper.seed_orthologs")
         )
+        self.assertIsInstance(collated, SeedOrthologDirFmt)
 
-    def test_collate_genes(self):
+    def test_collate_helper(self):
+        p1 = self.get_data_path("partitioned_genes/1/sample1")
+        p2 = self.get_data_path("partitioned_genes/2/sample1")
+        dir_fmts = [
+            GenesDirectoryFormat(p1, mode="r"),
+            GenesDirectoryFormat(p2, mode="r")
+        ]
+        collated = _collate_helper(dir_fmts)
+        self.assertTrue(os.path.exists(
+            collated.path / "genes1.fa")
+        )
+        self.assertTrue(os.path.exists(
+            collated.path / "genes2.fa")
+        )
+        self.assertIsInstance(collated, GenesDirectoryFormat)
+
+    def test_collate_helper_sample_data(self):
         p1 = self.get_data_path("partitioned_genes/1")
         p2 = self.get_data_path("partitioned_genes/2")
+        dir_fmts = [
+            GenesDirectoryFormat(p1, mode="r"),
+            GenesDirectoryFormat(p2, mode="r")
+        ]
+        collated = _collate_helper(dir_fmts)
+        self.assertTrue(os.path.exists(
+            collated.path / "sample1" / "genes1.fa")
+        )
+        self.assertTrue(os.path.exists(
+            collated.path / "sample1" / "genes2.fa")
+        )
+        self.assertIsInstance(collated, GenesDirectoryFormat)
+
+    def test_collate_genes(self):
+        p1 = self.get_data_path("partitioned_genes/1/sample1")
+        p2 = self.get_data_path("partitioned_genes/2/sample1")
         genes = [
             GenesDirectoryFormat(p1, mode="r"),
             GenesDirectoryFormat(p2, mode="r")
@@ -52,21 +86,23 @@ class TestPartitionCollating(TestPluginBase):
         self.assertTrue(os.path.exists(
             collated.path / "genes2.fa")
         )
+        self.assertIsInstance(collated, GenesDirectoryFormat)
 
-    def test_collate_proteins_per_sample(self):
+    def test_collate_proteins(self):
         p1 = self.get_data_path("partitioned_proteins/1")
         p2 = self.get_data_path("partitioned_proteins/2")
         proteins = [
             ProteinsDirectoryFormat(p1, mode="r"),
             ProteinsDirectoryFormat(p2, mode="r")
         ]
-        collated = collate_genes(proteins)
+        collated = collate_proteins(proteins)
         self.assertTrue(os.path.exists(
-            collated.path / "sample1" / "proteins1.faa")
+            collated.path / "proteins1.faa")
         )
         self.assertTrue(os.path.exists(
-            collated.path / "sample1" / "proteins2.faa")
+            collated.path / "proteins2.faa")
         )
+        self.assertIsInstance(collated, ProteinsDirectoryFormat)
 
     def test_collate_loci(self):
         p1 = self.get_data_path("uncollated_loci_1")
