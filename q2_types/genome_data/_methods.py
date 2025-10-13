@@ -35,8 +35,9 @@ def collate_ortholog_annotations(
     return _collate_helper(dir_fmts=ortholog_annotations)
 
 
-def collate_genes(genes: GenesDirectoryFormat) -> (
-        GenesDirectoryFormat):
+def collate_genes(
+        genes: GenesDirectoryFormat
+) -> GenesDirectoryFormat:
     return _collate_helper(dir_fmts=genes)
 
 
