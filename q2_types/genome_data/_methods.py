@@ -9,7 +9,7 @@ import glob
 import os
 import shutil
 import warnings
-from typing import Union, TypeVar
+from typing import Union, TypeVar, List
 from warnings import warn
 
 import numpy as np
@@ -26,37 +26,7 @@ from q2_types.genome_data import (
 DirFmt = TypeVar("DirFmt", bound=model.DirectoryFormat)
 
 
-def collate_loci(loci: LociDirectoryFormat) -> LociDirectoryFormat:
-    return _collate_helper(dir_fmts=loci)
-
-
-def collate_ortholog_annotations(
-    ortholog_annotations: OrthologAnnotationDirFmt
-) -> OrthologAnnotationDirFmt:
-    return _collate_helper(dir_fmts=ortholog_annotations)
-
-
-def collate_genes(genes: GenesDirectoryFormat) -> (
-        GenesDirectoryFormat):
-    return _collate_helper(dir_fmts=genes)
-
-
-def collate_proteins(proteins: ProteinsDirectoryFormat) -> (
-        ProteinsDirectoryFormat):
-    return _collate_helper(dir_fmts=proteins)
-
-
-def _duplicate_with_warning(src, dst):
-    try:
-        duplicate(src, dst)
-    except FileExistsError:
-        warnings.warn(
-            f"Skipping {src}. File already "
-            f"exists in the destination directory."
-        )
-
-
-def _collate_helper(dir_fmts: DirFmt) -> DirFmt:
+def _collate_helper(dir_fmts: List[DirFmt]) -> DirFmt:
     """
     Iterates through a list of directory formats, merging their contents
     into a single directory. Can be used with per sample directories and
@@ -88,6 +58,27 @@ def _collate_helper(dir_fmts: DirFmt) -> DirFmt:
                     item, collated.path / os.path.basename(item)
                 )
     return collated
+
+
+def collate_loci(loci: LociDirectoryFormat) -> LociDirectoryFormat:
+    return _collate_helper(dir_fmts=loci)
+
+
+def collate_ortholog_annotations(
+    ortholog_annotations: OrthologAnnotationDirFmt
+) -> OrthologAnnotationDirFmt:
+    return _collate_helper(dir_fmts=ortholog_annotations)
+
+
+def collate_genes(genes: GenesDirectoryFormat) -> (
+        GenesDirectoryFormat):
+    return _collate_helper(dir_fmts=genes)
+
+
+def collate_proteins(
+        proteins: ProteinsDirectoryFormat
+) -> ProteinsDirectoryFormat:
+    return _collate_helper(dir_fmts=proteins)
 
 
 def collate_orthologs(orthologs: SeedOrthologDirFmt) -> SeedOrthologDirFmt:
@@ -195,3 +186,13 @@ def collate_genomes(
         )
 
     return genomes_dir
+
+
+def _duplicate_with_warning(src, dst):
+    try:
+        duplicate(src, dst)
+    except FileExistsError:
+        warnings.warn(
+            f"Skipping {src}. File already "
+            f"exists in the destination directory."
+        )
