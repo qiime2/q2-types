@@ -21,7 +21,7 @@ from q2_types.genome_data import (
     LociDirectoryFormat
 )
 from q2_types.genome_data._methods import (
-    collate_loci, collate_genomes, _duplicate_warning, _collate_helper,
+    collate_loci, collate_genomes, _duplicate_with_warning, _collate_helper,
     collate_orthologs, partition_orthologs, collate_genes, collate_proteins
 )
 
@@ -131,7 +131,7 @@ class TestPartitionCollating(TestPluginBase):
 
         with warnings.catch_warnings(record=True) as w:
             warnings.simplefilter("always")
-            _duplicate_warning(src, dst)
+            _duplicate_with_warning(src, dst)
 
             self.assertIn("File already exists", str(w[-1].message))
 
@@ -227,7 +227,7 @@ class TestPartitionCollating(TestPluginBase):
                     expected_desc = content[expected_id]["description"]
                     expected_sequence = content[expected_id]["sequence"]
 
-                    self.assertEquals(actual_id, expected_id)
+                    self.assertEqual(actual_id, expected_id)
                     self.assertEqual(actual_description, expected_desc)
                     self.assertEqual(actual_sequence, expected_sequence)
 
@@ -308,7 +308,7 @@ class TestPartitionCollating(TestPluginBase):
                             expected_desc = content[expected_id]["description"]
                             exp_sequence = content[expected_id]["sequence"]
 
-                            self.assertEquals(actual_id, expected_id)
+                            self.assertEqual(actual_id, expected_id)
                             self.assertEqual(actual_description, expected_desc)
                             self.assertEqual(actual_sequence, exp_sequence)
 

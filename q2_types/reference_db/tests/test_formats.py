@@ -41,7 +41,7 @@ class TestRefFormats(TestPluginBase):
                 self.get_data_path('bad_dmnd_db'),
                 mode='r'
                 )
-        with self.assertRaisesRegexp(
+        with self.assertRaisesRegex(
                 ValidationError,
                 "Missing one or more files for DiamondDatabaseDirFmt"):
             dmnd_obj.validate()

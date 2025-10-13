@@ -9,11 +9,12 @@ import glob
 import os
 import shutil
 import warnings
-from typing import Union
+from typing import Union, TypeVar
 from warnings import warn
 
 import numpy as np
 import skbio
+from qiime2.plugin import model
 from qiime2.util import duplicate
 
 from q2_types.feature_data import DNAIterator, DNAFASTAFormat
@@ -21,6 +22,8 @@ from q2_types.genome_data import (
     SeedOrthologDirFmt, OrthologAnnotationDirFmt, LociDirectoryFormat,
     GenomeSequencesDirectoryFormat, GenesDirectoryFormat, ProteinsDirectoryFormat
 )
+
+DirFmt = TypeVar("DirFmt", bound=model.DirectoryFormat)
 
 
 def collate_loci(loci: LociDirectoryFormat) -> LociDirectoryFormat:
@@ -43,7 +46,7 @@ def collate_proteins(proteins: ProteinsDirectoryFormat) -> (
     return _collate_helper(dir_fmts=proteins)
 
 
-def _duplicate_warning(src, dst):
+def _duplicate_with_warning(src, dst):
     try:
         duplicate(src, dst)
     except FileExistsError:
@@ -53,7 +56,7 @@ def _duplicate_warning(src, dst):
         )
 
 
-def _collate_helper(dir_fmts: list):
+def _collate_helper(dir_fmts: DirFmt) -> DirFmt:
     """
     Iterates through a list of directory formats, merging their contents
     into a single directory. Can be used with per sample directories and
@@ -78,10 +81,10 @@ def _collate_helper(dir_fmts: list):
             if item.is_dir():
                 target.mkdir(exist_ok=True)
                 for file in item.iterdir():
-                    _duplicate_warning(file, target / file.name)
+                    _duplicate_with_warning(file, target / file.name)
             # Non per sample directories
             else:
-                _duplicate_warning(
+                _duplicate_with_warning(
                     item, collated.path / os.path.basename(item)
                 )
     return collated
