@@ -17,6 +17,7 @@ import pandas as pd
 
 import qiime2.plugin.model as model
 from qiime2.plugin import ValidationError
+from qiime2.util import duplicate
 
 
 def read_from_fasta(path, constructor=skbio.DNA, lowercase=False):
@@ -233,3 +234,13 @@ class FileDictMixin:
             else path.absolute()
         )
         return str(processed_path), _id
+
+
+def _duplicate_with_warning(src, dst):
+    try:
+        duplicate(src, dst)
+    except FileExistsError:
+        warnings.warn(
+            f"Skipping {src}. File already "
+            f"exists in the destination directory."
+        )

@@ -17,6 +17,7 @@ import skbio
 from qiime2.plugin import model
 from qiime2.util import duplicate
 
+from q2_types._util import _duplicate_with_warning
 from q2_types.feature_data import DNAIterator, DNAFASTAFormat
 from q2_types.genome_data import (
     SeedOrthologDirFmt, OrthologAnnotationDirFmt, LociDirectoryFormat,
@@ -186,13 +187,3 @@ def collate_genomes(
         )
 
     return genomes_dir
-
-
-def _duplicate_with_warning(src, dst):
-    try:
-        duplicate(src, dst)
-    except FileExistsError:
-        warnings.warn(
-            f"Skipping {src}. File already "
-            f"exists in the destination directory."
-        )
