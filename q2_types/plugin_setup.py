@@ -12,7 +12,7 @@ import pandas as pd
 
 import qiime2.plugin
 from qiime2.core.type import (
-    Int, Range, Collection, List, TypeMatch, Properties
+    Int, Range, Collection, List, TypeMatch, Properties, Str, Choices
 )
 
 import q2_types
@@ -20,14 +20,15 @@ from q2_types import __version__
 
 from q2_types.feature_data_mag import MAG
 import q2_types.kraken2
-from q2_types.per_sample_sequences import (MAGs,
-                                           JoinedSequencesWithQuality,
-                                           SequencesWithQuality,
-                                           PairedEndSequencesWithQuality)
-from q2_types.feature_data import FeatureData
+from q2_types.per_sample_sequences import (
+    MAGs, JoinedSequencesWithQuality, SequencesWithQuality,
+    PairedEndSequencesWithQuality, Contigs
+)
+from q2_types.feature_data import FeatureData, Sequence
 from q2_types.genome_data import (
-    Orthologs, GenomeData, NOG, Loci, Genes, Proteins)
-from q2_types.genome_data import collate_loci, collate_genes, collate_proteins
+    Orthologs, GenomeData, NOG, Loci, DNASequence, Genes, Proteins
+)
+from q2_types.genome_data._methods import collate_loci, collate_genes, collate_proteins
 from q2_types.sample_data import SampleData
 from q2_types.kraken2 import Kraken2Reports, Kraken2Outputs
 
@@ -350,6 +351,56 @@ plugin.methods.register_function(
     },
     name="Partition kraken2 outputs.",
     description=""
+)
+
+plugin.methods.register_function(
+    function=q2_types.per_sample_sequences.partition_contigs,
+    inputs={"contigs": SampleData[Contigs]},
+    parameters={"num_partitions": Int % Range(1, None)},
+    outputs={"partitioned_contigs": Collection[SampleData[Contigs]]},
+    input_descriptions={"contigs": "The contigs to partition."},
+    parameter_descriptions={
+        "num_partitions": "The number of partitions to split the contigs"
+        " into. Defaults to partitioning into individual"
+        " samples."
+    },
+    name="Partition contigs",
+    description="Partition contigs into individual samples or the number of "
+                "partitions specified.",
+)
+
+plugin.methods.register_function(
+    function=q2_types.per_sample_sequences.collate_contigs,
+    inputs={"contigs": List[SampleData[Contigs]]},
+    parameters={},
+    outputs={"collated_contigs": SampleData[Contigs]},
+    input_descriptions={"contigs": "A collection of contigs to be collated."},
+    name="Collate contigs",
+    description="Takes a collection of SampleData[Contigs] and collates them "
+                "into a single artifact.",
+)
+
+plugin.methods.register_function(
+    function=q2_types.genome_data.collate_genomes,
+    inputs={
+        "genomes": List[FeatureData[Sequence]] | List[GenomeData[DNASequence]]
+    },
+    parameters={"on_duplicates": Str % Choices(["error", "warn"])},
+    outputs={"collated_genomes": GenomeData[DNASequence]},
+    input_descriptions={"genomes": "A  list of genomes to be collated."},
+    parameter_descriptions={
+        "on_duplicates": "Preferred behaviour when duplicated genome IDs "
+        'are encountered: "warn" displays a warning and '
+        "continues with the combination of the genomes "
+        'while "error" raises an error and aborts further '
+        "execution."
+    },
+    output_descriptions={"collated_genomes": "The converted genomes."},
+    name="Convert a list of FeatureData[Sequence] or a list of "
+         "GenomeData[DNASequence] to GenomeData[DNASequence].",
+    description="This method converts a list of FeatureData[Sequence] or a "
+                "list of GenomeData[DNASequence] to a GenomeData[DNASequence] "
+                "artifact.",
 )
 
 importlib.import_module('q2_types.bowtie2._deferred_setup')

@@ -6,14 +6,14 @@
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
 import filecmp
+import os
 from unittest.mock import patch
 
 from qiime2.plugin.testing import TestPluginBase
 
-from q2_types.per_sample_sequences import MultiMAGSequencesDirFmt
-from q2_types.per_sample_sequences._methods import (
-    partition_sample_data_mags, collate_sample_data_mags
-)
+from q2_types.per_sample_sequences import MultiMAGSequencesDirFmt, \
+    partition_contigs, collate_contigs, partition_sample_data_mags, \
+    collate_sample_data_mags, ContigSequencesDirFmt
 
 
 class TestSampleDataMAGsPartitionCollating(TestPluginBase):
@@ -109,3 +109,47 @@ class TestSampleDataMAGsPartitionCollating(TestPluginBase):
                 f"{expected}/MANIFEST"
             )
         )
+
+    @patch("q2_types._util._validate_num_partitions")
+    def test_partition_sample_data_contigs_2_partitions(
+        self,
+        mock_validate_num_partitions,
+    ):
+        p = self.get_data_path("contigs")
+        contigs = ContigSequencesDirFmt(path=p, mode="r")
+        partitioned = partition_contigs(contigs, 2)
+
+        self.assertTrue(
+            os.path.exists(partitioned[1].path / "sample1_contigs.fa"))
+        self.assertTrue(
+            os.path.exists(partitioned[1].path / "sample2_contigs.fa"))
+        self.assertTrue(
+            os.path.exists(partitioned[2].path / "sample3_contigs.fa"))
+
+    @patch("q2_types._util._validate_num_partitions")
+    def test_partition_sample_data_contigs(
+        self,
+        mock_validate_num_partitions,
+    ):
+        p = self.get_data_path("contigs")
+        contigs = ContigSequencesDirFmt(path=p, mode="r")
+        partitioned = partition_contigs(contigs)
+
+        self.assertTrue(
+            os.path.exists(partitioned["sample1"].path / "sample1_contigs.fa"))
+        self.assertTrue(
+            os.path.exists(partitioned["sample2"].path / "sample2_contigs.fa"))
+        self.assertTrue(
+            os.path.exists(partitioned["sample3"].path / "sample3_contigs.fa"))
+
+    def test_collate_sample_data_contigs(self,):
+        p1 = self.get_data_path("contigs_partitioned/1")
+        p2 = self.get_data_path("contigs_partitioned/2")
+        contigs1 = ContigSequencesDirFmt(path=p1, mode="r")
+        contigs2 = ContigSequencesDirFmt(path=p2, mode="r")
+
+        collated = collate_contigs([contigs1, contigs2])
+
+        self.assertTrue(os.path.exists(collated.path / "sample1_contigs.fa"))
+        self.assertTrue(os.path.exists(collated.path / "sample2_contigs.fa"))
+        self.assertTrue(os.path.exists(collated.path / "sample3_contigs.fa"))

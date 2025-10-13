@@ -7,14 +7,20 @@
 # ----------------------------------------------------------------------------
 import glob
 import os
+import shutil
 import warnings
+from typing import Union
+from warnings import warn
 
 import numpy as np
+import skbio
 from qiime2.util import duplicate
 
-from q2_types.genome_data import (SeedOrthologDirFmt, OrthologAnnotationDirFmt,
-                                  LociDirectoryFormat, GenesDirectoryFormat,
-                                  ProteinsDirectoryFormat)
+from q2_types.feature_data import DNAIterator, DNAFASTAFormat
+from q2_types.genome_data import (
+    SeedOrthologDirFmt, OrthologAnnotationDirFmt, LociDirectoryFormat,
+    GenomeSequencesDirectoryFormat, GenesDirectoryFormat, ProteinsDirectoryFormat
+)
 
 
 def collate_loci(loci: LociDirectoryFormat) -> LociDirectoryFormat:
@@ -138,3 +144,51 @@ def partition_orthologs(
             partitioned_orthologs[i] = result
 
     return partitioned_orthologs
+
+
+def collate_genomes(
+    genomes: Union[DNAFASTAFormat, GenomeSequencesDirectoryFormat],
+    on_duplicates: str = "warn",
+) -> GenomeSequencesDirectoryFormat:
+    genomes_dir = GenomeSequencesDirectoryFormat()
+    error_on_duplicates = True if on_duplicates == "error" else False
+    ids = set()
+    duplicate_ids = set()
+    msg = "Duplicate sequence files were found for the following IDs: {}."
+    if isinstance(genomes[0], DNAFASTAFormat):
+        for genome_file in genomes:
+            for genome in genome_file.view(DNAIterator):
+                fn = genome.metadata["id"]
+                if fn not in ids:
+                    with open(os.path.join(genomes_dir.path, fn + ".fasta"),
+                              "w") as f:
+                        skbio.io.write(genome, format="fasta", into=f)
+                    ids.add(fn)
+                else:
+                    duplicate_ids.add(fn)
+                    if error_on_duplicates:
+                        raise ValueError(msg.format(", ".join(duplicate_ids)))
+
+    else:
+        for genome in genomes:
+            for fp in genome.path.iterdir():
+                fn = os.path.basename(fp)
+                if fn not in ids:
+                    shutil.copyfile(
+                        fp,
+                        os.path.join(genomes_dir.path, fn),
+                    )
+                    ids.add(fn)
+                else:
+                    duplicate_ids.add(fn)
+                    if error_on_duplicates:
+                        raise ValueError(msg.format(", ".join(duplicate_ids)))
+
+    if duplicate_ids:
+        warn(
+            msg.format(", ".join(sorted(duplicate_ids)))
+            + " The latest occurrence will overwrite all previous "
+            "occurrences for each corresponding ID."
+        )
+
+    return genomes_dir
