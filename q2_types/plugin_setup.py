@@ -28,7 +28,9 @@ from q2_types.feature_data import FeatureData, Sequence
 from q2_types.genome_data import (
     Orthologs, GenomeData, NOG, Loci, DNASequence, Genes, Proteins
 )
-from q2_types.genome_data._methods import collate_loci, collate_genes, collate_proteins
+from q2_types.genome_data._methods import (
+    collate_loci, collate_genes, collate_proteins
+)
 from q2_types.sample_data import SampleData
 from q2_types.kraken2 import Kraken2Reports, Kraken2Outputs
 

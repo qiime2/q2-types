@@ -9,56 +9,20 @@ import glob
 import os
 import shutil
 import warnings
-from typing import Union, TypeVar, List
+from typing import Union
 from warnings import warn
 
 import numpy as np
 import skbio
-from qiime2.plugin import model
 from qiime2.util import duplicate
 
-from q2_types._util import _duplicate_with_warning
+from q2_types._util import _collate_helper
 from q2_types.feature_data import DNAIterator, DNAFASTAFormat
 from q2_types.genome_data import (
     SeedOrthologDirFmt, OrthologAnnotationDirFmt, LociDirectoryFormat,
-    GenomeSequencesDirectoryFormat, GenesDirectoryFormat, ProteinsDirectoryFormat
+    GenomeSequencesDirectoryFormat, GenesDirectoryFormat,
+    ProteinsDirectoryFormat
 )
-
-DirFmt = TypeVar("DirFmt", bound=model.DirectoryFormat)
-
-
-def _collate_helper(dir_fmts: List[DirFmt]) -> DirFmt:
-    """
-    Iterates through a list of directory formats, merging their contents
-    into a single directory. Can be used with per sample directories and
-    without. Handles duplicate files by issuing warnings when conflicts occur.
-
-    Parameters:
-        dir_fmts (iterable):
-            A List of directory format objects to be collated.
-
-    Returns:
-        object:
-            The updated `collated` directory format object containing all
-            merged files and subdirectories.
-    """
-    # Initialize the collated directory format with the same class as inputs
-    collated = dir_fmts[0].__class__()
-
-    for dir_fmt in dir_fmts:
-        for item in dir_fmt.path.iterdir():
-            target = collated.path / item.name
-            # Per sample directories
-            if item.is_dir():
-                target.mkdir(exist_ok=True)
-                for file in item.iterdir():
-                    _duplicate_with_warning(file, target / file.name)
-            # Non per sample directories
-            else:
-                _duplicate_with_warning(
-                    item, collated.path / os.path.basename(item)
-                )
-    return collated
 
 
 def collate_loci(loci: LociDirectoryFormat) -> LociDirectoryFormat:

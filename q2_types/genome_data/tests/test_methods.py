@@ -16,15 +16,15 @@ from qiime2.plugins import types
 
 from q2_types.feature_data import DNAFASTAFormat
 from q2_types.genome_data import (
-    SeedOrthologDirFmt, OrthologAnnotationDirFmt,collate_ortholog_annotations,
-    GenomeSequencesDirectoryFormat, GenesDirectoryFormat, ProteinsDirectoryFormat,
-    LociDirectoryFormat
+    SeedOrthologDirFmt, OrthologAnnotationDirFmt,
+    GenomeSequencesDirectoryFormat, GenesDirectoryFormat,
+    ProteinsDirectoryFormat, LociDirectoryFormat
 )
 from q2_types.genome_data._methods import (
-    collate_loci, collate_genomes, _collate_helper,
-    collate_orthologs, partition_orthologs, collate_genes, collate_proteins
+    collate_loci, collate_genomes, collate_orthologs, partition_orthologs,
+    collate_genes, collate_proteins, collate_ortholog_annotations
 )
-from q2_types._util import _duplicate_with_warning
+from q2_types._util import _collate_helper
 
 
 class TestPartitionCollating(TestPluginBase):
