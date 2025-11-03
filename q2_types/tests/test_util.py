@@ -12,7 +12,7 @@ from typing import TypeVar
 
 from q2_types.genome_data import GenesDirectoryFormat
 from q2_types.kraken2 import Kraken2OutputDirectoryFormat
-from qiime2.plugin import model, DirectoryFormat
+from qiime2.plugin import model
 from qiime2.plugin.testing import TestPluginBase
 
 from q2_types._util import (

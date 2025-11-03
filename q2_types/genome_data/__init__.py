@@ -18,7 +18,8 @@ from ._types import (
 )
 from ._methods import collate_orthologs, partition_orthologs, \
     collate_ortholog_annotations, collate_genomes, collate_loci, \
-    collate_genes, collate_proteins, partition_genes, partition_proteins, partition_loci
+    collate_genes, collate_proteins, partition_genes, partition_proteins, \
+    partition_loci
 
 __all__ = [
     'GenomeData', 'Genes', 'Proteins', 'Loci', 'GFF3Format',

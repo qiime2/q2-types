@@ -283,6 +283,7 @@ def _collate_helper(dir_fmts: List[DirFmt]) -> DirFmt:
                 )
     return collated
 
+
 def partition_helper(dir_format: DirFmt, num_partitions: int = None):
     """
     This function splits the file dictionary of the given directory format into
