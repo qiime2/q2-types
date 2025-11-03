@@ -13,7 +13,8 @@ import pandas as pd
 from qiime2.util import duplicate
 
 from q2_types._util import _validate_num_partitions
-from q2_types.per_sample_sequences import MultiMAGSequencesDirFmt
+from q2_types.per_sample_sequences import MultiMAGSequencesDirFmt, \
+    ContigSequencesDirFmt
 
 
 def partition_sample_data_mags(
@@ -98,3 +99,45 @@ def collate_sample_data_mags(
                             dest.write(line)
 
     return collated_mags
+
+
+def partition_contigs(
+    contigs: ContigSequencesDirFmt, num_partitions: int = None
+) -> ContigSequencesDirFmt:
+    partitioned_contigs = {}
+    contigs = [
+        (sample_id, sample_fp) for sample_id, sample_fp in
+        contigs.sample_dict().items()
+    ]
+    num_samples = len(contigs)
+    num_partitions = _validate_num_partitions(
+        num_samples, num_partitions, "sample"
+    )
+
+    contigs = np.array_split(contigs, num_partitions)
+    for i, samples in enumerate(contigs, 1):
+        result = ContigSequencesDirFmt()
+
+        for sample_id, sample_fp in samples:
+            duplicate(sample_fp, result.path / os.path.basename(sample_fp))
+
+        # If num_partitions == num_samples we will only have gone through one
+        # sample in the above loop and will use its id as a key. Otherwise we
+        # may have gone through multiple samples in the above loop and will be
+        # using indices for keys
+        if num_partitions == num_samples:
+            partitioned_contigs[sample_id] = result
+        else:
+            partitioned_contigs[i] = result
+
+    return partitioned_contigs
+
+
+def collate_contigs(contigs: ContigSequencesDirFmt) -> ContigSequencesDirFmt:
+    collated_contigs = ContigSequencesDirFmt()
+
+    for contig in contigs:
+        for fp in contig.path.iterdir():
+            duplicate(fp, collated_contigs.path / fp.name)
+
+    return collated_contigs

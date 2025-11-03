@@ -17,8 +17,8 @@ from ._types import (
     GenomeData, Genes, Proteins, Loci, Orthologs, DNASequence, NOG
 )
 from ._methods import collate_orthologs, partition_orthologs, \
-    collate_ortholog_annotations, partition_genes, partition_proteins, \
-    partition_loci
+    collate_ortholog_annotations, collate_genomes, collate_loci, \
+    collate_genes, collate_proteins, partition_genes, partition_proteins, partition_loci
 
 __all__ = [
     'GenomeData', 'Genes', 'Proteins', 'Loci', 'GFF3Format',
@@ -26,5 +26,7 @@ __all__ = [
     'IntervalMetadataIterator', 'OrthologFileFmt', 'Orthologs',
     'SeedOrthologDirFmt', 'GenomeSequencesDirectoryFormat', 'DNASequence',
     'OrthologAnnotationDirFmt', 'NOG',
-    'collate_orthologs', 'partition_orthologs', "collate_ortholog_annotations",
-    'partition_genes', 'partition_proteins', 'partition_loci',]
+    'collate_orthologs', 'partition_orthologs', 'collate_ortholog_annotations',
+    'collate_genomes', 'collate_loci', 'collate_genes', 'collate_proteins',
+    'partition_genes', 'partition_proteins', 'partition_loci'
+    ]

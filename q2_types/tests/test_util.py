@@ -6,14 +6,17 @@
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
 import os
+import warnings
 from pathlib import Path
 
 from q2_types.kraken2 import Kraken2OutputDirectoryFormat
 from qiime2.plugin import model
 from qiime2.plugin.testing import TestPluginBase
 
-from q2_types._util import _validate_num_partitions, _validate_mag_ids, \
-    FileDictMixin
+from q2_types._util import (
+    _validate_num_partitions, _validate_mag_ids, FileDictMixin,
+    _duplicate_with_warning
+)
 
 
 class TestUtil(TestPluginBase):
@@ -52,6 +55,19 @@ class TestUtil(TestPluginBase):
                 6,
                 [(0, "a"), (0, "a"), (0, "c"), (0, "d"), (0, "e"), (0, "f")]
             )
+
+    def test_duplicate_warning(self):
+        tmpdir = self.temp_dir.name
+        src = os.path.join(tmpdir, "file.txt")
+        dst = os.path.join(tmpdir, "file_copy.txt")
+        with open(src, "w"), open(dst, "w"):
+            pass
+
+        with warnings.catch_warnings(record=True) as w:
+            warnings.simplefilter("always")
+            _duplicate_with_warning(src, dst)
+
+            self.assertIn("File already exists", str(w[-1].message))
 
 
 class TestFileDictMixin(TestPluginBase):
