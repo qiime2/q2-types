@@ -13,6 +13,7 @@ import warnings
 from collections import defaultdict
 from typing import List, TypeVar
 
+import numpy as np
 import skbio
 import pandas as pd
 
@@ -281,3 +282,57 @@ def _collate_helper(dir_fmts: List[DirFmt]) -> DirFmt:
                     item, collated.path / os.path.basename(item)
                 )
     return collated
+
+def partition_helper(dir_format: DirFmt, num_partitions: int = None):
+    """
+    This function splits the file dictionary of the given directory format into
+    a specified number of partitions. For each partition, a new instance of the
+    same directory format class is created and populated with the corresponding
+    files. If the values in the file dictionary are nested dictionaries,
+    subdirectories are created in the partition to preserve structure.
+
+    Parameters:
+        dir_format (qiime2.plugin.model.DirectoryFormat):
+            The directory format object containing files to partition.
+        num_partitions (int):
+            The number of partitions to split the files into. If None, the
+            function will partition by samples if applicable else by file.
+
+    Returns:
+        dict:
+            A dictionary mapping either partition indices or, if each
+            partition contains only a single sample/file, the corresponding
+            IDs, to new directory format instances containing the partitioned
+            files.
+    """
+    partitioned = {}
+    all = [{k: v} for k, v in dir_format.file_dict().items()]
+
+    num_partitions = _validate_num_partitions(
+        len(all), num_partitions, "sample"
+    )
+
+    arrays = np.array_split(all, num_partitions)
+
+    for i, samples in enumerate(arrays, 1):
+        result = dir_format.__class__()
+
+        for dict in samples:
+            if isinstance(next(iter(dict.values())), str):
+                for _id, fp in dict.items():
+                    duplicate(fp, result.path / os.path.basename(fp))
+            else:
+                for _id, feature_dict in dict.items():
+                    for fp in feature_dict.values():
+                        os.makedirs(result.path / _id, exist_ok=True)
+                        duplicate(
+                            fp,
+                            result.path / _id / os.path.basename(fp)
+                        )
+
+        if num_partitions == len(all):
+            partitioned[_id] = result
+        else:
+            partitioned[i] = result
+
+    return partitioned
