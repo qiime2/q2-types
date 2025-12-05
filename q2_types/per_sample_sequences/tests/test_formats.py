@@ -173,8 +173,6 @@ class TestAbsoluteFastqManifestV2Formats(TestPluginBase):
                 fmt(manifest, mode='r').validate()
 
 
-    
-
 class TestAbsoluteFastqManifestFormats(TestPluginBase):
     package = 'q2_types.per_sample_sequences.tests'
 
@@ -243,7 +241,6 @@ class TestAbsoluteFastqManifestFormats(TestPluginBase):
         for format in self.formats:
             with self.assertRaisesRegex(ValidationError, 'direction.*peanut'):
                 format(file_, mode='r').validate()
-    
 
 class TestRelativeFastqManifestFormats(TestPluginBase):
     package = 'q2_types.per_sample_sequences.tests'
