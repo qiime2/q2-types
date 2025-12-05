@@ -1,0 +1,7 @@
+#to investigate differences between 1 and 10
+sample-id,filename,direction
+1,'paired_end_data_overlapping_ids/5_S1_L001_R1_001.fastq.gz',forward
+1,'paired_end_data_overlapping_ids/5_S1_L001_R2_001.fastq.gz',reverse
+10,'paired_end_data_overlapping_ids/51_S2_L001_R1_001.fastq.gz',forward
+10,'paired_end_data_overlapping_ids/51_S2_L001_R2_001.fastq.gz',reverse
+

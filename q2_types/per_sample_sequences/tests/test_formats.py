@@ -173,6 +173,8 @@ class TestAbsoluteFastqManifestV2Formats(TestPluginBase):
                 fmt(manifest, mode='r').validate()
 
 
+    
+
 class TestAbsoluteFastqManifestFormats(TestPluginBase):
     package = 'q2_types.per_sample_sequences.tests'
 
@@ -241,7 +243,7 @@ class TestAbsoluteFastqManifestFormats(TestPluginBase):
         for format in self.formats:
             with self.assertRaisesRegex(ValidationError, 'direction.*peanut'):
                 format(file_, mode='r').validate()
-
+    
 
 class TestRelativeFastqManifestFormats(TestPluginBase):
     package = 'q2_types.per_sample_sequences.tests'
@@ -601,6 +603,21 @@ class TestFormats(TestPluginBase):
         with self.assertRaisesRegex(ValidationError,
                                     'Missing one or more files.*MANIFEST'):
             format.validate()
+
+    def test_validate_pe_overlap_sample_ids_positive(self):
+        filenames = ('paired_end_data_overlapping_ids/5_S1_L001_R1_001.fastq.gz',
+                     'paired_end_data_overlapping_ids/5_S1_L001_R2_001.fastq.gz',
+                     'paired_end_data_overlapping_ids/51_S2_L001_R1_001.fastq.gz',
+                     'paired_end_data_overlapping_ids/51_S2_L001_R2_001.fastq.gz',
+                     'paired_end_data_overlapping_ids/MANIFEST', 'metadata.yml')
+
+        for filename in filenames:
+            filepath = self.get_data_path(filename)
+            shutil.copy(filepath, self.temp_dir.name)
+
+        format = SingleLanePerSamplePairedEndFastqDirFmt(
+            self.temp_dir.name, mode='r')
+        format.validate()
 
 
 class TestQIIME1DemuxFormat(TestPluginBase):

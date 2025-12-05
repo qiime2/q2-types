@@ -359,6 +359,7 @@ class CasavaOneEightSingleLanePerSampleDirFmt(model.DirectoryFormat):
 
                 sample_id = re.split('_S[0-9]', file.name)[0]
                 for file2 in self.path.iterdir():
+                    #if sample_id == re.split('_S[0-9]', file2.name)[0]:
                     if sample_id in file2.name:
                         pair = file2.name
 
