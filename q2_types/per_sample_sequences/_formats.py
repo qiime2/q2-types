@@ -357,10 +357,14 @@ class CasavaOneEightSingleLanePerSampleDirFmt(model.DirectoryFormat):
                 if not re.match(self.casava_one_eight_regex, file.name):
                     continue
 
-                sample_id = re.split('_S[0-9]', file.name)[0]
+                if file.name.endswith('fastq.gz'):
+                    sample_id, _, _, _, _ = _parse_sequence_filename(file.name)
                 for file2 in self.path.iterdir():
-                    if sample_id == re.split('_S[0-9]', file2.name)[0]:
-                        pair = file2.name
+                    if file2.name.endswith('fastq.gz'):
+                        sample2_id, _, _, _, _ = \
+                         _parse_sequence_filename(file2.name)
+                        if sample_id == sample2_id:
+                            pair = file2.name
 
                 validated_files.append(file.name)
                 validated_files.append(pair)
