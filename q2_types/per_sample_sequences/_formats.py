@@ -308,9 +308,9 @@ class CasavaOneEightSingleLanePerSampleDirFmt(model.DirectoryFormat):
         return df
 
     def _validate_(self, level):
-        forwards = []
+        forward_sids = []
         forward_fns = []
-        reverses = []
+        reverse_sids = []
         reverse_fns = []
         for p in self.path.iterdir():
             if p.is_dir():
@@ -326,29 +326,29 @@ class CasavaOneEightSingleLanePerSampleDirFmt(model.DirectoryFormat):
                     sample_id, _, _, _, direction = \
                         _parse_sequence_filename(p.name)
                     if direction == 'forward':
-                        forwards.append(sample_id)
+                        forward_sids.append(sample_id)
                         forward_fns.append(p.name)
                     else:
-                        reverses.append(sample_id)
+                        reverse_sids.append(sample_id)
                         reverse_fns.append(p.name)
 
-        set_forwards = set(forwards)
-        set_reverse = set(reverses)
+        set_forward_sids = set(forward_sids)
+        set_reverse = set(reverse_sids)
 
-        if len(set_forwards) != len(forwards):
+        if len(set_forward_sids) != len(forward_sids):
             raise ValidationError('Duplicate samples in forward reads: %r'
-                                  % self._find_duplicates(forwards))
-        if len(set_reverse) != len(reverses):
+                                  % self._find_duplicates(forward_sids))
+        if len(set_reverse) != len(reverse_sids):
             raise ValidationError('Duplicate samples in reverse reads: %r'
-                                  % self._find_duplicates(reverses))
+                                  % self._find_duplicates(reverse_sids))
 
-        if len(forwards) > 0 and len(reverses) > 0:
+        if len(forward_sids) > 0 and len(reverse_sids) > 0:
             if not self._CHECK_PAIRED:
                 raise ValidationError("Forward and reverse reads found.")
-            elif set_forwards ^ set_reverse:
+            elif set_forward_sids ^ set_reverse:
                 raise ValidationError(
                     "These samples do not have matching pairs of forward and "
-                    "reverse reads: %r" % (set_forwards ^ set_reverse))
+                    "reverse reads: %r" % (set_forward_sids ^ set_reverse))
         elif self._REQUIRE_PAIRED:
             raise ValidationError("Reads are not paired end.")
 
