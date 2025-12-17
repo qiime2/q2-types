@@ -309,7 +309,9 @@ class CasavaOneEightSingleLanePerSampleDirFmt(model.DirectoryFormat):
 
     def _validate_(self, level):
         forwards = []
-        reverse = []
+        forward_fns = []
+        reverses = []
+        reverse_fns = []
         for p in self.path.iterdir():
             if p.is_dir():
                 # This branch happens if you have a filepath that looks roughly
@@ -321,23 +323,26 @@ class CasavaOneEightSingleLanePerSampleDirFmt(model.DirectoryFormat):
                 raise ValidationError("Contains a subdirectory: %s" % d)
             else:
                 if p.name.endswith('_001.fastq.gz'):
-                    sample_id = p.name.rsplit('_', maxsplit=4)[0]
-                    if p.name.endswith('R1_001.fastq.gz'):
+                    sample_id, _, _, _, direction = \
+                        _parse_sequence_filename(p.name)
+                    if direction == 'forward':
                         forwards.append(sample_id)
+                        forward_fns.append(p.name)
                     else:
-                        reverse.append(sample_id)
+                        reverses.append(sample_id)
+                        reverse_fns.append(p.name)
 
         set_forwards = set(forwards)
-        set_reverse = set(reverse)
+        set_reverse = set(reverses)
 
         if len(set_forwards) != len(forwards):
             raise ValidationError('Duplicate samples in forward reads: %r'
                                   % self._find_duplicates(forwards))
-        if len(set_reverse) != len(reverse):
+        if len(set_reverse) != len(reverses):
             raise ValidationError('Duplicate samples in reverse reads: %r'
-                                  % self._find_duplicates(reverse))
+                                  % self._find_duplicates(reverses))
 
-        if forwards and reverse:
+        if len(forwards) > 0 and len(reverses) > 0:
             if not self._CHECK_PAIRED:
                 raise ValidationError("Forward and reverse reads found.")
             elif set_forwards ^ set_reverse:
@@ -347,33 +352,15 @@ class CasavaOneEightSingleLanePerSampleDirFmt(model.DirectoryFormat):
         elif self._REQUIRE_PAIRED:
             raise ValidationError("Reads are not paired end.")
 
-        # ensure read pair record counts match
-        if forwards and reverse:
-            validated_files = []
-            for file in self.path.iterdir():
-                if file.name in validated_files:
-                    continue
-
-                if not re.match(self.casava_one_eight_regex, file.name):
-                    continue
-
-                if file.name.endswith('fastq.gz'):
-                    sample_id, _, _, _, _ = _parse_sequence_filename(file.name)
-                for file2 in self.path.iterdir():
-                    if file2.name.endswith('fastq.gz'):
-                        sample2_id, _, _, _, _ = \
-                         _parse_sequence_filename(file2.name)
-                        if sample_id == sample2_id:
-                            pair = file2.name
-
-                validated_files.append(file.name)
-                validated_files.append(pair)
-
-                file_path = self.path / file.name
-                pair_path = self.path / pair
+        # ensure read paired record counts match
+        if len(forward_fns) > 0 and len(reverse_fns) > 0:
+            for forward_fn, reverse_fn in zip(sorted(forward_fns),
+                                              sorted(reverse_fns)):
+                forward_fp = self.path / forward_fn
+                reverse_fp = self.path / reverse_fn
 
                 validate_paired_ends_equal_record_count(
-                    str(file_path), str(pair_path)
+                    str(forward_fp), str(reverse_fp)
                 )
 
 
