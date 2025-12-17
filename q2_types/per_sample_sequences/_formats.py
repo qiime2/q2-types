@@ -333,22 +333,23 @@ class CasavaOneEightSingleLanePerSampleDirFmt(model.DirectoryFormat):
                         reverse_fns.append(p.name)
 
         set_forward_sids = set(forward_sids)
-        set_reverse = set(reverse_sids)
+        set_reverse_sids = set(reverse_sids)
 
         if len(set_forward_sids) != len(forward_sids):
             raise ValidationError('Duplicate samples in forward reads: %r'
                                   % self._find_duplicates(forward_sids))
-        if len(set_reverse) != len(reverse_sids):
+        if len(set_reverse_sids) != len(reverse_sids):
             raise ValidationError('Duplicate samples in reverse reads: %r'
                                   % self._find_duplicates(reverse_sids))
 
         if len(forward_sids) > 0 and len(reverse_sids) > 0:
             if not self._CHECK_PAIRED:
                 raise ValidationError("Forward and reverse reads found.")
-            elif set_forward_sids ^ set_reverse:
+            elif set_forward_sids ^ set_reverse_sids:
                 raise ValidationError(
                     "These samples do not have matching pairs of forward and "
-                    "reverse reads: %r" % (set_forward_sids ^ set_reverse))
+                    "reverse reads: %r" %
+                    (set_forward_sids ^ set_reverse_sids))
         elif self._REQUIRE_PAIRED:
             raise ValidationError("Reads are not paired end.")
 
