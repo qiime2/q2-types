@@ -602,6 +602,22 @@ class TestFormats(TestPluginBase):
                                     'Missing one or more files.*MANIFEST'):
             format.validate()
 
+    def test_validate_pe_overlap_sample_ids_positive(self):
+        filenames = \
+         ('paired_end_data_overlapping_ids/sample_5_S771_L001_R1_001.fastq.gz',
+          'paired_end_data_overlapping_ids/sample_5_S771_L001_R2_001.fastq.gz',
+          'paired_end_data_overlapping_ids/sample_51_S26_L001_R1_001.fastq.gz',
+          'paired_end_data_overlapping_ids/sample_51_S26_L001_R2_001.fastq.gz',
+          'paired_end_data_overlapping_ids/MANIFEST', 'metadata.yml')
+
+        for filename in filenames:
+            filepath = self.get_data_path(filename)
+            shutil.copy(filepath, self.temp_dir.name)
+
+        format = SingleLanePerSamplePairedEndFastqDirFmt(
+            self.temp_dir.name, mode='r')
+        format.validate()
+
 
 class TestQIIME1DemuxFormat(TestPluginBase):
     package = 'q2_types.per_sample_sequences.tests'

@@ -308,8 +308,10 @@ class CasavaOneEightSingleLanePerSampleDirFmt(model.DirectoryFormat):
         return df
 
     def _validate_(self, level):
-        forwards = []
-        reverse = []
+        forward_sids = []
+        forward_fns = []
+        reverse_sids = []
+        reverse_fns = []
         for p in self.path.iterdir():
             if p.is_dir():
                 # This branch happens if you have a filepath that looks roughly
@@ -321,55 +323,45 @@ class CasavaOneEightSingleLanePerSampleDirFmt(model.DirectoryFormat):
                 raise ValidationError("Contains a subdirectory: %s" % d)
             else:
                 if p.name.endswith('_001.fastq.gz'):
-                    sample_id = p.name.rsplit('_', maxsplit=4)[0]
-                    if p.name.endswith('R1_001.fastq.gz'):
-                        forwards.append(sample_id)
+                    sample_id, _, _, _, direction = \
+                        _parse_sequence_filename(p.name)
+                    if direction == 'forward':
+                        forward_sids.append(sample_id)
+                        forward_fns.append(p.name)
                     else:
-                        reverse.append(sample_id)
+                        reverse_sids.append(sample_id)
+                        reverse_fns.append(p.name)
 
-        set_forwards = set(forwards)
-        set_reverse = set(reverse)
+        set_forward_sids = set(forward_sids)
+        set_reverse_sids = set(reverse_sids)
 
-        if len(set_forwards) != len(forwards):
+        if len(set_forward_sids) != len(forward_sids):
             raise ValidationError('Duplicate samples in forward reads: %r'
-                                  % self._find_duplicates(forwards))
-        if len(set_reverse) != len(reverse):
+                                  % self._find_duplicates(forward_sids))
+        if len(set_reverse_sids) != len(reverse_sids):
             raise ValidationError('Duplicate samples in reverse reads: %r'
-                                  % self._find_duplicates(reverse))
+                                  % self._find_duplicates(reverse_sids))
 
-        if forwards and reverse:
+        if len(forward_sids) > 0 and len(reverse_sids) > 0:
             if not self._CHECK_PAIRED:
                 raise ValidationError("Forward and reverse reads found.")
-            elif set_forwards ^ set_reverse:
+            elif set_forward_sids ^ set_reverse_sids:
                 raise ValidationError(
                     "These samples do not have matching pairs of forward and "
-                    "reverse reads: %r" % (set_forwards ^ set_reverse))
+                    "reverse reads: %r" %
+                    (set_forward_sids ^ set_reverse_sids))
         elif self._REQUIRE_PAIRED:
             raise ValidationError("Reads are not paired end.")
 
-        # ensure read pair record counts match
-        if forwards and reverse:
-            validated_files = []
-            for file in self.path.iterdir():
-                if file.name in validated_files:
-                    continue
-
-                if not re.match(self.casava_one_eight_regex, file.name):
-                    continue
-
-                sample_id = re.split('_S[0-9]', file.name)[0]
-                for file2 in self.path.iterdir():
-                    if sample_id in file2.name:
-                        pair = file2.name
-
-                validated_files.append(file.name)
-                validated_files.append(pair)
-
-                file_path = self.path / file.name
-                pair_path = self.path / pair
+        # ensure read paired record counts match
+        if len(forward_fns) > 0 and len(reverse_fns) > 0:
+            for forward_fn, reverse_fn in zip(sorted(forward_fns),
+                                              sorted(reverse_fns)):
+                forward_fp = self.path / forward_fn
+                reverse_fp = self.path / reverse_fn
 
                 validate_paired_ends_equal_record_count(
-                    str(file_path), str(pair_path)
+                    str(forward_fp), str(reverse_fp)
                 )
 
 

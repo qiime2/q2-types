@@ -1,0 +1,7 @@
+# To investigate differences between 5 and 51
+sample-id,filename,direction
+5,paired_end_data_overlapping_ids/sample_5_S771_L001_R1_001.fastq.gz,forward
+5,paired_end_data_overlapping_ids/sample_5_S771_L001_R2_001.fastq.gz,reverse
+51,paired_end_data_overlapping_ids/sample_51_S26_L001_R1_001.fastq.gz,forward
+51,paired_end_data_overlapping_ids/sample_51_S26_L001_R2_001.fastq.gz,reverse
+

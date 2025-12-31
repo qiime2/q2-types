@@ -7,16 +7,20 @@
 # ----------------------------------------------------------------------------
 import gzip
 import itertools
+import os
 import re
 import warnings
 from collections import defaultdict
-from typing import List
+from typing import List, TypeVar
 
 import skbio
 import pandas as pd
 
 import qiime2.plugin.model as model
 from qiime2.plugin import ValidationError
+from qiime2.util import duplicate
+
+DirFmt = TypeVar("DirFmt", bound=model.DirectoryFormat)
 
 
 def read_from_fasta(path, constructor=skbio.DNA, lowercase=False):
@@ -233,3 +237,47 @@ class FileDictMixin:
             else path.absolute()
         )
         return str(processed_path), _id
+
+
+def _duplicate_with_warning(src, dst):
+    try:
+        duplicate(src, dst)
+    except FileExistsError:
+        warnings.warn(
+            f"Skipping {src}. File already "
+            f"exists in the destination directory."
+        )
+
+
+def _collate_helper(dir_fmts: List[DirFmt]) -> DirFmt:
+    """
+    Iterates through a list of directory formats, merging their contents
+    into a single directory. Can be used with per sample directories and
+    without. Handles duplicate files by issuing warnings when conflicts occur.
+
+    Parameters:
+        dir_fmts (iterable):
+            A List of directory format objects to be collated.
+
+    Returns:
+        object:
+            The updated `collated` directory format object containing all
+            merged files and subdirectories.
+    """
+    # Initialize the collated directory format with the same class as inputs
+    collated = dir_fmts[0].__class__()
+
+    for dir_fmt in dir_fmts:
+        for item in dir_fmt.path.iterdir():
+            target = collated.path / item.name
+            # Per sample directories
+            if item.is_dir():
+                target.mkdir(exist_ok=True)
+                for file in item.iterdir():
+                    _duplicate_with_warning(file, target / file.name)
+            # Non per sample directories
+            else:
+                _duplicate_with_warning(
+                    item, collated.path / os.path.basename(item)
+                )
+    return collated
