@@ -134,8 +134,28 @@ class TSVTaxonomyFormat(model.TextFileFormat):
                 raise ValidationError('No taxonomy records found, only blank '
                                       'lines and/or a header row.')
 
+    def _check_single_taxon(self):
+        with self.open() as f:
+            depth_count = []
+            for line in f:
+                count = line.count(';')
+                depth_count.append(count)
+
+            if max(depth_count) == 0:
+                raise ValidationError('Importing taxonomy with taxonomic depth'
+                                      ' of one.')
+
+    def _check_trailing_semicolon(self):
+        with self.open() as f:
+            for line in f:
+                if line.endswith(';'):
+                    raise ValidationError('Importing taxonomy with a trailing '
+                                          'semicolon.')
+
     def _validate_(self, level):
         self._check_n_records(n={'min': 10, 'max': None}[level])
+        self._check_single_taxon()
+        self._check_trailing_semicolon()
 
 
 TSVTaxonomyDirectoryFormat = model.SingleFileDirectoryFormat(

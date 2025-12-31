@@ -48,11 +48,12 @@ class TestTaxonomyFormats(TestPluginBase):
 
         for filepath in filepaths:
             format = TaxonomyFormat(filepath, mode='r')
-
+            print('Reached:', filepath)
             format.validate()
 
     def test_taxonomy_format_validate_negative(self):
-        filenames = ['empty', 'blanks', '1-column.tsv']
+        filenames = ['empty', 'blanks', '1-column.tsv',
+                     'trailing-semicolon.tsv', 'one-depth.tsv']
         filepaths = [self.get_data_path(os.path.join('taxonomy', filename))
                      for filename in filenames]
 
@@ -129,7 +130,8 @@ class TestTaxonomyFormats(TestPluginBase):
 
     def test_tsv_taxonomy_format_validate_negative(self):
         filenames = ['empty', 'blanks', '1-column.tsv',
-                     'headerless.tsv', 'header-only.tsv', 'jagged.tsv']
+                     'headerless.tsv', 'header-only.tsv', 'jagged.tsv',
+                     'trailing-semicolon.tsv', 'one-depth.tsv']
         filepaths = [self.get_data_path(os.path.join('taxonomy', filename))
                      for filename in filenames]
 
