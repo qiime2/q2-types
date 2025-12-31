@@ -48,7 +48,6 @@ class TestTaxonomyFormats(TestPluginBase):
 
         for filepath in filepaths:
             format = TaxonomyFormat(filepath, mode='r')
-            print('Reached:', filepath)
             format.validate()
 
     def test_taxonomy_format_validate_negative(self):
