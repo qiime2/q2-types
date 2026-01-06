@@ -10,7 +10,7 @@ import unittest
 
 from qiime2.plugin.testing import TestPluginBase
 
-from q2_types.feature_map import MAGtoContigsFormat
+from q2_types.feature_map import MAGtoContigsFormat, AnnotationToContigsFormat
 
 
 class TestTransformers(TestPluginBase):
@@ -25,6 +25,12 @@ class TestTransformers(TestPluginBase):
                 "contig1", "contig3", "contig4"
             ],
             "6232c7e1-8ed7-47c8-9bdb-b94706a26931": ["contig2", "contig5"],
+        }
+        self.valid_annotation_map = {
+            "taxon1": ["contig1", "contig2"],
+            "taxon2": ["contig3"],
+            "taxon3": ["contig4", "contig5", "contig6"],
+            "taxon4": ["contig7", "contig8"],
         }
 
     def test_contig_map_to_dict(self):
@@ -43,6 +49,23 @@ class TestTransformers(TestPluginBase):
         with obs_fp.open() as obs_fh:
             obs = json.load(obs_fh)
         self.assertDictEqual(self.valid_contig_map, obs)
+
+    def test_annotation_map_to_dict(self):
+        transformer = self.get_transformer(AnnotationToContigsFormat, dict)
+        _input = AnnotationToContigsFormat(
+            self.get_data_path("annotation-to-contigs-valid.json"), "r"
+        )
+
+        obs = transformer(_input)
+        self.assertDictEqual(self.valid_annotation_map, obs)
+
+    def test_dict_to_annotation_map(self):
+        transformer = self.get_transformer(dict, AnnotationToContigsFormat)
+        obs_fp = transformer(self.valid_annotation_map)
+
+        with obs_fp.open() as obs_fh:
+            obs = json.load(obs_fh)
+        self.assertDictEqual(self.valid_annotation_map, obs)
 
 
 if __name__ == "__main__":

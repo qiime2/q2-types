@@ -8,7 +8,7 @@
 
 import json
 
-from .. import MAGtoContigsFormat
+from .. import MAGtoContigsFormat, AnnotationToContigsFormat
 
 from ...plugin_setup import plugin
 
@@ -23,6 +23,21 @@ def _1(fp: MAGtoContigsFormat) -> dict:
 @plugin.register_transformer
 def _2(data: dict) -> MAGtoContigsFormat:
     fp = MAGtoContigsFormat()
+    with fp.open() as fh:
+        json.dump(data, fh)
+    return fp
+
+
+@plugin.register_transformer
+def _3(fp: AnnotationToContigsFormat) -> dict:
+    with fp.open() as fh:
+        data = json.load(fh)
+    return data
+
+
+@plugin.register_transformer
+def _4(data: dict) -> AnnotationToContigsFormat:
+    fp = AnnotationToContigsFormat()
     with fp.open() as fh:
         json.dump(data, fh)
     return fp

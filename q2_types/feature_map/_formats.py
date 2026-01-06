@@ -47,3 +47,35 @@ class MAGtoContigsFormat(model.TextFileFormat):
 MAGtoContigsDirFmt = model.SingleFileDirectoryFormat(
     "MAGtoContigsDirFmt", "mag-to-contigs.json", MAGtoContigsFormat
 )
+
+class AnnotationToContigsFormat(model.TextFileFormat):
+    def _validate_(self, level):
+        with self.path.open("r") as fh:
+            try:
+                data = json.load(fh)
+            except json.decoder.JSONDecodeError:
+                raise ValidationError(f"Invalid JSON file: {self.path}")
+
+            level_map = {"min": 1, "max": len(data)}
+            max_entries = level_map[level]
+
+            # assert values are lists with at least one contig
+            for _id, contigs in list(data.items())[:max_entries]:
+                if not isinstance(contigs, list):
+                    raise ValidationError(
+                        "Values corresponding to annotation IDs must be lists of "
+                        f'contigs. Found "{type(contigs)}" for annotation "{_id}".'
+                    )
+
+                if len(contigs) == 0:
+                    raise ValidationError(
+                        "Only non-empty annotations are allowed. The list of "
+                        f'contigs for annotation "{_id}" is empty.'
+                    )
+
+
+AnnotationToContigsDirFmt = model.SingleFileDirectoryFormat(
+    "AnnotationToContigsDirFmt",
+    "annotation-to-contigs.json",
+    AnnotationToContigsFormat
+)

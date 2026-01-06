@@ -8,17 +8,28 @@
 
 import importlib
 
-from .. import MAGtoContigs, FeatureMap, MAGtoContigsDirFmt, MAGtoContigsFormat
+from .. import (
+    MAGtoContigs, FeatureMap, MAGtoContigsDirFmt, MAGtoContigsFormat,
+    TaxonomyToContigs, AnnotationToContigsDirFmt, AnnotationToContigsFormat
+)
 
 from ...plugin_setup import plugin
 
-plugin.register_formats(MAGtoContigsFormat, MAGtoContigsDirFmt)
+plugin.register_formats(
+    MAGtoContigsFormat, MAGtoContigsDirFmt, AnnotationToContigsFormat,
+    AnnotationToContigsDirFmt
+)
 
-plugin.register_semantic_types(FeatureMap, MAGtoContigs)
+plugin.register_semantic_types(FeatureMap, MAGtoContigs, TaxonomyToContigs)
 
 plugin.register_artifact_class(
     FeatureMap[MAGtoContigs],
     directory_format=MAGtoContigsDirFmt
+)
+
+plugin.register_artifact_class(
+    FeatureMap[TaxonomyToContigs],
+    directory_format=AnnotationToContigsDirFmt
 )
 
 importlib.import_module('._transformers', __name__)

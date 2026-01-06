@@ -1,0 +1,18 @@
+{
+    "taxon1": [
+      "contig1",
+      "contig2"
+    ],
+    "taxon2": [
+      "contig3"
+    ],
+    "taxon3": [
+      "contig4",
+      "contig5",
+      "contig6"
+    ],
+    "taxon4": [
+      "contig7",
+      "contig8"
+    ]
+  }

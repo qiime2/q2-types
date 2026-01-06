@@ -10,7 +10,7 @@ import unittest
 from qiime2.core.exceptions import ValidationError
 from qiime2.plugin.testing import TestPluginBase
 
-from q2_types.feature_map import MAGtoContigsFormat
+from q2_types.feature_map import MAGtoContigsFormat, AnnotationToContigsFormat
 
 
 class TestFormats(TestPluginBase):
@@ -53,6 +53,33 @@ class TestFormats(TestPluginBase):
         ):
             fmt.validate(level="max")
 
+    def test_annotation_to_contigs_valid_min(self):
+        fp = self.get_data_path("annotation-to-contigs-valid.json")
+        fmt = AnnotationToContigsFormat(fp, mode="r")
+        fmt.validate(level="min")
+
+    def test_annotation_to_contigs_valid_max(self):
+        fp = self.get_data_path("annotation-to-contigs-valid.json")
+        fmt = AnnotationToContigsFormat(fp, mode="r")
+        fmt.validate(level="max")
+
+    def test_annotation_to_contigs_has_invalid_values(self):
+        fp = self.get_data_path("annotation-to-contigs-invalid-values.json")
+        fmt = AnnotationToContigsFormat(fp, mode="r")
+        with self.assertRaisesRegex(
+            ValidationError,
+            'Found "<class \'str\'>" for annotation "taxon3".',
+        ):
+            fmt.validate(level="max")
+
+    def test_annotation_to_contigs_has_no_contigs(self):
+        fp = self.get_data_path("annotation-to-contigs-empty-list.json")
+        fmt = AnnotationToContigsFormat(fp, mode="r")
+        with self.assertRaisesRegex(
+            ValidationError,
+            'annotation "taxon4" is empty.',
+        ):
+            fmt.validate(level="max")
 
 if __name__ == "__main__":
     unittest.main()

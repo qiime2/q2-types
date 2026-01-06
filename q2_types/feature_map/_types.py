@@ -12,3 +12,6 @@ FeatureMap = SemanticType("FeatureMap", field_names="type")
 MAGtoContigs = SemanticType(
     "MAGtoContigs", variant_of=FeatureMap.field["type"]
 )
+TaxonomyToContigs = SemanticType(
+    "TaxonomyToContigs", variant_of=FeatureMap.field["type"]
+)
