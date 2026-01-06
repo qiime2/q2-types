@@ -48,6 +48,7 @@ MAGtoContigsDirFmt = model.SingleFileDirectoryFormat(
     "MAGtoContigsDirFmt", "mag-to-contigs.json", MAGtoContigsFormat
 )
 
+
 class AnnotationToContigsFormat(model.TextFileFormat):
     def _validate_(self, level):
         with self.path.open("r") as fh:
@@ -63,8 +64,9 @@ class AnnotationToContigsFormat(model.TextFileFormat):
             for _id, contigs in list(data.items())[:max_entries]:
                 if not isinstance(contigs, list):
                     raise ValidationError(
-                        "Values corresponding to annotation IDs must be lists of "
-                        f'contigs. Found "{type(contigs)}" for annotation "{_id}".'
+                        "Values corresponding to annotation IDs must be lists "
+                        f'of contigs. Found "{type(contigs)}" for '
+                        f'annotation "{_id}".'
                     )
 
                 if len(contigs) == 0:

@@ -81,5 +81,6 @@ class TestFormats(TestPluginBase):
         ):
             fmt.validate(level="max")
 
+
 if __name__ == "__main__":
     unittest.main()

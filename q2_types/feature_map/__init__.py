@@ -15,5 +15,6 @@ from ._types import FeatureMap, MAGtoContigs, TaxonomyToContigs
 
 __all__ = [
     "FeatureMap", "MAGtoContigs", "MAGtoContigsFormat", "MAGtoContigsDirFmt",
-    "TaxonomyToContigs", "AnnotationToContigsFormat", "AnnotationToContigsDirFmt"
+    "TaxonomyToContigs", "AnnotationToContigsFormat",
+    "AnnotationToContigsDirFmt"
 ]
