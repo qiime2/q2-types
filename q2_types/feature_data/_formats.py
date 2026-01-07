@@ -138,7 +138,7 @@ class TSVTaxonomyFormat(model.TextFileFormat):
         with self.open() as f:
             max_depth = 0
             for line in f:
-                if line.count(';') > max_depth
+                if line.count(';') > max_depth:
                     max_depth = line.count(';')
             if max_depth == 0:
                 raise ValidationError('Importing taxonomy with taxonomic depth'
