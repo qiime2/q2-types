@@ -136,12 +136,12 @@ class TSVTaxonomyFormat(model.TextFileFormat):
 
     def _check_single_taxon(self):
         with self.open() as f:
-            depth_count = []
+            max_count = 0
             for line in f:
                 count = line.count(';')
-                depth_count.append(count)
-
-            if max(depth_count) == 0:
+                if count > max_count:
+                    max_count = count
+            if max_count == 0:
                 raise ValidationError('Importing taxonomy with taxonomic depth'
                                       ' of one.')
 
