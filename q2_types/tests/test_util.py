@@ -17,7 +17,7 @@ from qiime2.plugin.testing import TestPluginBase
 
 from q2_types._util import (
     _validate_num_partitions, _validate_mag_ids, FileDictMixin,
-    _duplicate_with_warning, partition_helper
+    _duplicate_with_warning, partition_dir_format
 )
 DirFmt = TypeVar("DirFmt", bound=model.DirectoryFormat)
 
@@ -197,7 +197,7 @@ class TestFileDictMixin(TestPluginBase):
     def test_partition_helper_genes_samples(self):
         path = self.get_data_path("genes_samples")
         genes = GenesDirectoryFormat(path=path, mode="r")
-        obs = partition_helper(dir_format=genes)
+        obs = partition_dir_format(dir_format=genes)
         self.assertTrue(os.path.exists(
             obs["sample1"].path / "sample1" / "genes1.fa")
         )
@@ -208,7 +208,7 @@ class TestFileDictMixin(TestPluginBase):
     def test_partition_helper_genes(self):
         path = self.get_data_path("genes")
         genes = GenesDirectoryFormat(path=path, mode="r")
-        obs = partition_helper(dir_format=genes)
+        obs = partition_dir_format(dir_format=genes)
         self.assertTrue(os.path.exists(
             obs["genes1"].path / "genes1.fa")
         )
@@ -219,7 +219,7 @@ class TestFileDictMixin(TestPluginBase):
     def test_partition_helper_genes_samples_1_partition(self):
         path = self.get_data_path("genes_samples")
         genes = GenesDirectoryFormat(path=path, mode="r")
-        obs = partition_helper(dir_format=genes, num_partitions=1)
+        obs = partition_dir_format(dir_format=genes, num_partitions=1)
         self.assertTrue(os.path.exists(
             obs[1].path / "sample1" / "genes1.fa")
         )
@@ -230,7 +230,7 @@ class TestFileDictMixin(TestPluginBase):
     def test_partition_helper_genes_1_partition(self):
         path = self.get_data_path("genes")
         genes = GenesDirectoryFormat(path=path, mode="r")
-        obs = partition_helper(dir_format=genes, num_partitions=1)
+        obs = partition_dir_format(dir_format=genes, num_partitions=1)
         self.assertTrue(os.path.exists(
             obs[1].path / "genes1.fa")
         )
