@@ -6,6 +6,7 @@
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
 import re
+import warnings
 
 import pandas as pd
 import skbio
@@ -141,15 +142,19 @@ class TSVTaxonomyFormat(model.TextFileFormat):
                 if line.count(';') > max_depth:
                     max_depth = line.count(';')
             if max_depth == 0:
-                raise ValidationError('Importing taxonomy with taxonomic depth'
-                                      ' of one.')
+                warnings.warn(
+                    'Importing taxonomy with taxonomic depth of one.',
+                    UserWarning
+                )
 
     def _check_trailing_semicolon(self):
         with self.open() as f:
             for line in f:
-                if line.endswith(';'):
-                    raise ValidationError('Importing taxonomy with a trailing '
-                                          'semicolon.')
+                if line.rstrip().endswith(';'):
+                    warnings.warn(
+                        'Importing taxonomy with a trailing semicolon.',
+                        UserWarning
+                    )
 
     def _validate_(self, level):
         self._check_n_records(n={'min': 10, 'max': None}[level])

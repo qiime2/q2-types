@@ -51,8 +51,7 @@ class TestTaxonomyFormats(TestPluginBase):
             format.validate()
 
     def test_taxonomy_format_validate_negative(self):
-        filenames = ['empty', 'blanks', '1-column.tsv',
-                     'trailing-semicolon.tsv', 'one-depth.tsv']
+        filenames = ['empty', 'blanks', '1-column.tsv']
         filepaths = [self.get_data_path(os.path.join('taxonomy', filename))
                      for filename in filenames]
 
@@ -116,6 +115,16 @@ class TestTaxonomyFormats(TestPluginBase):
 
         format.validate()
 
+    def test_tsv_taxonomy_format_warns_negative(self):
+        filenames = ['one-depth.tsv', 'trailing-semicolon.tsv']
+        filepaths = [self.get_data_path(os.path.join('taxonomy', filename))
+                     for filename in filenames]
+
+        for filepath in filepaths:
+            format = TSVTaxonomyFormat(filepath, mode='r')
+            with self.assertWarns(UserWarning):
+                format.validate()
+
     def test_tsv_taxonomy_format_validate_positive(self):
         filenames = ['2-column.tsv', '3-column.tsv', 'valid-but-messy.tsv',
                      'many-rows.tsv']
@@ -129,8 +138,7 @@ class TestTaxonomyFormats(TestPluginBase):
 
     def test_tsv_taxonomy_format_validate_negative(self):
         filenames = ['empty', 'blanks', '1-column.tsv',
-                     'headerless.tsv', 'header-only.tsv', 'jagged.tsv',
-                     'trailing-semicolon.tsv', 'one-depth.tsv']
+                     'headerless.tsv', 'header-only.tsv', 'jagged.tsv']
         filepaths = [self.get_data_path(os.path.join('taxonomy', filename))
                      for filename in filenames]
 
