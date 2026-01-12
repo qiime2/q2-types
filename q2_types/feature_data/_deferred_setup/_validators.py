@@ -6,13 +6,21 @@
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
 
+import warnings
 import pandas as pd
 
 from qiime2.plugin import Properties, ValidationError
 
-from .. import FeatureData, SequenceCharacteristics
+from .. import FeatureData, SequenceCharacteristics, Taxonomy
 
 from ...plugin_setup import plugin
+
+from q2_types.feature_data._deferred_setup._transformers import (
+    _taxonomy_formats_to_dataframe
+)
+from q2_types.feature_data import TSVTaxonomyFormat
+
+from qiime2.core.exceptions import QIIME2Warning
 
 
 @plugin.register_validator(FeatureData[SequenceCharacteristics %
@@ -37,3 +45,32 @@ def validate_seq_char_len(data: pd.DataFrame, level):
     if not (data['length'] > 0).all():
         raise ValidationError('Column "length" cannot contain negative '
                               'values.')
+
+
+@plugin.register_validator(FeatureData[Taxonomy])
+def _check_single_taxon(data: TSVTaxonomyFormat, level):
+    print('I got called!')
+    taxon_df = _taxonomy_formats_to_dataframe(str(data))
+
+    max_depth = 0
+    for taxon in taxon_df['Taxon']:
+        if taxon.count(';') > max_depth:
+            max_depth = taxon.count(';')
+    if max_depth == 0:
+        warnings.warn(
+            'Importing taxonomy with taxonomic depth of one.',
+            QIIME2Warning
+        )
+
+
+@plugin.register_validator(FeatureData[Taxonomy])
+def _check_trailing_semicolon(data: TSVTaxonomyFormat, level):
+    print('I got called!')
+    taxon_df = _taxonomy_formats_to_dataframe(str(data))
+
+    for taxon in taxon_df['Taxon']:
+        if taxon.rstrip().endswith:
+            warnings.warn(
+                'Importing taxonomy with a trailing semicolon.',
+                QIIME2Warning
+            )

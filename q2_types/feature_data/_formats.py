@@ -6,7 +6,6 @@
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
 import re
-import warnings
 
 import pandas as pd
 import skbio
@@ -14,7 +13,6 @@ import skbio
 import qiime2.plugin.model as model
 from qiime2.plugin import ValidationError
 import qiime2
-from qiime2.core.exceptions import QIIME2Warning
 
 
 class TaxonomyFormat(model.TextFileFormat):
@@ -136,32 +134,8 @@ class TSVTaxonomyFormat(model.TextFileFormat):
                 raise ValidationError('No taxonomy records found, only blank '
                                       'lines and/or a header row.')
 
-    def _check_single_taxon(self):
-        taxon_df = pd.read_csv(self.__str__(), delimiter='\t')
-        max_depth = 0
-        for taxon in taxon_df['Taxon']:
-            if taxon.count(';') > max_depth:
-                max_depth = taxon.count(';')
-        if max_depth == 0:
-            warnings.warn(
-                'Importing taxonomy with taxonomic depth of one.',
-                QIIME2Warning
-            )
-
-    def _check_trailing_semicolon(self):
-        taxon_df = pd.read_csv(self.__str__(), delimiter='\t')
-
-        for taxon in taxon_df['Taxon']:
-            if taxon.rstrip().endswith:
-                warnings.warn(
-                    'Importing taxonomy with a trailing semicolon.',
-                    QIIME2Warning
-                )
-
     def _validate_(self, level):
         self._check_n_records(n={'min': 10, 'max': None}[level])
-        self._check_single_taxon()
-        self._check_trailing_semicolon()
 
 
 TSVTaxonomyDirectoryFormat = model.SingleFileDirectoryFormat(

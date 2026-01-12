@@ -36,6 +36,7 @@ from q2_types.feature_data import (
 from qiime2.plugin.testing import TestPluginBase
 from qiime2.plugin import ValidationError
 from qiime2.core.exceptions import QIIME2Warning
+from qiime2.sdk.result import Artifact
 
 
 class TestTaxonomyFormats(TestPluginBase):
@@ -124,7 +125,7 @@ class TestTaxonomyFormats(TestPluginBase):
         with self.assertWarnsRegex(
             QIIME2Warning, 'Importing taxonomy with taxonomic depth of one.'
         ):
-            format.validate()
+            Artifact.import_data('FeatureData[Taxonomy]', format)
 
         filepath = self.get_data_path(
             os.path.join('taxonomy', 'trailing-semicolon.tsv')
@@ -133,7 +134,7 @@ class TestTaxonomyFormats(TestPluginBase):
         with self.assertWarnsRegex(
             QIIME2Warning, 'Importing taxonomy with a trailing semicolon.'
         ):
-            format.validate()
+            Artifact.import_data('FeatureData[Taxonomy]', format)
 
     def test_tsv_taxonomy_format_validate_positive(self):
         filenames = ['2-column.tsv', '3-column.tsv', 'valid-but-messy.tsv',
