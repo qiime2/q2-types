@@ -138,13 +138,11 @@ class TSVTaxonomyFormat(model.TextFileFormat):
 
     def _check_single_taxon(self):
         taxon_df = pd.read_csv(self.__str__(), delimiter='\t')
-        print('Taxon_df:\n', taxon_df)
         max_depth = 0
         for taxon in taxon_df['Taxon']:
             if taxon.count(';') > max_depth:
                 max_depth = taxon.count(';')
         if max_depth == 0:
-            print('In warning block')
             warnings.warn(
                 'Importing taxonomy with taxonomic depth of one.',
                 QIIME2Warning
