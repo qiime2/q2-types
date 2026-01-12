@@ -14,6 +14,7 @@ import skbio
 import qiime2.plugin.model as model
 from qiime2.plugin import ValidationError
 import qiime2
+from qiime2.core.exceptions import QIIME2Warning
 
 
 class TaxonomyFormat(model.TextFileFormat):
@@ -136,25 +137,28 @@ class TSVTaxonomyFormat(model.TextFileFormat):
                                       'lines and/or a header row.')
 
     def _check_single_taxon(self):
-        with self.open() as f:
-            max_depth = 0
-            for line in f:
-                if line.count(';') > max_depth:
-                    max_depth = line.count(';')
-            if max_depth == 0:
-                warnings.warn(
-                    'Importing taxonomy with taxonomic depth of one.',
-                    UserWarning
-                )
+        taxon_df = pd.read_csv(self.__str__(), delimiter='\t')
+        print('Taxon_df:\n', taxon_df)
+        max_depth = 0
+        for taxon in taxon_df['Taxon']:
+            if taxon.count(';') > max_depth:
+                max_depth = taxon.count(';')
+        if max_depth == 0:
+            print('In warning block')
+            warnings.warn(
+                'Importing taxonomy with taxonomic depth of one.',
+                QIIME2Warning
+            )
 
     def _check_trailing_semicolon(self):
-        with self.open() as f:
-            for line in f:
-                if line.rstrip().endswith(';'):
-                    warnings.warn(
-                        'Importing taxonomy with a trailing semicolon.',
-                        UserWarning
-                    )
+        taxon_df = pd.read_csv(self.__str__(), delimiter='\t')
+
+        for taxon in taxon_df:
+            if taxon.rstrip().endswith:
+                warnings.warn(
+                    'Importing taxonomy with a trailing semicolon.',
+                    QIIME2Warning
+                )
 
     def _validate_(self, level):
         self._check_n_records(n={'min': 10, 'max': None}[level])
