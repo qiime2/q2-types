@@ -10,7 +10,8 @@ import importlib
 
 from .. import (
     MAGtoContigs, FeatureMap, MAGtoContigsDirFmt, MAGtoContigsFormat,
-    TaxonomyToContigs, AnnotationToContigsDirFmt, AnnotationToContigsFormat
+    TaxonomyToContigs, AnnotationToContigsDirFmt, AnnotationToContigsFormat,
+    FunctionToContigs
 )
 
 from ...plugin_setup import plugin
@@ -20,7 +21,9 @@ plugin.register_formats(
     AnnotationToContigsDirFmt
 )
 
-plugin.register_semantic_types(FeatureMap, MAGtoContigs, TaxonomyToContigs)
+plugin.register_semantic_types(
+    FeatureMap, MAGtoContigs, TaxonomyToContigs, FunctionToContigs
+)
 
 plugin.register_artifact_class(
     FeatureMap[MAGtoContigs],
@@ -29,6 +32,11 @@ plugin.register_artifact_class(
 
 plugin.register_artifact_class(
     FeatureMap[TaxonomyToContigs],
+    directory_format=AnnotationToContigsDirFmt
+)
+
+plugin.register_artifact_class(
+    FeatureMap[FunctionToContigs],
     directory_format=AnnotationToContigsDirFmt
 )
 

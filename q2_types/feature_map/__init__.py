@@ -11,10 +11,12 @@ from ._formats import (
     AnnotationToContigsDirFmt
 )
 
-from ._types import FeatureMap, MAGtoContigs, TaxonomyToContigs
+from ._types import (
+    FeatureMap, MAGtoContigs, TaxonomyToContigs, FunctionToContigs
+)
 
 __all__ = [
     "FeatureMap", "MAGtoContigs", "MAGtoContigsFormat", "MAGtoContigsDirFmt",
     "TaxonomyToContigs", "AnnotationToContigsFormat",
-    "AnnotationToContigsDirFmt"
+    "AnnotationToContigsDirFmt", "FunctionToContigs"
 ]

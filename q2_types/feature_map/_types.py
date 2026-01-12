@@ -15,3 +15,6 @@ MAGtoContigs = SemanticType(
 TaxonomyToContigs = SemanticType(
     "TaxonomyToContigs", variant_of=FeatureMap.field["type"]
 )
+FunctionToContigs = SemanticType(
+    "FunctionToContigs", variant_of=FeatureMap.field["type"]
+)
