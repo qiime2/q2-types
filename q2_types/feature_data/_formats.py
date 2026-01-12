@@ -151,7 +151,7 @@ class TSVTaxonomyFormat(model.TextFileFormat):
     def _check_trailing_semicolon(self):
         taxon_df = pd.read_csv(self.__str__(), delimiter='\t')
 
-        for taxon in taxon_df:
+        for taxon in taxon_df['Taxon']:
             if taxon.rstrip().endswith:
                 warnings.warn(
                     'Importing taxonomy with a trailing semicolon.',
