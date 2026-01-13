@@ -53,7 +53,7 @@ class FeatureMapFormat(model.TextFileFormat):
     def _validate_(self, level):
         level_map = {"min": 1, "max": float("inf")}
 
-        feature_map ={}
+        feature_map = {}
         with self.path.open("r") as fh:
             for i, line in enumerate(fh):
                 if i > level_map[level]:
@@ -68,24 +68,29 @@ class FeatureMapFormat(model.TextFileFormat):
                 members = data["members"]
 
                 if feature_id in feature_map:
-                    raise ValidationError(f"Duplicate feature ID: {feature_id}")
+                    raise ValidationError(
+                        f"Duplicate feature ID: {feature_id}"
+                    )
 
                 if not isinstance(members, list):
                     raise ValidationError(
-                        f"Values corresponding to feature IDs must be lists of "
-                        f"member features. Found {type(members)} for feature "
-                        f"'{feature_id}'."
+                        f"Values corresponding to feature IDs must be lists "
+                        f"of member features. Found {type(members)} for "
+                        f"feature '{feature_id}'."
                     )
 
                 if len(members) == 0:
                     raise ValidationError(
-                        f"Only non-empty feature members are allowed. The list of "
-                        f"members for feature '{feature_id}' is empty."
+                        "Only non-empty feature members are allowed. The "
+                        f"list of members for feature '{feature_id}' "
+                        "is empty."
                     )
 
                 feature_map[feature_id] = members
 
 
 FeatureMapDirFmt = model.SingleFileDirectoryFormat(
-    "FeatureMapDirFmt","feature-map.json", FeatureMapFormat
+    "FeatureMapDirFmt",
+    "feature-map.json",
+    FeatureMapFormat
 )
