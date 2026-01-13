@@ -1,0 +1,4 @@
+{"name": "taxon1", "members": ["contig1", "contig2"]}
+{"name": "taxon2", "members": "contig3"}
+{"name": "taxon3", "members": ["contig4", "contig5", "contig6"]}
+{"name": "taxon4", "members": ["contig7", "contig8"]}

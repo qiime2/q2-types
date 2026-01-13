@@ -11,7 +11,7 @@ from qiime2.plugin.testing import TestPluginBase
 
 from q2_types.feature_map import (
     FeatureMap, MAGtoContigs, MAGtoContigsDirFmt, TaxonomyToContigs,
-    AnnotationToContigsDirFmt, FunctionToContigs
+    FunctionToContigs, FeatureMapDirFmt
 )
 
 
@@ -34,7 +34,7 @@ class TestTypes(TestPluginBase):
 
     def test_feature_map_tax_annotation_to_contigs_fmt_registration(self):
         self.assertSemanticTypeRegisteredToFormat(
-            FeatureMap[TaxonomyToContigs], AnnotationToContigsDirFmt
+            FeatureMap[TaxonomyToContigs], FeatureMapDirFmt
         )
 
     def test_feature_map_function_to_contigs_semantic_type_registration(self):
@@ -42,7 +42,7 @@ class TestTypes(TestPluginBase):
 
     def test_feature_map_func_annotation_to_contigs_fmt_registration(self):
         self.assertSemanticTypeRegisteredToFormat(
-            FeatureMap[FunctionToContigs], AnnotationToContigsDirFmt
+            FeatureMap[FunctionToContigs], FeatureMapDirFmt
         )
 
 

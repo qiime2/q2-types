@@ -7,8 +7,8 @@
 # ----------------------------------------------------------------------------
 
 from ._formats import (
-    MAGtoContigsFormat, MAGtoContigsDirFmt, AnnotationToContigsFormat,
-    AnnotationToContigsDirFmt
+    MAGtoContigsFormat, MAGtoContigsDirFmt, FeatureMapFormat,
+    FeatureMapDirFmt
 )
 
 from ._types import (
@@ -17,6 +17,6 @@ from ._types import (
 
 __all__ = [
     "FeatureMap", "MAGtoContigs", "MAGtoContigsFormat", "MAGtoContigsDirFmt",
-    "TaxonomyToContigs", "AnnotationToContigsFormat",
-    "AnnotationToContigsDirFmt", "FunctionToContigs"
+    "TaxonomyToContigs", "FeatureMapFormat",
+    "FeatureMapDirFmt", "FunctionToContigs"
 ]

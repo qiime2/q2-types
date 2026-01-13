@@ -10,7 +10,7 @@ import unittest
 from qiime2.core.exceptions import ValidationError
 from qiime2.plugin.testing import TestPluginBase
 
-from q2_types.feature_map import MAGtoContigsFormat, AnnotationToContigsFormat
+from q2_types.feature_map import MAGtoContigsFormat, FeatureMapFormat
 
 
 class TestFormats(TestPluginBase):
@@ -53,31 +53,40 @@ class TestFormats(TestPluginBase):
         ):
             fmt.validate(level="max")
 
-    def test_annotation_to_contigs_valid_min(self):
-        fp = self.get_data_path("annotation-to-contigs-valid.json")
-        fmt = AnnotationToContigsFormat(fp, mode="r")
+    def test_feature_map_valid_min(self):
+        fp = self.get_data_path("feature-map-valid.jsonl")
+        fmt = FeatureMapFormat(fp, mode="r")
         fmt.validate(level="min")
 
-    def test_annotation_to_contigs_valid_max(self):
-        fp = self.get_data_path("annotation-to-contigs-valid.json")
-        fmt = AnnotationToContigsFormat(fp, mode="r")
+    def test_feature_map_valid_max(self):
+        fp = self.get_data_path("feature-map-valid.jsonl")
+        fmt = FeatureMapFormat(fp, mode="r")
         fmt.validate(level="max")
 
-    def test_annotation_to_contigs_has_invalid_values(self):
-        fp = self.get_data_path("annotation-to-contigs-invalid-values.json")
-        fmt = AnnotationToContigsFormat(fp, mode="r")
+    def test_feature_map_has_invalid_values(self):
+        fp = self.get_data_path("feature-map-invalid-values.jsonl")
+        fmt = FeatureMapFormat(fp, mode="r")
         with self.assertRaisesRegex(
             ValidationError,
-            'Found "<class \'str\'>" for annotation "taxon3".',
+            "Found <class \'str\'> for feature 'taxon2'.",
         ):
             fmt.validate(level="max")
 
-    def test_annotation_to_contigs_has_no_contigs(self):
-        fp = self.get_data_path("annotation-to-contigs-empty-list.json")
-        fmt = AnnotationToContigsFormat(fp, mode="r")
+    def test_feature_map_has_no_contigs(self):
+        fp = self.get_data_path("feature-map-empty-list.jsonl")
+        fmt = FeatureMapFormat(fp, mode="r")
         with self.assertRaisesRegex(
             ValidationError,
-            'annotation "taxon4" is empty.',
+            "feature 'taxon2' is empty.",
+        ):
+            fmt.validate(level="max")
+
+    def test_feature_map_has_duplicated_id(self):
+        fp = self.get_data_path("feature-map-duplicated.jsonl")
+        fmt = FeatureMapFormat(fp, mode="r")
+        with self.assertRaisesRegex(
+            ValidationError,
+            'Duplicate feature ID: taxon1',
         ):
             fmt.validate(level="max")
 

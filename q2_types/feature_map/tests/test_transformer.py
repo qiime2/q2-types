@@ -10,7 +10,7 @@ import unittest
 
 from qiime2.plugin.testing import TestPluginBase
 
-from q2_types.feature_map import MAGtoContigsFormat, AnnotationToContigsFormat
+from q2_types.feature_map import MAGtoContigsFormat, FeatureMapFormat
 
 
 class TestTransformers(TestPluginBase):
@@ -50,22 +50,25 @@ class TestTransformers(TestPluginBase):
             obs = json.load(obs_fh)
         self.assertDictEqual(self.valid_contig_map, obs)
 
-    def test_annotation_map_to_dict(self):
-        transformer = self.get_transformer(AnnotationToContigsFormat, dict)
-        _input = AnnotationToContigsFormat(
-            self.get_data_path("annotation-to-contigs-valid.json"), "r"
+    def test_feature_map_to_dict(self):
+        transformer = self.get_transformer(FeatureMapFormat, dict)
+        _input = FeatureMapFormat(
+            self.get_data_path("feature-map-valid.jsonl"), "r"
         )
 
         obs = transformer(_input)
         self.assertDictEqual(self.valid_annotation_map, obs)
 
-    def test_dict_to_annotation_map(self):
-        transformer = self.get_transformer(dict, AnnotationToContigsFormat)
+    def test_dict_to_feature_map(self):
+        transformer = self.get_transformer(dict, FeatureMapFormat)
         obs_fp = transformer(self.valid_annotation_map)
 
+        obs_data = {}
         with obs_fp.open() as obs_fh:
-            obs = json.load(obs_fh)
-        self.assertDictEqual(self.valid_annotation_map, obs)
+            for line in obs_fh:
+                data = json.loads(line)
+                obs_data[data["name"]] = data["members"]
+        self.assertDictEqual(self.valid_annotation_map, obs_data)
 
 
 if __name__ == "__main__":
