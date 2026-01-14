@@ -35,7 +35,7 @@ from q2_types.feature_data import (
 )
 from qiime2.plugin.testing import TestPluginBase
 from qiime2.plugin import ValidationError
-from qiime2.core.exceptions import QIIME2Warning
+from qiime2.core.exceptions import RachisWarning
 from qiime2.sdk.result import Artifact
 
 
@@ -123,7 +123,7 @@ class TestTaxonomyFormats(TestPluginBase):
         )
         format = TSVTaxonomyFormat(filepath, mode='r')
         with self.assertWarnsRegex(
-            QIIME2Warning, 'Importing taxonomy with taxonomic depth of one.'
+            RachisWarning, 'Importing taxonomy with taxonomic depth of one.'
         ):
             Artifact.import_data('FeatureData[Taxonomy]', format)
 
@@ -132,7 +132,7 @@ class TestTaxonomyFormats(TestPluginBase):
         )
         format = TSVTaxonomyFormat(filepath, mode='r')
         with self.assertWarnsRegex(
-            QIIME2Warning, 'Importing taxonomy with a trailing semicolon.'
+            RachisWarning, 'Importing taxonomy with a trailing semicolon.'
         ):
             Artifact.import_data('FeatureData[Taxonomy]', format)
 

@@ -20,7 +20,7 @@ from q2_types.feature_data._deferred_setup._transformers import (
 )
 from q2_types.feature_data import TSVTaxonomyFormat
 
-from qiime2.core.exceptions import QIIME2Warning
+from qiime2.core.exceptions import RachisWarning
 
 
 @plugin.register_validator(FeatureData[SequenceCharacteristics %
@@ -49,7 +49,6 @@ def validate_seq_char_len(data: pd.DataFrame, level):
 
 @plugin.register_validator(FeatureData[Taxonomy])
 def _check_single_taxon(data: TSVTaxonomyFormat, level):
-    print('I got called!')
     taxon_df = _taxonomy_formats_to_dataframe(str(data))
 
     max_depth = 0
@@ -59,18 +58,17 @@ def _check_single_taxon(data: TSVTaxonomyFormat, level):
     if max_depth == 0:
         warnings.warn(
             'Importing taxonomy with taxonomic depth of one.',
-            QIIME2Warning
+            RachisWarning
         )
 
 
 @plugin.register_validator(FeatureData[Taxonomy])
 def _check_trailing_semicolon(data: TSVTaxonomyFormat, level):
-    print('I got called!')
     taxon_df = _taxonomy_formats_to_dataframe(str(data))
 
     for taxon in taxon_df['Taxon']:
-        if taxon.rstrip().endswith:
+        if taxon.rstrip().endswith(';'):
             warnings.warn(
                 'Importing taxonomy with a trailing semicolon.',
-                QIIME2Warning
+                RachisWarning
             )
