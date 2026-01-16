@@ -15,11 +15,6 @@ from .. import FeatureData, SequenceCharacteristics, Taxonomy
 
 from ...plugin_setup import plugin
 
-from q2_types.feature_data._deferred_setup._transformers import (
-    _taxonomy_formats_to_dataframe
-)
-from q2_types.feature_data import TSVTaxonomyFormat
-
 from qiime2.core.exceptions import RachisWarning
 
 
@@ -48,13 +43,15 @@ def validate_seq_char_len(data: pd.DataFrame, level):
 
 
 @plugin.register_validator(FeatureData[Taxonomy])
-def _check_single_taxon(data: TSVTaxonomyFormat, level):
-    taxon_df = _taxonomy_formats_to_dataframe(str(data))
-
+def _check_single_taxon(data: pd.DataFrame, level):
+    '''
+    Raises a warning if the taxonomy's depth is one.
+    '''
     max_depth = 0
-    for taxon in taxon_df['Taxon']:
+    for taxon in data['Taxon']:
         if taxon.count(';') > max_depth:
             max_depth = taxon.count(';')
+
     if max_depth == 0:
         warnings.warn(
             'Importing taxonomy with taxonomic depth of one.',
@@ -63,10 +60,12 @@ def _check_single_taxon(data: TSVTaxonomyFormat, level):
 
 
 @plugin.register_validator(FeatureData[Taxonomy])
-def _check_trailing_semicolon(data: TSVTaxonomyFormat, level):
-    taxon_df = _taxonomy_formats_to_dataframe(str(data))
-
-    for taxon in taxon_df['Taxon']:
+def _check_trailing_semicolon(data: pd.DataFrame, level):
+    '''
+    Raises a warning if a taxon string in the taxonomy has a trailing
+    semicolon.
+    '''
+    for taxon in data['Taxon']:
         if taxon.rstrip().endswith(';'):
             warnings.warn(
                 'Importing taxonomy with a trailing semicolon.',
