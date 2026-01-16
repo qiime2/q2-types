@@ -117,11 +117,16 @@ class TestTaxonomyFormats(TestPluginBase):
 
         format.validate()
 
-    def test_tsv_taxonomy_format_warns_negative(self):
+    def test_tsv_taxonomy_format_warnings(self):
+        '''
+        Tests that the taxonomic depth of one and trailing semicolon warnings
+        are raised under the proper conditions.
+        '''
         filepath = self.get_data_path(
             os.path.join('taxonomy', 'one-depth.tsv')
         )
         format = TSVTaxonomyFormat(filepath, mode='r')
+
         with self.assertWarnsRegex(
             RachisWarning, 'Importing taxonomy with taxonomic depth of one.'
         ):
@@ -131,6 +136,7 @@ class TestTaxonomyFormats(TestPluginBase):
             os.path.join('taxonomy', 'trailing-semicolon.tsv')
         )
         format = TSVTaxonomyFormat(filepath, mode='r')
+
         with self.assertWarnsRegex(
             RachisWarning, 'Importing taxonomy with a trailing semicolon.'
         ):

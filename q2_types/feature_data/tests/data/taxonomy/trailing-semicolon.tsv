@@ -1,3 +1,4 @@
 Feature ID	Taxon	Confidence
-seq1	k__Bacteria;	0.3;
-seq2;	k__Bacteria; p__Proteobacteria	0.3
+seq1	k__Bacteria	0.3
+seq2;	k__Bacteria; p__Proteobacteria	0.5
+seq3	k__Bacteria; p__Proteobacteria;	0.5
