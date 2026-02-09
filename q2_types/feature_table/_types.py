@@ -34,3 +34,6 @@ Design = SemanticType('Design', variant_of=FeatureTable.field['content'])
 
 Normalized = SemanticType('Normalized',
                           variant_of=FeatureTable.field['content'])
+
+LogFrequency = SemanticType('LogFrequency',
+                                    variant_of=FeatureTable.field['content'])

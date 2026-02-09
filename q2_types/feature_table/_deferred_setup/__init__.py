@@ -15,7 +15,7 @@ from qiime2.plugin import Citations
 from .. import (BIOMV100Format, BIOMV210Format, BIOMV100DirFmt,
                 BIOMV210DirFmt, FeatureTable, Frequency, RelativeFrequency,
                 PresenceAbsence, Composition, Balance,
-                PercentileNormalized, Design, Normalized)
+                PercentileNormalized, Design, Normalized, LogFrequency)
 
 from ...plugin_setup import plugin
 
@@ -27,7 +27,7 @@ plugin.register_views(BIOMV100Format, BIOMV210Format, BIOMV100DirFmt,
 
 plugin.register_semantic_types(FeatureTable, Frequency, RelativeFrequency,
                                PresenceAbsence, Balance, Composition,
-                               PercentileNormalized, Design, Normalized)
+                               PercentileNormalized, Design, Normalized, LogFrequency)
 
 plugin.register_artifact_class(
     FeatureTable[Frequency],
@@ -81,5 +81,9 @@ plugin.register_artifact_class(
     directory_format=BIOMV210DirFmt,
     description="A feature table that was normalized."
 )
-
+plugin.register_artifact_class(
+    FeatureTable[LogFrequency],
+    directory_format=BIOMV210DirFmt,
+    description="A feature table that was log transformed."
+)
 importlib.import_module('._transformers', __name__)

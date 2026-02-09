@@ -10,9 +10,9 @@ from ._formats import (BIOMV100Format, BIOMV210Format, BIOMV100DirFmt,
                        BIOMV210DirFmt)
 from ._types import (FeatureTable, Frequency, RelativeFrequency,
                      PresenceAbsence, Composition, Balance,
-                     PercentileNormalized, Design, Normalized)
+                     PercentileNormalized, Design, Normalized, LogFrequency)
 
 __all__ = ['BIOMV100Format', 'BIOMV100DirFmt', 'FeatureTable', 'Frequency',
            'RelativeFrequency', 'PresenceAbsence', 'BIOMV210Format',
            'BIOMV210DirFmt', 'Composition', 'Balance', 'PercentileNormalized',
-           'Design', 'Normalized']
+           'Design', 'Normalized', 'LogFrequency']
