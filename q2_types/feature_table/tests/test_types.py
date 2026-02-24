@@ -40,7 +40,7 @@ class TestTypes(TestPluginBase):
 
     def test_normalized_semantic_type_registration(self):
         self.assertRegisteredSemanticType(Normalized)
-        
+
     def test_unconstrained_semantic_type_registration(self):
         self.assertRegisteredSemanticType(Unconstrained)
 

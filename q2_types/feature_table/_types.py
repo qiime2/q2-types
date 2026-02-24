@@ -36,4 +36,4 @@ Normalized = SemanticType('Normalized',
                           variant_of=FeatureTable.field['content'])
 
 Unconstrained = SemanticType('Unconstrained',
-                                    variant_of=FeatureTable.field['content'])
+                             variant_of=FeatureTable.field['content'])
