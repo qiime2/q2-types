@@ -718,7 +718,8 @@ class BAMDirFmt(model.DirectoryFormat, FileDictMixin):
         return '%s.bam' % sample_id
 
 
-class MultiBAMDirFmt(MultiDirValidationMixin, model.DirectoryFormat, FileDictMixin):
+class MultiBAMDirFmt(MultiDirValidationMixin, model.DirectoryFormat,
+                     FileDictMixin):
     pathspec = r'.+\.bam$'
     suffixes = ['.bam']
     bams = model.FileCollection(r'.+\/.+\.bam', format=BAMFormat)
