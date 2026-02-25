@@ -24,7 +24,7 @@ from qiime2.plugin import ValidationError
 from q2_types.bowtie2 import Bowtie2IndexDirFmt
 from q2_types.feature_data import DNAFASTAFormat
 from ._util import _parse_sequence_filename, _manifest_to_df
-from .._util import FastqGzFormat
+from .._util import FastqGzFormat, FileDictMixin
 from ._util import validate_paired_ends_equal_record_count
 
 
@@ -708,7 +708,9 @@ class BAMFormat(model.BinaryFileFormat):
 
 
 # borrowed from q2-phylogenomics
-class BAMDirFmt(model.DirectoryFormat):
+class BAMDirFmt(model.DirectoryFormat, FileDictMixin):
+    pathspec = r'.+\.bam$'
+    suffixes = ['.bam']
     bams = model.FileCollection(r'.+\.bam', format=BAMFormat)
 
     @bams.set_path_maker
@@ -716,7 +718,9 @@ class BAMDirFmt(model.DirectoryFormat):
         return '%s.bam' % sample_id
 
 
-class MultiBAMDirFmt(MultiDirValidationMixin, model.DirectoryFormat):
+class MultiBAMDirFmt(MultiDirValidationMixin, model.DirectoryFormat, FileDictMixin):
+    pathspec = r'.+\.bam$'
+    suffixes = ['.bam']
     bams = model.FileCollection(r'.+\/.+\.bam', format=BAMFormat)
 
     @bams.set_path_maker

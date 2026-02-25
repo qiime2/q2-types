@@ -858,6 +858,13 @@ class TestMultiFormats(TestPluginBase):
 
         format.validate()
 
+        file_dict = format.file_dict(relative=True)
+
+        assert file_dict == {
+            "sample1": "sample1.bam",
+            "sample2": "sample2.bam",
+        }
+
     @patch('subprocess.run', return_value=Mock(returncode=3))
     def test_bam_dirmt_invalid(self, p):
         # this patch is not ideal but samtools' installation sometimes can
@@ -876,6 +883,19 @@ class TestMultiFormats(TestPluginBase):
         format = MultiBAMDirFmt(filepath, mode='r')
 
         format.validate()
+
+        file_dict = format.file_dict(relative=True)
+
+        assert file_dict == {
+            "sample1": {
+                "map1": "sample1/map1.bam",
+                "map2": "sample1/map2.bam",
+            },
+            "sample2": {
+                "map1": "sample2/map1.bam",
+                "map2": "sample2/map2.bam",
+            },
+        }
 
 
 if __name__ == "__main__":
