@@ -27,7 +27,7 @@ plugin.register_views(BIOMV100Format, BIOMV210Format, BIOMV100DirFmt,
 
 plugin.register_semantic_types(FeatureTable, Frequency, RelativeFrequency,
                                PresenceAbsence, Balance, Composition,
-                               PercentileNormalized, Design, Normalized, 
+                               PercentileNormalized, Design, Normalized,
                                Unconstrained)
 
 plugin.register_artifact_class(
