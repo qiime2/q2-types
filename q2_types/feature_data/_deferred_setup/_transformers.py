@@ -19,7 +19,7 @@ from q2_types._util import fasta_to_series, read_from_fasta
 
 from .. import (
     TaxonomyFormat, HeaderlessTSVTaxonomyFormat, TSVTaxonomyFormat,
-    DNAFASTAFormat, PairedDNASequencesDirectoryFormat,
+    DNAFASTAFormat, LinkedDNAFASTAFormat, PairedDNASequencesDirectoryFormat,
     AlignedDNAFASTAFormat, DifferentialFormat, ProteinFASTAFormat,
     AlignedProteinFASTAFormat, RNAFASTAFormat,
     AlignedRNAFASTAFormat, PairedRNASequencesDirectoryFormat,
@@ -312,6 +312,19 @@ def _9(ff: DNAFASTAFormat) -> DNAIterator:
 @plugin.register_transformer
 def _10(data: DNAIterator) -> DNAFASTAFormat:
     ff = DNAFASTAFormat()
+    skbio.io.write(iter(data), format='fasta', into=str(ff))
+    return ff
+
+
+@plugin.register_transformer
+def _231(ff: LinkedDNAFASTAFormat) -> DNAIterator:
+    generator = read_from_fasta(str(ff), skbio.Sequence)
+    return DNAIterator(generator)
+
+
+@plugin.register_transformer
+def _232(data: DNAIterator) -> LinkedDNAFASTAFormat:
+    ff = LinkedDNAFASTAFormat()
     skbio.io.write(iter(data), format='fasta', into=str(ff))
     return ff
 

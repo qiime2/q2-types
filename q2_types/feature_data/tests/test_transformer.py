@@ -22,7 +22,7 @@ from qiime2.plugin.testing import TestPluginBase
 from q2_types.feature_table import BIOMV210Format
 from q2_types.feature_data import (
     TaxonomyFormat, HeaderlessTSVTaxonomyFormat, TSVTaxonomyFormat,
-    DNAFASTAFormat, DNAIterator, PairedDNAIterator,
+    DNAFASTAFormat, LinkedDNAFASTAFormat, DNAIterator, PairedDNAIterator,
     ProteinIterator, AlignedProteinIterator,
     PairedDNASequencesDirectoryFormat, AlignedDNAFASTAFormat,
     DifferentialFormat, AlignedDNAIterator, ProteinFASTAFormat,
@@ -562,6 +562,39 @@ class TestDNAFASTAFormatTransformers(TestPluginBase):
 
         for act, exp in zip(obs, input):
             self.assertEqual(act, exp)
+
+    def test_linked_dna_fasta_format_to_dna_iterator(self):
+        filepath = os.path.join(self.temp_dir.name, 'linked-dna.fasta')
+        with open(filepath, 'w') as fh:
+            fh.write('>id1\n')
+            fh.write('ACGT ACGT\n')
+            fh.write('>id2\n')
+            fh.write('ACGT\n')
+
+        transformer = self.get_transformer(LinkedDNAFASTAFormat, DNAIterator)
+        obs = list(transformer(LinkedDNAFASTAFormat(filepath, mode='r')))
+
+        self.assertEqual([seq.metadata['id'] for seq in obs], ['id1', 'id2'])
+        self.assertEqual([str(seq) for seq in obs], ['ACGT ACGT', 'ACGT'])
+        self.assertTrue(all(type(seq) is skbio.Sequence for seq in obs))
+
+    def test_dna_iterator_to_linked_dna_fasta_format(self):
+        transformer = self.get_transformer(DNAIterator, LinkedDNAFASTAFormat)
+        input = DNAIterator(iter([
+            skbio.Sequence('ACGT ACGT', metadata={'id': 'id1'}),
+            skbio.Sequence('ACGT', metadata={'id': 'id2'}),
+        ]))
+
+        obs = transformer(input)
+        self.assertIsInstance(obs, LinkedDNAFASTAFormat)
+
+        reread = list(
+            skbio.read(str(obs), format='fasta', constructor=skbio.Sequence)
+        )
+        self.assertEqual(
+            [seq.metadata['id'] for seq in reread], ['id1', 'id2']
+        )
+        self.assertEqual([str(seq) for seq in reread], ['ACGT ACGT', 'ACGT'])
 
     def test_aln_dna_fasta_format_to_aln_dna_iterator(self):
         filename = 'aligned-dna-sequences.fasta'

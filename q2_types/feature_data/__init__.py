@@ -10,6 +10,7 @@ from ._formats import (
     TaxonomyFormat, TaxonomyDirectoryFormat, HeaderlessTSVTaxonomyFormat,
     HeaderlessTSVTaxonomyDirectoryFormat, TSVTaxonomyFormat,
     TSVTaxonomyDirectoryFormat, DNAFASTAFormat, DNASequencesDirectoryFormat,
+    LinkedDNAFASTAFormat, LinkedDNASequencesDirectoryFormat,
     PairedDNASequencesDirectoryFormat, AlignedDNAFASTAFormat,
     AlignedDNASequencesDirectoryFormat, DifferentialFormat,
     DifferentialDirectoryFormat, FASTAFormat, AlignedFASTAFormatMixin,
@@ -29,7 +30,8 @@ from ._formats import (
     SequenceCharacteristicsDirectoryFormat,
     SequenceCharacteristicsFormat)
 from ._types import (
-    FeatureData, Taxonomy, Sequence, PairedEndSequence, AlignedSequence,
+    FeatureData, Taxonomy, Sequence, LinkedSequence, PairedEndSequence,
+    AlignedSequence,
     Differential, ProteinSequence, AlignedProteinSequence, RNASequence,
     AlignedRNASequence, PairedEndRNASequence, BLAST6, SequenceCharacteristics)
 from ._objects import (
@@ -41,9 +43,11 @@ __all__ = [
     'TaxonomyFormat', 'TaxonomyDirectoryFormat', 'HeaderlessTSVTaxonomyFormat',
     'HeaderlessTSVTaxonomyDirectoryFormat', 'TSVTaxonomyFormat',
     'TSVTaxonomyDirectoryFormat', 'DNAFASTAFormat', 'DifferentialFormat',
-    'DNASequencesDirectoryFormat', 'PairedDNASequencesDirectoryFormat',
+    'DNASequencesDirectoryFormat', 'LinkedDNAFASTAFormat',
+    'LinkedDNASequencesDirectoryFormat', 'PairedDNASequencesDirectoryFormat',
     'AlignedDNAFASTAFormat', 'AlignedDNASequencesDirectoryFormat',
-    'FeatureData', 'Taxonomy', 'Sequence', 'PairedEndSequence',
+    'FeatureData', 'Taxonomy', 'Sequence', 'LinkedSequence',
+    'PairedEndSequence',
     'AlignedSequence', 'NucleicAcidIterator', 'DNAIterator',
     'PairedDNAIterator', 'FASTAFormat', 'AlignedDNAIterator', 'Differential',
     'DifferentialDirectoryFormat', 'AlignedFASTAFormatMixin',
