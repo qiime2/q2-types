@@ -319,6 +319,13 @@ def _10(data: DNAIterator) -> DNAFASTAFormat:
 @plugin.register_transformer
 def _231(ff: LinkedDNAFASTAFormat) -> DNAIterator:
     generator = read_from_fasta(str(ff), skbio.Sequence)
+    generator = skbio.read(
+        str(ff),
+        format='fasta',
+        constructor=skbio.Sequence,
+        lowercase=False,
+        keep_spaces=True
+    )
     return DNAIterator(generator)
 
 
