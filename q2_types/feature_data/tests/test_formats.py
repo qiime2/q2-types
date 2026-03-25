@@ -310,31 +310,6 @@ class TestNucleicAcidFASTAFormats(TestPluginBase):
         )
         format.validate()
 
-    def test_linked_dna_fasta_format_spaces_in_header(self):
-        filepath = os.path.join(
-            self.temp_dir.name, 'linked-dna-sequences.fasta'
-        )
-        with open(filepath, 'w') as fh:
-            fh.write('>id1 with many spaces\n')
-            fh.write('ACGT ACGT\n')
-
-        format = LinkedDNAFASTAFormat(filepath, mode='r')
-        format.validate()
-
-    def test_linked_dna_sequences_too_many_spaces_in_sequence(self):
-        filepath = os.path.join(
-            self.temp_dir.name, 'linked-dna-sequences.fasta'
-        )
-        with open(filepath, 'w') as fh:
-            fh.write('>id1 with many spaces\n')
-            fh.write('ACGT  ACGT\n')
-
-        format = LinkedDNAFASTAFormat(filepath, mode='r')
-        with self.assertRaisesRegex(
-            ValidationError, "Expected at most one space.*2.*ACGT  ACGT"
-        ):
-            format.validate()
-
     def test_dna_fasta_format_duplicate_ids(self):
         filepath = self.get_data_path('dna-sequences-duplicate-id.fasta')
         format = DNAFASTAFormat(filepath, mode='r')

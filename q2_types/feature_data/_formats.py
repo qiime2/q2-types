@@ -288,20 +288,6 @@ class LinkedDNAFASTAFormat(FASTAFormat):
         super().__init__(*args, **kwargs)
         self.alphabet = "ACGTRYKMSWBDHVN "
 
-    def _validate_(self, level='min'):
-        '''
-        Ensure at most one space in each sequence record.
-        '''
-        super()._validate_(level)
-
-        with open(self.path, 'r') as fh:
-            for line_number, line in enumerate(fh):
-                if not line.startswith('>') and line.count(' ') > 1:
-                    raise ValidationError(
-                        'Expected at most one space in each sequence record. '
-                        f'Invalid sequence on line {line_number + 1}: {line}.'
-                    )
-
 
 class AlignedFASTAFormatMixin:
     def _turn_into_alignment(self):
