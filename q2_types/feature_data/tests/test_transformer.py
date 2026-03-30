@@ -588,9 +588,14 @@ class TestDNAFASTAFormatTransformers(TestPluginBase):
         obs = transformer(input)
         self.assertIsInstance(obs, LinkedDNAFASTAFormat)
 
-        reread = list(
-            skbio.read(str(obs), format='fasta', constructor=skbio.Sequence)
-        )
+        reread = list(skbio.read(
+            str(obs),
+            format='fasta',
+            constructor=skbio.Sequence,
+            lowercase=False,
+            keep_spaces=True
+        ))
+
         self.assertEqual(
             [seq.metadata['id'] for seq in reread], ['id1', 'id2']
         )
