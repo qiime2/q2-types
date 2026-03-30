@@ -278,7 +278,7 @@ class DNAFASTAFormat(FASTAFormat):
         self.alphabet = "ACGTRYKMSWBDHVN"
 
 
-class LinkedDNAFASTAFormat(FASTAFormat):
+class LinkedDNAFASTAFormat(DNAFASTAFormat):
     '''
     Linked sequences are paired end sequences that may contain a single
     space between two unmerged read directions. A space is not a valid
@@ -286,7 +286,7 @@ class LinkedDNAFASTAFormat(FASTAFormat):
     '''
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.alphabet = "ACGTRYKMSWBDHVN "
+        self.alphabet += " "
 
 
 class AlignedFASTAFormatMixin:
