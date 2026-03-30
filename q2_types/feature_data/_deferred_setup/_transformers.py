@@ -302,6 +302,16 @@ def _series_to_fasta_format(ff, data, sequence_type="DNA", lowercase=False):
             skbio.io.write(sequence, format='fasta', into=f)
 
 
+def _read_linked_from_fasta(path):
+    return skbio.read(
+        path,
+        format='fasta',
+        constructor=skbio.Sequence,
+        lowercase=False,
+        keep_spaces=True
+    )
+
+
 # DNA Transformers
 @plugin.register_transformer
 def _9(ff: DNAFASTAFormat) -> DNAIterator:
@@ -318,13 +328,7 @@ def _10(data: DNAIterator) -> DNAFASTAFormat:
 
 @plugin.register_transformer
 def _231(ff: LinkedDNAFASTAFormat) -> DNAIterator:
-    generator = skbio.read(
-        str(ff),
-        format='fasta',
-        constructor=skbio.Sequence,
-        lowercase=False,
-        keep_spaces=True
-    )
+    generator = _read_linked_from_fasta(str(ff))
     return DNAIterator(generator)
 
 
@@ -332,6 +336,34 @@ def _231(ff: LinkedDNAFASTAFormat) -> DNAIterator:
 def _232(data: DNAIterator) -> LinkedDNAFASTAFormat:
     ff = LinkedDNAFASTAFormat()
     skbio.io.write(iter(data), format='fasta', into=str(ff))
+    return ff
+
+
+@plugin.register_transformer
+def _233(ff: LinkedDNAFASTAFormat) -> pd.Series:
+    data = {}
+    for sequence in _read_linked_from_fasta(str(ff)):
+        id_ = sequence.metadata['id']
+        if id_ in data:
+            raise ValueError(
+                "FASTA format sequence IDs must be unique. The following ID "
+                f"was found more than once: {id_}."
+            )
+        data[id_] = sequence
+
+    return pd.Series(data)
+
+
+@plugin.register_transformer
+def _234(data: pd.Series) -> LinkedDNAFASTAFormat:
+    ff = LinkedDNAFASTAFormat()
+    with ff.open() as fh:
+        for id_, seq in data.items():
+            sequence = skbio.Sequence(
+                str(seq), metadata={'id': id_}, lowercase=False
+            )
+            skbio.io.write(sequence, format='fasta', into=fh)
+
     return ff
 
 
