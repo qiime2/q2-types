@@ -11,6 +11,7 @@ from itertools import zip_longest
 import pandas as pd
 import biom
 import skbio
+import numpy as np
 
 import qiime2
 
@@ -25,7 +26,7 @@ from .. import (
     AlignedRNAFASTAFormat, PairedRNASequencesDirectoryFormat,
     BLAST6Format, MixedCaseDNAFASTAFormat, MixedCaseRNAFASTAFormat,
     MixedCaseAlignedDNAFASTAFormat, MixedCaseAlignedRNAFASTAFormat,
-    SequenceCharacteristicsFormat,
+    SequenceCharacteristicsFormat, ImportanceFormat,
     DNAIterator, PairedDNAIterator, AlignedDNAIterator,
     ProteinIterator, AlignedProteinIterator, RNAIterator, AlignedRNAIterator,
     PairedRNAIterator
@@ -108,6 +109,14 @@ def _taxonomy_formats_to_dataframe(filepath, has_header=None):
 
 def _has_expected_header(df):
     return df.iloc[0].tolist()[:2] == TSVTaxonomyFormat.HEADER
+
+
+def _read_dataframe(fh):
+    """Read a TSV file into a dataframe with the first column as the index."""
+    df = pd.read_csv(fh, sep='\t', header=0, dtype='str')
+    df.set_index(df.columns[0], drop=True, append=False, inplace=True)
+    df.index.name = 'id'
+    return df
 
 
 def _dataframe_to_tsv_taxonomy_format(df):
@@ -240,6 +249,31 @@ def _23(ff: TSVTaxonomyFormat) -> pd.Series:
 def _29(ff: TSVTaxonomyFormat) -> qiime2.Metadata:
     df = _taxonomy_formats_to_dataframe(str(ff), has_header=True)
     return qiime2.Metadata(df)
+
+
+@plugin.register_transformer
+def _dataframe_to_importance_format(data: pd.DataFrame) -> ImportanceFormat:
+    """Write feature importance values from a dataframe to TSV format."""
+    ff = ImportanceFormat()
+    with ff.open() as fh:
+        data.to_csv(fh, sep='\t', header=True, na_rep=np.nan)
+    return ff
+
+
+@plugin.register_transformer
+def _importance_format_to_dataframe(ff: ImportanceFormat) -> pd.DataFrame:
+    """Read feature importance TSV values into a numeric dataframe."""
+    with ff.open() as fh:
+        return _read_dataframe(fh).apply(
+            lambda x: pd.to_numeric(x, errors='raise'))
+
+
+@plugin.register_transformer
+def _importance_format_to_metadata(ff: ImportanceFormat) -> qiime2.Metadata:
+    """Read feature importance TSV values into QIIME 2 metadata."""
+    with ff.open() as fh:
+        return qiime2.Metadata(_read_dataframe(fh).apply(
+            lambda x: pd.to_numeric(x, errors='raise')))
 
 
 @plugin.register_transformer

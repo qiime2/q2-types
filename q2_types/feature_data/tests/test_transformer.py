@@ -30,7 +30,7 @@ from q2_types.feature_data import (
     RNAIterator, AlignedRNAIterator, BLAST6Format, MixedCaseDNAFASTAFormat,
     MixedCaseRNAFASTAFormat, MixedCaseAlignedDNAFASTAFormat,
     MixedCaseAlignedRNAFASTAFormat,
-    SequenceCharacteristicsFormat
+    SequenceCharacteristicsFormat, ImportanceFormat
 )
 from q2_types.feature_data._deferred_setup._transformers import (
     _taxonomy_formats_to_dataframe, _dataframe_to_tsv_taxonomy_format,
@@ -1599,6 +1599,49 @@ class TestSequenceCharacteristicsTransformer(TestPluginBase):
         self.exp_df['length'] = self.exp_df['length'].astype('float64')
 
         assert_frame_equal(obs.to_dataframe(), self.exp_df)
+
+
+class TestImportanceFormatTransformers(TestPluginBase):
+    package = 'q2_types.feature_data.tests'
+
+    def test_pd_dataframe_to_importance_format(self):
+        transformer = self.get_transformer(pd.DataFrame, ImportanceFormat)
+        exp = pd.DataFrame([1, 2, 3, 4],
+                           columns=['importance'], index=['a', 'b', 'c', 'd'])
+        obs = transformer(exp)
+        obs = pd.read_csv(str(obs), sep='\t', header=0, index_col=0)
+
+        assert_frame_equal(exp, obs)
+
+    def test_importance_format_to_pd_dataframe(self):
+        _, obs = self.transform_format(
+            ImportanceFormat, pd.DataFrame, 'importance.tsv')
+        exp_index = pd.Index(['74ec9fe6ffab4ecff6d5def74298a825',
+                              'c82032c40c98975f71892e4be561c87a',
+                              '79280cea51a6fe8a3432b2f266dd34db',
+                              'f7686a74ca2d3729eb66305e8a26309b'],
+                             name='id')
+        exp = pd.DataFrame([0.44469828320835586, 0.07760118417569697,
+                            0.06570251750505914, 0.061718558716901406],
+                           columns=['importance'],
+                           index=exp_index)
+
+        assert_frame_equal(exp, obs[:4])
+
+    def test_importance_format_to_metadata(self):
+        _, obs = self.transform_format(
+            ImportanceFormat, qiime2.Metadata, 'importance.tsv')
+        exp_index = pd.Index(['74ec9fe6ffab4ecff6d5def74298a825',
+                              'c82032c40c98975f71892e4be561c87a',
+                              '79280cea51a6fe8a3432b2f266dd34db',
+                              'f7686a74ca2d3729eb66305e8a26309b'],
+                             name='id')
+        exp = pd.DataFrame([0.44469828320835586, 0.07760118417569697,
+                            0.06570251750505914, 0.061718558716901406],
+                           columns=['importance'],
+                           index=exp_index)
+
+        assert_frame_equal(obs.to_dataframe()[:4], exp)
 
 
 if __name__ == '__main__':
