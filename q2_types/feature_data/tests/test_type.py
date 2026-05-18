@@ -10,8 +10,10 @@ import unittest
 
 
 from q2_types.feature_data import (
-    FeatureData, Taxonomy, Sequence, PairedEndSequence, AlignedSequence,
+    FeatureData, Taxonomy, Sequence, LinkedSequence, PairedEndSequence,
+    AlignedSequence,
     Differential, TSVTaxonomyDirectoryFormat, DNASequencesDirectoryFormat,
+    LinkedDNASequencesDirectoryFormat,
     DifferentialDirectoryFormat, PairedDNASequencesDirectoryFormat,
     AlignedDNASequencesDirectoryFormat, ProteinSequencesDirectoryFormat,
     AlignedProteinSequencesDirectoryFormat, ProteinSequence,
@@ -36,6 +38,9 @@ class TestTypes(TestPluginBase):
 
     def test_sequence_semantic_type_registration(self):
         self.assertRegisteredSemanticType(Sequence)
+
+    def test_linked_sequence_semantic_type_registration(self):
+        self.assertRegisteredSemanticType(LinkedSequence)
 
     def test_paired_end_sequence_semantic_type_registration(self):
         self.assertRegisteredSemanticType(PairedEndSequence)
@@ -63,6 +68,11 @@ class TestTypes(TestPluginBase):
     def test_sequence_semantic_type_to_format_registration(self):
         self.assertSemanticTypeRegisteredToFormat(
                 FeatureData[Sequence], DNASequencesDirectoryFormat)
+
+    def test_linked_sequence_semantic_type_to_format_registration(self):
+        self.assertSemanticTypeRegisteredToFormat(
+                FeatureData[LinkedSequence], LinkedDNASequencesDirectoryFormat
+        )
 
     def test_paired_end_sequence_semantic_type_to_format_registration(self):
         self.assertSemanticTypeRegisteredToFormat(

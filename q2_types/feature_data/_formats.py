@@ -278,6 +278,17 @@ class DNAFASTAFormat(FASTAFormat):
         self.alphabet = "ACGTRYKMSWBDHVN"
 
 
+class LinkedDNAFASTAFormat(DNAFASTAFormat):
+    '''
+    Linked sequences are paired end sequences that may contain a single
+    space between two unmerged read directions. A space is not a valid
+    FASTA character, so this format is technically not FASTA (fastalmost).
+    '''
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.alphabet += " "
+
+
 class AlignedFASTAFormatMixin:
     def _turn_into_alignment(self):
         self.aligned = True
@@ -295,6 +306,12 @@ class AlignedFASTAFormatMixin:
 
 DNASequencesDirectoryFormat = model.SingleFileDirectoryFormat(
     'DNASequencesDirectoryFormat', 'dna-sequences.fasta', DNAFASTAFormat)
+
+LinkedDNASequencesDirectoryFormat = model.SingleFileDirectoryFormat(
+    'LinkedDNASequencesDirectoryFormat',
+    'linked-dna-sequences.fasta',
+    LinkedDNAFASTAFormat
+)
 
 
 class MixedCaseDNAFASTAFormat(DNAFASTAFormat):

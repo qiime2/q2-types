@@ -14,6 +14,9 @@ Taxonomy = SemanticType('Taxonomy', variant_of=FeatureData.field['type'])
 
 Sequence = SemanticType('Sequence', variant_of=FeatureData.field['type'])
 
+LinkedSequence = SemanticType('LinkedSequence',
+                              variant_of=FeatureData.field['type'])
+
 RNASequence = SemanticType('RNASequence', variant_of=FeatureData.field['type'])
 
 PairedEndSequence = SemanticType('PairedEndSequence',
