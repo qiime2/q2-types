@@ -532,7 +532,7 @@ def _validate_file_not_empty(has_data):
             "file in addition to the header line.")
 
 
-class _MultiColumnNumericFormat(model.TextFileFormat):
+class ImportanceFormat(model.TextFileFormat):
     def _validate(self, n_records=None):
         """Validate rows with an identifier followed by numeric values."""
         with self.open() as fh:
@@ -569,10 +569,6 @@ class _MultiColumnNumericFormat(model.TextFileFormat):
         """Validate this format using QIIME 2's min or max validation level."""
         record_count_map = {'min': 5, 'max': None}
         self._validate(record_count_map[level])
-
-
-class ImportanceFormat(_MultiColumnNumericFormat):
-    pass
 
 
 ImportanceDirectoryFormat = model.SingleFileDirectoryFormat(
