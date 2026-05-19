@@ -524,14 +524,6 @@ SequenceCharacteristicsDirectoryFormat = model.SingleFileDirectoryFormat(
 )
 
 
-def _validate_file_not_empty(has_data):
-    """Validate that a delimited text format contains at least one record."""
-    if not has_data:
-        raise ValidationError(
-            "There must be at least one data record present in the "
-            "file in addition to the header line.")
-
-
 class ImportanceFormat(model.TextFileFormat):
     def _validate(self, n_records=None):
         """Validate rows with an identifier followed by numeric values."""
@@ -563,7 +555,10 @@ class ImportanceFormat(model.TextFileFormat):
                 if n_records is not None and (line_number - 1) >= n_records:
                     break
 
-            _validate_file_not_empty(has_data)
+            if not has_data:
+                raise ValidationError(
+                    "There must be at least one data record present in the "
+                    "file in addition to the header line.")
 
     def _validate_(self, level):
         """Validate this format using QIIME 2's min or max validation level."""
