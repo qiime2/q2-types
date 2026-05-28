@@ -25,7 +25,11 @@ def _read_alpha_diversity(fh):
     # casting of columns adapted from SO post:
     # https://stackoverflow.com/a/36814203/3424666
     cols = df.columns
-    df[cols] = df[cols].apply(pd.to_numeric, errors='ignore')
+    for col in cols:
+        try:
+            df[col] = df[col].apply(pd.to_numeric)
+        except ValueError:
+            pass
     return df
 
 

@@ -350,7 +350,8 @@ class TestDataframeToJsonlTypeHandling(TestPluginBase):
             self.df,
             'datetime_column',
             pd.to_datetime(
-                pd.Series(['00:00:00', '17:00:00', '00:00:00'])
+                pd.Series(['00:00:00', '17:00:00', '00:00:00']),
+                format='%H:%M:%S'
             ).dt.time
         )
 
