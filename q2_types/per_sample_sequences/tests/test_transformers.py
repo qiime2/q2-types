@@ -13,6 +13,7 @@ import os
 import io
 import shutil
 import string
+import warnings
 
 import skbio
 import yaml
@@ -370,6 +371,18 @@ class TestTransformers(TestPluginBase):
 
 class TestFastqManifestTransformers(TestPluginBase):
     package = "q2_types.per_sample_sequences.tests"
+
+    def setUp(self):
+        super().setUp()
+        warnings.filterwarnings(
+            'ignore',
+            message='Importing of PHRED 64 data is slow.*',
+            category=UserWarning
+        )
+
+    def tearDown(self):
+        super().tearDown()
+        warnings.resetwarnings()
 
     def test_single_end_fastq_manifest_phred33_to_slpssefdf(self):
         format_ = SingleEndFastqManifestPhred33
@@ -1136,6 +1149,16 @@ class TestFastqManifestV2Transformers(TestPluginBase):
             "Peanut-Eyeball,Peanut-Eyeball_1_L001_R1_001.fastq.gz,forward\n"
             "Human-Kneecap,Human-Kneecap_2_L001_R2_001.fastq.gz,reverse\n"
             "Peanut-Eyeball,Peanut-Eyeball_3_L001_R2_001.fastq.gz,reverse\n")
+
+        warnings.filterwarnings(
+            'ignore',
+            message='Importing of PHRED 64 data is slow.*',
+            category=UserWarning
+        )
+
+    def tearDown(self):
+        super().tearDown()
+        warnings.resetwarnings()
 
     def template_manifest(self, filepath, ctx):
         with open(filepath) as fh:

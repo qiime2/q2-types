@@ -10,6 +10,7 @@ import unittest
 import os
 import string
 import tempfile
+import warnings
 
 import pandas as pd
 import pandas.testing as pdt
@@ -109,6 +110,16 @@ class TestFastqManifestV2Transformers(TestPluginBase):
             "Peanut-Eyeball,Peanut-Eyeball_1_L001_R1_001.fastq.gz,forward\n"
             "Human-Kneecap,Human-Kneecap_2_L001_R2_001.fastq.gz,reverse\n"
             "Peanut-Eyeball,Peanut-Eyeball_3_L001_R2_001.fastq.gz,reverse\n")
+
+        warnings.filterwarnings(
+            'ignore',
+            message='Importing of PHRED 64 data is slow.*',
+            category=UserWarning
+        )
+
+    def tearDown(self):
+        super().tearDown()
+        warnings.resetwarnings()
 
     def template_manifest(self, filepath, ctx):
         with open(filepath) as fh:

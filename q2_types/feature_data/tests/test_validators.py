@@ -22,6 +22,7 @@ class TestTypes(TestPluginBase):
 
     def test_validate_sequence_characteristics_length_not_numerical(self):
         data = self._setup_df()
+        data = data.astype({'length': 'object'})
         data.loc[1, 'length'] = 'a'
         self._assert_validation_error(data, 'Values in column "length" have '
                                             'to be numerical.')
