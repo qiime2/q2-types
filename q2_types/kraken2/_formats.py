@@ -135,7 +135,7 @@ class Kraken2OutputFormat(model.TextFileFormat):
         return df, self.COLUMNS
 
     def _validate_(self, level):
-        df = pd.read_csv(self.path, sep='\t', header=None)
+        df = pd.read_csv(self.path, sep='\t', header=None, nrows=100)
         if df.shape[1] != 5:
             raise ValidationError(
                 f'Expected 5 columns in the Kraken2 output file but '
