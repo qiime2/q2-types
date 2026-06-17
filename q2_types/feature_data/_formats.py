@@ -174,8 +174,8 @@ class FASTAFormat(model.TextFileFormat):
         max_lines = level_map[level]
 
         with self.path.open('rb') as fh:
-            num_seqs = 0
             try:
+                num_seqs = 0
                 first = fh.read(6)
                 if first[:3] == b'\xEF\xBB\xBF':
                     first = first[3:]
