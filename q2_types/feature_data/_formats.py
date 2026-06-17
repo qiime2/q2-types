@@ -156,20 +156,12 @@ class FASTAFormat(model.TextFileFormat):
         super().__init__(*args, **kwargs)
         self.aligned = False
         self.alphabet = None
+        self.one_sequence = False
 
     def _validate_(self, level):
         FASTAValidator, ValidationSet = _construct_validator_from_alphabet(
             self.alphabet)
         self._validate_FASTA(level, FASTAValidator, ValidationSet)
-
-    def _validate_line_lengths(
-            self, seq_len, prev_seq_len, prev_seq_start_line):
-        if prev_seq_len != seq_len:
-            raise ValidationError('The sequence starting on line '
-                                  f'{prev_seq_start_line} was length '
-                                  f'{prev_seq_len}. All previous sequences '
-                                  f'were length {seq_len}. All sequences must '
-                                  'be the same length for AlignedFASTAFormat.')
 
     def _validate_FASTA(self, level, FASTAValidator=None, ValidationSet=None):
         last_line_was_ID = False
@@ -183,6 +175,7 @@ class FASTAFormat(model.TextFileFormat):
         max_lines = level_map[level]
 
         with self.path.open('rb') as fh:
+            num_seqs = 0
             try:
                 first = fh.read(6)
                 if first[:3] == b'\xEF\xBB\xBF':
@@ -205,6 +198,7 @@ class FASTAFormat(model.TextFileFormat):
                     line = line.decode('utf-8-sig')
 
                     if line.startswith('>'):
+                        num_seqs += 1
                         if FASTAValidator and ValidationSet:
                             if seq_len == 0:
                                 seq_len = prev_seq_len
@@ -267,7 +261,9 @@ class FASTAFormat(model.TextFileFormat):
                 raise ValidationError(f'utf-8 cannot decode byte on line '
                                       f'{line_number}') from e
 
-        if self.aligned:
+        self.one_sequence = num_seqs == 1
+
+        if self.aligned and not self.one_sequence:
             self._validate_line_lengths(
                 seq_len, prev_seq_len, prev_seq_start_line)
 
