@@ -156,7 +156,6 @@ class FASTAFormat(model.TextFileFormat):
         super().__init__(*args, **kwargs)
         self.aligned = False
         self.alphabet = None
-        self.one_sequence = False
 
     def _validate_(self, level):
         FASTAValidator, ValidationSet = _construct_validator_from_alphabet(
@@ -261,9 +260,7 @@ class FASTAFormat(model.TextFileFormat):
                 raise ValidationError(f'utf-8 cannot decode byte on line '
                                       f'{line_number}') from e
 
-        self.one_sequence = num_seqs == 1
-
-        if self.aligned and not self.one_sequence:
+        if self.aligned and num_seqs > 1:
             self._validate_line_lengths(
                 seq_len, prev_seq_len, prev_seq_start_line)
 
