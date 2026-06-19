@@ -1,6 +1,0 @@
-#SampleID
-one
-two
-buckle
-my
-shoe

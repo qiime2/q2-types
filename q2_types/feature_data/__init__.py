@@ -28,14 +28,12 @@ from ._formats import (
     MixedCaseAlignedRNAFASTAFormat,
     MixedCaseAlignedRNASequencesDirectoryFormat,
     SequenceCharacteristicsDirectoryFormat,
-    SequenceCharacteristicsFormat, ImportanceFormat,
-    ImportanceDirectoryFormat)
+    SequenceCharacteristicsFormat)
 from ._types import (
     FeatureData, Taxonomy, Sequence, LinkedSequence, PairedEndSequence,
     AlignedSequence,
     Differential, ProteinSequence, AlignedProteinSequence, RNASequence,
-    AlignedRNASequence, PairedEndRNASequence, BLAST6,
-    SequenceCharacteristics, Importance)
+    AlignedRNASequence, PairedEndRNASequence, BLAST6, SequenceCharacteristics)
 from ._objects import (
     NucleicAcidIterator, DNAIterator, PairedDNAIterator, AlignedDNAIterator,
     ProteinIterator, AlignedProteinIterator, RNAIterator, AlignedRNAIterator,
@@ -74,6 +72,5 @@ __all__ = [
     'MixedCaseProteinSequencesDirectoryFormat',
     'MixedCaseAlignedProteinSequencesDirectoryFormat',
     'SequenceCharacteristics', 'SequenceCharacteristicsDirectoryFormat',
-    'SequenceCharacteristicsFormat', 'Importance', 'ImportanceFormat',
-    'ImportanceDirectoryFormat',
+    'SequenceCharacteristicsFormat',
 ]
