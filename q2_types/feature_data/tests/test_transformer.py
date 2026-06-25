@@ -608,6 +608,52 @@ class TestDNAFASTAFormatTransformers(TestPluginBase):
         self.assertEqual([seq.metadata['id'] for seq in obs], ['id1'])
         self.assertEqual([str(seq) for seq in obs], ['ACGT ACGT'])
 
+    def test_linked_dna_nucleotide_methods(self):
+        seq = LinkedDNA('ACGN ACGT', metadata={'id': 'id1'})
+
+        complement = seq.complement()
+        reverse_complement = seq.reverse_complement()
+
+        self.assertIs(type(complement), LinkedDNA)
+        self.assertIs(type(reverse_complement), LinkedDNA)
+        self.assertEqual(str(complement), 'TGCN TGCA')
+        self.assertEqual(str(reverse_complement), 'ACGT NCGT')
+        self.assertEqual(seq.gc_frequency(), 4)
+        with self.assertRaisesRegex(TypeError, 'different semantics'):
+            seq.gc_frequency(relative=True)
+        with self.assertRaisesRegex(TypeError, 'different semantics'):
+            seq.gc_content()
+
+    def test_linked_dna_grammared_sequence_methods(self):
+        seq = LinkedDNA('ACGN ACGT', metadata={'id': 'id1'})
+
+        self.assertTrue(seq.has_definites())
+        self.assertTrue(seq.has_degenerates())
+        self.assertEqual(
+            seq.definites().tolist(),
+            [True, True, True, False, False, True, True, True, True]
+        )
+        self.assertEqual(
+            seq.degenerates().tolist(),
+            [False, False, False, True, False, False, False, False, False]
+        )
+        self.assertEqual(
+            seq.nondegenerates().tolist(),
+            [True, True, True, False, False, True, True, True, True]
+        )
+
+        regex = seq.to_regex()
+        self.assertIsNotNone(regex.fullmatch('ACGA ACGT'))
+        self.assertIsNotNone(regex.fullmatch('ACGC ACGT'))
+        self.assertIsNone(regex.fullmatch('ACGX ACGT'))
+
+        expansions = list(seq.expand_degenerates())
+        self.assertTrue(all(type(seq) is LinkedDNA for seq in expansions))
+        self.assertCountEqual(
+            [str(seq) for seq in expansions],
+            ['ACGT ACGT', 'ACGC ACGT', 'ACGG ACGT', 'ACGA ACGT']
+        )
+
     def test_linked_dnafasta_format_to_series(self):
         '''
         Tests the LinkedDNAFASTAFormat -> pd.Series transformation.
