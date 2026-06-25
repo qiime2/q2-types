@@ -39,7 +39,8 @@ from ._types import (
 from ._objects import (
     NucleicAcidIterator, DNAIterator, PairedDNAIterator, AlignedDNAIterator,
     ProteinIterator, AlignedProteinIterator, RNAIterator, AlignedRNAIterator,
-    PairedRNAIterator)
+    PairedRNAIterator, LinkedDNA
+)
 
 __all__ = [
     'TaxonomyFormat', 'TaxonomyDirectoryFormat', 'HeaderlessTSVTaxonomyFormat',
@@ -75,5 +76,5 @@ __all__ = [
     'MixedCaseAlignedProteinSequencesDirectoryFormat',
     'SequenceCharacteristics', 'SequenceCharacteristicsDirectoryFormat',
     'SequenceCharacteristicsFormat', 'Importance', 'ImportanceFormat',
-    'ImportanceDirectoryFormat',
+    'ImportanceDirectoryFormat', 'LinkedDNA',
 ]

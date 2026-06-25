@@ -29,7 +29,7 @@ from .. import (
     SequenceCharacteristicsFormat, ImportanceFormat,
     DNAIterator, PairedDNAIterator, AlignedDNAIterator,
     ProteinIterator, AlignedProteinIterator, RNAIterator, AlignedRNAIterator,
-    PairedRNAIterator
+    PairedRNAIterator, LinkedDNA,
 )
 
 from ...plugin_setup import plugin
@@ -340,7 +340,7 @@ def _read_linked_from_fasta(path):
     return skbio.read(
         path,
         format='fasta',
-        constructor=skbio.Sequence,
+        constructor=LinkedDNA,
         lowercase=False,
         keep_spaces=True
     )
@@ -393,7 +393,7 @@ def _234(data: pd.Series) -> LinkedDNAFASTAFormat:
     ff = LinkedDNAFASTAFormat()
     with ff.open() as fh:
         for id_, seq in data.items():
-            sequence = skbio.Sequence(
+            sequence = LinkedDNA(
                 str(seq), metadata={'id': id_}, lowercase=False
             )
             skbio.io.write(sequence, format='fasta', into=fh)
