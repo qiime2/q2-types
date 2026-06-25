@@ -30,7 +30,7 @@ from q2_types.feature_data import (
     RNAIterator, AlignedRNAIterator, BLAST6Format, MixedCaseDNAFASTAFormat,
     MixedCaseRNAFASTAFormat, MixedCaseAlignedDNAFASTAFormat,
     MixedCaseAlignedRNAFASTAFormat,
-    SequenceCharacteristicsFormat, ImportanceFormat
+    SequenceCharacteristicsFormat, ImportanceFormat, LinkedDNA,
 )
 from q2_types.feature_data._deferred_setup._transformers import (
     _taxonomy_formats_to_dataframe, _dataframe_to_tsv_taxonomy_format,
@@ -577,7 +577,7 @@ class TestDNAFASTAFormatTransformers(TestPluginBase):
 
         self.assertEqual([seq.metadata['id'] for seq in obs], ['id1', 'id2'])
         self.assertEqual([str(seq) for seq in obs], ['ACGT ACGT', 'ACGT'])
-        self.assertTrue(all(type(seq) is skbio.Sequence for seq in obs))
+        self.assertTrue(all(type(seq) is LinkedDNA for seq in obs))
 
     def test_dna_iterator_to_linked_dna_fasta_format(self):
         transformer = self.get_transformer(DNAIterator, LinkedDNAFASTAFormat)
@@ -595,6 +595,18 @@ class TestDNAFASTAFormatTransformers(TestPluginBase):
             [seq.metadata['id'] for seq in reread], ['id1', 'id2']
         )
         self.assertEqual([str(seq) for seq in reread], ['ACGT ACGT', 'ACGT'])
+
+    def test_linked_dna_write_roundtrip_preserves_spaces(self):
+        filepath = os.path.join(self.temp_dir.name, 'linked-dna.fasta')
+        input = LinkedDNA('ACGT ACGT', metadata={'id': 'id1'})
+
+        with open(filepath, 'w') as fh:
+            skbio.io.write(input, format='fasta', into=fh)
+
+        obs = list(_read_linked_from_fasta(filepath))
+
+        self.assertEqual([seq.metadata['id'] for seq in obs], ['id1'])
+        self.assertEqual([str(seq) for seq in obs], ['ACGT ACGT'])
 
     def test_linked_dnafasta_format_to_series(self):
         '''
