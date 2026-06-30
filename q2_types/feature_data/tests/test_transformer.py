@@ -19,6 +19,7 @@ import skbio
 import qiime2
 from qiime2.plugin.testing import TestPluginBase
 
+from q2_types._util import read_from_fasta
 from q2_types.feature_table import BIOMV210Format
 from q2_types.feature_data import (
     TaxonomyFormat, HeaderlessTSVTaxonomyFormat, TSVTaxonomyFormat,
@@ -34,7 +35,6 @@ from q2_types.feature_data import (
 )
 from q2_types.feature_data._deferred_setup._transformers import (
     _taxonomy_formats_to_dataframe, _dataframe_to_tsv_taxonomy_format,
-    _read_linked_from_fasta,
 )
 
 
@@ -589,7 +589,9 @@ class TestDNAFASTAFormatTransformers(TestPluginBase):
         obs = transformer(input)
         self.assertIsInstance(obs, LinkedDNAFASTAFormat)
 
-        reread = list(_read_linked_from_fasta(str(obs)))
+        reread = list(
+            read_from_fasta(str(obs), LinkedDNA, keep_spaces=True)
+        )
 
         self.assertEqual(
             [seq.metadata['id'] for seq in reread], ['id1', 'id2']
@@ -603,7 +605,7 @@ class TestDNAFASTAFormatTransformers(TestPluginBase):
         with open(filepath, 'w') as fh:
             skbio.io.write(input, format='fasta', into=fh)
 
-        obs = list(_read_linked_from_fasta(filepath))
+        obs = list(read_from_fasta(filepath, LinkedDNA, keep_spaces=True))
 
         self.assertEqual([seq.metadata['id'] for seq in obs], ['id1'])
         self.assertEqual([str(seq) for seq in obs], ['ACGT ACGT'])
@@ -684,7 +686,9 @@ class TestDNAFASTAFormatTransformers(TestPluginBase):
         obs = transformer(input)
 
         self.assertIsInstance(obs, LinkedDNAFASTAFormat)
-        reread = list(_read_linked_from_fasta(str(obs)))
+        reread = list(
+            read_from_fasta(str(obs), LinkedDNA, keep_spaces=True)
+        )
         self.assertEqual(
             [seq.metadata['id'] for seq in reread], ['id1', 'id2']
         )

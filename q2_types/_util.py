@@ -24,15 +24,18 @@ from qiime2.util import duplicate
 DirFmt = TypeVar("DirFmt", bound=model.DirectoryFormat)
 
 
-def read_from_fasta(path, constructor=skbio.DNA, lowercase=False):
+def read_from_fasta(path, constructor=skbio.DNA, lowercase=False,
+                    keep_spaces=False):
     return skbio.read(path, format='fasta', constructor=constructor,
-                      lowercase=lowercase)
+                      lowercase=lowercase, keep_spaces=keep_spaces)
 
 
-def fasta_to_series(ff, constructor=skbio.DNA, lowercase=False):
+def fasta_to_series(ff, constructor=skbio.DNA, lowercase=False,
+                    keep_spaces=False):
     data = {}
     for sequence in read_from_fasta(str(ff), constructor,
-                                    lowercase=lowercase):
+                                    lowercase=lowercase,
+                                    keep_spaces=keep_spaces):
         id_ = sequence.metadata['id']
         # this may no longer do anything b/c of format validation, but leaving
         # here as a safeguard & we may want to examine/address later
