@@ -23,8 +23,8 @@ from q2_types._util import read_from_fasta
 from q2_types.feature_table import BIOMV210Format
 from q2_types.feature_data import (
     TaxonomyFormat, HeaderlessTSVTaxonomyFormat, TSVTaxonomyFormat,
-    DNAFASTAFormat, LinkedDNAFASTAFormat, DNAIterator, PairedDNAIterator,
-    ProteinIterator, AlignedProteinIterator,
+    FASTAFormat, DNAFASTAFormat, LinkedDNAFASTAFormat, DNAIterator,
+    PairedDNAIterator, ProteinIterator, AlignedProteinIterator,
     PairedDNASequencesDirectoryFormat, AlignedDNAFASTAFormat,
     DifferentialFormat, AlignedDNAIterator, ProteinFASTAFormat,
     AlignedProteinFASTAFormat, RNAFASTAFormat, AlignedRNAFASTAFormat,
@@ -564,6 +564,17 @@ class TestDNAFASTAFormatTransformers(TestPluginBase):
         for act, exp in zip(obs, input):
             self.assertEqual(act, exp)
 
+    def test_dna_fasta_format_to_fasta_format(self):
+        transformer = self.get_transformer(DNAFASTAFormat, FASTAFormat)
+        filepath = self.get_data_path('dna-sequences.fasta')
+        input = DNAFASTAFormat(filepath, mode='r')
+
+        obs = transformer(input)
+
+        self.assertIsInstance(obs, FASTAFormat)
+        obs.validate()
+        self.assertTrue(filecmp.cmp(str(input), str(obs), shallow=False))
+
     def test_linked_dna_fasta_format_to_dna_iterator(self):
         filepath = os.path.join(self.temp_dir.name, 'linked-dna.fasta')
         with open(filepath, 'w') as fh:
@@ -609,6 +620,22 @@ class TestDNAFASTAFormatTransformers(TestPluginBase):
 
         self.assertEqual([seq.metadata['id'] for seq in obs], ['id1'])
         self.assertEqual([str(seq) for seq in obs], ['ACGT ACGT'])
+
+    def test_linked_dna_fasta_format_to_fasta_format(self):
+        transformer = self.get_transformer(LinkedDNAFASTAFormat, FASTAFormat)
+        filepath = os.path.join(self.temp_dir.name, 'linked-dna.fasta')
+        with open(filepath, 'w') as fh:
+            fh.write('>id1\n')
+            fh.write('ACGT ACGT\n')
+            fh.write('>id2\n')
+            fh.write('ACGT\n')
+        input = LinkedDNAFASTAFormat(filepath, mode='r')
+
+        obs = transformer(input)
+
+        self.assertIsInstance(obs, FASTAFormat)
+        obs.validate()
+        self.assertTrue(filecmp.cmp(str(input), str(obs), shallow=False))
 
     def test_linked_dna_nucleotide_methods(self):
         seq = LinkedDNA('ACGN ACGT', metadata={'id': 'id1'})

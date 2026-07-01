@@ -7,6 +7,7 @@
 # ----------------------------------------------------------------------------
 
 from itertools import zip_longest
+import os
 
 import pandas as pd
 import biom
@@ -14,14 +15,16 @@ import skbio
 import numpy as np
 
 import qiime2
+from qiime2.util import duplicate
 
 from q2_types.feature_table import BIOMV210Format
 from q2_types._util import fasta_to_series, read_from_fasta
 
 from .. import (
     TaxonomyFormat, HeaderlessTSVTaxonomyFormat, TSVTaxonomyFormat,
-    DNAFASTAFormat, LinkedDNAFASTAFormat, PairedDNASequencesDirectoryFormat,
-    AlignedDNAFASTAFormat, DifferentialFormat, ProteinFASTAFormat,
+    FASTAFormat, DNAFASTAFormat, LinkedDNAFASTAFormat,
+    PairedDNASequencesDirectoryFormat, AlignedDNAFASTAFormat,
+    DifferentialFormat, ProteinFASTAFormat,
     AlignedProteinFASTAFormat, RNAFASTAFormat,
     AlignedRNAFASTAFormat, PairedRNASequencesDirectoryFormat,
     BLAST6Format, MixedCaseDNAFASTAFormat, MixedCaseRNAFASTAFormat,
@@ -337,6 +340,13 @@ def _series_to_fasta_format(ff, data, sequence_type="DNA", lowercase=False):
 
 
 # DNA Transformers
+def _copy_to_fasta_format(ff):
+    result = FASTAFormat()
+    os.remove(str(result))
+    duplicate(str(ff), str(result))
+    return result
+
+
 @plugin.register_transformer
 def _9(ff: DNAFASTAFormat) -> DNAIterator:
     generator = read_from_fasta(str(ff), skbio.DNA)
@@ -351,6 +361,11 @@ def _10(data: DNAIterator) -> DNAFASTAFormat:
 
 
 @plugin.register_transformer
+def _235(ff: DNAFASTAFormat) -> FASTAFormat:
+    return _copy_to_fasta_format(ff)
+
+
+@plugin.register_transformer
 def _231(ff: LinkedDNAFASTAFormat) -> DNAIterator:
     generator = read_from_fasta(str(ff), LinkedDNA, keep_spaces=True)
     return DNAIterator(generator)
@@ -361,6 +376,11 @@ def _232(data: DNAIterator) -> LinkedDNAFASTAFormat:
     ff = LinkedDNAFASTAFormat()
     skbio.io.write(iter(data), format='fasta', into=str(ff))
     return ff
+
+
+@plugin.register_transformer
+def _236(ff: LinkedDNAFASTAFormat) -> FASTAFormat:
+    return _copy_to_fasta_format(ff)
 
 
 @plugin.register_transformer
