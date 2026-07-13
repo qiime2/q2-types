@@ -121,10 +121,10 @@ plugin.methods.register_function(
 
 
 ORTHOLOGS = TypeMatch([
-    SampleData[Orthologs],
-    SampleData[Orthologs % Properties('contigs')],
-    SampleData[Orthologs % Properties('mags')],
     SampleData[Orthologs % Properties('contigs', 'mags')],
+    SampleData[Orthologs % Properties('mags')],
+    SampleData[Orthologs % Properties('contigs')],
+    SampleData[Orthologs],
 ])
 plugin.methods.register_function(
     function=q2_types.genome_data.partition_orthologs,
@@ -193,10 +193,10 @@ plugin.methods.register_function(
 )
 
 NOGS = TypeMatch([
-    GenomeData[NOG],
-    GenomeData[NOG % Properties('contigs')],
-    GenomeData[NOG % Properties('mags')],
     GenomeData[NOG % Properties('contigs', 'mags')],
+    GenomeData[NOG % Properties('mags')],
+    GenomeData[NOG % Properties('contigs')],
+    GenomeData[NOG],
 ])
 plugin.methods.register_function(
     function=q2_types.genome_data.collate_ortholog_annotations,
