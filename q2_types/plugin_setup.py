@@ -121,6 +121,7 @@ plugin.methods.register_function(
 
 
 ORTHOLOGS = TypeMatch([
+    SampleData[Orthologs],
     SampleData[Orthologs % Properties('contigs')],
     SampleData[Orthologs % Properties('mags')],
     SampleData[Orthologs % Properties('contigs', 'mags')],
@@ -192,6 +193,7 @@ plugin.methods.register_function(
 )
 
 NOGS = TypeMatch([
+    GenomeData[NOG],
     GenomeData[NOG % Properties('contigs')],
     GenomeData[NOG % Properties('mags')],
     GenomeData[NOG % Properties('contigs', 'mags')],
