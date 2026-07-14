@@ -6,7 +6,8 @@
 # The full license is in the file LICENSE, distributed with this software.
 # ----------------------------------------------------------------------------
 
-# from ._formats import ImmutableMetadataFormat, ImmutableMetadataDirectoryFormat
+# from ._formats import (ImmutableMetadataFormat,
+#                        ImmutableMetadataDirectoryFormat)
 # from ._types import ImmutableMetadata
 
 # __all__ = ['ImmutableMetadataFormat',

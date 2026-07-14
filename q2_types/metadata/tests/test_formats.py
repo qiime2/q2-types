@@ -12,7 +12,7 @@ from qiime2.plugin.testing import TestPluginBase
 from qiime2.plugin import ValidationError
 
 from q2_metadata import (ImmutableMetadataDirectoryFormat,
-                               ImmutableMetadataFormat)
+                         ImmutableMetadataFormat)
 
 
 class TestFormats(TestPluginBase):
