@@ -11,7 +11,7 @@ import shutil
 from qiime2.plugin.testing import TestPluginBase
 from qiime2.plugin import ValidationError
 
-from q2_types.metadata import (ImmutableMetadataDirectoryFormat,
+from q2_metadata import (ImmutableMetadataDirectoryFormat,
                                ImmutableMetadataFormat)
 
 
