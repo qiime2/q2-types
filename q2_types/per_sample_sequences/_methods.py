@@ -36,9 +36,10 @@ def partition_sample_data_mags(
     for i, samples in enumerate(arrays_of_mags, 1):
         result = MultiMAGSequencesDirFmt()
         all_samples = set(k for d in samples for k in d.keys())
-        manifest = pd.read_csv(mags.path / "MANIFEST", index_col=None)
-        manifest = \
-            manifest[manifest["sample-id"].astype("string").isin(all_samples)]
+        manifest = pd.read_csv(
+            mags.path / "MANIFEST", index_col=None, dtype=str
+        )
+        manifest = manifest[manifest["sample-id"].isin(all_samples)]
         manifest.to_csv(result.path / "MANIFEST", index=False)
 
         for sample_dict in samples:
