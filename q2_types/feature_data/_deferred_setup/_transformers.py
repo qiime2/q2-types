@@ -7,6 +7,7 @@
 # ----------------------------------------------------------------------------
 
 from itertools import zip_longest
+import os
 
 import pandas as pd
 import biom
@@ -14,14 +15,16 @@ import skbio
 import numpy as np
 
 import qiime2
+from qiime2.util import duplicate
 
 from q2_types.feature_table import BIOMV210Format
 from q2_types._util import fasta_to_series, read_from_fasta
 
 from .. import (
     TaxonomyFormat, HeaderlessTSVTaxonomyFormat, TSVTaxonomyFormat,
-    DNAFASTAFormat, LinkedDNAFASTAFormat, PairedDNASequencesDirectoryFormat,
-    AlignedDNAFASTAFormat, DifferentialFormat, ProteinFASTAFormat,
+    FASTAFormat, DNAFASTAFormat, LinkedDNAFASTAFormat,
+    PairedDNASequencesDirectoryFormat, AlignedDNAFASTAFormat,
+    DifferentialFormat, ProteinFASTAFormat,
     AlignedProteinFASTAFormat, RNAFASTAFormat,
     AlignedRNAFASTAFormat, PairedRNASequencesDirectoryFormat,
     BLAST6Format, MixedCaseDNAFASTAFormat, MixedCaseRNAFASTAFormat,
@@ -29,7 +32,7 @@ from .. import (
     SequenceCharacteristicsFormat, ImportanceFormat,
     DNAIterator, PairedDNAIterator, AlignedDNAIterator,
     ProteinIterator, AlignedProteinIterator, RNAIterator, AlignedRNAIterator,
-    PairedRNAIterator
+    PairedRNAIterator, LinkedDNA,
 )
 
 from ...plugin_setup import plugin
@@ -336,17 +339,14 @@ def _series_to_fasta_format(ff, data, sequence_type="DNA", lowercase=False):
             skbio.io.write(sequence, format='fasta', into=f)
 
 
-def _read_linked_from_fasta(path):
-    return skbio.read(
-        path,
-        format='fasta',
-        constructor=skbio.Sequence,
-        lowercase=False,
-        keep_spaces=True
-    )
-
-
 # DNA Transformers
+def _copy_to_fasta_format(ff):
+    result = FASTAFormat()
+    os.remove(str(result))
+    duplicate(str(ff), str(result))
+    return result
+
+
 @plugin.register_transformer
 def _9(ff: DNAFASTAFormat) -> DNAIterator:
     generator = read_from_fasta(str(ff), skbio.DNA)
@@ -361,8 +361,13 @@ def _10(data: DNAIterator) -> DNAFASTAFormat:
 
 
 @plugin.register_transformer
+def _235(ff: DNAFASTAFormat) -> FASTAFormat:
+    return _copy_to_fasta_format(ff)
+
+
+@plugin.register_transformer
 def _231(ff: LinkedDNAFASTAFormat) -> DNAIterator:
-    generator = _read_linked_from_fasta(str(ff))
+    generator = read_from_fasta(str(ff), LinkedDNA, keep_spaces=True)
     return DNAIterator(generator)
 
 
@@ -374,18 +379,13 @@ def _232(data: DNAIterator) -> LinkedDNAFASTAFormat:
 
 
 @plugin.register_transformer
-def _233(ff: LinkedDNAFASTAFormat) -> pd.Series:
-    data = {}
-    for sequence in _read_linked_from_fasta(str(ff)):
-        id_ = sequence.metadata['id']
-        if id_ in data:
-            raise ValueError(
-                "FASTA format sequence IDs must be unique. The following ID "
-                f"was found more than once: {id_}."
-            )
-        data[id_] = sequence
+def _236(ff: LinkedDNAFASTAFormat) -> FASTAFormat:
+    return _copy_to_fasta_format(ff)
 
-    return pd.Series(data)
+
+@plugin.register_transformer
+def _233(ff: LinkedDNAFASTAFormat) -> pd.Series:
+    return fasta_to_series(ff, LinkedDNA, keep_spaces=True)
 
 
 @plugin.register_transformer
@@ -393,7 +393,7 @@ def _234(data: pd.Series) -> LinkedDNAFASTAFormat:
     ff = LinkedDNAFASTAFormat()
     with ff.open() as fh:
         for id_, seq in data.items():
-            sequence = skbio.Sequence(
+            sequence = LinkedDNA(
                 str(seq), metadata={'id': id_}, lowercase=False
             )
             skbio.io.write(sequence, format='fasta', into=fh)
