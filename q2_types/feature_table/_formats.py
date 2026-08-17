@@ -92,3 +92,14 @@ BIOMV100DirFmt = model.SingleFileDirectoryFormat('BIOMV100DirFmt',
 BIOMV210DirFmt = model.SingleFileDirectoryFormat('BIOMV210DirFmt',
                                                  'feature-table.biom',
                                                  BIOMV210Format)
+
+
+class BIOMV210MultiDirFmt(model.DirectoryFormat):
+    resampled_table_regex=rf'resampled-table-[\w+-.~].biom'
+    resampled_tables = model.FileCollection(
+        resampled_table_regex, format=BIOMV210Format
+    )
+
+    @resampled_tables.set_path_maker
+    def resampled_tables_path_maker(self, key):
+        return rf'resampled-table-{key}.biom'

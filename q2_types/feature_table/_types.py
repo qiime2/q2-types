@@ -37,3 +37,5 @@ Normalized = SemanticType('Normalized',
 
 Unconstrained = SemanticType('Unconstrained',
                              variant_of=FeatureTable.field['content'])
+
+Resampled = SemanticType('Resampled', variant_of=FeatureTable.field['content'])

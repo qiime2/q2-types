@@ -13,16 +13,17 @@ import biom
 from qiime2.plugin import Citations
 
 from .. import (BIOMV100Format, BIOMV210Format, BIOMV100DirFmt,
-                BIOMV210DirFmt, FeatureTable, Frequency, RelativeFrequency,
-                PresenceAbsence, Composition, Balance,
-                PercentileNormalized, Design, Normalized, Unconstrained)
+                BIOMV210DirFmt, BIOMV210MultiDirFmt, FeatureTable, Frequency,
+                RelativeFrequency, PresenceAbsence, Composition, Balance,
+                PercentileNormalized, Design, Normalized, Unconstrained,
+                Resampled)
 
 from ...plugin_setup import plugin
 
 citations = Citations.load('citations.bib', package='q2_types.feature_table')
 
 plugin.register_views(BIOMV100Format, BIOMV210Format, BIOMV100DirFmt,
-                      BIOMV210DirFmt, biom.Table,
+                      BIOMV210DirFmt, BIOMV210MultiDirFmt, biom.Table,
                       citations=[citations['mcdonald2012biological']])
 
 plugin.register_semantic_types(FeatureTable, Frequency, RelativeFrequency,
@@ -88,5 +89,10 @@ plugin.register_artifact_class(
     description="A feature table containing real-valued feature "
                 "measurements represented in Euclidean space without "
                 "constant-sum (compositional) constraints."
+)
+plugin.register_artifact_class(
+    FeatureTable[Resampled],
+    directory_format=BIOMV210MultiDirFmt,
+    description="A collection of resampled feature tables"
 )
 importlib.import_module('._transformers', __name__)
