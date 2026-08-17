@@ -95,7 +95,7 @@ BIOMV210DirFmt = model.SingleFileDirectoryFormat('BIOMV210DirFmt',
 
 
 class BIOMV210MultiDirFmt(model.DirectoryFormat):
-    resampled_table_regex=rf'resampled-table-[\w+-.~].biom'
+    resampled_table_regex = r'resampled-table-[\w+-.~].biom'
     resampled_tables = model.FileCollection(
         resampled_table_regex, format=BIOMV210Format
     )
