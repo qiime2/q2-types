@@ -500,7 +500,8 @@ class QIIME1DemuxFormat(model.TextFileFormat):
 
 
 QIIME1DemuxDirFmt = model.SingleFileDirectoryFormat(
-    'QIIME1DemuxDirFmt', 'seqs.fna', QIIME1DemuxFormat)
+    'QIIME1DemuxDirFmt', 'seqs.fna', QIIME1DemuxFormat, True
+)
 
 
 # TODO: that's a copy of the _FastqManifestBase from q2-types
@@ -650,7 +651,8 @@ class MultiMAGSequencesDirFmt(MultiFASTADirectoryFormat):
 
 
 class MultiBowtie2IndexDirFmt(MultiDirValidationMixin, Bowtie2IndexDirFmt):
-    pass
+    def __init__(self, path=None, mode='w'):
+        super().__init__(path, mode, True)
 
 
 class ContigSequencesDirFmt(model.DirectoryFormat):
