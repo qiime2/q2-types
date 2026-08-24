@@ -90,9 +90,16 @@ plugin.register_artifact_class(
                 "measurements represented in Euclidean space without "
                 "constant-sum (compositional) constraints."
 )
+# We need this to be called something other than FeatureTable[Resampled]
+#
+# We need to handle groups of resampled
+#
+# 1. SampleData[AlphaDiversity]
+# 2. DistanceMatrix
+# 3. FeatureTable[Frequency]
 plugin.register_artifact_class(
-    FeatureTable[Resampled],
+    Resampled[FeatureTable[Frequency]],
     directory_format=BIOMV210MultiDirFmt,
-    description="A collection of resampled feature tables"
+    description="Resampled FeatureTables in one Artifact"
 )
 importlib.import_module('._transformers', __name__)

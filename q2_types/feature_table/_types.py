@@ -8,8 +8,12 @@
 
 from qiime2.plugin import SemanticType
 
+Resampled = SemanticType('Resampled', field_names='content')
 
-FeatureTable = SemanticType('FeatureTable', field_names='content')
+FeatureTable = SemanticType(
+    'FeatureTable', field_names='content',
+    variant_of=Resampled.field['content']
+)
 
 Frequency = SemanticType('Frequency', variant_of=FeatureTable.field['content'])
 
@@ -37,5 +41,3 @@ Normalized = SemanticType('Normalized',
 
 Unconstrained = SemanticType('Unconstrained',
                              variant_of=FeatureTable.field['content'])
-
-Resampled = SemanticType('Resampled', variant_of=FeatureTable.field['content'])
