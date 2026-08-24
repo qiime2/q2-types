@@ -12,7 +12,7 @@ import biom
 import pandas as pd
 import qiime2
 
-from .. import BIOMV100Format, BIOMV210Format
+from .. import BIOMV100Format, BIOMV210Format, BIOMV210MultiDirFmt
 from ...plugin_setup import plugin
 
 # NOTE: In the readers and writers for BIOM v1 and v2 below, metadata must be
@@ -150,3 +150,9 @@ def _13(ff: BIOMV100Format) -> qiime2.Metadata:
 def _14(ff: BIOMV210Format) -> qiime2.Metadata:
     table = _parse_biom_table_v210(ff)
     return _table_to_metadata(table)
+
+
+@plugin.register_transformer
+def _22(infmt: dict[str, BIOMV210Format]) -> BIOMV210MultiDirFmt:
+    raise ValueError()
+    pass
