@@ -21,6 +21,7 @@ requirements:
   - biom-format {{ biom_format }}
   - ijson
   - h5py
+  - qiime2 >={{ qiime2 }}
   - rachis >={{ rachis }}
   - samtools
   - pyhmmer
@@ -37,7 +38,7 @@ test:
   - rachis >={{ rachis }}
   imports:
   - q2_types
-  - rachis.plugins.types
+  - qiime2.plugins.types
 about:
   home: https://qiime2.org
   license: BSD-3-Clause
