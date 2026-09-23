@@ -825,13 +825,18 @@ class TestMultiFormats(TestPluginBase):
 
         format.validate()
 
+    def test_contig_seqs_dirfmt_legacy(self):
+        filepath = self.get_data_path('contigs_legacy/')
+        shutil.copytree(filepath, self.temp_dir.name, dirs_exist_ok=True)
+        ContigSequencesDirFmt(self.temp_dir.name, mode='r').validate()
+
     def test_contig_seqs_dirfmt(self):
         filepath = self.get_data_path('contigs/')
         shutil.copytree(filepath, self.temp_dir.name, dirs_exist_ok=True)
         ContigSequencesDirFmt(self.temp_dir.name, mode='r').validate()
 
-    def test_contig_seqs_dirfmt_sample_dict(self):
-        filepath = self.get_data_path('contigs/')
+    def test_contig_seqs_dirfmt_sample_dict_legacy(self):
+        filepath = self.get_data_path('contigs_legacy/')
         shutil.copytree(filepath, self.temp_dir.name, dirs_exist_ok=True)
         contigs = ContigSequencesDirFmt(self.temp_dir.name, mode='r')
 
@@ -848,6 +853,27 @@ class TestMultiFormats(TestPluginBase):
             'sample1': 'sample1_contigs.fa',
             'sample2': 'sample2_contigs.fa',
             'sample3': 'sample3_contigs.fa'
+        }
+        self.assertDictEqual(obs, exp)
+
+    def test_contig_seqs_dirfmt_sample_dict(self):
+        filepath = self.get_data_path('contigs/')
+        shutil.copytree(filepath, self.temp_dir.name, dirs_exist_ok=True)
+        contigs = ContigSequencesDirFmt(self.temp_dir.name, mode='r')
+
+        obs = contigs.sample_dict()
+        exp = {
+            'sample1': str(Path(contigs.path / 'sample1.fa')),
+            'sample2': str(Path(contigs.path / 'sample2.fa')),
+            'sample3': str(Path(contigs.path / 'sample3.fa'))
+        }
+        self.assertDictEqual(obs, exp)
+
+        obs = contigs.sample_dict(relative=True)
+        exp = {
+            'sample1': 'sample1.fa',
+            'sample2': 'sample2.fa',
+            'sample3': 'sample3.fa'
         }
         self.assertDictEqual(obs, exp)
 
