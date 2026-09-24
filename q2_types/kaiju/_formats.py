@@ -20,6 +20,9 @@ class KaijuIndexFormat(model.BinaryFileFormat):
 
 
 class KaijuDBDirectoryFormat(model.DirectoryFormat):
+    def __init__(self, path=None, mode='w'):
+        super().__init__(path, mode, True)
+
     nodes = model.File(r"nodes.dmp", format=NCBITaxonomyNodesFormat)
     names = model.File(r"names.dmp", format=NCBITaxonomyNamesFormat)
     index = model.File(r"kaiju_db.+\.fmi", format=KaijuIndexFormat)

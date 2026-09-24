@@ -167,6 +167,9 @@ class Kraken2DBFormat(model.TextFileFormat):
 
 
 class Kraken2DBDirectoryFormat(model.DirectoryFormat):
+    def __init__(self, path=None, mode='w'):
+        super().__init__(path, mode, True)
+
     hash = model.File(r'hash.k2d', format=Kraken2DBFormat)
     opts = model.File(r'opts.k2d', format=Kraken2DBFormat)
     taxo = model.File(r'taxo.k2d', format=Kraken2DBFormat)
@@ -181,6 +184,9 @@ class BrackenDBFormat(model.TextFileFormat):
 
 
 class BrackenDBDirectoryFormat(model.DirectoryFormat):
+    def __init__(self, path=None, mode='w'):
+        super().__init__(path, mode, True)
+
     kmers = model.FileCollection(
         r'database(\d{2,})mers\.kmer_distrib$', format=BrackenDBFormat
     )
