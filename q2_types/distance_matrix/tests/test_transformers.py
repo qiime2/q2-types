@@ -71,6 +71,38 @@ class TestTransformers(TestPluginBase):
 
             self.assertEqual(obs, exp)
 
+    def test_lsmat_format_to_pd_data_frame(self):
+        filenames = ('distance-matrix-1x1.tsv', 'distance-matrix-2x2.tsv',
+                     'distance-matrix-NxN.tsv')
+        for filename in filenames:
+            input, obs = self.transform_format(LSMatFormat,
+                                               pd.DataFrame,
+                                               filename=filename)
+            exp = skbio.DistanceMatrix.read(str(input)).to_data_frame()
+            pd.testing.assert_frame_equal(obs, exp)
+
+    def test_pd_data_frame_to_skbio_distance_matrix(self):
+        transformer = self.get_transformer(pd.DataFrame, LSMatFormat)
+
+        filenames = ('distance-matrix-1x1.tsv', 'distance-matrix-2x2.tsv',
+                     'distance-matrix-NxN.tsv')
+        for filename in filenames:
+            input = skbio.DistanceMatrix.read(self.get_data_path(filename))
+            obs = transformer(input.to_data_frame())
+            obs = skbio.DistanceMatrix.read(str(obs))
+            exp = input
+            self.assertEqual(obs, exp)
+
+    def test_pd_data_frame_to_lsmat_format_rejects_misordered_columns(self):
+        transformer = self.get_transformer(pd.DataFrame, LSMatFormat)
+        dm = skbio.DistanceMatrix.read(
+            self.get_data_path('distance-matrix-NxN.tsv'))
+        data = dm.to_data_frame().reindex(columns=dm.ids[::-1])
+
+        with self.assertRaisesRegex(
+                ValueError, "same IDs in the same order"):
+            transformer(data)
+
 
 if __name__ == "__main__":
     unittest.main()

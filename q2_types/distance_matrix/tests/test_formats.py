@@ -32,7 +32,35 @@ class TestFormats(TestPluginBase):
         filepath = self.get_data_path('not-lsmat')
         format = LSMatFormat(filepath, mode='r')
 
-        with self.assertRaisesRegex(ValidationError, 'LSMat'):
+        with self.assertRaises(ValidationError):
+            format.validate()
+
+    def test_lsmat_format_validate_rejects_invalid_distance_matrix(self):
+        filepath = self.get_data_path('non-symmetrical-distance-matrix.tsv')
+        format = LSMatFormat(filepath, mode='r')
+
+        with self.assertRaisesRegex(ValidationError, 'symmetric'):
+            format.validate()
+
+    def test_lsmat_format_validate_rejects_nonzero_diagonal(self):
+        filepath = self.get_data_path('nonzero-diagonal-distance-matrix.tsv')
+        format = LSMatFormat(filepath, mode='r')
+
+        with self.assertRaisesRegex(ValidationError, 'hollow'):
+            format.validate()
+
+    def test_lsmat_format_validate_rejects_non_numeric_value(self):
+        filepath = self.get_data_path('non-numeric-distance-matrix.tsv')
+        format = LSMatFormat(filepath, mode='r')
+
+        with self.assertRaisesRegex(ValidationError, 'could not be read'):
+            format.validate()
+
+    def test_lsmat_format_validate_rejects_duplicate_ids(self):
+        filepath = self.get_data_path('duplicate-ids-distance-matrix.tsv')
+        format = LSMatFormat(filepath, mode='r')
+
+        with self.assertRaisesRegex(ValidationError, 'IDs must be unique'):
             format.validate()
 
     def test_distance_matrix_directory_format(self):
