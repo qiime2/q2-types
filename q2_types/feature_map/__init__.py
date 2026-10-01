@@ -14,9 +14,10 @@ from ._formats import (
 from ._types import (
     FeatureMap, MAGtoContigs, TaxonomyToContigs, FunctionToContigs
 )
+from ._methods import collate_contig_maps
 
 __all__ = [
     "FeatureMap", "MAGtoContigs", "MAGtoContigsFormat", "MAGtoContigsDirFmt",
     "TaxonomyToContigs", "FeatureMapFormat",
-    "FeatureMapDirFmt", "FunctionToContigs"
+    "FeatureMapDirFmt", "FunctionToContigs", "collate_contig_maps"
 ]
