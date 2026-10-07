@@ -13,6 +13,9 @@ import unittest
 from q2_types.distance_matrix import LSMatFormat, DistanceMatrixDirectoryFormat
 from qiime2.plugin.testing import TestPluginBase
 from qiime2.plugin import ValidationError
+from skbio.io import FileFormatError
+from skbio.stats.distance import DistanceMatrixError, PairwiseMatrixError, \
+    SymmetricMatrixError
 
 
 class TestFormats(TestPluginBase):
@@ -32,36 +35,50 @@ class TestFormats(TestPluginBase):
         filepath = self.get_data_path('not-lsmat')
         format = LSMatFormat(filepath, mode='r')
 
-        with self.assertRaises(ValidationError):
+        with self.assertRaises(ValidationError) as error:
             format.validate()
 
-    def test_lsmat_format_validate_rejects_invalid_distance_matrix(self):
+        self.assertIsInstance(error.exception.__cause__.__cause__,
+                              FileFormatError)
+
+    def test_lsmat_format_validate_rejects_non_symmetrical(self):
         filepath = self.get_data_path('non-symmetrical-distance-matrix.tsv')
         format = LSMatFormat(filepath, mode='r')
 
-        with self.assertRaisesRegex(ValidationError, 'symmetric'):
+        with self.assertRaisesRegex(ValidationError, 'symmetric') as error:
             format.validate()
+
+        self.assertIsInstance(error.exception.__cause__.__cause__,
+                              DistanceMatrixError)
 
     def test_lsmat_format_validate_rejects_nonzero_diagonal(self):
         filepath = self.get_data_path('nonzero-diagonal-distance-matrix.tsv')
         format = LSMatFormat(filepath, mode='r')
 
-        with self.assertRaisesRegex(ValidationError, 'hollow'):
+        with self.assertRaisesRegex(ValidationError, 'hollow') as error:
             format.validate()
+
+        self.assertIsInstance(error.exception.__cause__.__cause__,
+                              DistanceMatrixError)
 
     def test_lsmat_format_validate_rejects_non_numeric_value(self):
         filepath = self.get_data_path('non-numeric-distance-matrix.tsv')
         format = LSMatFormat(filepath, mode='r')
 
-        with self.assertRaisesRegex(ValidationError, 'could not be read'):
+        with self.assertRaisesRegex(ValidationError, 'could not be read') as error:
             format.validate()
+
+        self.assertIsInstance(error.exception.__cause__.__cause__, ValueError)
 
     def test_lsmat_format_validate_rejects_duplicate_ids(self):
         filepath = self.get_data_path('duplicate-ids-distance-matrix.tsv')
         format = LSMatFormat(filepath, mode='r')
 
-        with self.assertRaisesRegex(ValidationError, 'IDs must be unique'):
+        with self.assertRaisesRegex(ValidationError, 'IDs must be unique') as error:
             format.validate()
+
+        self.assertIsInstance(error.exception.__cause__.__cause__,
+                              PairwiseMatrixError)
 
     def test_distance_matrix_directory_format(self):
         # This test exists mainly to assert that the single-file directory
