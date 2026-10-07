@@ -87,10 +87,9 @@ class TestTransformers(TestPluginBase):
         filenames = ('distance-matrix-1x1.tsv', 'distance-matrix-2x2.tsv',
                      'distance-matrix-NxN.tsv')
         for filename in filenames:
-            input = skbio.DistanceMatrix.read(self.get_data_path(filename))
-            obs = transformer(input.to_data_frame())
+            exp = skbio.DistanceMatrix.read(self.get_data_path(filename))
+            obs = transformer(exp.to_data_frame())
             obs = skbio.DistanceMatrix.read(str(obs))
-            exp = input
             self.assertEqual(obs, exp)
 
     def test_pd_data_frame_to_lsmat_format_rejects_misordered_columns(self):
