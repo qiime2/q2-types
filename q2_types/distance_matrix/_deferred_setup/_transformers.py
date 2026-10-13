@@ -56,3 +56,24 @@ def _4(data: pd.Series) -> LSMatFormat:
     with ff.open() as fh:
         dm.write(fh, format='lsmat')
     return ff
+
+
+@plugin.register_transformer
+def _5(ff: LSMatFormat) -> pd.DataFrame:
+    dm = skbio.DistanceMatrix.read(str(ff), format='lsmat', verify=False)
+    return dm.to_data_frame()
+
+
+@plugin.register_transformer
+def _6(data: pd.DataFrame) -> LSMatFormat:
+    # Raise if index != columns because columns will be ignored later.
+    if not data.index.equals(data.columns):
+        raise ValueError(
+            "Distance matrix DataFrame index and columns must contain "
+            "the same IDs in the same order."
+        )
+    dm = skbio.DistanceMatrix(data, ids=data.index)
+    ff = LSMatFormat()
+    with ff.open() as fh:
+        dm.write(fh, format='lsmat')
+    return ff
