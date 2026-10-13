@@ -12,6 +12,7 @@ from skbio.stats.distance import PairwiseMatrixError
 import qiime2.plugin.model as model
 from qiime2.plugin import ValidationError
 
+
 class LSMatFormat(model.TextFileFormat):
     """An lsmat distance matrix with non-empty square float data, unique IDs,
     symmetric values, and a zero-valued diagonal.

@@ -14,8 +14,7 @@ from q2_types.distance_matrix import LSMatFormat, DistanceMatrixDirectoryFormat
 from qiime2.plugin.testing import TestPluginBase
 from qiime2.plugin import ValidationError
 from skbio.io import FileFormatError
-from skbio.stats.distance import DistanceMatrixError, PairwiseMatrixError, \
-    SymmetricMatrixError
+from skbio.stats.distance import DistanceMatrixError, PairwiseMatrixError
 
 
 class TestFormats(TestPluginBase):
@@ -65,7 +64,8 @@ class TestFormats(TestPluginBase):
         filepath = self.get_data_path('non-numeric-distance-matrix.tsv')
         format = LSMatFormat(filepath, mode='r')
 
-        with self.assertRaisesRegex(ValidationError, 'could not be read') as error:
+        with self.assertRaisesRegex(ValidationError,
+                                    'could not be read') as error:
             format.validate()
 
         self.assertIsInstance(error.exception.__cause__.__cause__, ValueError)
@@ -74,7 +74,8 @@ class TestFormats(TestPluginBase):
         filepath = self.get_data_path('duplicate-ids-distance-matrix.tsv')
         format = LSMatFormat(filepath, mode='r')
 
-        with self.assertRaisesRegex(ValidationError, 'IDs must be unique') as error:
+        with self.assertRaisesRegex(ValidationError,
+                                    'IDs must be unique') as error:
             format.validate()
 
         self.assertIsInstance(error.exception.__cause__.__cause__,
