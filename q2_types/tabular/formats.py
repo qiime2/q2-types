@@ -40,6 +40,9 @@ class TabularDataResourceDirFmt(model.DirectoryFormat):
     metadata = model.File('dataresource.json',
                           format=DataResourceSchemaFileFormat)
 
+    def __init__(self, path=None, mode='w'):
+        super().__init__(path, mode, True)
+
     def _validate_(self, level='min'):
         try:
             validate(str(self.path/'dataresource.json'))

@@ -24,6 +24,9 @@ class PressedProfileHmmsDirectoryFmt(model.DirectoryFormat):
     (the MSV filter).  The <hmmfile>.h3p file contains precomputed data
     structures for the rest of each profile.
     """
+    def __init__(self, path=None, mode='w'):
+        super().__init__(path, mode, True)
+
     h3m = model.File(r'.*\.hmm\.h3m', format=ProfileHmmBinaryFileFmt)
     h3i = model.File(r'.*\.hmm\.h3i', format=ProfileHmmBinaryFileFmt)
     h3f = model.File(r'.*\.hmm\.h3f', format=ProfileHmmBinaryFileFmt)
