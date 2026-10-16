@@ -878,6 +878,20 @@ class TestMultiFormats(TestPluginBase):
         self.assertDictEqual(obs, exp)
 
     @patch('subprocess.run', return_value=Mock(returncode=0))
+    def test_bam_dirmt_legacy(self, p):
+        filepath = self.get_data_path('bowtie/maps-legacy')
+        format = BAMDirFmt(filepath, mode='r')
+
+        format.validate()
+
+        file_dict = format.file_dict(relative=True)
+
+        assert file_dict == {
+            "sample1": "sample1_alignment.bam",
+            "sample2": "sample2_alignment.bam",
+        }
+
+    @patch('subprocess.run', return_value=Mock(returncode=0))
     def test_bam_dirmt(self, p):
         filepath = self.get_data_path('bowtie/maps-single')
         format = BAMDirFmt(filepath, mode='r')
