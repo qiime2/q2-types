@@ -696,8 +696,8 @@ class BAMFormat(model.BinaryFileFormat):
 # borrowed from q2-phylogenomics
 class BAMDirFmt(model.DirectoryFormat, FileDictMixin):
     pathspec = r'.+\.bam$'
-    suffixes = ['.bam']
-    bams = model.FileCollection(r'.+\.bam', format=BAMFormat)
+    suffixes = ['_alignment']
+    bams = model.FileCollection(pathspec, format=BAMFormat)
 
     @bams.set_path_maker
     def bams_path_maker(self, sample_id):
@@ -707,8 +707,8 @@ class BAMDirFmt(model.DirectoryFormat, FileDictMixin):
 class MultiBAMDirFmt(MultiDirValidationMixin, model.DirectoryFormat,
                      FileDictMixin):
     pathspec = r'.+\.bam$'
-    suffixes = ['.bam']
-    bams = model.FileCollection(r'.+\/.+\.bam', format=BAMFormat)
+    suffixes = ['_alignment']
+    bams = model.FileCollection(pathspec, format=BAMFormat)
 
     @bams.set_path_maker
     def bams_path_maker(self, sample_id, genome_id):
