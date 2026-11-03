@@ -1,0 +1,3 @@
+{"doctype":{"name":"table.jsonl","format":"application/x-json-lines","version":"1.0"},"direction":"row","style":"key:value","fields":[{"name":"id","type":"string","missing":false,"title":"id","description":"","extra":{}},{"name":"measure","type":"number","missing":false,"title":"measure","description":"","extra":{}}],"index":[],"title":"","description":"","extra":{}}
+{"id":"1","measure":0.5}
+{"id":"0001","measure":1.5}

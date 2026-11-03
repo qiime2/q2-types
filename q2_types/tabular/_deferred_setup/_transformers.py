@@ -428,7 +428,7 @@ def _4(obj: pd.DataFrame) -> TabularDataResourceDirFmt:
 def _5(ff: TableJSONLFileFormat) -> qiime2.Metadata:
     with ff.open() as fh:
         header = json.loads(next(fh))
-        df = pd.read_json(fh, lines=True, orient='records')
+        df = pd.read_json(fh, lines=True, orient='records', dtype=False)
         if df.empty:
             df = pd.DataFrame(columns=[
                 spec['name'] for spec in header['fields']])
