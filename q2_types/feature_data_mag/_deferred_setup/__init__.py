@@ -36,3 +36,4 @@ plugin.register_semantic_type_to_format(
 plugin.register_formats(MAGSequencesDirFmt)
 
 importlib.import_module('._transformers', __name__)
+importlib.import_module('._validators', __name__)

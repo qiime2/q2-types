@@ -30,6 +30,14 @@ def read_from_fasta(path, constructor=skbio.DNA, lowercase=False,
                       lowercase=lowercase, keep_spaces=keep_spaces)
 
 
+def iter_fasta_ids(path):
+    with open(path) as fh:
+        for line in fh:
+            if line.startswith('>'):
+                parts = line[1:].split()
+                yield parts[0] if parts else ''
+
+
 def fasta_to_series(ff, constructor=skbio.DNA, lowercase=False,
                     keep_spaces=False):
     data = {}
