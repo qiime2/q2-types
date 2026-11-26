@@ -27,7 +27,8 @@ DirFmt = TypeVar("DirFmt", bound=model.DirectoryFormat)
 def read_from_fasta(path, constructor=skbio.DNA, lowercase=False,
                     keep_spaces=False):
     return skbio.read(path, format='fasta', constructor=constructor,
-                      lowercase=lowercase, keep_spaces=keep_spaces)
+                      lowercase=lowercase, keep_spaces=keep_spaces,
+                      validate=False)
 
 
 def fasta_to_series(ff, constructor=skbio.DNA, lowercase=False,
